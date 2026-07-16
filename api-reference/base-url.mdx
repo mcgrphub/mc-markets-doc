@@ -1,0 +1,94 @@
+---
+title: "API Base URL and Environments"
+sidebarTitle: "Base URL"
+description: "Find the correct base URL for the Open API Platform production and sandbox environments, and learn how to switch between them."
+---
+
+The API is served exclusively over HTTPS on versioned URLs. Every request you make must target one of the environment base URLs listed below, followed by the API version path and the specific endpoint — for example, `https://api.example.com/v1/users`.
+
+## Environments
+
+Choose the environment that matches your use case:
+
+| Environment | Base URL                               |
+| ----------- | -------------------------------------- |
+| Production  | `https://api.example.com/v1`           |
+| Sandbox     | `https://sandbox-api.example.com/v1`   |
+
+## Using the sandbox
+
+The sandbox environment is fully functional and mirrors the production API in every way — the only differences are that data is completely isolated from production and is reset on a weekly schedule. This makes it ideal for development, testing, and CI/CD pipelines without any risk of affecting live data.
+
+To switch environments, replace the base URL in your code. No other changes to your requests or authentication headers are required.
+
+<CodeGroup>
+
+```bash cURL
+# Production
+curl https://api.example.com/v1/users \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Sandbox
+curl https://sandbox-api.example.com/v1/users \
+  -H "Authorization: Bearer YOUR_SANDBOX_API_KEY"
+```
+
+```python Python
+import os
+import requests
+
+BASE_URL = os.environ.get("API_BASE_URL", "https://api.example.com/v1")
+
+response = requests.get(
+    f"{BASE_URL}/users",
+    headers={"Authorization": f"Bearer {os.environ['API_KEY']}"},
+)
+```
+
+```javascript Node.js
+const BASE_URL = process.env.API_BASE_URL ?? "https://api.example.com/v1";
+
+const response = await fetch(`${BASE_URL}/users`, {
+  headers: {
+    Authorization: `Bearer ${process.env.API_KEY}`,
+  },
+});
+```
+
+```go Go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+)
+
+func main() {
+	baseURL := os.Getenv("API_BASE_URL")
+	if baseURL == "" {
+		baseURL = "https://api.example.com/v1"
+	}
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s/users", baseURL), nil)
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("API_KEY"))
+
+	client := &http.Client{}
+	client.Do(req)
+}
+```
+
+</CodeGroup>
+
+<Warning>
+  Always use HTTPS when making requests. The API rejects plain HTTP requests
+  with a `301 Moved Permanently` redirect to the HTTPS equivalent. Most HTTP
+  clients will not automatically re-send request bodies on a redirect, which can
+  result in unexpected errors.
+</Warning>
+
+<Tip>
+  Store the base URL as an environment variable (for example, `API_BASE_URL`) in
+  your application configuration. Switching from sandbox to production then
+  requires only a single config change — no code modifications needed.
+</Tip>

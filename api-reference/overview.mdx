@@ -1,0 +1,41 @@
+---
+title: "Open API Platform REST API Reference"
+sidebarTitle: "Overview"
+description: "Complete reference for the Open API Platform REST API — endpoints, authentication, request format, response envelope, and available resources."
+---
+
+This reference covers every public endpoint, request/response schemas, and error codes for the Open API Platform REST API. Use it to understand how to authenticate, structure requests, handle responses, and work with each available resource.
+
+<CardGroup cols={2}>
+  <Card title="Base URL" icon="server" href="/api-reference/base-url">
+    Learn the base URL for production and sandbox environments and how to switch between them.
+  </Card>
+  <Card title="Versioning" icon="code-branch" href="/api-reference/versioning">
+    Understand how the API is versioned and what to expect when versions are deprecated.
+  </Card>
+  <Card title="Users" icon="user" href="/api-reference/endpoints/users">
+    Create, read, update, and delete user records in your account.
+  </Card>
+  <Card title="Resources" icon="box" href="/api-reference/endpoints/resources">
+    Manage the core resources exposed by the Open API Platform.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/endpoints/webhooks">
+    Subscribe to real-time event notifications delivered to your endpoint.
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    Learn how to authenticate requests using Bearer token API keys.
+  </Card>
+</CardGroup>
+
+## API at a glance
+
+The table below summarises the key properties of the Open API Platform REST API.
+
+| Property    | Value                                          |
+| ----------- | ---------------------------------------------- |
+| Base URL    | `https://api.example.com/v1`                   |
+| Protocol    | HTTPS only                                     |
+| Format      | JSON                                           |
+| Auth        | Bearer token (API Key)                         |
+| Versioning  | URL path (`/v1`)                               |
+| Rate limits | See [/guides/rate-limits](/guides/rate-limits) |

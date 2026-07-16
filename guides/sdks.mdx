@@ -1,0 +1,210 @@
+---
+title: "Use Official SDKs to Integrate Faster"
+sidebarTitle: "SDKs"
+description: "Install and use the Open API Platform official SDKs for Python, Node.js, and other languages to speed up your integration."
+---
+
+The official Open API Platform SDKs handle authentication, pagination, automatic retries, and type safety out of the box — so you can focus on building your product instead of managing HTTP boilerplate. Each SDK is open source, fully typed, and kept in sync with the latest API version.
+
+<Note>
+  All SDK examples use real API responses. Replace `YOUR_API_KEY` with your actual key from the [dashboard](https://dashboard.example.com) before running any code.
+</Note>
+
+## Available SDKs
+
+<CardGroup cols={2}>
+  <Card title="Python" icon="python">
+    Install with pip: `pip install openapi-platform`
+
+    Supports Python 3.8+. Fully typed with `py.typed` marker.
+  </Card>
+  <Card title="Node.js" icon="node-js">
+    Install with npm: `npm install @openapi-platform/node`
+
+    Supports Node 18+. Ships ESM and CJS builds with full TypeScript types.
+  </Card>
+  <Card title="PHP" icon="php">
+    Install with Composer: `composer require openapi-platform/php-sdk`
+
+    Supports PHP 8.1+. PSR-18 compatible HTTP client.
+  </Card>
+  <Card title="Go" icon="golang">
+    Install with go get: `go get github.com/openapi-platform/go-sdk`
+
+    Idiomatic Go with context support and structured error types.
+  </Card>
+</CardGroup>
+
+---
+
+## Python SDK
+
+### Installation
+
+```bash
+pip install openapi-platform
+```
+
+### Initialization
+
+```python
+from openapi_platform import OpenAPIPlatform
+
+client = OpenAPIPlatform(api_key="YOUR_API_KEY")
+```
+
+### List users
+
+```python
+users = client.users.list()
+
+for user in users:
+    print(f"{user.id}: {user.email}")
+```
+
+The SDK handles cursor-based pagination automatically. You can also paginate manually if you prefer:
+
+```python
+page = client.users.list(limit=20)
+
+while page:
+    for user in page.data:
+        print(f"{user.id}: {user.email}")
+    page = page.next_page()
+```
+
+### Create a resource
+
+```python
+resource = client.resources.create(
+    name="My Resource",
+    description="Created with the Python SDK",
+    type="example",
+)
+
+print(f"Created resource: {resource.id}")
+```
+
+---
+
+## Node.js SDK
+
+### Installation
+
+<CodeGroup>
+
+```bash npm
+npm install @openapi-platform/node
+```
+
+```bash yarn
+yarn add @openapi-platform/node
+```
+
+```bash pnpm
+pnpm add @openapi-platform/node
+```
+
+</CodeGroup>
+
+### Initialization
+
+```typescript
+import OpenAPIPlatform from "@openapi-platform/node";
+
+const client = new OpenAPIPlatform({
+  apiKey: "YOUR_API_KEY",
+});
+```
+
+### List users
+
+```typescript
+const users = await client.users.list();
+
+for (const user of users.data) {
+  console.log(`${user.id}: ${user.email}`);
+}
+```
+
+Auto-pagination is available via async iteration:
+
+```typescript
+for await (const user of client.users.list()) {
+  console.log(`${user.id}: ${user.email}`);
+}
+```
+
+### Create a resource
+
+```typescript
+const resource = await client.resources.create({
+  name: "My Resource",
+  description: "Created with the Node.js SDK",
+  type: "example",
+});
+
+console.log(`Created resource: ${resource.id}`);
+```
+
+---
+
+## Error handling with SDKs
+
+Both SDKs expose structured exception types so you can handle specific error conditions without parsing raw HTTP responses.
+
+<CodeGroup>
+
+```python Python
+from openapi_platform import OpenAPIPlatform
+from openapi_platform.exceptions import (
+    AuthenticationError,
+    NotFoundError,
+    RateLimitError,
+    APIError,
+)
+
+client = OpenAPIPlatform(api_key="YOUR_API_KEY")
+
+try:
+    resource = client.resources.retrieve("res_does_not_exist")
+except AuthenticationError:
+    print("Invalid API key — check your credentials.")
+except NotFoundError:
+    print("Resource not found — it may have been deleted.")
+except RateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after}s.")
+except APIError as e:
+    print(f"API error {e.status_code}: {e.message}")
+```
+
+```typescript Node.js
+import OpenAPIPlatform, {
+  AuthenticationError,
+  NotFoundError,
+  RateLimitError,
+  APIError,
+} from "@openapi-platform/node";
+
+const client = new OpenAPIPlatform({ apiKey: "YOUR_API_KEY" });
+
+try {
+  const resource = await client.resources.retrieve("res_does_not_exist");
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    console.error("Invalid API key — check your credentials.");
+  } else if (error instanceof NotFoundError) {
+    console.error("Resource not found — it may have been deleted.");
+  } else if (error instanceof RateLimitError) {
+    console.error(`Rate limited. Retry after ${error.retryAfter}s.`);
+  } else if (error instanceof APIError) {
+    console.error(`API error ${error.statusCode}: ${error.message}`);
+  } else {
+    throw error;
+  }
+}
+```
+
+</CodeGroup>
+
+For a complete list of exception types and their properties, see the [API reference documentation](/api-reference/overview).

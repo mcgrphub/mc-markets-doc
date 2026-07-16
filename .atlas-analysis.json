@@ -1,13 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
+  "projectType": "api-service",
+  "projectName": "Open API Platform",
+  "projectDescription": "A developer-facing open API platform providing RESTful interfaces, authentication, and SDKs for third-party integrations.",
   "theme": "luma",
-  "name": "Open API Platform",
-  "colors": {
-    "primary": "#ef7025",
-    "light": "#eec9bc",
-    "dark": "#4fa1ab"
-  },
-  "favicon": "/favicon.svg",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
   "navigation": {
     "tabs": [
       {
@@ -16,7 +14,7 @@
           {
             "group": "Get Started",
             "pages": [
-              "index",
+              "introduction",
               "quickstart",
               "authentication"
             ]
@@ -72,17 +70,29 @@
       }
     ]
   },
-  "navbar": {
-    "links": [
-      { "label": "Support", "href": "mailto:support@example.com" }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Get API Key",
-      "href": "https://dashboard.example.com"
-    }
-  },
-  "footer": {
-    "socials": {}
-  }
+  "keyFeatures": [
+    "RESTful API with JSON responses",
+    "API Key and OAuth 2.0 authentication",
+    "Webhook event notifications",
+    "Pagination and filtering",
+    "Rate limiting with clear headers",
+    "Versioned API endpoints",
+    "Comprehensive error codes",
+    "Multiple SDK libraries"
+  ],
+  "publicApiSurface": [
+    "GET /v1/users",
+    "POST /v1/users",
+    "GET /v1/users/{id}",
+    "PUT /v1/users/{id}",
+    "DELETE /v1/users/{id}",
+    "GET /v1/resources",
+    "POST /v1/resources",
+    "GET /v1/resources/{id}",
+    "PUT /v1/resources/{id}",
+    "DELETE /v1/resources/{id}",
+    "POST /v1/webhooks",
+    "GET /v1/webhooks",
+    "DELETE /v1/webhooks/{id}"
+  ]
 }

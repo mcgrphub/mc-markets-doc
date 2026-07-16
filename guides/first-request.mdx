@@ -1,0 +1,106 @@
+---
+title: "Make Your First API Request Step by Step"
+sidebarTitle: "First Request"
+description: "Walk through creating, reading, updating, and deleting a resource with the Open API Platform REST API using real curl examples."
+---
+
+This guide walks you through the full CRUD lifecycle — create, read, update, and delete — on a resource using the Open API Platform REST API. By the end, you'll have a working pattern you can adapt for any resource type.
+
+<Note>
+  Replace `YOUR_API_KEY` with your actual key from the [dashboard](https://dashboard.example.com). Keep your key secret and never commit it to source control.
+</Note>
+
+<Steps>
+  <Step title="Create a resource">
+    Send a `POST` request to `/v1/resources` with a JSON body describing the resource you want to create.
+
+    ```bash
+    curl -X POST https://api.example.com/v1/resources \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "name": "My First Resource",
+        "description": "Created via the REST API",
+        "type": "example"
+      }'
+    ```
+
+    A successful request returns `201 Created` with the new resource object:
+
+    ```json
+    {
+      "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
+      "name": "My First Resource",
+      "description": "Created via the REST API",
+      "type": "example",
+      "created_at": "2024-05-10T12:00:00Z",
+      "updated_at": "2024-05-10T12:00:00Z"
+    }
+    ```
+
+    Save the `id` field — you'll use it in the next steps.
+  </Step>
+
+  <Step title="Retrieve the resource">
+    Send a `GET` request to `/v1/resources/{id}` to fetch the resource you just created.
+
+    ```bash
+    curl https://api.example.com/v1/resources/res_01hx9k2p3mfqe7ztw4v8n6jdc \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+
+    The API returns the same resource object with its current state:
+
+    ```json
+    {
+      "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
+      "name": "My First Resource",
+      "description": "Created via the REST API",
+      "type": "example",
+      "created_at": "2024-05-10T12:00:00Z",
+      "updated_at": "2024-05-10T12:00:00Z"
+    }
+    ```
+  </Step>
+
+  <Step title="Update the resource">
+    Send a `PUT` request to `/v1/resources/{id}` with the fields you want to change. You must include all required fields in the body — the API performs a full replacement.
+
+    ```bash
+    curl -X PUT https://api.example.com/v1/resources/res_01hx9k2p3mfqe7ztw4v8n6jdc \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "name": "My Updated Resource",
+        "description": "Updated description via the REST API",
+        "type": "example"
+      }'
+    ```
+
+    A successful update returns `200 OK` with the updated resource object:
+
+    ```json
+    {
+      "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
+      "name": "My Updated Resource",
+      "description": "Updated description via the REST API",
+      "type": "example",
+      "created_at": "2024-05-10T12:00:00Z",
+      "updated_at": "2024-05-10T12:34:56Z"
+    }
+    ```
+  </Step>
+
+  <Step title="Delete the resource">
+    Send a `DELETE` request to `/v1/resources/{id}` to permanently remove the resource.
+
+    ```bash
+    curl -X DELETE https://api.example.com/v1/resources/res_01hx9k2p3mfqe7ztw4v8n6jdc \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+
+    A successful deletion returns `204 No Content` with an empty body. The resource is permanently removed and cannot be recovered.
+  </Step>
+</Steps>
+
+You've now completed a full CRUD cycle against the Open API Platform. To explore all available endpoints, path parameters, and request schemas, head to the [API Reference](/api-reference).

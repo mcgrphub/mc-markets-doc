@@ -1,0 +1,123 @@
+---
+title: "API Request and Response Format Reference"
+sidebarTitle: "Requests & Responses"
+description: "Learn how the Open API Platform structures HTTP requests and responses, including headers, JSON bodies, and status codes."
+---
+
+The Open API Platform is a JSON-over-HTTP API. Every request you send must target `https://api.example.com/v1`, carry the appropriate headers, and — where applicable — include a JSON body. Every response you receive back is also JSON. This page describes exactly what that exchange looks like on both sides.
+
+## Request format
+
+### Required headers
+
+Include the following headers with every request:
+
+| Header | Required | Value |
+|---|---|---|
+| `Authorization` | Yes | `Bearer YOUR_API_KEY` |
+| `Content-Type` | For POST / PUT | `application/json` |
+| `Accept` | No | `application/json` |
+
+<Warning>
+  Requests without a valid `Authorization` header will be rejected with a `401 Unauthorized` response. Keep your API key secret and never expose it in client-side code.
+</Warning>
+
+### Example: create a user
+
+The following example shows a complete `POST` request that creates a new user:
+
+```bash
+curl --request POST \
+  --url https://api.example.com/v1/users \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/json" \
+  --header "Accept: application/json" \
+  --data '{
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "role": "member"
+  }'
+```
+
+## Response format
+
+All responses from the API are JSON objects. The shape of the response depends on whether the endpoint returns a single object or a list.
+
+### Single object response
+
+Endpoints that return one resource wrap the result in a `data` key:
+
+```json
+{
+  "data": {
+    "id": "usr_01J3K9XYZ",
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "role": "member",
+    "created_at": "2024-07-15T10:32:00Z",
+    "updated_at": "2024-07-15T10:32:00Z"
+  }
+}
+```
+
+### List response
+
+Endpoints that return multiple resources include a `data` array alongside a `pagination` object and an optional `meta` object:
+
+```json
+{
+  "data": [
+    {
+      "id": "usr_01J3K9XYZ",
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "role": "member",
+      "created_at": "2024-07-15T10:32:00Z",
+      "updated_at": "2024-07-15T10:32:00Z"
+    },
+    {
+      "id": "usr_01J3K9ABC",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "role": "admin",
+      "created_at": "2024-07-14T08:10:00Z",
+      "updated_at": "2024-07-14T08:10:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 20,
+    "total": 2,
+    "next_cursor": null,
+    "prev_cursor": null
+  },
+  "meta": {
+    "request_id": "req_8fHq2mNpLd"
+  }
+}
+```
+
+<Note>
+  The `pagination` key is only present on list endpoints. Single-object endpoints return only `data`. See [Pagination](/concepts/pagination) for details on iterating through large result sets.
+</Note>
+
+## HTTP status codes
+
+The API uses standard HTTP status codes to communicate the outcome of every request. Codes in the `2xx` range indicate success; codes in the `4xx` range indicate a problem with your request; codes in the `5xx` range indicate a server-side issue.
+
+| Code | Meaning |
+|---|---|
+| `200` | **Success** — the request completed successfully and the response body contains the result. |
+| `201` | **Created** — a new resource was created successfully. |
+| `204` | **No content** — the request succeeded but there is no response body (typically returned by `DELETE`). |
+| `400` | **Bad request** — the request was malformed or missing required parameters. |
+| `401` | **Unauthorized** — no API key was provided, or the key is invalid. |
+| `403` | **Forbidden** — the API key does not have permission to perform this action. |
+| `404` | **Not found** — the requested resource does not exist. |
+| `422` | **Validation error** — the request body passed structural checks but failed business-logic validation. |
+| `429` | **Rate limit exceeded** — you have sent too many requests in a short period. |
+| `500` | **Server error** — an unexpected error occurred on the platform side. |
+
+<Tip>
+  When you receive a `4xx` error, inspect the JSON response body for a machine-readable `error.code` and a human-readable `error.message` that explain exactly what went wrong. See [Error Handling](/concepts/errors) for the full error reference.
+</Tip>

@@ -1,0 +1,117 @@
+---
+title: "Authenticate Requests to the Open API Platform"
+sidebarTitle: "Authentication"
+description: "Learn how to generate and use API keys to authenticate every request to the Open API Platform REST API."
+---
+
+Every request you make to the Open API Platform REST API must include a valid API key. You pass your key in the `Authorization` header using the `Bearer` scheme. Requests that are missing a key or that supply an invalid one are rejected before they reach any resource.
+
+## API Keys
+
+API keys are long-lived credentials that identify your account and determine what actions your requests are allowed to perform. Each key is tied to a specific set of [scopes](#key-scopes) that you choose at creation time.
+
+To generate a new key:
+
+1. Log in to your dashboard at [https://dashboard.example.com](https://dashboard.example.com).
+2. Go to **Settings → API Keys**.
+3. Click **New Key**, enter a descriptive name, select the scopes you need, and click **Create**.
+4. Copy the key immediately — it is only displayed once.
+
+### Sending your API key
+
+Include your key as a `Bearer` token in the `Authorization` header of every request:
+
+```bash
+curl https://api.example.com/v1/users \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Examples in multiple languages
+
+<CodeGroup>
+
+```bash curl
+curl https://api.example.com/v1/users \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.example.com/v1/users",
+    headers={
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Accept": "application/json",
+    },
+)
+
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.example.com/v1/users", {
+  method: "GET",
+  headers: {
+    Authorization: "Bearer YOUR_API_KEY",
+    Accept: "application/json",
+  },
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```php PHP
+<?php
+
+$ch = curl_init("https://api.example.com/v1/users");
+
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer YOUR_API_KEY",
+        "Accept: application/json",
+    ],
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+echo $response;
+```
+
+</CodeGroup>
+
+## Key scopes
+
+When you create an API key, you assign it one or more scopes. Scopes limit what the key can do, so you can follow the principle of least privilege and issue tightly scoped keys for specific use cases.
+
+| Scope   | Permissions granted                                                                 |
+| ------- | ----------------------------------------------------------------------------------- |
+| `read`  | Retrieve any resource (GET requests). Cannot create, update, or delete resources.  |
+| `write` | Create and update resources (POST and PATCH requests). Includes `read` access.     |
+| `admin` | Full access: read, write, and delete resources, plus manage API keys and settings. |
+
+Choose the narrowest scope that covers your use case. For example, a reporting integration only needs `read`, while a data-sync service likely needs `write`.
+
+## Security best practices
+
+<Tip>
+  Follow these practices to keep your API keys — and your data — secure:
+
+  - **Never expose your key in frontend code.** API keys included in client-side JavaScript or mobile app binaries can be extracted by anyone. Always make API calls from a backend server.
+  - **Store keys in environment variables.** Reference your key via an environment variable (for example, `process.env.API_KEY`) rather than hard-coding it in your source files.
+  - **Restrict scopes to the minimum needed.** Limit each key to only the scopes required for its specific task. If a key is compromised, a narrow scope limits the blast radius.
+  - **Rotate keys regularly.** Periodically revoke old keys and issue new ones, especially after team-member offboarding or any suspected exposure.
+</Tip>
+
+## Authentication errors
+
+If your request fails authentication or authorization, the API returns one of the following HTTP error responses:
+
+| Status code       | Meaning                                                                                     | How to fix                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `401 Unauthorized`  | The `Authorization` header is missing, malformed, or contains an invalid or revoked key.   | Check that you're sending the header correctly and that the key hasn't been deleted or revoked. Generate a new key in **Settings → API Keys** if needed. |
+| `403 Forbidden`     | The key is valid, but it doesn't have the scope required to perform the requested action.   | Review the key's scopes in the dashboard. Either add the necessary scope to the existing key or generate a new key with the correct scopes.              |

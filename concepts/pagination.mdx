@@ -1,0 +1,170 @@
+---
+title: "Paginate API Results in the Open API Platform"
+sidebarTitle: "Pagination"
+description: "Learn how to use cursor-based and page-based pagination to retrieve large result sets from the Open API Platform API."
+---
+
+All list endpoints in the Open API Platform return paginated results rather than dumping every record in a single response. By default, each page contains up to **20 items**; you can request up to a maximum of **100 items per page**. You can navigate result sets using either classic page-number pagination or cursor-based pagination, depending on which fits your use case best.
+
+<Note>
+  Use cursor-based pagination when you need stable, consistent iteration over a large or frequently-updated dataset. Use page-number pagination when you need to jump directly to a specific offset.
+</Note>
+
+## Query parameters
+
+Append the following query parameters to any list endpoint URL to control pagination:
+
+<ParamField query="page" type="integer" default="1">
+  The page number to retrieve. Pages are 1-indexed. Use this together with `per_page` for page-number pagination. Ignored when `cursor` is provided.
+</ParamField>
+
+<ParamField query="per_page" type="integer" default="20">
+  The number of results to return per page. Must be between `1` and `100`. Applies to both page-number and cursor-based pagination.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  An opaque string that points to a specific position in the result set. Pass the `next_cursor` value from a previous response to retrieve the following page. When this parameter is present, `page` is ignored.
+</ParamField>
+
+## Pagination response object
+
+Every list response includes a `pagination` object alongside the `data` array. Use the fields in this object to determine whether additional pages exist and to construct your next request.
+
+<ResponseField name="pagination.page" type="integer">
+  The current page number (1-indexed). Reflects the `page` query parameter you sent, or `1` if you used cursor-based pagination.
+</ResponseField>
+
+<ResponseField name="pagination.per_page" type="integer">
+  The number of results returned on this page. May be less than the requested `per_page` value on the final page.
+</ResponseField>
+
+<ResponseField name="pagination.total" type="integer">
+  The total number of items across all pages matching your query.
+</ResponseField>
+
+<ResponseField name="pagination.next_cursor" type="string | null">
+  An opaque cursor string you can pass as the `cursor` query parameter to retrieve the next page. Returns `null` when you are on the last page.
+</ResponseField>
+
+<ResponseField name="pagination.prev_cursor" type="string | null">
+  An opaque cursor string you can pass as the `cursor` query parameter to retrieve the previous page. Returns `null` when you are on the first page.
+</ResponseField>
+
+### Example paginated response
+
+```json
+{
+  "data": [
+    {
+      "id": "usr_01J3K9XYZ",
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "created_at": "2024-07-15T10:32:00Z",
+      "updated_at": "2024-07-15T10:32:00Z"
+    },
+    {
+      "id": "usr_01J3K9ABC",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "created_at": "2024-07-14T08:10:00Z",
+      "updated_at": "2024-07-14T08:10:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 2,
+    "total": 53,
+    "next_cursor": "cur_eyJpZCI6InVzcl8wMUozSzlBQkMifQ",
+    "prev_cursor": null
+  }
+}
+```
+
+## Iterating all pages
+
+The examples below show how to loop through every page of results until there are no more pages to fetch.
+
+### Python
+
+```python
+import requests
+
+API_KEY = "YOUR_API_KEY"
+BASE_URL = "https://api.example.com/v1"
+
+def fetch_all_users():
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Accept": "application/json",
+    }
+
+    cursor = None
+    all_users = []
+
+    while True:
+        params = {"per_page": 100}
+        if cursor:
+            params["cursor"] = cursor
+
+        response = requests.get(f"{BASE_URL}/users", headers=headers, params=params)
+        response.raise_for_status()
+        body = response.json()
+
+        all_users.extend(body["data"])
+
+        next_cursor = body["pagination"].get("next_cursor")
+        if not next_cursor:
+            break  # No more pages
+
+        cursor = next_cursor
+
+    return all_users
+
+users = fetch_all_users()
+print(f"Fetched {len(users)} users in total.")
+```
+
+### JavaScript
+
+```javascript
+const BASE_URL = "https://api.example.com/v1";
+const API_KEY = "YOUR_API_KEY";
+
+async function fetchAllUsers() {
+  const headers = {
+    Authorization: `Bearer ${API_KEY}`,
+    Accept: "application/json",
+  };
+
+  let cursor = null;
+  const allUsers = [];
+
+  do {
+    const url = new URL(`${BASE_URL}/users`);
+    url.searchParams.set("per_page", "100");
+    if (cursor) {
+      url.searchParams.set("cursor", cursor);
+    }
+
+    const response = await fetch(url.toString(), { headers });
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    const body = await response.json();
+    allUsers.push(...body.data);
+
+    cursor = body.pagination.next_cursor;
+  } while (cursor !== null);
+
+  console.log(`Fetched ${allUsers.length} users in total.`);
+  return allUsers;
+}
+
+fetchAllUsers();
+```
+
+<Tip>
+  Set `per_page` to `100` when iterating all pages to minimize the number of API round-trips and reduce the risk of hitting rate limits.
+</Tip>

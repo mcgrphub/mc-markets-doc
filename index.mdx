@@ -1,20 +1,54 @@
 ---
-title: "Introduction"
-description: "Welcome to your project"
+title: "Open API Platform: Integrate Anything with Our REST API"
+sidebarTitle: "Introduction"
+description: "Explore the Open API Platform — a RESTful API that lets you build powerful integrations, automate workflows, and connect your services in minutes."
 ---
 
-Write a short description of your product here. What it does, who it's for, and what they can accomplish with it.
+The Open API Platform gives you a clean, versioned REST API to integrate your applications, automate data flows, and build new products on top of our infrastructure. Whether you're accessing user data, managing resources, or wiring up real-time webhook notifications, everything you need is exposed through a single, well-documented API.
 
-<Tip>
-  Ready to make this your own? Start by editing this page. Update your `docs.json` file to customize your site. Then fill out the [Quickstart](/quickstart) page.
-</Tip>
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Make your first API call in under 5 minutes
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Get your API key and authenticate requests
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    Browse all endpoints, parameters, and responses
+  </Card>
+  <Card title="Guides" icon="book-open" href="/guides/first-request">
+    Step-by-step guides for common use cases
+  </Card>
+</CardGroup>
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  This card links to the quickstart page in your project.
-</Card>
-<Card title="Components" icon="puzzle-piece" href="https://mintlify.com/docs/components">
-  Add cards, callouts, steps, tabs, and more to design and structure your pages.
-</Card>
-<Card title="Settings" icon="gear" href="https://mintlify.com/docs/organize/settings">
-  Set your site name, branding, and navigation in the `docs.json` file.
-</Card>
+## Get started in 3 steps
+
+<Steps>
+  <Step title="Get your API key">
+    Sign in to the [dashboard](https://dashboard.example.com) and generate an API key from **Settings → API Keys**.
+  </Step>
+  <Step title="Make your first request">
+    Pass your key in the `Authorization` header and call any endpoint:
+    ```bash
+    curl https://api.example.com/v1/users \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+  </Step>
+  <Step title="Explore & build">
+    Browse the [API Reference](/api-reference/overview) for every available endpoint, or follow the [Guides](/guides/first-request) to tackle common workflows.
+  </Step>
+</Steps>
+
+## What you can build
+
+<CardGroup cols={3}>
+  <Card title="User Management" icon="users" href="/api-reference/endpoints/users">
+    Create, update, and query users via the REST API
+  </Card>
+  <Card title="Resource CRUD" icon="database" href="/api-reference/endpoints/resources">
+    Full create/read/update/delete on all resources
+  </Card>
+  <Card title="Webhooks" icon="bolt" href="/guides/webhooks">
+    Receive real-time event notifications in your app
+  </Card>
+</CardGroup>

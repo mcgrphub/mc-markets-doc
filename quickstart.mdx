@@ -1,47 +1,87 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with the Open API Platform"
+sidebarTitle: "Quickstart"
+description: "Learn how to make your first authenticated API call with the Open API Platform in under 5 minutes using your API key."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+This quickstart walks you through everything you need to get up and running with the Open API Platform: obtaining an API key and making your first authenticated REST call. By the end, you'll have a working request and a clear path to explore the rest of the platform.
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+<Note>
+  You need a dashboard account before you begin. If you don't have one yet, sign up for free at [https://dashboard.example.com](https://dashboard.example.com).
+</Note>
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
-
-    ```bash
-    npm install your-package
-    ```
+  <Step title="Create an account">
+    Navigate to [https://dashboard.example.com](https://dashboard.example.com) and click **Sign Up**. Fill in your name, email address, and a secure password, then verify your email to activate your account.
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
 
-    ```bash
-    your-cli init
-    ```
+  <Step title="Generate an API key">
+    Once you're logged in, go to **Settings → API Keys** and click **New Key**. Give your key a descriptive name (for example, `my-first-key`) so you can identify it later, then click **Create**.
+
+    Copy your new API key and store it somewhere safe — a password manager or a secrets vault works well.
+
+    <Warning>
+      Your API key is only shown once. If you lose it, you'll need to revoke it and generate a new one. Never commit keys to source control.
+    </Warning>
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+
+  <Step title="Make your first request">
+    Use the API key you just generated to call the `/v1/users` endpoint. Replace `YOUR_API_KEY` with your actual key:
 
     ```bash
-    your-cli start
+    curl https://api.example.com/v1/users \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Accept: application/json"
     ```
+
+    A successful response looks like this:
+
+    ```json
+    {
+      "data": [
+        {
+          "id": "usr_01H...",
+          "name": "Jane Doe",
+          "email": "jane@example.com",
+          "created_at": "2024-01-15T10:30:00Z"
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "per_page": 20,
+        "total": 1
+      }
+    }
+    ```
+
+    The `data` array contains the list of users your key has permission to view. The `pagination` object tells you how many results are available and how they are paged.
+  </Step>
+
+  <Step title="What's next">
+    Now that you've made your first request, explore the rest of the platform to learn how authentication works in depth, understand core concepts, and browse the full API reference.
+
+    <CardGroup cols={2}>
+      <Card
+        title="Authentication"
+        icon="key"
+        href="/authentication"
+      >
+        Learn how API keys work, how to scope them, and how to keep them secure.
+      </Card>
+      <Card
+        title="Concepts Overview"
+        icon="book-open"
+        href="/concepts/overview"
+      >
+        Understand the core objects and data model that power the Open API Platform.
+      </Card>
+      <Card
+        title="API Reference"
+        icon="code"
+        href="/api-reference/overview"
+      >
+        Browse every endpoint, parameter, and response schema in the full API reference.
+      </Card>
+    </CardGroup>
   </Step>
 </Steps>
-
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
-
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>

@@ -1,0 +1,166 @@
+---
+title: "Receive Real-Time Events with Webhooks"
+sidebarTitle: "Webhooks"
+description: "Set up webhook endpoints to receive real-time event notifications from the Open API Platform when resources are created, updated, or deleted."
+---
+
+Webhooks let your server receive instant notifications the moment an event occurs in the Open API Platform — no polling required. When a subscribed event fires, the platform sends an HTTP `POST` request to the URL you register, with a signed JSON payload describing what happened.
+
+## Supported events
+
+Subscribe to any combination of the following events when registering a webhook endpoint:
+
+| Event | Description |
+|---|---|
+| `resource.created` | A new resource was created |
+| `resource.updated` | A resource was updated |
+| `resource.deleted` | A resource was deleted |
+| `user.created` | A new user was created |
+| `user.updated` | A user profile was updated |
+
+## Register a webhook
+
+Send a `POST` request to `/v1/webhooks` with the URL you want to receive events at and the list of events you want to subscribe to.
+
+```bash
+curl -X POST https://api.example.com/v1/webhooks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://yourapp.com/webhooks",
+    "events": ["resource.created", "resource.updated"]
+  }'
+```
+
+A successful registration returns `201 Created`:
+
+```json
+{
+  "id": "wh_04kz8m1r2ngqf9aub5w7c3xep",
+  "url": "https://yourapp.com/webhooks",
+  "events": ["resource.created", "resource.updated"],
+  "secret": "whsec_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "created_at": "2024-05-10T12:00:00Z"
+}
+```
+
+Store the `secret` securely — you'll use it to verify incoming request signatures. It is only returned once at registration time.
+
+## Webhook payload
+
+Every event delivery sends a `POST` request to your endpoint with the following JSON structure:
+
+```json
+{
+  "id": "evt_07qy5n3s4ohrf0bvc9x2e1gfz",
+  "event": "resource.created",
+  "created_at": "2024-05-10T12:05:30Z",
+  "data": {
+    "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
+    "name": "My First Resource",
+    "description": "Created via the REST API",
+    "type": "example",
+    "created_at": "2024-05-10T12:05:30Z",
+    "updated_at": "2024-05-10T12:05:30Z"
+  }
+}
+```
+
+Your endpoint must return a `2xx` status code within **10 seconds** to acknowledge receipt.
+
+## Verifying signatures
+
+Every webhook request includes an `X-Signature` header containing an HMAC-SHA256 hex digest of the raw request body, signed with your webhook `secret`. You should always verify this signature before processing the payload to confirm the request originated from the Open API Platform.
+
+<CodeGroup>
+
+```python Python
+import hashlib
+import hmac
+
+def verify_signature(payload: bytes, secret: str, signature: str) -> bool:
+    expected = hmac.new(
+        key=secret.encode("utf-8"),
+        msg=payload,
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
+# In your request handler (example using Flask):
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+WEBHOOK_SECRET = "whsec_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+
+@app.route("/webhooks", methods=["POST"])
+def handle_webhook():
+    signature = request.headers.get("X-Signature", "")
+    if not verify_signature(request.get_data(), WEBHOOK_SECRET, signature):
+        abort(401)
+
+    event = request.get_json()
+    print(f"Received event: {event['event']}")
+    return "", 200
+```
+
+```javascript Node.js
+const crypto = require("crypto");
+
+function verifySignature(payload, secret, signature) {
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
+  return crypto.timingSafeEqual(
+    Buffer.from(expected, "hex"),
+    Buffer.from(signature, "hex")
+  );
+}
+
+// In your request handler (example using Express):
+const express = require("express");
+const app = express();
+
+const WEBHOOK_SECRET = "whsec_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6";
+
+app.post("/webhooks", express.raw({ type: "application/json" }), (req, res) => {
+  const signature = req.headers["x-signature"] || "";
+
+  if (!verifySignature(req.body, WEBHOOK_SECRET, signature)) {
+    return res.status(401).send("Invalid signature");
+  }
+
+  const event = JSON.parse(req.body);
+  console.log(`Received event: ${event.event}`);
+  res.status(200).send();
+});
+```
+
+</CodeGroup>
+
+## Retry policy
+
+<Info>
+  If your endpoint returns a non-`2xx` response or times out, the Open API Platform automatically retries delivery up to **5 times** using exponential backoff: **1s → 2s → 4s → 8s → 16s**. If all retries are exhausted without a successful acknowledgment, the event is marked as failed and no further attempts are made. You can inspect failed deliveries in the [dashboard](https://dashboard.example.com).
+</Info>
+
+## Manage webhooks
+
+You can list and remove your registered webhooks at any time.
+
+**List all webhooks**
+
+```bash
+curl https://api.example.com/v1/webhooks \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Remove a webhook**
+
+```bash
+curl -X DELETE https://api.example.com/v1/webhooks/wh_04kz8m1r2ngqf9aub5w7c3xep \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+A successful deletion returns `204 No Content`. Once removed, your endpoint will no longer receive event deliveries.

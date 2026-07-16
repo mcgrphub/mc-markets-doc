@@ -1,0 +1,82 @@
+---
+title: "Frequently Asked Questions about the Open API Platform"
+sidebarTitle: "FAQ"
+description: "Find answers to the most common questions about authentication, rate limits, billing, and integrating the Open API Platform API."
+---
+
+Got a quick question about the Open API Platform? You're in the right place. Browse the answers below to resolve the most common questions about authentication, rate limits, billing, and day-to-day API usage.
+
+<AccordionGroup>
+  <Accordion title="How do I get an API key?">
+    Sign in to your account, navigate to **Settings → API Keys**, and click **Create New Key**. Give your key a descriptive name, choose the appropriate scopes, and save it somewhere secure — the full key value is only shown once.
+  </Accordion>
+
+  <Accordion title="What happens if I lose my API key?">
+    If you can no longer access your API key, revoke it immediately from the dashboard to prevent unauthorized use. Go to **Settings → API Keys**, find the key in question, and click **Revoke**. You can then generate a new key to replace it.
+  </Accordion>
+
+  <Accordion title="How are rate limits calculated?">
+    Rate limits are enforced **per API key** using a rolling minute window. Every request you make is counted against the limit for that key, resetting continuously over the previous 60 seconds rather than at a fixed clock boundary.
+
+    For full details on limits by tier and how to handle `429` responses, see the [Rate Limits guide](/guides/rate-limits).
+  </Accordion>
+
+  <Accordion title="Can I use one API key for multiple applications?">
+    Technically yes, but we strongly recommend creating a **separate API key for each application**. Using distinct keys lets you rotate or revoke access for one app without disrupting others, and makes it much easier to track usage and audit logs per service.
+  </Accordion>
+
+  <Accordion title="What response format does the API use?">
+    All API responses are returned as **JSON** wrapped in a standard `data` envelope. A typical successful response looks like this:
+
+    ```json
+    {
+      "data": {
+        "id": "res_abc123",
+        "status": "active"
+      }
+    }
+    ```
+
+    Error responses follow the same envelope structure but include an `error` object with a `code`, `message`, and optional `details` array.
+  </Accordion>
+
+  <Accordion title="How do I test the API without affecting production data?">
+    Use the **sandbox environment** for all development and testing. The sandbox mirrors the production API surface but operates on isolated test data, so no real records are created or modified.
+
+    ```
+    https://sandbox-api.example.com/v1
+    ```
+
+    Authenticate with a sandbox-specific API key (created from the same **Settings → API Keys** page) and point your requests at the sandbox base URL instead of the production one.
+  </Accordion>
+
+  <Accordion title="How do I receive real-time updates?">
+    The Open API Platform supports **webhooks** for real-time event notifications. You register an HTTPS endpoint in your dashboard, and the platform sends a `POST` request to that URL whenever a subscribed event occurs.
+
+    To get started, check out the [Webhooks guide](/guides/webhooks).
+  </Accordion>
+
+  <Accordion title="Is there a free tier?">
+    Yes. The free tier includes:
+
+    - **60 requests per minute** (rolling window)
+    - **5,000 requests per day**
+
+    If you need higher limits, you can upgrade to a paid plan from the **Billing** section of your dashboard. Usage above the free tier limits returns a `429 Too Many Requests` response until the window resets.
+  </Accordion>
+
+  <Accordion title="What do I do if I get a 429 error?">
+    A `429 Too Many Requests` error means you've exceeded your rate limit for the current window. Read the `Retry-After` header in the response — it tells you how many seconds to wait before retrying.
+
+    Implement **exponential backoff** in your client so that retries are spaced out progressively rather than hammering the API repeatedly. For a full walkthrough, see the [Rate Limits guide](/guides/rate-limits).
+  </Accordion>
+
+  <Accordion title="How do I contact support?">
+    You can reach the support team in two ways:
+
+    - **Email:** [support@example.com](mailto:support@example.com)
+    - **Dashboard ticket:** Open a ticket directly from the **Help → Support** section in your dashboard for the fastest response.
+
+    When contacting support about a specific failed request, include the `X-Request-ID` value from the response headers to help the team locate your request quickly.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,79 @@
+---
+title: "API Versioning Policy and Migration Guide"
+sidebarTitle: "Versioning"
+description: "Learn how the Open API Platform API is versioned, how to specify a version in requests, and what to expect when versions are deprecated."
+---
+
+The Open API Platform API uses URL path versioning to give you stability and predictability. Embedding the version directly in the URL means you always know exactly which contract your integration targets, and updates to the API never silently change the behaviour of your existing requests.
+
+## Specifying a version
+
+You specify the API version by including it as the first segment of the URL path, immediately after the base URL. Every endpoint follows the pattern `/{version}/{resource}`.
+
+```bash cURL
+# Users endpoint on v1
+curl https://api.example.com/v1/users \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Resources endpoint on v1
+curl https://api.example.com/v1/resources \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Users endpoint on the v2 beta
+curl https://api.example.com/v2/users \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+All examples throughout this reference use `/v1` unless stated otherwise.
+
+## Current versions
+
+| Version | Status  | Notes                        |
+| ------- | ------- | ---------------------------- |
+| v1      | Current | Stable, recommended          |
+| v2      | Beta    | Available on request         |
+
+<Note>
+  To gain access to the v2 beta, contact your account manager or open a support
+  ticket. Beta versions may change without prior notice.
+</Note>
+
+## Deprecation policy
+
+<Info>
+  Deprecated versions receive a minimum of **12 months' notice** before they are
+  removed. Breaking changes are never made to a stable version — if a change
+  would break existing integrations, it is introduced in a new version only.
+</Info>
+
+When a version enters deprecation:
+
+1. You receive an email notification to the address on your account.
+2. The API starts returning a `Deprecation` response header on every request to that version, containing the scheduled removal date.
+3. Reminder notifications are sent at the 6-month, 3-month, and 1-month marks.
+
+## What counts as a breaking change
+
+The following changes are considered breaking and are **never** introduced into a stable API version:
+
+- Removing an existing endpoint or field from a response
+- Changing the type of an existing field (for example, `string` → `integer`)
+- Adding a new **required** request parameter to an existing endpoint
+- Changing the HTTP status code returned for an existing scenario
+
+## Non-breaking changes
+
+The following changes are additive and safe to absorb without updating your integration:
+
+- Adding new **optional** fields to response bodies
+- Adding new **optional** request parameters to existing endpoints
+- Adding entirely new endpoints
+
+You should write your integration defensively — ignore unexpected fields in responses rather than treating them as errors. This ensures your code continues to work smoothly as the API evolves.
+
+<Tip>
+  Pin your integration to the current stable version (`v1`) and subscribe to
+  changelog notifications in your [dashboard
+  settings](https://app.example.com/settings/notifications) so you are notified
+  as soon as a new version is announced or a deprecation is scheduled.
+</Tip>
