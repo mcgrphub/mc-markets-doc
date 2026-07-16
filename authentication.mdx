@@ -1,7 +1,7 @@
 ---
-title: "Authenticate Requests to the Open API Platform"
+title: "API Authentication: Keys, Scopes, and Best Practices"
 sidebarTitle: "Authentication"
-description: "Learn how to generate and use API keys to authenticate every request to the Open API Platform REST API."
+description: "Learn how to generate API keys, pass them in request headers, configure permission scopes, and follow security best practices for the Open API Platform."
 ---
 
 Every request you make to the Open API Platform REST API must include a valid API key. You pass your key in the `Authorization` header using the `Bearer` scheme. Requests that are missing a key or that supply an invalid one are rejected before they reach any resource.
@@ -91,7 +91,7 @@ When you create an API key, you assign it one or more scopes. Scopes limit what 
 | Scope   | Permissions granted                                                                 |
 | ------- | ----------------------------------------------------------------------------------- |
 | `read`  | Retrieve any resource (GET requests). Cannot create, update, or delete resources.  |
-| `write` | Create and update resources (POST and PATCH requests). Includes `read` access.     |
+| `write` | Create and update resources (POST and PUT requests). Includes `read` access.       |
 | `admin` | Full access: read, write, and delete resources, plus manage API keys and settings. |
 
 Choose the narrowest scope that covers your use case. For example, a reporting integration only needs `read`, while a data-sync service likely needs `write`.
@@ -111,7 +111,7 @@ Choose the narrowest scope that covers your use case. For example, a reporting i
 
 If your request fails authentication or authorization, the API returns one of the following HTTP error responses:
 
-| Status code       | Meaning                                                                                     | How to fix                                                                                        |
-| ----------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `401 Unauthorized`  | The `Authorization` header is missing, malformed, or contains an invalid or revoked key.   | Check that you're sending the header correctly and that the key hasn't been deleted or revoked. Generate a new key in **Settings → API Keys** if needed. |
-| `403 Forbidden`     | The key is valid, but it doesn't have the scope required to perform the requested action.   | Review the key's scopes in the dashboard. Either add the necessary scope to the existing key or generate a new key with the correct scopes.              |
+| Status code         | Meaning                                                                                   | How to fix                                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `401 Unauthorized`  | The `Authorization` header is missing, malformed, or contains an invalid or revoked key. | Check that you're sending the header correctly and that the key hasn't been deleted or revoked. Generate a new key in **Settings → API Keys** if needed. |
+| `403 Forbidden`     | The key is valid, but it doesn't have the scope required to perform the requested action. | Review the key's scopes in the dashboard. Either add the necessary scope to the existing key or generate a new key with the correct scopes.              |

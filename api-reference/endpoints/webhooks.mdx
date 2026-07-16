@@ -1,10 +1,10 @@
 ---
-title: "Webhooks API Endpoints Reference"
+title: "Webhooks API Endpoints — Register, List, and Delete"
 sidebarTitle: "Webhooks"
 description: "Reference for the Webhooks API: register, list, and delete webhook endpoints. Includes event types, payload schema, and signature verification."
 ---
 
-Use the Webhooks endpoints to programmatically manage your webhook subscriptions. You can register a URL to receive real-time event notifications, list your active subscriptions, inspect individual webhooks, and remove ones you no longer need.
+Use the Webhooks endpoints to programmatically manage your webhook subscriptions. You can register a URL to receive real-time event notifications, list your active subscriptions, and remove ones you no longer need.
 
 ---
 
@@ -124,45 +124,6 @@ curl -X GET "https://api.example.com/v1/webhooks?page=1&per_page=20" \
   }
 }
 ```
-
----
-
-## Get a webhook
-
-<br />
-
-**`GET /v1/webhooks/{id}`**
-
-Retrieves a single webhook by its unique ID. Returns the webhook object with a `200 OK` status.
-
-### Path parameters
-
-<ParamField path="id" type="string" required>
-  The unique identifier of the webhook to retrieve.
-</ParamField>
-
-### Example request
-
-```bash
-curl -X GET "https://api.example.com/v1/webhooks/wh_01HXYZABCD1234EF" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Accept: application/json"
-```
-
-### Example response
-
-```json
-{
-  "id": "wh_01HXYZABCD1234EF",
-  "url": "https://your-app.example.com/webhooks/handler",
-  "events": ["resource.created", "resource.deleted", "user.created"],
-  "created_at": "2024-07-20T08:00:00Z"
-}
-```
-
-<Note>
-  The `secret` field is **not** returned for existing webhooks — only at the moment of initial registration. Store your secret safely when you first create the webhook.
-</Note>
 
 ---
 

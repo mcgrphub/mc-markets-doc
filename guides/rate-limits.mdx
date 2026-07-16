@@ -1,7 +1,7 @@
 ---
-title: "Understanding and Handling API Rate Limits"
+title: "Understanding and Handling API Rate Limits Effectively"
 sidebarTitle: "Rate Limits"
-description: "Learn about the Open API Platform rate limits, how to read rate limit headers, and how to implement retry logic to avoid errors."
+description: "Learn how the Open API Platform enforces rate limits, how to read rate limit response headers, and how to implement retry logic to avoid errors."
 ---
 
 The Open API Platform enforces rate limits per API key to ensure fair use and reliable performance for all users. When you exceed your plan's limit, the API returns a `429 Too Many Requests` error until your window resets. Building rate-limit-aware retry logic into your integration keeps your application resilient under load.
@@ -140,5 +140,5 @@ const resources = await response.json();
 </CodeGroup>
 
 <Tip>
-  Use batch endpoints wherever the API offers them. Fetching 100 resources in a single `POST /v1/resources/batch` request consumes only one request against your quota instead of 100 individual `GET` calls — dramatically reducing your exposure to rate limits.
+  Minimize unnecessary requests by caching responses locally where data changes infrequently. Use the `X-RateLimit-Remaining` header to proactively throttle your own request rate before hitting a `429`, rather than waiting for the error to trigger your retry logic.
 </Tip>
