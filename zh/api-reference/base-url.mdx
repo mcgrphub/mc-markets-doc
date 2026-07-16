@@ -1,0 +1,75 @@
+---
+title: "基础 URL"
+sidebarTitle: "基础 URL"
+description: "MC OpenAPI 测试与生产环境的网关基础 URL。"
+---
+
+MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使用下方环境 Base URL \+ 路径前缀(`/openapi/v1`)\+ 具体路径,例如 `https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`。
+
+## 环境
+
+| 环境 | Base URL |
+| --- | --- |
+| 测试 | `https://test-gateway.mcconnects.com` |
+| 生产 | `https://gateway.mcconnects.com` |
+
+<Note>
+  两个环境的鉴权方式相同(AK/SK \+ HMAC-SHA256)。测试与生产的密钥在 MC 平台分别申请。
+</Note>
+
+## 路径前缀
+
+所有资源路径均位于 `/openapi/v1/…` 下。将网关主机与接口路径拼接:
+
+```text
+{gateway}/openapi/v1/{resource}/…
+```
+
+例如:
+
+- `https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`
+- `https://gateway.mcconnects.com/openapi/v1/finance/account/overview`
+
+## 切换环境
+
+从测试切换到生产只需替换网关主机,无需修改签名、头部或路径。
+
+<CodeGroup>
+
+```bash cURL
+# 测试
+curl -X POST https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+  -H "X-Access-Key: $MC_ACCESS_KEY" \
+  -H "X-Signature: $MC_SIGNATURE" \
+  -H "X-Timestamp: $MC_TIMESTAMP" \
+  -H "Content-Type: application/json"
+
+# 生产
+curl -X POST https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+  -H "X-Access-Key: $MC_ACCESS_KEY" \
+  -H "X-Signature: $MC_SIGNATURE" \
+  -H "X-Timestamp: $MC_TIMESTAMP" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import os
+
+MC_GATEWAY = os.environ.get("MC_GATEWAY", "https://test-gateway.mcconnects.com")
+url = f"{MC_GATEWAY}/openapi/v1/exchange-rate/query/usd"
+```
+
+```javascript Node.js
+const MC_GATEWAY = process.env.MC_GATEWAY ?? "https://test-gateway.mcconnects.com";
+const url = `${MC_GATEWAY}/openapi/v1/exchange-rate/query/usd`;
+```
+
+</CodeGroup>
+
+<Warning>
+  始终使用 HTTPS。HTTP 请求会被拒绝。如果客户端自动重定向,POST body 可能不会重发,导致签名校验失败。
+</Warning>
+
+<Tip>
+  将网关主机存为环境变量(如 `MC_GATEWAY`),上线时仅需一处配置改动。
+</Tip>

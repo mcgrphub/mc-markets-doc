@@ -1,0 +1,99 @@
+---
+title: "MC OpenAPI 排障"
+sidebarTitle: "排障"
+description: "诊断并修复常见 MC OpenAPI 错误:签名失败、时间戳过期、权限不足、404、频率限制。"
+---
+
+将本指南作为请求失败时的决策树。始终**同时**检查 HTTP 状态码与 JSON 信封中的 `code`。
+
+## HTTP 401 — 签名或时间戳问题
+
+```json
+{ "code": "40001", "msg": "Invalid signature", "success": false }
+```
+
+### 检查清单
+
+- **待签名字符串。** 打印已签名内容,必需五行:`METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP`。空 query 或 body 对应空行,而非字符串 `"null"`。
+- **body 一致。** JSON body 序列化一次,签名与发送复用同一字符串。
+- **query 排序。** 按 key 升序,`key=value` 以 `&` 拼接。签名与发送使用相同的 URL 编码方式。
+- **方法/路径大小写。** 方法大写(`GET`,不是 `get`)。路径以 `/openapi/v1/` 开头,不包含 Base URL 与 query。
+- **用对密钥。** `X-Access-Key` 为 Access Key,签名用 Secret Key。容易紊乱。
+- **摆计格式。** `X-Signature` 为 HMAC-SHA256 的小写 hex,不是 base64。
+
+```json
+{ "code": "40002", "msg": "Timestamp expired", "success": false }
+```
+
+- `X-Timestamp` 为当前 UTC **毫秒**(13 位,如 `1731657600000`),非秒。
+- 使用 NTP 同步本机时钟。几秒偏移就可能触发。
+- 批量调用时,为每次调用重新生成 `ts`。
+
+## HTTP 403 — 权限不足
+
+```json
+{ "code": "40301", "msg": "Permission denied", "success": false }
+```
+
+- Access Key 存在且签名正确,但无对应权限。
+- 在 MC 控制台 **API 管理** 中为 Key 添加 `READ`/`TRADE`/`WITHDRAW`。
+- 每个接口页均注明需要的权限:[API 参考](/zh/api-reference/overview)。
+
+## HTTP 404 — 接口或资源不存在
+
+- 对照 [API 参考](/zh/api-reference/overview) 核对完整路径,均以 `/openapi/v1/...` 开头,大小写敏感。
+- 检查路径参数(`{id}`、`{symbolType}`、`{baseCurrency}`...)——必须 URL 安全且对应真实资源。
+- 已删除的资源(如下架币种)对认证请求仍返回 `404`。
+
+## HTTP 400 — 请求格式错误
+
+```json
+{ "code": "42201", "msg": "Parameter validation failed", "success": false }
+```
+
+- 带 JSON body 的 POST/PUT 缺少 `Content-Type: application/json`。
+- body 缺少必填字段,或类型不匹配(如对字符串字段传了数字)。
+- 枚举值(权限、币种类型、币种)不在允许集内——对照接口页枚举。
+
+## HTTP 429 — 频率限制
+
+```json
+{ "code": "42901", "msg": "Too many requests", "success": false }
+```
+
+- 指数退避 \+ 抖动,参阅 [频率限制](/zh/guides/rate-limits) 中可拷贝的重试封装。
+- 常规负载下仍频繁命中,降低轮询频率或联系支持升级层级。
+
+## HTTP 5xx — 网关错误
+
+- `500`/`502`/`503` 属瞬时错误。使用与 `429` 相同的退避。
+- 若某个接口持续 `5xx`,记录请求时间戳与 correlation 头,联系支持。
+
+## HTTP 200 下的业务错误
+
+不要假定 `200 OK` 就是成功。始终检查 `code`:
+
+```json
+{ "code": "60001", "msg": "Insufficient balance", "success": false, "data": null }
+```
+
+常见类别:
+
+- 理财账户申购/赎回时余额或限额不足。
+- 交易接口中币种暂停或已下架。
+- `/openapi/v1/fund/account/por` 当前窗口的 PoR 快照尚未生成。
+
+## 提交调试信息清单
+
+请在提交支持工单时附上以下信息,可大幅缩短定位时间:
+
+1. **环境** — 测试或生产。
+2. **Access Key ID** — 仅公开标识,绝不提供 Secret Key。
+3. **时间戳** — 失败请求的 `X-Timestamp`。
+4. **含 query 的完整路径。**
+5. **响应体**(隐去 Secret Key,其他保留)。
+6. **待签名字符串**(末行 ≡ `X-Timestamp`)。
+
+<Warning>
+  向任何人求助时都不要共享 Secret Key。若 Secret Key 已暴露,立即禁用并新建 Key。
+</Warning>

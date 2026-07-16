@@ -1,0 +1,105 @@
+---
+title: "币种"
+sidebarTitle: "币种"
+description: "查询币种网络、可兑换币种与币种详情。"
+---
+
+标签 **Currency（币种）** 下的接口用于查询平台配置的币种及其各网络配置。本组接口均需 `READ` 权限。
+
+## 接口列表
+
+| 方法 | 路径 | 描述 |
+| --- | --- | --- |
+| GET | `/openapi/v1/symbol/list` | 币种 × 网络列表(充提可用性、精度、最小金额、图标)。 |
+| GET | `/openapi/v1/symbol/exchange/list` | 支持兑换(币内兑换)的币种与最小金额。 |
+| GET | `/openapi/v1/symbol/detail/{id}` | 按币种 ID 获取详情。 |
+
+---
+
+## 币种网络列表
+
+`GET /openapi/v1/symbol/list` — 权限 `READ`。
+
+### 响应 `data` — SymbolNetworkDto\[\]
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": [
+    {
+      "symbolId": 1001,
+      "symbol": "USDT",
+      "network": "TRC20",
+      "fullName": "Tether USD",
+      "iconUrl": "https://.../usdt.png",
+      "depositEnabled": true,
+      "withdrawEnabled": true,
+      "minDepositAmount": 1.0,
+      "minWithdrawAmount": 5.0,
+      "withdrawFee": 1.0,
+      "amountPrecision": 6,
+      "confirmations": 20
+    }
+  ]
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/symbol/list"
+```
+
+---
+
+## 可兑换币种
+
+`GET /openapi/v1/symbol/exchange/list` — 权限 `READ`。
+
+### 响应 `data` — ExchangeSymbolDto\[\]
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": [
+    {
+      "symbolId": 1001,
+      "symbol": "USDT",
+      "quoteSymbol": "USDC",
+      "minTradeUnit": 1.0,
+      "pricePrecision": 6,
+      "exchangeRate": 1.0
+    }
+  ]
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/symbol/exchange/list"
+```
+
+---
+
+## 币种详情
+
+`GET /openapi/v1/symbol/detail/{id}` — 权限 `READ`。
+
+响应 `data` 形式与上方列表接口相同(`SymbolNetworkDto`)。
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/symbol/detail/1001"
+```

@@ -1,0 +1,99 @@
+---
+title: "资金账户"
+sidebarTitle: "资金账户"
+description: "读取现货持仓(v2)与用户储备金证明(PoRv2)快照。"
+---
+
+标签 **Fund Account（资金账户）** 下的接口提供用户现货持仓与储备金证明快照。本组接口均需 `READ` 权限。
+
+## 接口列表
+
+| 方法 | 路径 | 描述 |
+| --- | --- | --- |
+| GET | `/openapi/v1/fund/account/spot/positions/v2` | 获取现货持仓信息(v2)。 |
+| GET | `/openapi/v1/fund/account/por` | 查询用户 PoRv2 Merkle 证明快照。 |
+
+---
+
+## 获取持仓(v2)
+
+`GET /openapi/v1/fund/account/spot/positions/v2` — 权限 `READ`。
+
+### 响应 `data` — UserPositionDTO
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "uid": "u_1122334455",
+    "totalValueUsd": 15234.02,
+    "positions": [
+      {
+        "symbolId": 1001,
+        "symbol": "USDT",
+        "totalBalance": 5000.0,
+        "availableBalance": 4800.0,
+        "frozenBalance": 200.0,
+        "usdValue": 5000.0
+      },
+      {
+        "symbolId": 1002,
+        "symbol": "BTC",
+        "totalBalance": 0.15,
+        "availableBalance": 0.15,
+        "frozenBalance": 0.0,
+        "usdValue": 10234.02
+      }
+    ]
+  }
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/fund/account/spot/positions/v2"
+```
+
+---
+
+## 储备金证明(PoRv2)
+
+`GET /openapi/v1/fund/account/por` — 权限 `READ`。
+
+### 响应 `data` — UserAssetMerkleProofSnapshotDTO
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "batchId": "2024010100",
+    "uid": "u_1122334455",
+    "merkleRoot": "0xabc...",
+    "userLeafHash": "0xdef...",
+    "userTotalUsd": 15234.02,
+    "proofPath": [
+      { "position": "LEFT", "hash": "0x111..." },
+      { "position": "RIGHT", "hash": "0x222..." }
+    ],
+    "assets": [
+      { "symbol": "USDT", "balance": 5000.0, "usdValue": 5000.0 },
+      { "symbol": "BTC", "balance": 0.15, "usdValue": 10234.02 }
+    ]
+  }
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/fund/account/por?batchId=2024010100"
+```

@@ -1,0 +1,110 @@
+---
+title: "MC OpenAPI 快速开始"
+sidebarTitle: "快速开始"
+description: "创建 MC Access Key / Secret Key,构造 HMAC-SHA256 签名,并通过网关发起第一次带签名的调用。"
+---
+
+本指南将带你完成第一次调用 MC OpenAPI 的完整流程:创建 API Key、使用 HMAC-SHA256 对请求签名,并通过网关调用汇率接口。
+
+<Note>
+  开始前需要一个 MC 平台账号。如果没有,请联系你的 MC 对接人。
+</Note>
+
+<Steps>
+  <Step title="创建 API Key">
+    登录 MC 平台,进入 **API Key 管理**,点击 **创建**。为 Key 命名,并勾选需要的权限:
+
+    - `READ` — 只读操作(余额、列表、查询)
+    - `TRADE` — 交易操作(下单 / 撤单)
+    - `WITHDRAW` — 提币与划转操作
+
+    可选配置 IP 白名单(最多 15 个 IPv4 地址)。立即复制 **Access Key** 和 **Secret Key** —— Secret Key 仅显示一次。
+
+    <Warning>
+      切勿将 Secret Key 提交到源代码库,也不要在客户端代码中暴露。
+    </Warning>
+  </Step>
+  <Step title="对请求签名">
+    每个鉴权请求都需要三个请求头:
+
+    | Header | 说明 |
+    | --- | --- |
+    | `X-Access-Key` | 你的 Access Key |
+    | `X-Timestamp` | 当前 Unix **毫秒** 时间戳(需在服务器时间 ±10 分钟内) |
+    | `X-Signature` | 待签名字符串的 HMAC-SHA256 结果的 Base64 编码 |
+
+    用 `\n` 拼接以下部分构造待签名字符串,末尾附加一个 `\n`:
+
+    ```text
+    {HTTP_METHOD}
+    {REQUEST_URI}
+    {QUERY_STRING}       # 无 query 参数时省略该行
+    {SIGNED_HEADERS}     # x-access-key={AK}&x-timestamp={TS},小写并按 key 排序
+    {TIMESTAMP}
+    ```
+
+    完整规则与 Python / Java / Node.js 示例请参见 [认证](/zh/authentication)。
+  </Step>
+  <Step title="调用汇率接口">
+    `GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` 仅需 `READ` 权限,适合用来验证签名实现。
+
+    ```bash
+    ACCESS_KEY='YOUR_ACCESS_KEY'
+    SECRET_KEY='YOUR_SECRET_KEY'
+    URI='/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT'
+    TIMESTAMP=$(python3 -c 'import time; print(int(time.time()*1000))')
+    
+    SIGNATURE=$(python3 << 'PY'
+    import base64, hashlib, hmac, os
+    method = "GET"
+    uri = os.environ["URI"]
+    access_key = os.environ["ACCESS_KEY"]
+    secret_key = os.environ["SECRET_KEY"]
+    timestamp = os.environ["TIMESTAMP"]
+    headers = f"x-access-key={access_key}&x-timestamp={timestamp}"
+    string_to_sign = f"{method}\n{uri}\n{headers}\n{timestamp}\n"
+    sig = base64.b64encode(
+        hmac.new(secret_key.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+    ).decode()
+    print(sig)
+    PY
+    )
+    
+    curl -s \
+      -H "X-Access-Key: ${ACCESS_KEY}" \
+      -H "X-Signature: ${SIGNATURE}" \
+      -H "X-Timestamp: ${TIMESTAMP}" \
+      "https://test-gateway.mcconnects.com${URI}"
+    ```
+
+    成功响应:
+
+    ```json
+    {
+      "status": 200,
+      "code": "200",
+      "success": true,
+      "data": 98500.12
+    }
+    ```
+  </Step>
+  <Step title="继续探索">
+    <CardGroup cols={2}>
+      <Card title="认证" icon="key" href="/zh/authentication">
+        完整签名算法、权限、IP 白名单与错误响应。
+      </Card>
+
+      <Card title="基础 URL" icon="server" href="/zh/api-reference/base-url">
+        测试与生产环境网关地址与路径约定。
+      </Card>
+
+      <Card title="API 参考" icon="code" href="/zh/api-reference/overview">
+        按标签组织的所有接口(交易、理财、币种、资金账户、资金费、汇率)。
+      </Card>
+
+      <Card title="首次请求" icon="rocket" href="/zh/guides/first-request">
+        用代码走一遍带签名的端到端调用。
+      </Card>
+    </CardGroup>
+  </Step>
+</Steps>

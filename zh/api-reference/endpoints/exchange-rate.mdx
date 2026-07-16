@@ -1,0 +1,111 @@
+---
+title: "汇率"
+sidebarTitle: "汇率"
+description: "查询币对汇率、USD 汇率与带手续费估算的闪兑报价。"
+---
+
+标签 **Exchange Rate（汇率）** 下的接口用于查询行情汇率与闪兑报价。本组接口均需 `READ` 权限。
+
+## 接口列表
+
+| 方法 | 路径 | 描述 |
+| --- | --- | --- |
+| GET | `/openapi/v1/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` | 查询单个币对汇率。 |
+| GET | `/openapi/v1/exchange-rate/query/usd` | 批量查询 USD 汇率。 |
+| GET | `/openapi/v1/exchange-rate/convert-rate/{from}/{to}` | 闪兑报价(汇率 \+ 费率 \+ 预计到账)。 |
+
+---
+
+## 币对汇率查询
+
+`GET /openapi/v1/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` — 权限 `READ`。
+
+### 响应
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "symbolType": "CRYPTO",
+    "baseCurrency": "BTC",
+    "targetCurrency": "USDT",
+    "rate": 68245.12,
+    "timestamp": "2026-01-01T09:00:00Z"
+  }
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/CRYPTO/BTC/USDT"
+```
+
+---
+
+## USD 汇率
+
+`GET /openapi/v1/exchange-rate/query/usd` — 权限 `READ`。
+
+### 响应 `data` — ExchangeRateDto\[\]
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": [
+    { "symbol": "BTC", "usdRate": 68245.12, "timestamp": "2026-01-01T09:00:00Z" },
+    { "symbol": "ETH", "usdRate": 3512.44, "timestamp": "2026-01-01T09:00:00Z" }
+  ]
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd"
+```
+
+---
+
+## 闪兑报价
+
+`GET /openapi/v1/exchange-rate/convert-rate/{from}/{to}` — 权限 `READ`。
+
+### 响应 `data` — ConvertExchangeRateRsp
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "from": "BTC",
+    "to": "USDT",
+    "fromAmount": 1.23,
+    "rate": 68245.12,
+    "feeRate": 0.001,
+    "feeAmount": 83.94,
+    "toAmount": 83857.61,
+    "quoteId": "Q-20260101-000001",
+    "expireAt": "2026-01-01T09:00:15Z"
+  }
+}
+```
+
+```bash cURL
+curl -s \
+  -G \
+  --data-urlencode "fromAmount=1.23" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/convert-rate/BTC/USDT"
+```

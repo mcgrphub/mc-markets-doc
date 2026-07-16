@@ -1,0 +1,35 @@
+---
+title: "MC OpenAPI 变更日志"
+sidebarTitle: "变更日志"
+description: "MC OpenAPI 发布说明——新接口、 schema 更新与集成建议,按倒序时间排列。"
+---
+
+<Update label="2026-07-16" description="文档刷新">
+  - 发布 MC OpenAPI 的完整文档站点,覆盖六个接口分组:交易、理财账户、币种、资金账户、资金费、汇率。
+  - 新增 [认证](/zh/authentication) 参考,包含 HMAC-SHA256 待签名字符串规范与 Python、Java、Node.js 拷贝即用示例。
+  - 新增 [频率限制](/zh/guides/rate-limits),含指数退避封装。
+  - 新增 [轮询更新](/zh/guides/webhooks) — MC OpenAPI 仅支持请求-响应,使用轮询模式检测新活动。
+  - 新增 Python、Node.js、Java、Go [开箱即用客户端](/zh/guides/sdks)。
+</Update>
+
+<Update label="v2 接口" description="推荐使用">
+  以下 v2 接口取代对应 v1。v1 仍可用,可自行安排迁移。
+
+  - `GET /openapi/v1/fund/account/spot/positions/v2` — 现货持仓,拓展字段。
+  - `POST /openapi/v1/funding-fee-record/page/v2` — 按 `positionId + dealTime` 聚合的资金费历史。
+
+  完整见 [版本管理](/zh/api-reference/versioning)。
+</Update>
+
+<Update label="初始 API 范围" description="MC OpenAPI v0.0.1">
+  MC OpenAPI 正式上线,包含以下分组:
+
+  - **交易** — 按 ID 或分页查询交易记录。
+  - **理财账户** — 活期/定期产品申购/赎回与投组概览。
+  - **币种** — 币种网络、可兑换币种与币种详情。
+  - **资金账户** — 现货持仓与储备金证明(PoRv2)快照。
+  - **资金费** — 永续合约资金费历史。
+  - **汇率** — 币对、USD、闪兑汇率查询。
+
+  所有接口共享路径前缀 `/openapi/v1/`,使用 AK/SK \+ HMAC-SHA256 签名。
+</Update>

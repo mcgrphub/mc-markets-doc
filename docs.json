@@ -9,66 +9,140 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "tabs": [
+    "languages": [
       {
-        "tab": "Documentation",
-        "groups": [
+        "language": "en",
+        "default": true,
+        "tabs": [
           {
-            "group": "Get Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "authentication"
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "index",
+                  "quickstart",
+                  "authentication"
+                ]
+              },
+              {
+                "group": "Core Concepts",
+                "pages": [
+                  "concepts/overview",
+                  "concepts/request-response",
+                  "concepts/pagination",
+                  "concepts/errors"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/first-request",
+                  "guides/webhooks",
+                  "guides/rate-limits",
+                  "guides/sdks"
+                ]
+              },
+              {
+                "group": "Help",
+                "pages": [
+                  "help/faq",
+                  "help/troubleshooting",
+                  "help/changelog"
+                ]
+              }
             ]
           },
           {
-            "group": "Core Concepts",
-            "pages": [
-              "concepts/overview",
-              "concepts/request-response",
-              "concepts/pagination",
-              "concepts/errors"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/first-request",
-              "guides/webhooks",
-              "guides/rate-limits",
-              "guides/sdks"
-            ]
-          },
-          {
-            "group": "Help",
-            "pages": [
-              "help/faq",
-              "help/troubleshooting",
-              "help/changelog"
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "api-reference/overview",
+                  "api-reference/base-url",
+                  "api-reference/versioning"
+                ]
+              },
+              {
+                "group": "Endpoints",
+                "pages": [
+                  "api-reference/endpoints/trading",
+                  "api-reference/endpoints/finance-account",
+                  "api-reference/endpoints/currency",
+                  "api-reference/endpoints/fund-account",
+                  "api-reference/endpoints/funding-fee",
+                  "api-reference/endpoints/exchange-rate"
+                ]
+              }
             ]
           }
         ]
       },
       {
-        "tab": "API Reference",
-        "groups": [
+        "language": "zh",
+        "tabs": [
           {
-            "group": "Overview",
-            "pages": [
-              "api-reference/overview",
-              "api-reference/base-url",
-              "api-reference/versioning"
+            "tab": "文档",
+            "groups": [
+              {
+                "group": "开始",
+                "pages": [
+                  "zh/index",
+                  "zh/quickstart",
+                  "zh/authentication"
+                ]
+              },
+              {
+                "group": "核心概念",
+                "pages": [
+                  "zh/concepts/overview",
+                  "zh/concepts/request-response",
+                  "zh/concepts/pagination",
+                  "zh/concepts/errors"
+                ]
+              },
+              {
+                "group": "指南",
+                "pages": [
+                  "zh/guides/first-request",
+                  "zh/guides/webhooks",
+                  "zh/guides/rate-limits",
+                  "zh/guides/sdks"
+                ]
+              },
+              {
+                "group": "帮助",
+                "pages": [
+                  "zh/help/faq",
+                  "zh/help/troubleshooting",
+                  "zh/help/changelog"
+                ]
+              }
             ]
           },
           {
-            "group": "Endpoints",
-            "pages": [
-              "api-reference/endpoints/trading",
-              "api-reference/endpoints/finance-account",
-              "api-reference/endpoints/currency",
-              "api-reference/endpoints/fund-account",
-              "api-reference/endpoints/funding-fee",
-              "api-reference/endpoints/exchange-rate"
+            "tab": "API 参考",
+            "groups": [
+              {
+                "group": "概览",
+                "pages": [
+                  "zh/api-reference/overview",
+                  "zh/api-reference/base-url",
+                  "zh/api-reference/versioning"
+                ]
+              },
+              {
+                "group": "接口",
+                "pages": [
+                  "zh/api-reference/endpoints/trading",
+                  "zh/api-reference/endpoints/finance-account",
+                  "zh/api-reference/endpoints/currency",
+                  "zh/api-reference/endpoints/fund-account",
+                  "zh/api-reference/endpoints/funding-fee",
+                  "zh/api-reference/endpoints/exchange-rate"
+                ]
+              }
             ]
           }
         ]

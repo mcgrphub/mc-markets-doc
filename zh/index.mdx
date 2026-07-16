@@ -1,0 +1,76 @@
+---
+title: "MC OpenAPI — 多账户交易与资金 API"
+sidebarTitle: "简介"
+description: "MC OpenAPI 是面向多账户系统的 REST API,支持余额、持仓、交易记录、资金费、汇率以及理财账户申赎等能力。"
+---
+
+MC OpenAPI 是 MC 多账户平台提供的 REST API。你可以用它查询交易与资金流水、管理理财账户的申购与赎回、查询币种与网络信息、获取汇率与闪兑报价,以及读取持仓与储备金证明数据。
+
+所有请求都通过 MC **API 网关** 路由,并使用 **Access Key / Secret Key** 密钥对配合 **HMAC-SHA256** 完成请求签名。
+
+<CardGroup cols={2}>
+  <Card title="认证" icon="key" href="/zh/authentication">
+    AK/SK 凭证、HMAC-SHA256 签名、时间戳与权限
+  </Card>
+
+  <Card title="基础 URL" icon="server" href="/zh/api-reference/base-url">
+    测试与生产环境的网关地址
+  </Card>
+
+  <Card title="快速开始" icon="rocket" href="/zh/quickstart">
+    5 分钟内完成第一次带签名的 API 调用
+  </Card>
+
+  <Card title="API 参考" icon="code" href="/zh/api-reference/overview">
+    按标签组织的完整接口:交易、理财、币种、资金账户等
+  </Card>
+</CardGroup>
+
+## 基础 URL
+
+| 环境 | Base URL |
+| --- | --- |
+| 测试 | `https://test-gateway.mcconnects.com` |
+| 生产 | `https://gateway.mcconnects.com` |
+
+## 三步开始
+
+<Steps>
+  <Step title="获取 API Key">
+    登录 MC 平台,进入 **API Key 管理**,创建新的 Key 并勾选所需权限(`READ`、`TRADE`、`WITHDRAW`)。复制 Access Key 与 Secret Key —— Secret Key 仅显示一次。
+  </Step>
+  <Step title="对请求签名">
+    构造待签名字符串,用 Secret Key 计算 HMAC-SHA256 签名,连同 Access Key 与毫秒级时间戳一起发送。详见 [认证](/zh/authentication)。
+  </Step>
+  <Step title="调用接口">
+    先调用 [汇率查询](/zh/api-reference/endpoints/exchange-rate) 验证集成,再浏览 [完整 API 参考](/zh/api-reference/overview)。
+  </Step>
+</Steps>
+
+## API 内容
+
+<CardGroup cols={3}>
+  <Card title="交易" icon="right-left" href="/zh/api-reference/endpoints/trading">
+    按 transactionId 或分页查询交易记录与资金流水。
+  </Card>
+
+  <Card title="理财账户" icon="piggy-bank" href="/zh/api-reference/endpoints/finance-account">
+    活期与定期理财产品的申购、赎回,以及账户概览。
+  </Card>
+
+  <Card title="币种" icon="coins" href="/zh/api-reference/endpoints/currency">
+    查询币种网络、可兑换币种与币种详情。
+  </Card>
+
+  <Card title="资金账户" icon="wallet" href="/zh/api-reference/endpoints/fund-account">
+    读取现货持仓(v2)与用户储备金证明快照。
+  </Card>
+
+  <Card title="资金费历史" icon="receipt" href="/zh/api-reference/endpoints/funding-fee">
+    按持仓与结算时间聚合的资金费与利息费历史。
+  </Card>
+
+  <Card title="汇率" icon="chart-line" href="/zh/api-reference/endpoints/exchange-rate">
+    币对汇率、USD 汇率查询,以及带手续费估算的闪兑报价。
+  </Card>
+</CardGroup>

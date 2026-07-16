@@ -1,0 +1,263 @@
+---
+title: "MC OpenAPI 客户端代码示例"
+sidebarTitle: "代码示例"
+description: "Python、Node.js、Java、Go 的 MC OpenAPI HMAC-SHA256 签名客户端,开箱即用。"
+---
+
+MC OpenAPI 目前没有官方 SDK。因为所有请求的签名规则一致([认证](/zh/authentication)),只需一个轻量封装 HMAC-SHA256 签名 \+ 标准 HTTP 库的客户端即可。
+
+以下参考片段为生产可用的起点,可直接拷贝到你的代码库并适配。
+
+## Python
+
+```python
+"""mc_client.py — 最小 MC OpenAPI 客户端。"""
+import hmac, hashlib, json, time, os
+from urllib.parse import urlencode
+import requests
+
+
+class MCClient:
+    def __init__(self, access_key: str, secret_key: str,
+                 base_url: str = "https://gateway.mcconnects.com"):
+        self.access_key = access_key
+        self.secret_key = secret_key.encode()
+        self.base_url = base_url.rstrip("/")
+
+    def _sign(self, method: str, path: str, query: str, body: str, ts: str) -> str:
+        canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+        return hmac.new(self.secret_key, canonical.encode(), hashlib.sha256).hexdigest()
+
+    def request(self, method: str, path: str, *, params=None, json_body=None):
+        query = urlencode(sorted((params or {}).items()))
+        body = json.dumps(json_body, separators=(",", ":")) if json_body is not None else ""
+        ts = str(int(time.time() * 1000))
+        signature = self._sign(method.upper(), path, query, body, ts)
+
+        url = self.base_url + path + (f"?{query}" if query else "")
+        headers = {
+            "X-Access-Key": self.access_key,
+            "X-Signature": signature,
+            "X-Timestamp": ts,
+            "Accept": "application/json",
+        }
+        if body:
+            headers["Content-Type"] = "application/json"
+
+        r = requests.request(method, url, headers=headers, data=body or None, timeout=15)
+        r.raise_for_status()
+        return r.json()
+
+
+# 使用
+client = MCClient(os.environ["MC_ACCESS_KEY"], os.environ["MC_SECRET_KEY"])
+rates = client.request("GET", "/openapi/v1/exchange-rate/query/usd")
+print(rates)
+```
+
+## Node.js
+
+```javascript
+// mcClient.js — 最小 MC OpenAPI 客户端(Node.js 18+, ESM)。
+import crypto from "crypto";
+
+export class MCClient {
+  constructor({ accessKey, secretKey, baseUrl = "https://gateway.mcconnects.com" }) {
+    this.accessKey = accessKey;
+    this.secretKey = secretKey;
+    this.baseUrl = baseUrl.replace(/\/$/, "");
+  }
+
+  #sign(method, path, query, body, ts) {
+    const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
+    return crypto.createHmac("sha256", this.secretKey).update(canonical).digest("hex");
+  }
+
+  async request(method, path, { params = {}, jsonBody } = {}) {
+    const query = new URLSearchParams(
+      Object.entries(params).sort(([a], [b]) => a.localeCompare(b))
+    ).toString();
+    const body = jsonBody !== undefined ? JSON.stringify(jsonBody) : "";
+    const ts = Date.now().toString();
+    const signature = this.#sign(method.toUpperCase(), path, query, body, ts);
+
+    const url = this.baseUrl + path + (query ? `?${query}` : "");
+    const headers = {
+      "X-Access-Key": this.accessKey,
+      "X-Signature": signature,
+      "X-Timestamp": ts,
+      Accept: "application/json",
+    };
+    if (body) headers["Content-Type"] = "application/json";
+
+    const res = await fetch(url, { method, headers, body: body || undefined });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    return res.json();
+  }
+}
+
+// 使用
+const client = new MCClient({
+  accessKey: process.env.MC_ACCESS_KEY,
+  secretKey: process.env.MC_SECRET_KEY,
+});
+const rates = await client.request("GET", "/openapi/v1/exchange-rate/query/usd");
+console.log(rates);
+```
+
+## Java
+
+```java
+// MCClient.java — 最小 MC OpenAPI 客户端(Java 11+)。
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+public class MCClient {
+    private final String accessKey;
+    private final byte[] secretKey;
+    private final String baseUrl;
+    private final HttpClient http = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10)).build();
+
+    public MCClient(String accessKey, String secretKey, String baseUrl) {
+        this.accessKey = accessKey;
+        this.secretKey = secretKey.getBytes(StandardCharsets.UTF_8);
+        this.baseUrl = baseUrl.replaceAll("/$", "");
+    }
+
+    private String sign(String method, String path, String query, String body, String ts) {
+        try {
+            String canonical = method + "\n" + path + "\n" + query + "\n" + body + "\n" + ts;
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(secretKey, "HmacSHA256"));
+            byte[] raw = mac.doFinal(canonical.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : raw) hex.append(String.format("%02x", b));
+            return hex.toString();
+        } catch (Exception e) { throw new RuntimeException(e); }
+    }
+
+    public HttpResponse<String> request(String method, String path,
+                                        Map<String, String> params, String body) throws Exception {
+        StringBuilder qb = new StringBuilder();
+        if (params != null) {
+            for (Map.Entry<String, String> e : new TreeMap<>(params).entrySet()) {
+                if (qb.length() > 0) qb.append('&');
+                qb.append(e.getKey()).append('=').append(e.getValue());
+            }
+        }
+        String query = qb.toString();
+        String safeBody = body == null ? "" : body;
+        String ts = String.valueOf(System.currentTimeMillis());
+        String signature = sign(method, path, query, safeBody, ts);
+
+        String url = baseUrl + path + (query.isEmpty() ? "" : "?" + query);
+        HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(url))
+                .header("X-Access-Key", accessKey)
+                .header("X-Signature", signature)
+                .header("X-Timestamp", ts)
+                .header("Accept", "application/json");
+        if (!safeBody.isEmpty()) b.header("Content-Type", "application/json");
+        b.method(method,
+                safeBody.isEmpty()
+                        ? HttpRequest.BodyPublishers.noBody()
+                        : HttpRequest.BodyPublishers.ofString(safeBody));
+
+        return http.send(b.build(), HttpResponse.BodyHandlers.ofString());
+    }
+}
+```
+
+## Go
+
+```go
+// mcclient.go — 最小 MC OpenAPI 客户端。
+package mc
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+    "fmt"
+    "io"
+    "net/http"
+    "net/url"
+    "sort"
+    "strings"
+    "time"
+)
+
+type Client struct {
+    AccessKey string
+    SecretKey []byte
+    BaseURL   string
+    HTTP      *http.Client
+}
+
+func New(accessKey, secretKey, baseURL string) *Client {
+    return &Client{
+        AccessKey: accessKey,
+        SecretKey: []byte(secretKey),
+        BaseURL:   strings.TrimRight(baseURL, "/"),
+        HTTP:      &http.Client{Timeout: 15 * time.Second},
+    }
+}
+
+func (c *Client) sign(method, path, query, body, ts string) string {
+    canonical := method + "\n" + path + "\n" + query + "\n" + body + "\n" + ts
+    m := hmac.New(sha256.New, c.SecretKey)
+    m.Write([]byte(canonical))
+    return hex.EncodeToString(m.Sum(nil))
+}
+
+func (c *Client) Do(method, path string, params url.Values, body string) ([]byte, error) {
+    keys := make([]string, 0, len(params))
+    for k := range params {
+        keys = append(keys, k)
+    }
+    sort.Strings(keys)
+    parts := make([]string, 0, len(keys))
+    for _, k := range keys {
+        parts = append(parts, k+"="+params.Get(k))
+    }
+    query := strings.Join(parts, "&")
+
+    ts := fmt.Sprintf("%d", time.Now().UnixMilli())
+    signature := c.sign(method, path, query, body, ts)
+
+    full := c.BaseURL + path
+    if query != "" {
+        full += "?" + query
+    }
+    req, err := http.NewRequest(method, full, strings.NewReader(body))
+    if err != nil {
+        return nil, err
+    }
+    req.Header.Set("X-Access-Key", c.AccessKey)
+    req.Header.Set("X-Signature", signature)
+    req.Header.Set("X-Timestamp", ts)
+    req.Header.Set("Accept", "application/json")
+    if body != "" {
+        req.Header.Set("Content-Type", "application/json")
+    }
+
+    resp, err := c.HTTP.Do(req)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+    return io.ReadAll(resp.Body)
+}
+```
+
+<Tip>
+  以上片段都按 [认证](/zh/authentication) 文档描述的方式签名。如果签名被拒 (`code: "40001"`),打印你的待签名字符串,与参考实现逐字节对比。
+</Tip>

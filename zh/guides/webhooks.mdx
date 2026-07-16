@@ -1,0 +1,103 @@
+---
+title: "MC OpenAPI 中的轮询更新"
+sidebarTitle: "轮询更新"
+description: "MC OpenAPI 仅支持请求-响应——使用以下轮询模式检测新交易、余额变化与汇率更新。"
+---
+
+<Note>
+  MC OpenAPI 目前不提供 Webhook 或事件推送。需要检测新活动的集成应按计划轮询相关列表接口。
+</Note>
+
+## 轮询什么
+
+选择与你关心事件最匹配的接口:
+
+| 你想检测 | 轮询接口 | 建议频率 |
+| --- | --- | --- |
+| 新交易记录 | `POST /openapi/v1/transaction/transaction/record/page` | 30–60 秒 |
+| 余额/申购/赎回变化 | `POST /openapi/v1/finance/account/overview` | 60 秒 |
+| 现货持仓变化 | `GET /openapi/v1/fund/account/spot/positions/v2` | 60–300 秒 |
+| 资金费事件 | `POST /openapi/v1/funding-fee-record/page/v2` | 300 秒(上游 8 小时结算) |
+| 汇率更新 | `GET /openapi/v1/exchange-rate/query/usd` | 60–300 秒 |
+
+具体形式见 [API 参考](/zh/api-reference/overview)。
+
+## 高效轮询模式
+
+目标是**仅获取上次以后的新数据**,避免重下全量。
+
+1. 记录**水位线**:已处理的最大 `createdTime`(或 `transactionId`)。
+2. 每次轮询使用 `startTime = watermark + 1`(或同等过滤)。
+3. 如果 `pages > 1`,继续遗历——见 [分页](/zh/concepts/pagination)。
+4. 仅在**持久化处理完本批**后再保存新水位线,避免崩溃时丢失记录。
+5. Sleep,重复。
+
+### Python 示例
+
+```python
+import time, hmac, hashlib, json, requests
+
+BASE_URL = "https://gateway.mcconnects.com"
+ACCESS_KEY, SECRET_KEY = "…", "…"
+
+def sign(method, path, query, body, ts):
+    canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+    return hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+def poll_new_transactions(watermark_ms: int, page_size: int = 100):
+    path = "/openapi/v1/transaction/transaction/record/page"
+    page_num = 1
+    new_watermark = watermark_ms
+    collected = []
+
+    while True:
+        body = json.dumps({
+            "pageNum": page_num, "pageSize": page_size,
+            "startTime": watermark_ms + 1,
+        }, separators=(",", ":"))
+        ts = str(int(time.time() * 1000))
+        signature = sign("POST", path, "", body, ts)
+        r = requests.post(
+            BASE_URL + path,
+            headers={
+                "X-Access-Key": ACCESS_KEY,
+                "X-Signature": signature,
+                "X-Timestamp": ts,
+                "Content-Type": "application/json",
+            },
+            data=body,
+        )
+        r.raise_for_status()
+        page = r.json()["data"]
+
+        for record in page["list"]:
+            collected.append(record)
+            new_watermark = max(new_watermark, record["createdTime"])
+
+        if page_num >= page["pages"]:
+            break
+        page_num += 1
+
+    return collected, new_watermark
+
+
+watermark = load_watermark_from_db()
+while True:
+    records, watermark = poll_new_transactions(watermark)
+    if records:
+        handle_new_records(records)
+        persist_watermark(watermark)
+    time.sleep(30)
+```
+
+## 最佳实践
+
+- **不要轮询得过快。** 多余调用会吃掉 [频率限制](/zh/guides/rate-limits) 额度。
+- **给轮询间隔加抖动** (`sleep(30 + random(0, 5))`),避免多实例同步命中网关。
+- **持久化水位线。** 内存状态重启后丢失,可能导致重复或遗漏。
+- **在接收端去重。** 即使有水位线,重试与最终一致性仍可能产生重复——以 `transactionId` 为幂等键。
+- **对 `429` / `5xx` 退避。** 复用 [指数退避](/zh/guides/rate-limits) 封装。
+
+<Tip>
+  确实需要推送时,联系 MC 支持确认你的账号层级建议。
+</Tip>

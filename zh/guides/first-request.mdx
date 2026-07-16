@@ -1,0 +1,174 @@
+---
+title: "发起首次 MC OpenAPI 请求"
+sidebarTitle: "首次请求"
+description: "端到端演示:创建 Access Key、对请求签名,并调用 USD 汇率接口。"
+---
+
+本指南带你完成一次完整的已签名 MC OpenAPI 调用。完成后你将获得一个可用的 `GET /openapi/v1/exchange-rate/query/usd` 请求实现,返回实时 USD 汇率。
+
+## 前置条件
+
+开始前确保:
+
+- 已开启 API 接入的 MC 账号。
+- **Access Key** 与 **Secret Key** — 创建方式见 [认证](/zh/authentication)。
+- Key 已开启 `READ` 权限(汇率接口必需)。
+- 可发送 HTTPS 请求的工具:`curl`、Python 3.8\+ 或 Node.js 18\+。
+
+<Warning>
+  Secret Key 仅在创建时显示一次。请保存到密钥管理器或环境变量中,不要提交到代码仓库。
+</Warning>
+
+## 步骤 1 — 选择环境
+
+| 环境 | Base URL |
+| --- | --- |
+| 测试 | `https://test-gateway.mcconnects.com` |
+| 生产 | `https://gateway.mcconnects.com` |
+
+本指南使用生产环境。换为测试只需替换主机。
+
+## 步骤 2 — 了解你在签名什么
+
+每个 MC OpenAPI 请求都对以下待签名字符串进行 HMAC-SHA256 签名:
+
+```text
+{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+```
+
+对 `GET /openapi/v1/exchange-rate/query/usd` 无 query、无 body 的调用:
+
+```text
+GET
+/openapi/v1/exchange-rate/query/usd
+
+
+1731657600000
+```
+
+注意空 query 与空 body 对应的空行。完整规则见 [认证](/zh/authentication)。
+
+## 步骤 3 — 发送请求
+
+### cURL
+
+```bash
+ACCESS_KEY="your_access_key"
+SECRET_KEY="your_secret_key"
+TS=$(date +%s000)
+METHOD="GET"
+PATH_="/openapi/v1/exchange-rate/query/usd"
+
+CANONICAL=$(printf "%s\n%s\n\n\n%s" "$METHOD" "$PATH_" "$TS")
+SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -hex | awk '{print $2}')
+
+curl --request GET \
+  --url "https://gateway.mcconnects.com${PATH_}" \
+  --header "X-Access-Key: ${ACCESS_KEY}" \
+  --header "X-Signature: ${SIGNATURE}" \
+  --header "X-Timestamp: ${TS}" \
+  --header "Accept: application/json"
+```
+
+### Python
+
+```python
+import hmac, hashlib, time, requests, os
+
+BASE_URL = "https://gateway.mcconnects.com"
+ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
+SECRET_KEY = os.environ["MC_SECRET_KEY"]
+
+method = "GET"
+path = "/openapi/v1/exchange-rate/query/usd"
+query = ""
+body = ""
+ts = str(int(time.time() * 1000))
+
+canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+signature = hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+resp = requests.get(
+    BASE_URL + path,
+    headers={
+        "X-Access-Key": ACCESS_KEY,
+        "X-Signature": signature,
+        "X-Timestamp": ts,
+        "Accept": "application/json",
+    },
+)
+print(resp.status_code, resp.json())
+```
+
+### Node.js
+
+```javascript
+import crypto from "crypto";
+
+const BASE_URL = "https://gateway.mcconnects.com";
+const ACCESS_KEY = process.env.MC_ACCESS_KEY;
+const SECRET_KEY = process.env.MC_SECRET_KEY;
+
+const method = "GET";
+const path = "/openapi/v1/exchange-rate/query/usd";
+const query = "";
+const body = "";
+const ts = Date.now().toString();
+
+const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
+const signature = crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
+
+const res = await fetch(BASE_URL + path, {
+  method,
+  headers: {
+    "X-Access-Key": ACCESS_KEY,
+    "X-Signature": signature,
+    "X-Timestamp": ts,
+    Accept: "application/json",
+  },
+});
+
+console.log(res.status, await res.json());
+```
+
+## 步骤 4 — 读取响应
+
+成功响应:
+
+```json
+{
+  "code": "0",
+  "msg": "success",
+  "success": true,
+  "data": [
+    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "EUR", "rate": "0.9187" },
+    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "JPY", "rate": "155.42" },
+    { "symbolType": "CRYPTO", "baseCurrency": "USD", "targetCurrency": "BTC", "rate": "0.0000148" }
+  ]
+}
+```
+
+- `code == "0"` 调用成功。
+- `data` 载荷 — 完整 schema 见 [汇率接口](/zh/api-reference/endpoints/exchange-rate)。
+
+如 `code` 不为 `"0"`,查看 `msg` 并参阅 [错误处理](/zh/concepts/errors)。
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="探索全部接口" icon="list" href="/zh/api-reference/overview">
+    浏览六个分组及其 schema。
+  </Card>
+
+  <Card title="处理分页" icon="layer-group" href="/zh/concepts/pagination">
+    学习如何遗历列表接口(如交易记录)。
+  </Card>
+
+  <Card title="参考实现" icon="code" href="/zh/guides/sdks">
+    Python、Java、Node.js 代码片段。
+  </Card>
+
+  <Card title="处理频率限制" icon="gauge-high" href="/zh/guides/rate-limits">
+    为 `429 Too Many Requests` 实现退避。
+  </Card>
+</CardGroup>

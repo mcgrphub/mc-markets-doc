@@ -1,0 +1,90 @@
+---
+title: "MC OpenAPI 频率限制"
+sidebarTitle: "频率限制"
+description: "MC OpenAPI 按 Access Key 施加频率限制、如何识别与如何实现指数退避。"
+---
+
+MC OpenAPI 在网关侧按 Access Key 施加请求频率限制,以保护平台并为每个集成提供公平容量。
+
+<Note>
+  具体接口限额因账号层级而异。需要更高吐吐量请联系 MC 支持。
+</Note>
+
+## 限制如何施加
+
+- 按 **Access Key** 计数,而非 IP。
+- 测试与生产网关各自独立计数。
+- 重型接口(分页历史查询、PoR 快照)下的限额严于轻量元数据接口。
+
+## 识别限流
+
+超过限额后,网关返回 HTTP **`429 Too Many Requests`** 与业务错误信封:
+
+```json
+{
+  "code": "42901",
+  "msg": "Too many requests",
+  "success": false,
+  "data": null
+}
+```
+
+同时检查两者:
+
+- HTTP 状态码—传输层信号。
+- 信封中 `code == "42901"`(或其他限流码)—表示限流。
+
+## 推荐处理:带抖动的指数退避
+
+不要在遇到 `429` 后紧循环重试。等待 \+ 指数增长延时 \+ 少量随机抖动,避免同步重试风暴。
+
+### Python
+
+```python
+import time, random
+
+def call_with_backoff(send_request, *, max_retries=6, base=1.0, cap=30.0):
+    for attempt in range(max_retries):
+        response = send_request()
+        if response.status_code != 429:
+            return response
+
+        payload = {}
+        try:
+            payload = response.json()
+        except ValueError:
+            pass
+        if payload.get("code") not in {"42901", None}:
+            return response
+
+        delay = min(cap, base * (2 ** attempt)) + random.uniform(0, 0.5)
+        time.sleep(delay)
+
+    raise RuntimeError("Exceeded max retries after repeated 429 responses")
+```
+
+### JavaScript
+
+```javascript
+async function callWithBackoff(sendRequest, { maxRetries = 6, base = 1000, cap = 30_000 } = {}) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const res = await sendRequest();
+    if (res.status !== 429) return res;
+    const delay = Math.min(cap, base * 2 ** attempt) + Math.floor(Math.random() * 500);
+    await new Promise((r) => setTimeout(r, delay));
+  }
+  throw new Error("Exceeded max retries after repeated 429 responses");
+}
+```
+
+## 最佳实践
+
+- **高效分页。** 使用接口允许的最大 `pageSize`—见 [分页](/zh/concepts/pagination)。
+- **缓存慢变数据。** 币种列表、兑换元数据、USD 汇率变化缓慢,可本地缓存数分钟。
+- **工作负载分开 Key。** 交互查询与后台任务使用不同 Key,避免任务处抢占用户流量。
+- **同步时钟。** 时钟偏离将产生签名失败 `401`,但重试依然消耗频率预算。使用 NTP。
+- **`5xx` 同样处理。** 对 `500`、`502`、`503` 采用相同指数退避。
+
+<Tip>
+  在每次 `429` 时记录 `code`、`msg` 与相关相关 ID。若常规负载下仍频繁命中,带上日志联系支持以评估账号层级。
+</Tip>

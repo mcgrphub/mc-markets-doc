@@ -1,0 +1,103 @@
+---
+title: "MC OpenAPI 常见问题"
+sidebarTitle: "FAQ"
+description: "MC OpenAPI 常见问题解答:签名、权限、环境、分页、PoR 快照与获取帮助。"
+---
+
+## 入门
+
+<AccordionGroup>
+  <Accordion title="如何获取 Access Key 与 Secret Key?">
+    登录 MC 账号,打开 **API 管理**。创建新 Key,选择需要的权限(`READ`、`TRADE`、`WITHDRAW`),立即复制 Access Key 与 Secret Key—Secret Key 仅显示一次。完整步骤见 [认证](/zh/authentication)。
+  </Accordion>
+
+  <Accordion title="测试与生产网关有什么区别?">
+    - **测试:** `https://test-gateway.mcconnects.com` — 集成沙盒。使用测试余额,不影响真实资金。
+    - **生产:** `https://gateway.mcconnects.com` — 真实流量。
+
+    密钥与环境绑定:测试 Key 不能用于生产,反之亦然。见 [基础 URL](/zh/api-reference/base-url)。
+  </Accordion>
+
+  <Accordion title="每个接口需要什么权限?">
+    - `READ` — 大多查询接口(交易、持仓、汇率、币种元数据、PoR)。
+    - `TRADE` — 理财产品申购与定期订阅。
+    - `WITHDRAW` — 理财产品赎回。
+
+    具体权限在 [API 参考](/zh/api-reference/overview) 的接口页中标注。
+  </Accordion>
+</AccordionGroup>
+
+## 认证
+
+<AccordionGroup>
+  <Accordion title="到底签名什么?">
+    待签名字符串为 `METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP` — 五行,`\n` 分隔,无 query/body 时为空行。使用 Secret Key 计算 HMAC-SHA256,小写 hex 放入 `X-Signature`。参考 [认证](/zh/authentication)。
+  </Accordion>
+
+  <Accordion title="返回 code 40001(签名无效) 怎么办?">
+    按可能性排序:
+
+    1. 待签名字符串与网关预期不一致——打印并逐字节对比。
+    2. 签名时使用的 body 与实际发送的 body 不一致(多余空格、键顺序不同)。序列化一次,两处复用同一字符串。
+    3. 把 Access Key 当作 Secret Key。
+    4. query 参数未按 key 升序排序。
+
+    另见 [排障](/zh/help/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="返回 code 40002(时间戳过期) 怎么办?">
+    本机时钟与网关偏离。`X-Timestamp` 必须是当前 UTC **毫秒**(非秒),并位于服务器时间附近。使用 NTP 同步。
+  </Accordion>
+
+  <Accordion title="如何无寕机轮换密钥?">
+    可以。创建一把相同权限的新 Key,部署后在后台禁用旧 Key。两把 Key 在旧 Key 禁用前同时有效。
+  </Accordion>
+</AccordionGroup>
+
+## 请求与分页
+
+<AccordionGroup>
+  <Accordion title="哪些接口返回分页响应?">
+    所有列表型接口(交易记录、资金费历史)均返回 `pageNum`、`pageSize`、`total`、`pages` 与 `list`。见 [分页](/zh/concepts/pagination)。
+  </Accordion>
+
+  <Accordion title="pageSize 最大多少?">
+    多数列表接口上限为 `100`。具体以 [API 参考](/zh/api-reference/overview) 为准。
+  </Accordion>
+
+  <Accordion title="如何获取实时更新?">
+    MC OpenAPI 目前不提供 Webhook 或事件推送。使用 [轮询模式](/zh/guides/webhooks) 高效检测新活动。
+  </Accordion>
+</AccordionGroup>
+
+## 数据模型
+
+<AccordionGroup>
+  <Accordion title="什么是储备金证明(PoRv2)?">
+    基于 Merkle 树的用户资产快照。调用 `GET /openapi/v1/fund/account/por` 获取你的快照与审计路径。完整 schema 见 [资金账户](/zh/api-reference/endpoints/fund-account)。
+  </Accordion>
+
+  <Accordion title="v1 与 v2 接口差异?">
+    部分资源(现货持仓、资金费记录)提供 v2。v2 为当前推荐版本,返回额外字段。见 [版本管理](/zh/api-reference/versioning)。
+  </Accordion>
+
+  <Accordion title="数字字段是数字还是字符串?">
+    所有金额、价格、汇率都以**字符串**返回以保留精度。使用十进制库解析(Python `Decimal`、JavaScript `bignumber.js`、Java `BigDecimal`),不要使用浮点型。
+  </Accordion>
+</AccordionGroup>
+
+## 运维
+
+<AccordionGroup>
+  <Accordion title="有官方 SDK 吗?">
+    暂无。Python、Node.js、Java、Go 的开箱即用客户端见 [代码示例](/zh/guides/sdks)。
+  </Accordion>
+
+  <Accordion title="频率限制如何实施?">
+    网关按 Access Key 计数。超限后返回 HTTP `429` 与 `code: "42901"`。退避策略见 [频率限制](/zh/guides/rate-limits)。
+  </Accordion>
+
+  <Accordion title="如何提 Bug 或需求?">
+    联系 MC 支持,附上:描述、受影响接口、失败请求的时间戳,如可能包含响应体(隐去 Secret Key)。
+  </Accordion>
+</AccordionGroup>

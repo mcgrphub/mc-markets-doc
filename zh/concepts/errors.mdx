@@ -1,0 +1,127 @@
+---
+title: "MC OpenAPI 错误处理"
+sidebarTitle: "错误处理"
+description: "MC OpenAPI 错误格式、常见业务码、HTTP 状态码与推荐重试策略。"
+---
+
+MC OpenAPI 在**两层**报告失败:标准 HTTP 状态码,以及 JSON 信封中的业务 `code`。健壮的集成应同时检查两者。
+
+## 两层错误模型
+
+1. **传输层** — HTTP 状态码。`4xx` 为客户端问题,`5xx` 为网关/服务问题。
+2. **业务层** — JSON 信封中的 `code`。`200 OK` 仍可能携带业务错误(如余额不足、币种不存在)。
+
+无论 HTTP 状态码如何,都应检查 `code`。
+
+## 错误响应格式
+
+失败响应保持相同信封,`code` 为非 `"0"`,`success` 为 `false`:
+
+```json
+{
+  "code": "40001",
+  "msg": "Invalid signature",
+  "success": false,
+  "data": null
+}
+```
+
+   
+
+## HTTP 状态码
+
+| 码 | 发生时机 | 应对 |
+| --- | --- | --- |
+| `400` | JSON 格式错误、参数缺失 | 修正后重试。 |
+| `401` | `X-Signature` 缺失/无效或 `X-Timestamp` 偏离 | 校对签名与时钟,重新签名后重试。 |
+| `403` | Access Key 缺少必需权限 | 在 Key 管理台勾选 `READ`/`TRADE`/`WITHDRAW`。 |
+| `404` | 路径错误或资源 ID 不存在 | 核对 URL 与 ID。 |
+| `429` | 频率限制 | 退避重试—见 [频率限制](/zh/guides/rate-limits)。 |
+| `500`/`502`/`503` | 网关/上游错误 | 指数退避重试。 |
+
+## 常见业务码
+
+| `code` | 含义 | 建议处理 |
+| --- | --- | --- |
+| `"0"` | 成功 | 消费 `data`。 |
+| `40001` | 签名无效 | 重算签名;核对 Secret Key 与待签名字符串。 |
+| `40002` | 时间戳过期/偏离 | 同步时钟;使用当前 UTC 毫秒。 |
+| `40003` | Access Key 不存在/已禁用 | 在后台检查状态。 |
+| `40301` | 权限不足 | 为 Key 添加对应权限。 |
+| `40401` | 资源不存在 | 核对请求中的 ID。 |
+| `42201` | 参数校验失败 | 根据 `msg` 修正参数。 |
+| `42901` | 频率限制 | 退避后重试。 |
+| `50001` | 内部错误 | 指数退避重试;持续时联系支持。 |
+
+<Note>
+  `code` 为字符串,非整数——始终以字符串相等比较(`code === "0"`)。
+</Note>
+
+## 错误处理示例
+
+### Python
+
+```python
+import requests, time
+
+def call(method, path, body=""):
+    # … 按认证文档构造已签名请求…
+    response = requests.request(method, url, headers=headers, data=body)
+
+    if response.status_code == 429 or 500 <= response.status_code < 600:
+        raise TransientError(response.status_code, response.text)
+
+    payload = response.json()
+    code = payload.get("code")
+
+    if code == "0":
+        return payload["data"]
+
+    if code in {"40001", "40002"}:
+        raise AuthError(code, payload["msg"])
+    if code == "42901":
+        raise TransientError(code, payload["msg"])
+
+    raise BusinessError(code, payload["msg"])
+
+
+def with_backoff(fn, *args, max_retries=5, **kwargs):
+    delay = 1.0
+    for attempt in range(max_retries):
+        try:
+            return fn(*args, **kwargs)
+        except TransientError:
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(delay)
+            delay = min(delay * 2, 30)
+```
+
+### JavaScript
+
+```javascript
+async function call(method, path, body = "") {
+  // … 按认证文档构造已签名请求…
+  const res = await fetch(url, { method, headers, body: body || undefined });
+
+  if (res.status === 429 || res.status >= 500) {
+    throw new TransientError(res.status, await res.text());
+  }
+
+  const payload = await res.json();
+
+  if (payload.code === "0") return payload.data;
+
+  if (payload.code === "40001" || payload.code === "40002") {
+    throw new AuthError(payload.code, payload.msg);
+  }
+  if (payload.code === "42901") {
+    throw new TransientError(payload.code, payload.msg);
+  }
+  throw new BusinessError(payload.code, payload.msg);
+}
+```
+
+<Tip>
+  对于 `429` 与 `5xx`,采用**带抖动的指数退避**:初始 ~1s,每次失败翻倍,封顶 ~30s,并添加少量随机偏移以避免同步重试。
+</Tip>

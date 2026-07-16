@@ -1,0 +1,139 @@
+---
+title: "分页 MC OpenAPI 列表接口"
+sidebarTitle: "分页"
+description: "MC OpenAPI 列表接口的 pageNum / pageSize 用法与大结果集遗历。"
+---
+
+MC OpenAPI 所有列表接口采用基于页号的分页。你使用 `pageNum` 与 `pageSize` 请求单页,响应同时返回当页数据以及遗历下一页所需的元信息。
+
+## 请求参数
+
+分页接口支持以下参数(GET 在 query、POST 在 body,具体见各接口页):
+
+<ParamField query="pageNum" default="1" type="integer">
+  要获取的页码,从 1 开始。
+</ParamField>
+
+<ParamField query="pageSize" default="20" type="integer">
+  每页条数。典型上限 `100`,具体以接口为准。
+</ParamField>
+
+大多列表接口还支持额外过滤参数(如 `startTime`、`endTime`、`symbol`、`type`)。详见 [API 参考](/zh/api-reference/overview)。
+
+## 响应形式
+
+```json
+{
+  "code": "0",
+  "msg": "success",
+  "success": true,
+  "data": {
+    "pageNum": 1,
+    "pageSize": 20,
+    "total": 132,
+    "pages": 7,
+    "list": [
+      {
+        "transactionId": "T-1001",
+        "amount": "125.50",
+        "currency": "USDT",
+        "createdTime": 1731657600000
+      }
+    ]
+  }
+}
+```
+
+    
+
+## 遗历全部页
+
+循环直到 `pageNum >= pages`,每次递增 `pageNum`。下面例子获取指定账户的全部交易记录。
+
+### Python
+
+```python
+import time, hmac, hashlib, requests
+
+BASE_URL = "https://gateway.mcconnects.com"
+ACCESS_KEY = "YOUR_ACCESS_KEY"
+SECRET_KEY = "YOUR_SECRET_KEY"
+
+def sign(method, path, query, body, ts):
+    canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+    return hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+def fetch_all_transactions(page_size=100):
+    path = "/openapi/v1/transaction/account/record/page"
+    page_num = 1
+    all_items = []
+
+    while True:
+        body = f'{{"pageNum":{page_num},"pageSize":{page_size}}}'
+        ts = str(int(time.time() * 1000))
+        signature = sign("POST", path, "", body, ts)
+        headers = {
+            "X-Access-Key": ACCESS_KEY,
+            "X-Signature": signature,
+            "X-Timestamp": ts,
+            "Content-Type": "application/json",
+        }
+        r = requests.post(BASE_URL + path, headers=headers, data=body)
+        r.raise_for_status()
+        page = r.json()["data"]
+        all_items.extend(page["list"])
+
+        if page_num >= page["pages"]:
+            break
+        page_num += 1
+
+    return all_items
+```
+
+### Node.js
+
+```javascript
+import crypto from "crypto";
+
+const BASE_URL = "https://gateway.mcconnects.com";
+const ACCESS_KEY = process.env.MC_ACCESS_KEY;
+const SECRET_KEY = process.env.MC_SECRET_KEY;
+
+function sign(method, path, query, body, ts) {
+  const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
+  return crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
+}
+
+async function fetchAllTransactions(pageSize = 100) {
+  const path = "/openapi/v1/transaction/account/record/page";
+  let pageNum = 1;
+  const all = [];
+
+  while (true) {
+    const body = JSON.stringify({ pageNum, pageSize });
+    const ts = Date.now().toString();
+    const signature = sign("POST", path, "", body, ts);
+
+    const res = await fetch(BASE_URL + path, {
+      method: "POST",
+      headers: {
+        "X-Access-Key": ACCESS_KEY,
+        "X-Signature": signature,
+        "X-Timestamp": ts,
+        "Content-Type": "application/json",
+      },
+      body,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { data } = await res.json();
+    all.push(...data.list);
+    if (pageNum >= data.pages) break;
+    pageNum += 1;
+  }
+  return all;
+}
+```
+
+<Tip>
+  尽量使用接口允许的最大 `pageSize`,以减少往返次数并降低命中 [频率限制](/zh/guides/rate-limits) 的风险。
+</Tip>

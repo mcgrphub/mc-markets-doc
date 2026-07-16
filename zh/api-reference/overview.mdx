@@ -1,0 +1,87 @@
+---
+title: "API 参考"
+sidebarTitle: "概览"
+description: "MC OpenAPI 接口按标签分组:交易、理财、币种、资金账户、资金费、汇率。"
+---
+
+本参考涵盖 MC OpenAPI(MC-account，`v0.0.1`)的全部接口,按标签分组。所有接口共享相同的网关主机、路径前缀(`/openapi/v1`)、鉴权方式(AK/SK \+ HMAC-SHA256)以及 JSON 响应信封。
+
+<CardGroup cols={2}>
+  <Card title="认证" icon="lock" href="/zh/authentication">
+    AK/SK 凭证、HMAC-SHA256 签名、时间戳与权限。
+  </Card>
+
+  <Card title="基础 URL" icon="server" href="/zh/api-reference/base-url">
+    测试与生产网关,以及如何切换。
+  </Card>
+
+  <Card title="版本管理" icon="code-branch" href="/zh/api-reference/versioning">
+    `/openapi/v1` 路径版本与废弃策略。
+  </Card>
+
+  <Card title="交易" icon="right-left" href="/zh/api-reference/endpoints/trading">
+    交易记录与资金流水。
+  </Card>
+
+  <Card title="理财账户" icon="piggy-bank" href="/zh/api-reference/endpoints/finance-account">
+    活期/定期申购与赎回、账户概览。
+  </Card>
+
+  <Card title="币种" icon="coins" href="/zh/api-reference/endpoints/currency">
+    币种网络列表、可兑换币种与币种详情。
+  </Card>
+
+  <Card title="资金账户" icon="wallet" href="/zh/api-reference/endpoints/fund-account">
+    现货持仓(v2)与用户储备金证明。
+  </Card>
+
+  <Card title="资金费" icon="receipt" href="/zh/api-reference/endpoints/funding-fee">
+    资金费与利息费历史分页查询(v2)。
+  </Card>
+
+  <Card title="汇率" icon="chart-line" href="/zh/api-reference/endpoints/exchange-rate">
+    币对汇率、USD 汇率与闪兑报价。
+  </Card>
+</CardGroup>
+
+## API 一览
+
+| 属性 | 值 |
+| --- | --- |
+| 产品 | MC-account（多账户系统） |
+| 版本 | `v0.0.1` |
+| Base URL(测试) | `https://test-gateway.mcconnects.com` |
+| Base URL(生产) | `https://gateway.mcconnects.com` |
+| 路径前缀 | `/openapi/v1` |
+| 协议 | 仅 HTTPS |
+| 格式 | JSON |
+| 鉴权 | AK/SK \+ HMAC-SHA256 |
+| 必需头 | `X-Access-Key`、`X-Signature`、`X-Timestamp` |
+| 权限 | `READ`、`TRADE`、`WITHDRAW` |
+
+## 响应信封
+
+所有接口返回统一的 JSON 信封:
+
+```json
+{
+  "status": 200,
+  "code": "200",
+  "codeKey": "DEFAULT",
+  "message": "...",
+  "success": true,
+  "data": { }
+}
+```
+
+- `status` — body 中回传的 HTTP 状态。
+- `code` / `codeKey` — 业务级状态(如 `PARAM_ERROR`、`SIGN_ERROR`、`PERMISSION_DENIED`、`ACCOUNT_BALANCE_INSUFFICIENT`)。
+- `success` — 业务成功时为 `true`。
+- `data` — 具体接口的数据(对象、数组、字符串或数字)。
+
+## 通用约定
+
+- **`trackingId`** — 大多数 POST body 需传 `trackingId` 字符串,每次请求不同,用于幂等与追踪。
+- **分页请求** — 共享 `{ size, current, orderBy, orderDirection, trackingId, ...filters }`。`orderBy` 支持逗号分隔多字段(如 `id,createTime`);`orderDirection` 为 `ASC`/`DESC`,逗号对应。
+- **分页响应** — 共享 `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`。
+- **时间格式** — `yyyy-MM-dd HH:mm:ss.SSS`(ISO 8601)。

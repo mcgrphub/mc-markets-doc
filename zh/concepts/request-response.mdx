@@ -1,0 +1,119 @@
+---
+title: "MC OpenAPI 请求与响应格式"
+sidebarTitle: "请求与响应"
+description: "MC OpenAPI HTTP 请求与 JSON 响应参考:签名头、body 格式、响应信封与 HTTP 状态码。"
+---
+
+MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关,携带三个签名头;请求带 body 时为 JSON。所有响应都是包含 `code`、`msg`、`data`、`success` 的 JSON 信封。
+
+## 请求格式
+
+### 必需头
+
+| Header | 必需 | 值 |
+| --- | --- | --- |
+| `X-Access-Key` | 是 | 你的 Access Key ID |
+| `X-Signature` | 是 | 待签名字符串的小写 hex HMAC-SHA256 签名 |
+| `X-Timestamp` | 是 | 当前 UTC 时间(毫秒) |
+| `Content-Type` | POST/PUT | `application/json` |
+| `Accept` | 建议 | `application/json` |
+
+<Warning>
+  缺少有效签名头或 `X-Timestamp` 超出允许区间的请求将被拒绝。切勿将 Secret Key 提交到代码仓库或在客户端暴露。
+</Warning>
+
+待签名字符串的确切格式与 Python/Java/Node.js 参考实现见 [认证](/zh/authentication)。
+
+### 待签名字符串
+
+```text
+{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+```
+
+- `METHOD` — 大写 HTTP 方法。
+- `PATH` — 以 `/openapi/v1/...` 开头的完整路径,不包含 query。
+- `SORTED_QUERY_STRING` — 按 key 升序排列的 `key=value` 拼接,无 query 时为空字符串。
+- `BODY_OR_EMPTY` — 实际发送的 JSON body 原文;无 body 时为空。
+- `TIMESTAMP` — 与 `X-Timestamp` 头一致。
+
+### 示例:查询 USD 汇率
+
+```bash
+curl --request GET \
+  --url "https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd" \
+  --header "X-Access-Key: $MC_ACCESS_KEY" \
+  --header "X-Signature: $MC_SIGNATURE" \
+  --header "X-Timestamp: $MC_TIMESTAMP" \
+  --header "Accept: application/json"
+```
+
+## 响应格式
+
+所有响应都是 JSON。MC OpenAPI 将每次结果包在统一信封中。
+
+### 响应信封
+
+```json
+{
+  "code": "0",
+  "msg": "success",
+  "data": { },
+  "success": true
+}
+```
+
+<ResponseField name="code" type="string">
+  业务状态码。`"0"` 代表成功。其他值为业务失败 — 见 [错误处理](/zh/concepts/errors)。
+</ResponseField>
+
+<ResponseField name="msg" type="string">
+  人可读消息。成功时通常为 `"success"`;失败时描述原因。
+</ResponseField>
+
+<ResponseField name="data" type="object | array | null">
+  实际响应载荷,形式因接口而异。
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  方便标志;`code == "0"` 时为 `true`。
+</ResponseField>
+
+### 分页响应
+
+```json
+{
+  "code": "0",
+  "msg": "success",
+  "success": true,
+  "data": {
+    "pageNum": 1,
+    "pageSize": 20,
+    "total": 132,
+    "pages": 7,
+    "list": [
+      { "transactionId": "T-1001", "amount": "125.50", "currency": "USDT" }
+    ]
+  }
+}
+```
+
+翻页使用方法见 [分页](/zh/concepts/pagination)。
+
+## HTTP 状态码
+
+MC OpenAPI 使用标准 HTTP 状态码表示传输层结果。即使返回 `200 OK`,仍需检查信封中的 `code`。
+
+| 码 | 含义 |
+| --- | --- |
+| `200` | 请求已送达,检查 JSON 信封中的 `code` 确认业务结果。 |
+| `400` | 请求格式错误——参数缺失或 JSON 不合法。 |
+| `401` | 签名无效、`X-Timestamp` 偏离或 Access Key 不可识别。 |
+| `403` | Access Key 有效但缺少必需权限(`READ`、`TRADE`、`WITHDRAW`)。 |
+| `404` | 接口或资源不存在。 |
+| `429` | 频率限制——见 [频率限制](/zh/guides/rate-limits)。 |
+| `500` | 网关内部错误。指数退避重试。 |
+| `503` | 网关临时不可用。指数退避重试。 |
+
+<Tip>
+  非 `200` 响应时记录 `code`、`msg` 与响应头中的 correlation ID,循迹与支持将更高效。
+</Tip>

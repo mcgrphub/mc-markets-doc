@@ -1,0 +1,251 @@
+---
+title: "认证"
+sidebarTitle: "认证"
+description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名对 MC OpenAPI 请求进行鉴权。"
+---
+
+所有 OpenAPI 请求都必须发送到 **API 网关**,并使用 **Access Key (AK)** 与 **Secret Key (SK)** 密钥对进行认证。网关会校验签名、检查 API Key 权限,并将请求转发到后端服务。
+
+## 基础 URL
+
+| 环境 | Base URL |
+| --- | --- |
+| 测试 | `https://test-gateway.mcconnects.com` |
+| 生产 | `https://gateway.mcconnects.com` |
+
+本文档中的路径均相对于上面的 Base URL。例如:
+
+```text
+https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+```
+
+<Warning>
+  不要直接调用后端服务。始终使用网关 URL,以确保鉴权与权限检查生效。
+</Warning>
+
+## 凭证
+
+每把 API Key 包含两部分:
+
+| 凭证 | 格式 | 示例 |
+| --- | --- | --- |
+| **Access Key (AK)** | `AK` \+ 16 位大写十六进制 | `AKF013EB0CC51E4BEB` |
+| **Secret Key (SK)** | `SK` \+ Base64URL 随机字符串 | `SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc` |
+
+- **Secret Key 仅在创建时显示一次**,请安全存储,无法找回。
+- 每把 API Key 绑定到一个用户账号与业务线。
+- 可在用户后台启用、禁用或删除。
+- 每个用户最多创建 **30 把** API Key。
+
+## 必需请求头
+
+| Header | 必需 | 说明 |
+| --- | --- | --- |
+| `X-Access-Key` | 是 | 你的 Access Key (AK) |
+| `X-Signature` | 是 | HMAC-SHA256 签名(Base64 编码) |
+| `X-Timestamp` | 是 | 当前 Unix **毫秒** 级时间戳 |
+| `Content-Type` | POST/PUT | `application/json`(发送 JSON body 时) |
+
+<Warning>
+  不要同时发送 `Authorization: Bearer ...` 与 AK/SK 头。存在 Bearer token 时,网关会将请求当作会话调用,不会使用 AK/SK 签名。
+</Warning>
+
+## 请求签名
+
+签名可防止篡改与重放。每个请求:
+
+1. 从 HTTP 方法、URI、query 参数与选定头部构造 **待签名字符串**。
+2. 使用 Secret Key 计算 **HMAC-SHA256**。
+3. Base64 编码后作为 `X-Signature` 发送。
+
+### 待签名字符串
+
+用换行符 `\n` 拼接:
+
+```text
+{HTTP_METHOD}
+{REQUEST_URI}
+{QUERY_STRING}
+{SIGNED_HEADERS}
+{TIMESTAMP}
+```
+
+| 部分 | 说明 |
+| --- | --- |
+| `HTTP_METHOD` | 大写 HTTP 方法,如 `GET`、`POST`、`PUT`、`DELETE` |
+| `REQUEST_URI` | 不包含 host 的完整网关路径,如 `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` |
+| `QUERY_STRING` | 按 key(ASCII 升序)排序后的 `key1=value1&key2=value2`。无 query 时**整行省略**。 |
+| `SIGNED_HEADERS` | 按小写 key 排序的 `key1=value1&key2=value2`。无参与签名的 header 时**整行省略**。 |
+| `TIMESTAMP` | 与 `X-Timestamp` 头保持一致(毫秒) |
+
+#### 参与签名的头
+
+仅以下两个头参与签名,且均需小写:
+
+| Header | 拼接形式 |
+| --- | --- |
+| `X-Access-Key` | `x-access-key={value}` |
+| `X-Timestamp` | `x-timestamp={value}` |
+
+其他头(如 `Content-Type`)不参与签名。
+
+<Info>
+  使用 **网关上可见的路径**,账户服务接口前缀为 `/openapi/v1/mc-account/`,而非 `/openapi/v1/`。
+</Info>
+
+请求 body(JSON 载荷)**不参与**签名。
+
+### 签名算法
+
+```text
+signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
+```
+
+- 算法: **HMAC-SHA256**
+- 密钥编码: Secret Key 字符串的 UTF-8 字节
+- 输出编码: **Base64**(标准,含 padding)
+
+### 时间戳有效性
+
+- `X-Timestamp` 为当前 **毫秒** 时间戳(13 位)。
+- 网关接受服务器时间 **±10 分钟** 内的时间戳。
+- 时间戳过期或格式错误将返回 `401 Unauthorized`。
+
+## 权限
+
+每把 API Key 携带一个或多个权限。接口声明所需权限,你的 Key 需 **包含全部** 所需权限(AND 逻辑)。
+
+| 权限 | 代码 | 说明 |
+| --- | --- | --- |
+| 读 | `READ` | 只读操作(余额、列表、查询) |
+| 交易 | `TRADE` | 交易操作(下单/撤单) |
+| 提币 | `WITHDRAW` | 提币与划转操作 |
+
+若 API Key 权限不足,网关返回 `401 Unauthorized`,消息为 `没有访问该接口的权限`。
+
+## IP 白名单(可选)
+
+创建或编辑 API Key 时,可以配置 IP 白名单(最多 15 个 IPv4,逗号分隔)。
+
+- 已配置时,非白名单 IP 发起的请求返回 `401 Unauthorized`。
+- 未配置时,任意 IP 均可调用(仍受其他校验限制)。
+
+网关从 `X-Forwarded-For`、`X-Real-IP` 或直连地址判断客户端 IP。
+
+## 示例 — 汇率查询
+
+查询加密资产 BTC/USDT 汇率,需 `READ` 权限。
+
+**请求:**
+
+```text
+GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+Host: test-gateway.mcconnects.com
+X-Access-Key: AKF013EB0CC51E4BEB
+X-Timestamp: 1747890123456
+X-Signature: <计算出的签名>
+```
+
+**待签名字符串:**
+
+```text
+GET
+/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+x-access-key=AKF013EB0CC51E4BEB&x-timestamp=1747890123456
+1747890123456
+```
+
+**成功响应:**
+
+```json
+{
+  "status": 200,
+  "code": "200",
+  "success": true,
+  "data": 98500.12
+}
+```
+
+## 代码示例
+
+<CodeGroup>
+
+```python Python
+import base64, hashlib, hmac, time
+import requests
+
+ACCESS_KEY = "YOUR_ACCESS_KEY"
+SECRET_KEY = "YOUR_SECRET_KEY"
+BASE_URL = "https://test-gateway.mcconnects.com"
+
+def sign_request(method, uri, query_params=None):
+    timestamp = str(int(time.time() * 1000))
+    headers_to_sign = {"x-access-key": ACCESS_KEY, "x-timestamp": timestamp}
+    parts = [method.upper(), uri]
+    if query_params:
+        parts.append("&".join(f"{k}={v}" for k, v in sorted(query_params.items())))
+    parts.append("&".join(f"{k}={v}" for k, v in sorted(headers_to_sign.items())))
+    parts.append(timestamp)
+    string_to_sign = "\n".join(parts) + "\n"
+    signature = base64.b64encode(
+        hmac.new(SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+    ).decode()
+    return {"X-Access-Key": ACCESS_KEY, "X-Timestamp": timestamp, "X-Signature": signature}
+
+uri = "/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT"
+print(requests.get(f"{BASE_URL}{uri}", headers=sign_request("GET", uri)).json())
+```
+
+```javascript Node.js
+const crypto = require("crypto");
+
+function signRequest(method, uri, queryParams, accessKey, secretKey) {
+  const timestamp = String(Date.now());
+  const parts = [method.toUpperCase(), uri];
+  if (queryParams && Object.keys(queryParams).length) {
+    parts.push(Object.keys(queryParams).sort().map(k => `${k}=${queryParams[k]}`).join("&"));
+  }
+  const h = { "x-access-key": accessKey, "x-timestamp": timestamp };
+  parts.push(Object.keys(h).sort().map(k => `${k}=${h[k]}`).join("&"));
+  parts.push(timestamp);
+  const signature = crypto.createHmac("sha256", secretKey).update(parts.join("\n") + "\n").digest("base64");
+  return { "X-Access-Key": accessKey, "X-Timestamp": timestamp, "X-Signature": signature };
+}
+```
+
+</CodeGroup>
+
+## 错误响应
+
+认证失败返回 HTTP **401 Unauthorized**,body 为 JSON:
+
+```json
+{
+  "status": 401,
+  "code": 401,
+  "message": "签名无效"
+}
+```
+
+| 消息 | 原因 |
+| --- | --- |
+| `缺少有效鉴权凭证` | 未提供有效鉴权头 |
+| `缺少AccessKey, 请在请求头中添加X-Access-Key` | 缺 `X-Access-Key` |
+| `缺少签名, 请在请求头中添加X-Signature` | 缺 `X-Signature` |
+| `缺少时间戳, 请在请求头中添加X-Timestamp` | 缺 `X-Timestamp` |
+| `时间戳无效或已过期` | 时间戳不在 ±10 分钟内 |
+| `[X-Access-Key]AccessKey无效` | Key 不存在、已禁用或已过期 |
+| `签名无效` | 签名不匹配 |
+| `没有访问权限, ip: {ip}` | IP 不在白名单 |
+| `没有访问该接口的权限` | Key 缺少接口需要的权限 |
+
+## 安全最佳实践
+
+<Tip>
+  1. **绝不暴露 Secret Key** 到客户端代码、公开仓库或日志。
+  2. **使用 IP 白名单**将生产环境 Key 限定到可信服务器。
+  3. **最小权限**—仅在必要时授予 `TRADE` 或 `WITHDRAW`。
+  4. **定期轮换**—团队人员变动或凭证可能泄漏时禁用旧 Key、新建 Key。
+  5. **同步系统时钟**—签名校验依赖准确时间(建议 NTP)。
+  6. **仅使用 HTTPS**—所有通信均需 TLS。
+</Tip>

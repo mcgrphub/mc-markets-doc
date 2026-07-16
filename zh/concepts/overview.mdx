@@ -1,0 +1,60 @@
+---
+title: "MC OpenAPI 核心概念"
+sidebarTitle: "概览"
+description: "MC OpenAPI 基石:签名、响应信封、分页与错误处理。"
+---
+
+MC OpenAPI 是面向 MC 多账户系统(MC-account)的 JSON-over-HTTPS API。本节介绍每个接口共享的约定,帮助你更快集成、更安心地排查问题。
+
+<CardGroup cols={2}>
+  <Card title="请求与响应" icon="arrow-right-arrow-left" href="/zh/concepts/request-response">
+    必需签名头、JSON body 格式,以及包含 `code`、`msg`、`data` 的通用信封。
+  </Card>
+
+  <Card title="分页" icon="layer-group" href="/zh/concepts/pagination">
+    `pageNum` / `pageSize` 在列表接口上的用法与大结果集的遗历。
+  </Card>
+
+  <Card title="错误处理" icon="circle-exclamation" href="/zh/concepts/errors">
+    HTTP 状态码、信封中的业务 `code` 与推荐重试策略。
+  </Card>
+
+  <Card title="认证" icon="lock" href="/zh/authentication">
+    AK/SK 发放、HMAC-SHA256 签名规则与权限(`READ`、`TRADE`、`WITHDRAW`)。
+  </Card>
+</CardGroup>
+
+## 环境
+
+| 环境 | Base URL |
+| --- | --- |
+| 测试 | `https://test-gateway.mcconnects.com` |
+| 生产 | `https://gateway.mcconnects.com` |
+
+所有接口共用路径前缀 `/openapi/v1/`。详见 [基础 URL](/zh/api-reference/base-url)。
+
+## 接口分组
+
+MC OpenAPI 按功能分为六组。所有接口均需签名,部分接口需求 Access Key 具备对应权限。
+
+| 分组 | 用途 | 需要权限 |
+| --- | --- | --- |
+| [交易](/zh/api-reference/endpoints/trading) | 交易记录(按 ID 或分页) | `READ` |
+| [理财账户](/zh/api-reference/endpoints/finance-account) | 申购、赎回、定期产品、投组概览 | `READ`、`TRADE`、`WITHDRAW` |
+| [币种](/zh/api-reference/endpoints/currency) | 币种/兑换元数据 | `READ` |
+| [资金账户](/zh/api-reference/endpoints/fund-account) | 现货持仓与储备金证明 | `READ` |
+| [资金费](/zh/api-reference/endpoints/funding-fee) | 永续合约资金费历史 | `READ` |
+| [汇率](/zh/api-reference/endpoints/exchange-rate) | 法币与加密资产汇率 | `READ` |
+
+## 请求生命周期
+
+每次调用的流程相同:
+
+1. **构造** 请求—HTTP 方法、路径(`/openapi/v1/...`)、query 与可选 JSON body。
+2. **签名** 请求—使用 Secret Key 对待签名字符串计算 HMAC-SHA256。
+3. **发送** —以 HTTPS 发送,带 `X-Access-Key`、`X-Signature`、`X-Timestamp` 头。
+4. **处理** 响应—先看 HTTP 状态码,再看 JSON 信封中的 `code`。
+
+<Note>
+  时间戳必须位于网关时钟附近。签名时使用当前 UTC 时间的毫秒值。
+</Note>
