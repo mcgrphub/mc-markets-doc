@@ -63,9 +63,12 @@
           {
             "group": "Endpoints",
             "pages": [
-              "api-reference/endpoints/users",
-              "api-reference/endpoints/resources",
-              "api-reference/endpoints/webhooks"
+              "api-reference/endpoints/trading",
+              "api-reference/endpoints/finance-account",
+              "api-reference/endpoints/currency",
+              "api-reference/endpoints/fund-account",
+              "api-reference/endpoints/funding-fee",
+              "api-reference/endpoints/exchange-rate"
             ]
           }
         ]

@@ -1,165 +1,143 @@
 ---
-title: "API Error Codes and Error Handling in the Open API Platform"
+title: "MC OpenAPI Error Handling"
 sidebarTitle: "Error Handling"
-description: "Understand the Open API Platform error response format, browse every error code and its HTTP status, and see handling patterns in Python and JavaScript."
+description: "MC OpenAPI error format, common business codes, HTTP status codes, and recommended retry strategy."
 ---
 
-Whenever a request cannot be completed successfully, the Open API Platform returns a structured JSON error response with a consistent shape. Instead of relying solely on HTTP status codes, you can inspect the response body for a machine-readable error code and a human-readable message that pinpoint exactly what went wrong.
+MC OpenAPI reports failures through **two layers**: a standard HTTP status code, and a business `code` field inside the JSON envelope. Robust integrations check both.
+
+## Two-layer error model
+
+1. **Transport layer** — the HTTP status code. `4xx` indicates a client problem, `5xx` a gateway problem.
+2. **Business layer** — the `code` field in the JSON envelope. A `200 OK` HTTP response can still carry a business error such as insufficient balance or a symbol not found.
+
+Always inspect `code` even when the HTTP status is `200`.
 
 ## Error response format
 
-Every error response follows the same envelope structure:
+Failed calls return the same envelope shape as successful ones, with a non-`"0"` `code` and `success: false`:
 
 ```json
 {
-  "error": {
-    "code": "validation_error",
-    "message": "The 'email' field is required.",
-    "details": [
-      {
-        "field": "email",
-        "message": "This field is required."
-      }
-    ]
-  }
+  "code": "40001",
+  "msg": "Invalid signature",
+  "success": false,
+  "data": null
 }
 ```
 
-The fields within the `error` object are:
-
-<ResponseField name="error.code" type="string">
-  A stable, machine-readable identifier for the error type. Use this field — not the `message` — to drive error-handling logic in your code, because messages may change without notice.
+<ResponseField name="code" type="string">
+  Business status code. `"0"` is success. Non-zero values identify the specific error class — use this to drive retry / user-facing logic.
 </ResponseField>
 
-<ResponseField name="error.message" type="string">
-  A human-readable description of the error, suitable for logging or displaying to developers. Do not rely on this string for programmatic branching.
+<ResponseField name="msg" type="string">
+  Human-readable message. Suitable for logs; do not branch on the exact string.
 </ResponseField>
 
-<ResponseField name="error.details" type="array | null">
-  An optional array of objects that provide field-level context for validation errors. Each item contains a `field` (the name of the invalid field) and a `message` (a description of why validation failed). Returns `null` or is omitted for non-validation errors.
+<ResponseField name="success" type="boolean">
+  `false` on any non-`"0"` `code`.
 </ResponseField>
 
-## Error codes
+<ResponseField name="data" type="object | null">
+  Usually `null` on errors. Some validation errors include a `data` object with per-field detail.
+</ResponseField>
 
-The table below lists every error code the API returns, the HTTP status it accompanies, and what it means for your integration.
+## HTTP status codes
 
-| Code | HTTP Status | Description |
-|---|---|---|
-| `authentication_required` | `401` | No API key was provided in the request. Add an `Authorization: Bearer YOUR_API_KEY` header. |
-| `invalid_api_key` | `401` | The API key you provided is invalid, revoked, or expired. Generate a new key and retry. |
-| `insufficient_permissions` | `403` | Your API key does not have the scope required for this action. Check the key's permissions in your dashboard. |
-| `not_found` | `404` | The resource you requested does not exist, or you do not have access to it. Verify the ID in your request. |
-| `validation_error` | `422` | The request body passed format checks but failed business-logic validation. Inspect `error.details` for field-level information. |
-| `rate_limit_exceeded` | `429` | You have exceeded the allowed request rate. Wait before retrying, and consider implementing exponential backoff. |
-| `internal_error` | `500` | An unexpected error occurred on the platform. Retry the request after a short delay. If the problem persists, contact support. |
+| Code | When it occurs | What to do |
+| --- | --- | --- |
+| `400` | Malformed JSON, missing required parameter | Fix the request and retry. |
+| `401` | Missing / invalid `X-Signature`, or `X-Timestamp` skewed | Re-check the signing algorithm and clock; re-sign and retry. |
+| `403` | Access Key lacks the required scope | Add `READ` / `TRADE` / `WITHDRAW` in the key management console. |
+| `404` | Path is wrong, or the resource ID does not exist | Verify the URL and IDs. |
+| `429` | Rate limit exceeded | Back off — see [Rate Limits](/guides/rate-limits). |
+| `500` / `502` / `503` | Gateway or upstream error | Retry with exponential backoff. |
+
+## Common business codes
+
+The table below lists frequently-seen business `code` values. This is not exhaustive — new codes are added over time; treat unknown codes as retryable / user-facing errors based on context.
+
+| `code` | Meaning | Suggested action |
+| --- | --- | --- |
+| `"0"` | Success | Consume `data`. |
+| `40001` | Invalid signature | Recompute signature; verify Secret Key and canonical string. |
+| `40002` | Timestamp expired or skewed | Sync clock; use current UTC ms. |
+| `40003` | Access Key not found or disabled | Check key status in the console. |
+| `40301` | Insufficient permission | Add the required scope to the key. |
+| `40401` | Resource not found | Verify IDs in the request. |
+| `42201` | Parameter validation failed | Fix parameters per `msg`. |
+| `42901` | Rate limit exceeded | Back off and retry. |
+| `50001` | Internal error | Retry with backoff; contact support if it persists. |
 
 <Note>
-  The `not_found` error is intentionally returned for both "does not exist" and "you lack access" cases to avoid leaking the existence of private resources.
+  Codes are strings, not integers — always compare with string equality (`code === "0"`).
 </Note>
 
 ## Handling errors
 
-The examples below show a robust pattern for catching and responding to API errors in your application.
-
 ### Python
 
 ```python
-import requests
-from time import sleep
+import requests, time
 
-API_KEY = "YOUR_API_KEY"
-BASE_URL = "https://api.example.com/v1"
+def call(method, path, body=""):
+    # ... build signed request as in the auth docs ...
+    response = requests.request(method, url, headers=headers, data=body)
 
-def create_user(name: str, email: str) -> dict:
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    }
-    payload = {"name": name, "email": email}
+    if response.status_code == 429 or 500 <= response.status_code < 600:
+        raise TransientError(response.status_code, response.text)
 
-    try:
-        response = requests.post(
-            f"{BASE_URL}/users",
-            headers=headers,
-            json=payload,
-        )
-        response.raise_for_status()
-        return response.json()["data"]
+    payload = response.json()
+    code = payload.get("code")
 
-    except requests.HTTPError as exc:
-        error_body = exc.response.json().get("error", {})
-        code = error_body.get("code", "unknown")
-        message = error_body.get("message", "An unexpected error occurred.")
+    if code == "0":
+        return payload["data"]
 
-        if code == "validation_error":
-            details = error_body.get("details", [])
-            for detail in details:
-                print(f"Validation failed on '{detail['field']}': {detail['message']}")
-        elif code == "rate_limit_exceeded":
-            print("Rate limit hit. Waiting 60 seconds before retrying...")
-            sleep(60)
-            return create_user(name, email)  # Retry once
-        elif code == "invalid_api_key":
-            print("Invalid API key. Check your credentials.")
-        else:
-            print(f"API error [{code}]: {message}")
+    if code in {"40001", "40002"}:
+        raise AuthError(code, payload["msg"])
+    if code == "42901":
+        raise TransientError(code, payload["msg"])
 
-        raise
+    raise BusinessError(code, payload["msg"])
+
+
+def with_backoff(fn, *args, max_retries=5, **kwargs):
+    delay = 1.0
+    for attempt in range(max_retries):
+        try:
+            return fn(*args, **kwargs)
+        except TransientError:
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(delay)
+            delay = min(delay * 2, 30)
 ```
 
 ### JavaScript
 
 ```javascript
-const BASE_URL = "https://api.example.com/v1";
-const API_KEY = "YOUR_API_KEY";
+async function call(method, path, body = "") {
+  // ... build signed request as in the auth docs ...
+  const res = await fetch(url, { method, headers, body: body || undefined });
 
-async function createUser(name, email) {
-  const headers = {
-    Authorization: `Bearer ${API_KEY}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-
-  try {
-    const response = await fetch(`${BASE_URL}/users`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ name, email }),
-    });
-
-    if (!response.ok) {
-      const body = await response.json();
-      const { code, message, details } = body.error ?? {};
-
-      switch (code) {
-        case "validation_error":
-          details?.forEach(({ field, message: msg }) => {
-            console.error(`Validation failed on '${field}': ${msg}`);
-          });
-          break;
-        case "rate_limit_exceeded":
-          console.warn("Rate limit hit. Implement backoff before retrying.");
-          break;
-        case "invalid_api_key":
-          console.error("Invalid API key. Check your credentials.");
-          break;
-        default:
-          console.error(`API error [${code}]: ${message}`);
-      }
-
-      throw new Error(`Request failed: ${code ?? response.status}`);
-    }
-
-    const body = await response.json();
-    return body.data;
-  } catch (err) {
-    // Re-throw so the caller can handle or log the error
-    throw err;
+  if (res.status === 429 || res.status >= 500) {
+    throw new TransientError(res.status, await res.text());
   }
+
+  const payload = await res.json();
+
+  if (payload.code === "0") return payload.data;
+
+  if (payload.code === "40001" || payload.code === "40002") {
+    throw new AuthError(payload.code, payload.msg);
+  }
+  if (payload.code === "42901") {
+    throw new TransientError(payload.code, payload.msg);
+  }
+  throw new BusinessError(payload.code, payload.msg);
 }
 ```
 
 <Tip>
-  For `429 Rate Limit Exceeded` and `5xx` server errors, implement **exponential backoff with jitter**: wait an initial delay (for example, 1 second), double it on each successive failure, and add a small random jitter to avoid thundering-herd problems. Most transient server errors resolve within a few retries.
+  For `429` and `5xx` responses, use **exponential backoff with jitter**: start at ~1 s, double on each failure, cap at ~30 s, and add a small random offset to avoid synchronized retries.
 </Tip>

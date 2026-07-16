@@ -1,135 +1,99 @@
 ---
-title: "Troubleshooting Guide for Open API Platform Issues"
+title: "MC OpenAPI Troubleshooting"
 sidebarTitle: "Troubleshooting"
-description: "Diagnose and fix common errors when integrating the Open API Platform API, including authentication failures, 404s, and rate limit issues."
+description: "Diagnose and fix common MC OpenAPI errors: signature failures, expired timestamps, missing permissions, 404s, and rate-limit throttling."
 ---
 
-If something isn't working as expected, this guide walks you through step-by-step diagnosis and fixes for the most common integration problems. Work through the relevant section below to get back on track quickly.
+Use this guide as a decision tree when a request fails. Always inspect **both** the HTTP status and the `code` field in the JSON envelope before diagnosing.
 
-<AccordionGroup>
-  <Accordion title="401 Unauthorized">
-    A `401` response means the server could not authenticate your request. Work through this checklist:
+## HTTP 401 — signature or timestamp problem
 
-    - **Check your Authorization header format.** The API requires a Bearer token — not Basic auth. Your header must look exactly like this:
+```json
+{ "code": "40001", "msg": "Invalid signature", "success": false }
+```
 
-      ```http
-      Authorization: Bearer <your_api_key>
-      ```
+### Checklist
 
-    - **Check for extra whitespace.** Copy-paste errors often introduce a leading or trailing space in the key. Trim the value before sending.
+- **Canonical string.** Print exactly what you signed. It must be five lines: `METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP`. Empty query string or body means an empty line, not the string `"null"`.
+- **Body match.** Serialize the JSON body **once** and reuse the same string for both signing and the HTTP request. `JSON.stringify(obj)` after signing gives a subtly different string than the one you signed.
+- **Query ordering.** Sort query parameters by key ascending, joined `key=value` with `&`. Do not URL-encode differently between signing and sending.
+- **Method / path case.** Method is uppercase (`GET`, not `get`). Path starts with `/openapi/v1/` and does not include the base URL or the query string.
+- **Correct key.** `X-Access-Key` is the Access Key; sign with the Secret Key. It is easy to swap them.
+- **Digest format.** `X-Signature` is the **lowercase hex** encoding of the HMAC-SHA256 digest, not base64.
 
-    - **Check whether the key has been revoked.** Go to **Settings → API Keys** in your dashboard. If the key shows a **Revoked** status, it can no longer authenticate requests. Click **Create New Key** to generate a replacement, then update your environment variables or secrets manager with the new value.
-  </Accordion>
+```json
+{ "code": "40002", "msg": "Timestamp expired", "success": false }
+```
 
-  <Accordion title="403 Forbidden">
-    A `403` response means your API key is valid and authenticated, but it **lacks the required scope** for the endpoint you're calling.
+- `X-Timestamp` must be current UTC time in **milliseconds** (13 digits, e.g. `1731657600000`), not seconds.
+- Sync your machine clock via NTP. A drift of only a few seconds can trigger this error.
+- If you generate `ts` once and reuse it for a batch of requests, re-generate for every call.
 
-    To fix this:
+## HTTP 403 — insufficient permission
 
-    1. Go to **Settings → API Keys** in your dashboard.
-    2. Find the key you're using and open its details.
-    3. Review the **Assigned Scopes** list. If the required scope is missing, edit the key to add it — or create a new key with the correct scopes for that integration.
+```json
+{ "code": "40301", "msg": "Permission denied", "success": false }
+```
 
-    Each endpoint's reference page lists the minimum required scope under the **Authentication** section.
-  </Accordion>
+- Your Access Key exists and the signature is valid, but the key does not have the required scope.
+- Open **API Management** in the MC console and add `READ`, `TRADE`, or `WITHDRAW` as required by the endpoint.
+- Required scopes are documented on each endpoint page under [API Reference](/api-reference/overview).
 
-  <Accordion title="404 Not Found">
-    A `404` response means the server couldn't locate the resource you requested. Check the following:
+## HTTP 404 — endpoint or resource not found
 
-    - **Verify the resource ID.** Confirm that the ID in your request path (e.g. `res_abc123`) actually exists and belongs to your account. IDs are case-sensitive.
-    - **Check the API version prefix.** All endpoints must include `/v1/` in the path:
+- Verify the full path against [API Reference](/api-reference/overview). All paths start with `/openapi/v1/...` and are case-sensitive.
+- Check any path parameters (`{id}`, `{symbolType}`, `{baseCurrency}`, ...) — they must be URL-safe and correspond to real resources.
+- If the resource used to exist but no longer does (e.g. a soft-deleted symbol), the endpoint returns `404` even for authenticated requests.
 
-      ```
-      GET https://api.example.com/v1/resources/{id}
-      ```
+## HTTP 400 — malformed request
 
-      Omitting the version segment or using an unsupported version (e.g. `/v0/`) will return a `404`.
-    - **Check for typos in the endpoint path.** Compare your URL against the [API reference](/api-reference/overview) to make sure every segment is spelled correctly.
-  </Accordion>
+```json
+{ "code": "42201", "msg": "Parameter validation failed", "success": false }
+```
 
-  <Accordion title="422 Validation Error">
-    A `422 Unprocessable Entity` response means your request was received and understood, but one or more fields failed validation. The response body always includes an `error.details` array that identifies exactly what went wrong:
+- The `Content-Type: application/json` header is missing on a `POST`/`PUT` with a JSON body.
+- Required fields are missing from the body, or types don't match (e.g. sending a number where the schema expects a string).
+- Enum values (permission, symbol type, currency) don't match the allowed set — check the endpoint page for the enum values.
 
-    ```json
-    {
-      "error": {
-        "code": "validation_error",
-        "message": "Request validation failed.",
-        "details": [
-          {
-            "field": "email",
-            "issue": "Must be a valid email address."
-          },
-          {
-            "field": "amount",
-            "issue": "Required field is missing."
-          }
-        ]
-      }
-    }
-    ```
+## HTTP 429 — rate limited
 
-    For each item in `error.details`:
+```json
+{ "code": "42901", "msg": "Too many requests", "success": false }
+```
 
-    - Confirm the field is **present** in your request body if it's required.
-    - Confirm the **data type** matches what the API expects (e.g. integer vs. string, ISO 8601 date format).
-    - Check for **null values** on non-nullable fields.
-  </Accordion>
+- Back off with exponential delay \+ jitter — see [Rate Limits](/guides/rate-limits) for a copy-pasteable retry helper.
+- If you routinely hit `429` under normal load, reduce polling frequency or contact support about a higher tier.
 
-  <Accordion title="429 Rate Limit Exceeded">
-    A `429 Too Many Requests` response means you've hit the rate limit for your API key within the current rolling window.
+## HTTP 5xx — gateway error
 
-    **Steps to handle this gracefully:**
+- `500` / `502` / `503` are transient. Retry with the same backoff strategy as `429`.
+- If a single endpoint returns `5xx` persistently, capture the request timestamp and any correlation header, then contact support.
 
-    1. Read the `Retry-After` response header. It contains the number of seconds you must wait before making another request:
+## Business error with HTTP 200
 
-       ```http
-       Retry-After: 12
-       ```
+Do not assume `200 OK` means success. Always check `code`:
 
-    2. Implement **exponential backoff** in your retry logic. Instead of retrying immediately, wait progressively longer between each attempt (e.g. 1 s, 2 s, 4 s, 8 s) and add a small random jitter to avoid synchronized retry storms.
+```json
+{ "code": "60001", "msg": "Insufficient balance", "success": false, "data": null }
+```
 
-    3. Monitor the `X-RateLimit-Remaining` header on successful responses so you can slow down proactively before hitting the limit.
+Typical categories:
 
-    For limit values by tier and a backoff implementation example, see the [Rate Limits guide](/guides/rate-limits).
-  </Accordion>
+- Balance / limit violations on finance-account deposit / withdrawal.
+- Symbol suspended or delisted on trading endpoints.
+- PoR snapshot not yet generated for the current window on `/openapi/v1/fund/account/por`.
 
-  <Accordion title="500 Internal Server Error">
-    A `500` response indicates an unexpected error on the server side. This is almost always transient.
+## Debugging checklist
 
-    **What to do:**
+When you file a support request, include the following. It roughly quarters the round-trip time to a resolution:
 
-    1. Wait a few seconds and retry the request using **exponential backoff**.
-    2. Check the [status page](https://status.example.com) to see whether there's a known incident affecting the API.
-    3. If the error persists after several retries, contact support. Include the **`X-Request-ID`** value from the response headers in your message — this lets the team trace your exact request in the server logs:
+1. **Environment** — test or production.
+2. **Access Key ID** — the public identifier only, never the Secret Key.
+3. **Timestamp** — the `X-Timestamp` value on the failing request.
+4. **Full path with query string.**
+5. **Response body** (Secret Key redacted; other data intact).
+6. **Canonical string** you signed (last line = the same `X-Timestamp`).
 
-       ```http
-       X-Request-ID: req_7f3a2b1c9e
-       ```
-  </Accordion>
-
-  <Accordion title="Webhook not being received">
-    If your registered endpoint isn't receiving webhook events, work through the following checks:
-
-    - **Your endpoint must return a `2xx` status code.** If it returns anything else (including a redirect), the platform marks the delivery as failed and retries according to the retry schedule.
-    - **Check your firewall and network rules.** Inbound HTTPS traffic on port 443 must be allowed from the Open API Platform's webhook IP ranges (listed in the dashboard under **Settings → Webhooks**).
-    - **Verify the registered URL is correct.** Go to **Settings → Webhooks** and confirm the URL exactly matches your publicly accessible endpoint — including the correct protocol (`https://`), domain, and path.
-    - **Check your server logs** for incoming `POST` requests to rule out delivery attempts that your application is silently rejecting.
-  </Accordion>
-
-  <Accordion title="CORS errors in browser">
-    If you're making API requests directly from browser-side JavaScript, you will encounter **CORS (Cross-Origin Resource Sharing) errors** — and more critically, your API key will be **exposed to anyone who inspects your page's network traffic**.
-
-    **The correct approach is to proxy all API requests through your own backend:**
-
-    1. Your frontend calls your own server endpoint (e.g. `POST /api/my-action`).
-    2. Your server makes the authenticated request to the Open API Platform using the API key stored securely in an environment variable.
-    3. Your server returns only the data the frontend needs.
-
-    This pattern keeps your API key private and eliminates CORS issues entirely, since same-origin requests from your frontend to your own backend are unrestricted.
-  </Accordion>
-</AccordionGroup>
-
-<Info>
-  When contacting support about a specific request, always include the **`X-Request-ID`** header value from the response. This unique identifier lets the support team locate your exact request in the server logs and dramatically speeds up diagnosis.
-</Info>
+<Warning>
+  Never share your Secret Key when asking for help — not with support, not with colleagues, not in issue trackers. If a Secret Key has been exposed, disable the key immediately and generate a new one.
+</Warning>

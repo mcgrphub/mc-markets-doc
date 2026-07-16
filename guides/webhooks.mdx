@@ -1,166 +1,103 @@
 ---
-title: "Receive Real-Time Event Notifications with Webhooks"
-sidebarTitle: "Webhooks"
-description: "Set up webhook endpoints to receive real-time event notifications from the Open API Platform when resources are created, updated, or deleted."
+title: "Polling for Updates in MC OpenAPI"
+sidebarTitle: "Polling for Updates"
+description: "MC OpenAPI is request-response only — use these polling patterns to detect new transactions, balance changes, and rate updates."
 ---
 
-Webhooks let your server receive instant notifications the moment an event occurs in the Open API Platform — no polling required. When a subscribed event fires, the platform sends an HTTP `POST` request to the URL you register, with a signed JSON payload describing what happened.
+<Note>
+  MC OpenAPI does not currently deliver webhooks or push events. Integrations that need to detect new activity should poll the relevant list endpoints on a schedule using the patterns below.
+</Note>
 
-## Supported events
+## What to poll
 
-Subscribe to any combination of the following events when registering a webhook endpoint:
+Choose the endpoint that most tightly matches the event you care about:
 
-| Event | Description |
-|---|---|
-| `resource.created` | A new resource was created |
-| `resource.updated` | A resource was updated |
-| `resource.deleted` | A resource was deleted |
-| `user.created` | A new user was created |
-| `user.updated` | A user profile was updated |
+| You want to detect | Poll this endpoint | Suggested frequency |
+| --- | --- | --- |
+| New transaction records | `POST /openapi/v1/transaction/transaction/record/page` | 30–60 s |
+| Balance / deposit / withdrawal changes | `POST /openapi/v1/finance/account/overview` | 60 s |
+| Spot position changes | `GET /openapi/v1/fund/account/spot/positions/v2` | 60–300 s |
+| Funding-fee events | `POST /openapi/v1/funding-fee-record/page/v2` | 300 s (settled every 8 h upstream) |
+| Exchange-rate updates | `GET /openapi/v1/exchange-rate/query/usd` | 60–300 s |
 
-## Register a webhook
+See the [API Reference](/api-reference/overview) for the full request/response shape of each endpoint.
 
-Send a `POST` request to `/v1/webhooks` with the URL you want to receive events at and the list of events you want to subscribe to.
+## Efficient polling pattern
 
-```bash
-curl -X POST https://api.example.com/v1/webhooks \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://yourapp.com/webhooks",
-    "events": ["resource.created", "resource.updated"]
-  }'
+The goal is to fetch **only what is new** since the last poll and never re-download the entire history.
+
+1. Record a **watermark** — the highest `createdTime` (or `transactionId`) you have already processed.
+2. On each poll, request records with `startTime = watermark + 1` (or an equivalent filter).
+3. Iterate pages if `pages > 1` — see [Pagination](/concepts/pagination).
+4. Persist the new watermark **only after** you have durably processed the batch (write to your DB, publish to your queue, etc.). This avoids missing records if your worker crashes mid-batch.
+5. Sleep, then repeat.
+
+### Python example
+
+```python
+import time, hmac, hashlib, json, requests
+
+BASE_URL = "https://gateway.mcconnects.com"
+ACCESS_KEY, SECRET_KEY = "…", "…"
+
+def sign(method, path, query, body, ts):
+    canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+    return hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+def poll_new_transactions(watermark_ms: int, page_size: int = 100):
+    path = "/openapi/v1/transaction/transaction/record/page"
+    page_num = 1
+    new_watermark = watermark_ms
+    collected = []
+
+    while True:
+        body = json.dumps({
+            "pageNum": page_num, "pageSize": page_size,
+            "startTime": watermark_ms + 1,
+        }, separators=(",", ":"))
+        ts = str(int(time.time() * 1000))
+        signature = sign("POST", path, "", body, ts)
+        r = requests.post(
+            BASE_URL + path,
+            headers={
+                "X-Access-Key": ACCESS_KEY,
+                "X-Signature": signature,
+                "X-Timestamp": ts,
+                "Content-Type": "application/json",
+            },
+            data=body,
+        )
+        r.raise_for_status()
+        page = r.json()["data"]
+
+        for record in page["list"]:
+            collected.append(record)
+            new_watermark = max(new_watermark, record["createdTime"])
+
+        if page_num >= page["pages"]:
+            break
+        page_num += 1
+
+    return collected, new_watermark
+
+
+watermark = load_watermark_from_db()
+while True:
+    records, watermark = poll_new_transactions(watermark)
+    if records:
+        handle_new_records(records)   # your business logic
+        persist_watermark(watermark)  # only after successful processing
+    time.sleep(30)
 ```
 
-A successful registration returns `201 Created`:
+## Best practices
 
-```json
-{
-  "id": "wh_04kz8m1r2ngqf9aub5w7c3xep",
-  "url": "https://yourapp.com/webhooks",
-  "events": ["resource.created", "resource.updated"],
-  "secret": "whsec_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
-  "created_at": "2024-05-10T12:00:00Z"
-}
-```
+- **Never poll faster than you need.** Every extra call eats into your [rate limit](/guides/rate-limits) budget.
+- **Add jitter** to your polling interval (`sleep(30 + random(0, 5))`) so multiple workers don't hit the gateway in lockstep.
+- **Persist watermarks durably.** In-memory state is lost on restart and can cause duplicate or missed records.
+- **Deduplicate on the receiving side.** Even with watermarks, network retries and eventual consistency can produce the same record twice — use `transactionId` (or the endpoint's natural key) as an idempotency key.
+- **Back off on `429` / `5xx`.** Reuse the [exponential-backoff helper](/guides/rate-limits#recommended-handling-exponential-backoff-with-jitter) for every poll.
 
-Store the `secret` securely — you'll use it to verify incoming request signatures. It is only returned once at registration time.
-
-## Webhook payload
-
-Every event delivery sends a `POST` request to your endpoint with the following JSON structure:
-
-```json
-{
-  "id": "evt_07qy5n3s4ohrf0bvc9x2e1gfz",
-  "event": "resource.created",
-  "created_at": "2024-05-10T12:05:30Z",
-  "data": {
-    "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
-    "name": "My First Resource",
-    "description": "Created via the REST API",
-    "type": "example",
-    "created_at": "2024-05-10T12:05:30Z",
-    "updated_at": "2024-05-10T12:05:30Z"
-  }
-}
-```
-
-Your endpoint must return a `2xx` status code within **10 seconds** to acknowledge receipt.
-
-## Verifying signatures
-
-Every webhook request includes an `X-Signature` header containing an HMAC-SHA256 hex digest of the raw request body, signed with your webhook `secret`. You should always verify this signature before processing the payload to confirm the request originated from the Open API Platform.
-
-<CodeGroup>
-
-```python Python
-import hashlib
-import hmac
-
-def verify_signature(payload: bytes, secret: str, signature: str) -> bool:
-    expected = hmac.new(
-        key=secret.encode("utf-8"),
-        msg=payload,
-        digestmod=hashlib.sha256,
-    ).hexdigest()
-    return hmac.compare_digest(expected, signature)
-
-
-# In your request handler (example using Flask):
-from flask import Flask, request, abort
-
-app = Flask(__name__)
-WEBHOOK_SECRET = "whsec_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
-
-@app.route("/webhooks", methods=["POST"])
-def handle_webhook():
-    signature = request.headers.get("X-Signature", "")
-    if not verify_signature(request.get_data(), WEBHOOK_SECRET, signature):
-        abort(401)
-
-    event = request.get_json()
-    print(f"Received event: {event['event']}")
-    return "", 200
-```
-
-```javascript Node.js
-const crypto = require("crypto");
-
-function verifySignature(payload, secret, signature) {
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex");
-  return crypto.timingSafeEqual(
-    Buffer.from(expected, "hex"),
-    Buffer.from(signature, "hex")
-  );
-}
-
-// In your request handler (example using Express):
-const express = require("express");
-const app = express();
-
-const WEBHOOK_SECRET = "whsec_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6";
-
-app.post("/webhooks", express.raw({ type: "application/json" }), (req, res) => {
-  const signature = req.headers["x-signature"] || "";
-
-  if (!verifySignature(req.body, WEBHOOK_SECRET, signature)) {
-    return res.status(401).send("Invalid signature");
-  }
-
-  const event = JSON.parse(req.body);
-  console.log(`Received event: ${event.event}`);
-  res.status(200).send();
-});
-```
-
-</CodeGroup>
-
-## Retry policy
-
-<Info>
-  If your endpoint returns a non-`2xx` response or times out, the Open API Platform automatically retries delivery up to **5 times** using exponential backoff: **1s → 2s → 4s → 8s → 16s**. If all retries are exhausted without a successful acknowledgment, the event is marked as failed and no further attempts are made. You can inspect failed deliveries in the [dashboard](https://dashboard.example.com).
-</Info>
-
-## Manage webhooks
-
-You can list and remove your registered webhooks at any time.
-
-**List all webhooks**
-
-```bash
-curl https://api.example.com/v1/webhooks \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-**Remove a webhook**
-
-```bash
-curl -X DELETE https://api.example.com/v1/webhooks/wh_04kz8m1r2ngqf9aub5w7c3xep \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-A successful deletion returns `204 No Content`. Once removed, your endpoint will no longer receive event deliveries.
+<Tip>
+  If your use case truly requires push delivery, contact MC support to discuss options for your account tier.
+</Tip>

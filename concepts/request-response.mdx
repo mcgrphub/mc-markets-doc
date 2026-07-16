@@ -1,123 +1,125 @@
 ---
-title: "HTTP Request and Response Format in the Open API Platform"
+title: "MC OpenAPI Request and Response Format"
 sidebarTitle: "Requests & Responses"
-description: "Complete reference for HTTP requests and JSON responses in the Open API Platform: required headers, request body format, and HTTP status codes explained."
+description: "Reference for MC OpenAPI HTTP requests and JSON responses: signing headers, request body format, response envelope, and HTTP status codes."
 ---
 
-The Open API Platform is a JSON-over-HTTP API. Every request you send must target `https://api.example.com/v1`, carry the appropriate headers, and — where applicable — include a JSON body. Every response you receive back is also JSON. This page describes exactly what that exchange looks like on both sides.
+MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the three signing headers, and — where applicable — a JSON body. Every response is a JSON envelope with `code`, `msg`, `data`, and `success`.
 
 ## Request format
 
 ### Required headers
 
-Include the following headers with every request:
+Include the following headers on every request:
 
 | Header | Required | Value |
-|---|---|---|
-| `Authorization` | Yes | `Bearer YOUR_API_KEY` |
-| `Content-Type` | For POST / PUT | `application/json` |
-| `Accept` | No | `application/json` |
+| --- | --- | --- |
+| `X-Access-Key` | Yes | Your Access Key ID |
+| `X-Signature` | Yes | Lowercase hex HMAC-SHA256 signature over the canonical string |
+| `X-Timestamp` | Yes | Current UTC time in **milliseconds** |
+| `Content-Type` | For `POST` / `PUT` | `application/json` |
+| `Accept` | Recommended | `application/json` |
 
 <Warning>
-  Requests without a valid `Authorization` header will be rejected with a `401 Unauthorized` response. Keep your API key secret and never expose it in client-side code.
+  Requests without valid signing headers, or with a `X-Timestamp` outside the allowed window, are rejected. Never commit your Secret Key to source control or expose it in client-side code.
 </Warning>
 
-### Example: create a user
+See [Authentication](/authentication) for the exact canonical-string format and reference implementations in Python, Java, and Node.js.
 
-The following example shows a complete `POST` request that creates a new user:
+### Canonical string
+
+The string that is signed with HMAC-SHA256 is:
+
+```text
+{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+```
+
+- `METHOD` — uppercase HTTP method (`GET`, `POST`, ...).
+- `PATH` — the full request path starting with `/openapi/v1/...`, without the query string.
+- `SORTED_QUERY_STRING` — query parameters sorted by key ascending, `key=value` joined by `&`; empty string when there are no query parameters.
+- `BODY_OR_EMPTY` — the raw JSON body sent on the wire; empty string for methods without a body.
+- `TIMESTAMP` — the exact same value sent in the `X-Timestamp` header.
+
+### Example: query the USD exchange rates
 
 ```bash
-curl --request POST \
-  --url https://api.example.com/v1/users \
-  --header "Authorization: Bearer YOUR_API_KEY" \
-  --header "Content-Type: application/json" \
-  --header "Accept: application/json" \
-  --data '{
-    "name": "Jane Smith",
-    "email": "jane.smith@example.com",
-    "role": "member"
-  }'
+curl --request GET \
+  --url "https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd" \
+  --header "X-Access-Key: $MC_ACCESS_KEY" \
+  --header "X-Signature: $MC_SIGNATURE" \
+  --header "X-Timestamp: $MC_TIMESTAMP" \
+  --header "Accept: application/json"
 ```
 
 ## Response format
 
-All responses from the API are JSON objects. The shape of the response depends on whether the endpoint returns a single object or a list.
+All responses are JSON. The MC OpenAPI wraps every result in a common envelope.
 
-### Single object response
-
-Endpoints that return one resource wrap the result in a `data` key:
+### Response envelope
 
 ```json
 {
+  "code": "0",
+  "msg": "success",
+  "data": { },
+  "success": true
+}
+```
+
+<ResponseField name="code" type="string">
+  Business status code. `"0"` indicates success. Any other value indicates a business-level error — see [Error Handling](/concepts/errors).
+</ResponseField>
+
+<ResponseField name="msg" type="string">
+  Human-readable status message. For successful calls this is typically `"success"`. On failure it describes the reason.
+</ResponseField>
+
+<ResponseField name="data" type="object | array | null">
+  The actual response payload. Shape depends on the endpoint — a single object, a list, or a paginated page object.
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Convenience flag; `true` when `code == "0"`, otherwise `false`.
+</ResponseField>
+
+### Paginated list response
+
+Endpoints that return a page of results place a page object inside `data`:
+
+```json
+{
+  "code": "0",
+  "msg": "success",
+  "success": true,
   "data": {
-    "id": "usr_01J3K9XYZ",
-    "name": "Jane Smith",
-    "email": "jane.smith@example.com",
-    "role": "member",
-    "created_at": "2024-07-15T10:32:00Z",
-    "updated_at": "2024-07-15T10:32:00Z"
+    "pageNum": 1,
+    "pageSize": 20,
+    "total": 132,
+    "pages": 7,
+    "list": [
+      { "transactionId": "T-1001", "amount": "125.50", "currency": "USDT" }
+    ]
   }
 }
 ```
 
-### List response
-
-Endpoints that return multiple resources include a `data` array alongside a `pagination` object and an optional `meta` object:
-
-```json
-{
-  "data": [
-    {
-      "id": "usr_01J3K9XYZ",
-      "name": "Jane Smith",
-      "email": "jane.smith@example.com",
-      "role": "member",
-      "created_at": "2024-07-15T10:32:00Z",
-      "updated_at": "2024-07-15T10:32:00Z"
-    },
-    {
-      "id": "usr_01J3K9ABC",
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-      "role": "admin",
-      "created_at": "2024-07-14T08:10:00Z",
-      "updated_at": "2024-07-14T08:10:00Z"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "per_page": 20,
-    "total": 2,
-    "next_cursor": null,
-    "prev_cursor": null
-  },
-  "meta": {
-    "request_id": "req_8fHq2mNpLd"
-  }
-}
-```
-
-<Note>
-  The `pagination` key is only present on list endpoints. Single-object endpoints return only `data`. See [Pagination](/concepts/pagination) for details on iterating through large result sets.
-</Note>
+See [Pagination](/concepts/pagination) for how to request additional pages.
 
 ## HTTP status codes
 
-The API uses standard HTTP status codes to communicate the outcome of every request. Codes in the `2xx` range indicate success; codes in the `4xx` range indicate a problem with your request; codes in the `5xx` range indicate a server-side issue.
+MC OpenAPI uses standard HTTP status codes for transport-level outcomes. Even on a `200 OK`, always inspect the envelope `code` for the business result.
 
 | Code | Meaning |
-|---|---|
-| `200` | **Success** — the request completed successfully and the response body contains the result. |
-| `201` | **Created** — a new resource was created successfully. |
-| `204` | **No content** — the request succeeded but there is no response body (typically returned by `DELETE`). |
-| `400` | **Bad request** — the request was malformed or missing required parameters. |
-| `401` | **Unauthorized** — no API key was provided, or the key is invalid. |
-| `403` | **Forbidden** — the API key does not have permission to perform this action. |
-| `404` | **Not found** — the requested resource does not exist. |
-| `422` | **Validation error** — the request body passed structural checks but failed business-logic validation. |
-| `429` | **Rate limit exceeded** — you have sent too many requests in a short period. |
-| `500` | **Server error** — an unexpected error occurred on the platform side. |
+| --- | --- |
+| `200` | Request delivered successfully. Check `code` in the JSON envelope for the business result. |
+| `400` | Malformed request — missing parameters or invalid JSON body. |
+| `401` | Signature invalid, `X-Timestamp` skewed, or Access Key not recognised. |
+| `403` | Access Key is valid but lacks the required scope (`READ`, `TRADE`, or `WITHDRAW`). |
+| `404` | The endpoint or resource does not exist. |
+| `429` | Rate limit exceeded — see [Rate Limits](/guides/rate-limits). |
+| `500` | Unexpected gateway error. Retry with backoff. |
+| `503` | Gateway temporarily unavailable. Retry with backoff. |
 
 <Tip>
-  When you receive a `4xx` error, inspect the JSON response body for a machine-readable `error.code` and a human-readable `error.message` that explain exactly what went wrong. See [Error Handling](/concepts/errors) for the full error reference.
+  Log the `code`, `msg`, and any correlation ID from response headers on every non-`200` response — it makes support requests much faster to triage.
 </Tip>

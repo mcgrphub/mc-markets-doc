@@ -1,7 +1,7 @@
 ---
-title: "API Versioning Policy, Deprecation, and Migrations"
+title: "Versioning"
 sidebarTitle: "Versioning"
-description: "Learn how the Open API Platform API is versioned, how to specify a version in requests, and what to expect when versions are deprecated."
+description: "MC OpenAPI URL-path versioning under /openapi/v1 with v2 variants for specific resources."
 ---
 
 The Open API Platform API uses URL path versioning to give you stability and predictability. Embedding the version directly in the URL means you always know exactly which contract your integration targets, and updates to the API never silently change the behaviour of your existing requests.
@@ -28,22 +28,19 @@ All examples throughout this reference use `/v1` unless stated otherwise.
 
 ## Current versions
 
-| Version | Status  | Notes                        |
-| ------- | ------- | ---------------------------- |
-| v1      | Current | Stable, recommended          |
-| v2      | Beta    | Available on request         |
+| Version | Status | Notes |
+| --- | --- | --- |
+| v1 | Current | Stable, recommended |
+| v2 | Beta | Available on request |
 
 <Note>
-  To gain access to the v2 beta, contact your account manager or open a support
-  ticket. Beta versions may change without prior notice.
+  To gain access to the v2 beta, contact your account manager or open a support ticket. Beta versions may change without prior notice.
 </Note>
 
 ## Deprecation policy
 
 <Info>
-  Deprecated versions receive a minimum of **12 months' notice** before they are
-  removed. Breaking changes are never made to a stable version — if a change
-  would break existing integrations, it is introduced in a new version only.
+  Deprecated versions receive a minimum of **12 months' notice** before they are removed. Breaking changes are never made to a stable version — if a change would break existing integrations, it is introduced in a new version only.
 </Info>
 
 When a version enters deprecation:
@@ -72,8 +69,5 @@ The following changes are additive and safe to absorb without updating your inte
 You should write your integration defensively — ignore unexpected fields in responses rather than treating them as errors. This ensures your code continues to work smoothly as the API evolves.
 
 <Tip>
-  Pin your integration to the current stable version (`v1`) and subscribe to
-  changelog notifications in your [dashboard
-  settings](https://app.example.com/settings/notifications) so you are notified
-  as soon as a new version is announced or a deprecation is scheduled.
+  Pin your integration to the current stable version (`v1`) and subscribe to changelog notifications in your [dashboard settings](https://app.example.com/settings/notifications) so you are notified as soon as a new version is announced or a deprecation is scheduled.
 </Tip>

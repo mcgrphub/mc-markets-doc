@@ -1,58 +1,73 @@
 ---
-title: "API Base URL, Environments, and Integration Switching"
+title: "Base URL"
 sidebarTitle: "Base URL"
-description: "Find the correct base URL for the Open API Platform production and sandbox environments, and learn how to configure your integration to switch between them."
+description: "Gateway base URLs for MC OpenAPI test and production environments."
 ---
 
-The API is served exclusively over HTTPS on versioned URLs. Every request you make must target one of the environment base URLs listed below, followed by the API version path and the specific endpoint — for example, `https://api.example.com/v1/users`.
+The MC OpenAPI is served exclusively over HTTPS through the **MC API Gateway**. Every request must target one of the environment base URLs below, followed by the API path prefix (`/openapi/v1`) and the specific endpoint — for example, `https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`.
 
 ## Environments
 
-Choose the environment that matches your use case:
+| Environment | Base URL |
+| --- | --- |
+| Test | `https://test-gateway.mcconnects.com` |
+| Production | `https://gateway.mcconnects.com` |
 
-| Environment | Base URL                               |
-| ----------- | -------------------------------------- |
-| Production  | `https://api.example.com/v1`           |
-| Sandbox     | `https://sandbox-api.example.com/v1`   |
+<Note>
+  Both environments require the same **AK/SK** credentials and **HMAC-SHA256** signing scheme. Test keys and production keys are issued separately from the MC platform.
+</Note>
 
-## Using the sandbox
+## Path prefix
 
-The sandbox environment is fully functional and mirrors the production API in every way — the only differences are that data is completely isolated from production and is reset on a weekly schedule. This makes it ideal for development, testing, and CI/CD pipelines without any risk of affecting live data.
+All resource paths are versioned under `/openapi/v1/…`. Combine the gateway host with the endpoint's path:
 
-To switch environments, replace the base URL in your code. No other changes to your requests or authentication headers are required.
+```text
+{gateway}/openapi/v1/{resource}/…
+```
+
+For example:
+
+- `https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`
+- `https://gateway.mcconnects.com/openapi/v1/finance/account/overview`
+
+## Switching environments
+
+To move from test to production, change only the gateway host in your configuration — no code changes to signing, headers, or endpoint paths are required.
 
 <CodeGroup>
 
 ```bash cURL
-# Production
-curl https://api.example.com/v1/users \
-  -H "Authorization: Bearer YOUR_API_KEY"
+# Test
+curl -X POST https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+  -H "X-Access-Key: $MC_ACCESS_KEY" \
+  -H "X-Signature: $MC_SIGNATURE" \
+  -H "X-Timestamp: $MC_TIMESTAMP" \
+  -H "Content-Type: application/json"
 
-# Sandbox
-curl https://sandbox-api.example.com/v1/users \
-  -H "Authorization: Bearer YOUR_SANDBOX_API_KEY"
+# Production
+curl -X POST https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+  -H "X-Access-Key: $MC_ACCESS_KEY" \
+  -H "X-Signature: $MC_SIGNATURE" \
+  -H "X-Timestamp: $MC_TIMESTAMP" \
+  -H "Content-Type: application/json"
 ```
 
 ```python Python
 import os
-import requests
 
-BASE_URL = os.environ.get("API_BASE_URL", "https://api.example.com/v1")
-
-response = requests.get(
-    f"{BASE_URL}/users",
-    headers={"Authorization": f"Bearer {os.environ['API_KEY']}"},
+MC_GATEWAY = os.environ.get(
+    "MC_GATEWAY",
+    "https://test-gateway.mcconnects.com",
 )
+
+url = f"{MC_GATEWAY}/openapi/v1/exchange-rate/query/usd"
 ```
 
 ```javascript Node.js
-const BASE_URL = process.env.API_BASE_URL ?? "https://api.example.com/v1";
+const MC_GATEWAY =
+  process.env.MC_GATEWAY ?? "https://test-gateway.mcconnects.com";
 
-const response = await fetch(`${BASE_URL}/users`, {
-  headers: {
-    Authorization: `Bearer ${process.env.API_KEY}`,
-  },
-});
+const url = `${MC_GATEWAY}/openapi/v1/exchange-rate/query/usd`;
 ```
 
 ```go Go
@@ -60,35 +75,25 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 )
 
 func main() {
-	baseURL := os.Getenv("API_BASE_URL")
-	if baseURL == "" {
-		baseURL = "https://api.example.com/v1"
+	gateway := os.Getenv("MC_GATEWAY")
+	if gateway == "" {
+		gateway = "https://test-gateway.mcconnects.com"
 	}
-
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s/users", baseURL), nil)
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("API_KEY"))
-
-	client := &http.Client{}
-	client.Do(req)
+	url := fmt.Sprintf("%s/openapi/v1/exchange-rate/query/usd", gateway)
+	fmt.Println(url)
 }
 ```
 
 </CodeGroup>
 
 <Warning>
-  Always use HTTPS when making requests. The API rejects plain HTTP requests
-  with a `301 Moved Permanently` redirect to the HTTPS equivalent. Most HTTP
-  clients will not automatically re-send request bodies on a redirect, which can
-  result in unexpected errors.
+  Always use HTTPS. Plain HTTP requests are rejected. If your client follows redirects, POST bodies may not be re-sent, causing signature verification to fail on the retried request.
 </Warning>
 
 <Tip>
-  Store the base URL as an environment variable (for example, `API_BASE_URL`) in
-  your application configuration. Switching from sandbox to production then
-  requires only a single config change — no code modifications needed.
+  Store the gateway host as an environment variable (for example, `MC_GATEWAY`) in your application config. Promoting an integration from test to production then requires only a single config change.
 </Tip>

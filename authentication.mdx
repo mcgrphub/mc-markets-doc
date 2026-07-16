@@ -1,117 +1,391 @@
 ---
-title: "API Authentication: Keys, Scopes, and Best Practices"
+title: "Authentication"
 sidebarTitle: "Authentication"
-description: "Learn how to generate API keys, pass them in request headers, configure permission scopes, and follow security best practices for the Open API Platform."
+description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key (SK) and HMAC-SHA256 signing."
 ---
 
-Every request you make to the Open API Platform REST API must include a valid API key. You pass your key in the `Authorization` header using the `Bearer` scheme. Requests that are missing a key or that supply an invalid one are rejected before they reach any resource.
+All OpenAPI requests must be sent to the **API Gateway** and authenticated with an **Access Key (AK)** and **Secret Key (SK)** pair. The gateway validates your signature, checks API Key permissions, and forwards the request to the appropriate backend service.
 
-## API Keys
+## Base URLs
 
-API keys are long-lived credentials that identify your account and determine what actions your requests are allowed to perform. Each key is tied to a specific set of [scopes](#key-scopes) that you choose at creation time.
+| Environment | Base URL |
+| --- | --- |
+| Test | `https://test-gateway.mcconnects.com` |
+| Production | `https://gateway.mcconnects.com` |
 
-To generate a new key:
+All paths in this documentation are relative to the base URL above. For example, a documented path of `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` should be requested as:
 
-1. Log in to your dashboard at [https://dashboard.example.com](https://dashboard.example.com).
-2. Go to **Settings → API Keys**.
-3. Click **New Key**, enter a descriptive name, select the scopes you need, and click **Create**.
-4. Copy the key immediately — it is only displayed once.
-
-### Sending your API key
-
-Include your key as a `Bearer` token in the `Authorization` header of every request:
-
-```bash
-curl https://api.example.com/v1/users \
-  -H "Authorization: Bearer YOUR_API_KEY"
+```text
+https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
 ```
 
-### Examples in multiple languages
+<Warning>
+  Do not call backend services directly. Always use the gateway URL so that authentication and permission checks are enforced.
+</Warning>
+
+## Credentials
+
+Each API Key consists of two parts:
+
+| Credential | Format | Example |
+| --- | --- | --- |
+| **Access Key (AK)** | `AK` \+ 16 uppercase hex characters | `AKF013EB0CC51E4BEB` |
+| **Secret Key (SK)** | `SK` \+ Base64URL-encoded random string | `SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc` |
+
+- The **Secret Key is shown only once** when the API Key is created. Store it securely — it cannot be retrieved again.
+- Each API Key is bound to a user account and business line.
+- API Keys can be enabled, disabled, or deleted from the user portal.
+- You can create up to **30 API Keys** per user.
+
+### How to obtain credentials
+
+<Steps>
+  <Step title="Log in to the MC platform with your user account.">
+  </Step>
+  <Step title="Navigate to API Key Management.">
+  </Step>
+  <Step title="Create a new API Key, selecting the required permissions (READ, TRADE, WITHDRAW).">
+  </Step>
+  <Step title="Copy and securely store both the Access Key and Secret Key immediately after creation.">
+  </Step>
+</Steps>
+
+## Required headers
+
+Every authenticated request must include the following HTTP headers:
+
+| Header | Required | Description |
+| --- | --- | --- |
+| `X-Access-Key` | Yes | Your Access Key (AK) |
+| `X-Signature` | Yes | HMAC-SHA256 signature (Base64-encoded) |
+| `X-Timestamp` | Yes | Current Unix timestamp in **milliseconds** |
+| `Content-Type` | For POST/PUT | `application/json` (when sending a JSON body) |
+
+<Warning>
+  Do not send `Authorization: Bearer ...` together with AK/SK headers. If a Bearer token is present, the gateway treats the request as a web session call and will not use your AK/SK signature.
+</Warning>
+
+## Request signing
+
+Signing prevents tampering and replay attacks. For each request:
+
+1. Build a **string to sign** from the HTTP method, URI, query parameters, and selected headers.
+2. Compute **HMAC-SHA256** using your Secret Key.
+3. Base64-encode the result and send it as `X-Signature`.
+
+### String to sign
+
+The string to sign concatenates the following parts, separated by newline characters (`\n`):
+
+```text
+{HTTP_METHOD}
+{REQUEST_URI}
+{QUERY_STRING}
+{SIGNED_HEADERS}
+{TIMESTAMP}
+```
+
+| Part | Description |
+| --- | --- |
+| `HTTP_METHOD` | Uppercase HTTP method, e.g. `GET`, `POST`, `PUT`, `DELETE` |
+| `REQUEST_URI` | Full gateway path **without** the host, e.g. `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` |
+| `QUERY_STRING` | Query parameters sorted by key (ASCII ascending), formatted as `key1=value1&key2=value2`. **Omit this line entirely** if there are no query parameters. |
+| `SIGNED_HEADERS` | Selected request headers sorted by key (lowercase), formatted as `key1=value1&key2=value2`. **Omit this line entirely** if no signed headers are present. |
+| `TIMESTAMP` | Same value as the `X-Timestamp` header (milliseconds) |
+
+#### Signed headers
+
+Only the following headers participate in the signature:
+
+| Header | Included as |
+| --- | --- |
+| `X-Access-Key` | `x-access-key={value}` |
+| `X-Timestamp` | `x-timestamp={value}` |
+
+Header names are **lowercased** when building the string. Other headers (e.g. `Content-Type`, `X-Custom-Header`) are **not** included.
+
+<Info>
+  Use the **gateway-visible path** exactly as documented in the API reference. For example, account service endpoints are prefixed with `/openapi/v1/mc-account/`, not `/openapi/v1/`.
+</Info>
+
+The request body (JSON payload) is **not** included in the signature. Only method, URI, query string, and the two signed headers are used.
+
+### Signature algorithm
+
+```text
+signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
+```
+
+- Algorithm: **HMAC-SHA256**
+- Key encoding: UTF-8 bytes of the Secret Key string
+- Output encoding: **Base64** (standard, with padding)
+
+### Timestamp validity
+
+- `X-Timestamp` must be the current time in **milliseconds** (13-digit Unix epoch).
+- The gateway accepts timestamps within **±10 minutes** of server time.
+- Requests with expired or malformed timestamps are rejected with `401 Unauthorized`.
+
+## Permissions
+
+Each API Key carries one or more permission scopes. Individual API endpoints declare which permissions are required. Your key must include **all** required permissions (AND logic).
+
+| Permission | Code | Description |
+| --- | --- | --- |
+| Read | `READ` | Read-only operations (balances, lists, queries) |
+| Trade | `TRADE` | Trading operations (place/cancel orders) |
+| Withdraw | `WITHDRAW` | Withdrawal and transfer operations |
+
+If your API Key lacks the required permission for an endpoint, the gateway returns `401 Unauthorized` with the message `没有访问该接口的权限`.
+
+## IP whitelist (optional)
+
+When creating or editing an API Key, you can configure an IP whitelist (up to 15 IPv4 addresses, comma-separated).
+
+- If a whitelist is configured, requests from non-whitelisted IPs are rejected with `401 Unauthorized`.
+- If no whitelist is configured, requests from any IP are allowed (subject to other checks).
+
+The gateway determines the client IP from `X-Forwarded-For`, `X-Real-IP`, or the direct connection address.
+
+## Example — exchange rate query
+
+Query the BTC/USDT exchange rate for crypto assets. This endpoint requires the `READ` permission.
+
+**Request:**
+
+```text
+GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+Host: test-gateway.mcconnects.com
+X-Access-Key: AKF013EB0CC51E4BEB
+X-Timestamp: 1747890123456
+X-Signature: <computed signature>
+```
+
+**String to sign:**
+
+```text
+GET
+/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+x-access-key=AKF013EB0CC51E4BEB&x-timestamp=1747890123456
+1747890123456
+```
+
+**cURL:**
+
+```bash
+ACCESS_KEY='AKF013EB0CC51E4BEB'
+SECRET_KEY='SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc'
+URI='/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT'
+TIMESTAMP=$(python3 -c 'import time; print(int(time.time()*1000))')
+
+SIGNATURE=$(python3 << 'PY'
+import base64, hashlib, hmac, os
+method = "GET"
+uri = os.environ["URI"]
+access_key = os.environ["ACCESS_KEY"]
+secret_key = os.environ["SECRET_KEY"]
+timestamp = os.environ["TIMESTAMP"]
+headers = f"x-access-key={access_key}&x-timestamp={timestamp}"
+string_to_sign = f"{method}\n{uri}\n{headers}\n{timestamp}\n"
+sig = base64.b64encode(
+    hmac.new(secret_key.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+).decode()
+print(sig)
+PY
+)
+
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com${URI}"
+```
+
+**Success response:**
+
+```json
+{
+  "status": 200,
+  "code": "200",
+  "success": true,
+  "data": 98500.12
+}
+```
+
+## Code examples
 
 <CodeGroup>
 
-```bash curl
-curl https://api.example.com/v1/users \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Accept: application/json"
-```
-
 ```python Python
+import base64
+import hashlib
+import hmac
+import time
 import requests
 
-response = requests.get(
-    "https://api.example.com/v1/users",
-    headers={
-        "Authorization": "Bearer YOUR_API_KEY",
-        "Accept": "application/json",
-    },
-)
+ACCESS_KEY = "YOUR_ACCESS_KEY"
+SECRET_KEY = "YOUR_SECRET_KEY"
+BASE_URL = "https://test-gateway.mcconnects.com"
 
+def sign_request(method: str, uri: str, query_params: dict | None = None) -> dict:
+    timestamp = str(int(time.time() * 1000))
+    headers_to_sign = {
+        "x-access-key": ACCESS_KEY,
+        "x-timestamp": timestamp,
+    }
+
+    parts = [method.upper(), uri]
+
+    if query_params:
+        query_string = "&".join(
+            f"{k}={v}" for k, v in sorted(query_params.items())
+        )
+        parts.append(query_string)
+
+    signed_headers = "&".join(
+        f"{k}={v}" for k, v in sorted(headers_to_sign.items())
+    )
+    parts.append(signed_headers)
+    parts.append(timestamp)
+
+    string_to_sign = "\n".join(parts) + "\n"
+    signature = base64.b64encode(
+        hmac.new(SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+    ).decode()
+
+    return {
+        "X-Access-Key": ACCESS_KEY,
+        "X-Timestamp": timestamp,
+        "X-Signature": signature,
+    }
+
+uri = "/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT"
+auth_headers = sign_request("GET", uri)
+response = requests.get(f"{BASE_URL}{uri}", headers=auth_headers)
 print(response.json())
 ```
 
-```javascript JavaScript
-const response = await fetch("https://api.example.com/v1/users", {
-  method: "GET",
-  headers: {
-    Authorization: "Bearer YOUR_API_KEY",
-    Accept: "application/json",
-  },
-});
+```java Java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-const data = await response.json();
-console.log(data);
+public class McOpenApiSigner {
+
+    public static String sign(String method, String uri,
+                              Map<String, String> queryParams,
+                              String accessKey, String secretKey) throws Exception {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(method.toUpperCase()).append("\n");
+        sb.append(uri).append("\n");
+
+        if (queryParams != null && !queryParams.isEmpty()) {
+            String query = new TreeMap<>(queryParams).entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining("&"));
+            sb.append(query).append("\n");
+        }
+
+        TreeMap<String, String> signHeaders = new TreeMap<>();
+        signHeaders.put("x-access-key", accessKey);
+        signHeaders.put("x-timestamp", timestamp);
+        String headerStr = signHeaders.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining("&"));
+        sb.append(headerStr).append("\n");
+        sb.append(timestamp).append("\n");
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+        return Base64.getEncoder().encodeToString(
+                mac.doFinal(sb.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+}
 ```
 
-```php PHP
-<?php
+```javascript Node.js
+const crypto = require("crypto");
 
-$ch = curl_init("https://api.example.com/v1/users");
+function signRequest(method, uri, queryParams, accessKey, secretKey) {
+  const timestamp = String(Date.now());
+  const parts = [method.toUpperCase(), uri];
 
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HTTPHEADER => [
-        "Authorization: Bearer YOUR_API_KEY",
-        "Accept: application/json",
-    ],
-]);
+  if (queryParams && Object.keys(queryParams).length > 0) {
+    const query = Object.keys(queryParams)
+      .sort()
+      .map((k) => `${k}=${queryParams[k]}`)
+      .join("&");
+    parts.push(query);
+  }
 
-$response = curl_exec($ch);
-curl_close($ch);
+  const signHeaders = {
+    "x-access-key": accessKey,
+    "x-timestamp": timestamp,
+  };
+  const headerStr = Object.keys(signHeaders)
+    .sort()
+    .map((k) => `${k}=${signHeaders[k]}`)
+    .join("&");
+  parts.push(headerStr, timestamp);
 
-echo $response;
+  const stringToSign = parts.join("\n") + "\n";
+  const signature = crypto
+    .createHmac("sha256", secretKey)
+    .update(stringToSign)
+    .digest("base64");
+
+  return {
+    "X-Access-Key": accessKey,
+    "X-Timestamp": timestamp,
+    "X-Signature": signature,
+  };
+}
 ```
 
 </CodeGroup>
 
-## Key scopes
+## Error responses
 
-When you create an API key, you assign it one or more scopes. Scopes limit what the key can do, so you can follow the principle of least privilege and issue tightly scoped keys for specific use cases.
+Authentication failures return HTTP **401 Unauthorized** with a JSON body:
 
-| Scope   | Permissions granted                                                                 |
-| ------- | ----------------------------------------------------------------------------------- |
-| `read`  | Retrieve any resource (GET requests). Cannot create, update, or delete resources.  |
-| `write` | Create and update resources (POST and PUT requests). Includes `read` access.       |
-| `admin` | Full access: read, write, and delete resources, plus manage API keys and settings. |
+```json
+{
+  "status": 401,
+  "code": 401,
+  "message": "签名无效"
+}
+```
 
-Choose the narrowest scope that covers your use case. For example, a reporting integration only needs `read`, while a data-sync service likely needs `write`.
+| Message | Cause |
+| --- | --- |
+| `缺少有效鉴权凭证` | No valid auth headers provided |
+| `缺少AccessKey, 请在请求头中添加X-Access-Key` | Missing `X-Access-Key` header |
+| `缺少签名, 请在请求头中添加X-Signature` | Missing `X-Signature` header |
+| `缺少时间戳, 请在请求头中添加X-Timestamp` | Missing `X-Timestamp` header |
+| `时间戳无效或已过期` | Timestamp outside the ±10-minute window |
+| `[X-Access-Key]AccessKey无效` | Access Key not found, disabled, or expired |
+| `签名无效` | Signature does not match |
+| `没有访问权限, ip: {ip}` | Client IP not in the API Key whitelist |
+| `没有访问该接口的权限` | API Key lacks required permission for this endpoint |
+| `API Key 未绑定业务线或用户` | API Key configuration error (contact support) |
 
 ## Security best practices
 
 <Tip>
-  Follow these practices to keep your API keys — and your data — secure:
-
-  - **Never expose your key in frontend code.** API keys included in client-side JavaScript or mobile app binaries can be extracted by anyone. Always make API calls from a backend server.
-  - **Store keys in environment variables.** Reference your key via an environment variable (for example, `process.env.API_KEY`) rather than hard-coding it in your source files.
-  - **Restrict scopes to the minimum needed.** Limit each key to only the scopes required for its specific task. If a key is compromised, a narrow scope limits the blast radius.
-  - **Rotate keys regularly.** Periodically revoke old keys and issue new ones, especially after team-member offboarding or any suspected exposure.
+  1. **Never expose your Secret Key** in client-side code, public repositories, or logs.
+  2. **Use IP whitelisting** in production to restrict API Key usage to known server IPs.
+  3. **Grant minimum permissions** — only assign `TRADE` or `WITHDRAW` if your integration requires them.
+  4. **Rotate keys regularly** — disable old keys and create new ones when team members leave or credentials may be compromised.
+  5. **Sync your system clock** — signature validation requires accurate timestamps (NTP recommended).
+  6. **Use HTTPS only** — all API communication must go through TLS.
 </Tip>
 
-## Authentication errors
+## Quick checklist
 
-If your request fails authentication or authorization, the API returns one of the following HTTP error responses:
-
-| Status code         | Meaning                                                                                   | How to fix                                                                                        |
-| ------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `401 Unauthorized`  | The `Authorization` header is missing, malformed, or contains an invalid or revoked key. | Check that you're sending the header correctly and that the key hasn't been deleted or revoked. Generate a new key in **Settings → API Keys** if needed. |
-| `403 Forbidden`     | The key is valid, but it doesn't have the scope required to perform the requested action. | Review the key's scopes in the dashboard. Either add the necessary scope to the existing key or generate a new key with the correct scopes.              |
+Before making your first API call, verify:

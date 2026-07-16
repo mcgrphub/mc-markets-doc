@@ -1,82 +1,103 @@
 ---
-title: "Frequently Asked Questions about the Open API Platform"
+title: "MC OpenAPI Frequently Asked Questions"
 sidebarTitle: "FAQ"
-description: "Find answers to the most common questions about authentication, rate limits, billing, and integrating the Open API Platform into your application."
+description: "Answers to common MC OpenAPI questions: signing, permissions, environments, pagination, PoR snapshots, and getting help."
 ---
 
-Got a quick question about the Open API Platform? You're in the right place. Browse the answers below to resolve the most common questions about authentication, rate limits, billing, and day-to-day API usage.
+## Getting started
 
 <AccordionGroup>
-  <Accordion title="How do I get an API key?">
-    Sign in to your account, navigate to **Settings → API Keys**, and click **Create New Key**. Give your key a descriptive name, choose the appropriate scopes, and save it somewhere secure — the full key value is only shown once.
+  <Accordion title="How do I get an Access Key and Secret Key?">
+    Sign in to your MC account and open **API Management**. Create a new key, choose the permissions you need (`READ`, `TRADE`, `WITHDRAW`), and copy both the Access Key and the Secret Key immediately — the Secret Key is shown only once. Full walkthrough: [Authentication](/authentication#creating-api-keys).
   </Accordion>
 
-  <Accordion title="What happens if I lose my API key?">
-    If you can no longer access your API key, revoke it immediately from the dashboard to prevent unauthorized use. Go to **Settings → API Keys**, find the key in question, and click **Revoke**. You can then generate a new key to replace it.
+  <Accordion title="What is the difference between the test and production gateways?">
+    - **Test:** `https://test-gateway.mcconnects.com` — sandbox for building integrations. Uses test balances and does not affect real funds.
+    - **Production:** `https://gateway.mcconnects.com` — live traffic. Real balances, real money movement.
+
+    Keys are environment-specific: a test key will not work against production and vice versa. See [Base URL](/api-reference/base-url).
   </Accordion>
 
-  <Accordion title="How are rate limits calculated?">
-    Rate limits are enforced **per API key** using a rolling minute window. Every request you make is counted against the limit for that key, resetting continuously over the previous 60 seconds rather than at a fixed clock boundary.
+  <Accordion title="Which permission does an endpoint require?">
+    - `READ` — most query endpoints (transactions, positions, exchange rates, symbol metadata, PoR snapshots).
+    - `TRADE` — finance-account deposit and fixed-term subscriptions.
+    - `WITHDRAW` — finance-account withdrawals.
 
-    For full details on limits by tier and how to handle `429` responses, see the [Rate Limits guide](/guides/rate-limits).
+    The required scope is listed on each endpoint page under [API Reference](/api-reference/overview).
+  </Accordion>
+</AccordionGroup>
+
+## Authentication
+
+<AccordionGroup>
+  <Accordion title="What exactly do I sign?">
+    The canonical string is `METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP` — five lines separated by `\n`, with empty lines for empty query strings or bodies. Sign it with HMAC-SHA256 using your Secret Key, and put the lowercase hex digest in `X-Signature`. Reference implementations: [Authentication](/authentication#signing-a-request).
   </Accordion>
 
-  <Accordion title="Can I use one API key for multiple applications?">
-    Technically yes, but we strongly recommend creating a **separate API key for each application**. Using distinct keys lets you rotate or revoke access for one app without disrupting others, and makes it much easier to track usage and audit logs per service.
+  <Accordion title="I get code 40001 (invalid signature). What's wrong?">
+    In order of likelihood:
+
+    1. The canonical string does not match what the gateway expects — print it and compare byte-for-byte with the [reference examples](/authentication#signing-a-request).
+    2. You signed a **stringified** body but sent a different one on the wire (extra whitespace, different key ordering). Serialize once and reuse the exact string in both places.
+    3. You used the Access Key in place of the Secret Key.
+    4. Query parameters are not sorted by key ascending.
+
+    See also [Troubleshooting](/help/troubleshooting).
   </Accordion>
 
-  <Accordion title="What response format does the API use?">
-    All API responses are returned as **JSON** wrapped in a standard `data` envelope. A typical successful response looks like this:
-
-    ```json
-    {
-      "data": {
-        "id": "res_abc123",
-        "status": "active"
-      }
-    }
-    ```
-
-    Error responses follow the same envelope structure but include an `error` object with a `code`, `message`, and optional `details` array.
+  <Accordion title="I get code 40002 (timestamp expired). What's wrong?">
+    Your machine's clock is skewed from the gateway. `X-Timestamp` must be current UTC time in **milliseconds** (not seconds), and within a small window of the server clock. Sync via NTP.
   </Accordion>
 
-  <Accordion title="How do I test the API without affecting production data?">
-    Use the **sandbox environment** for all development and testing. The sandbox mirrors the production API surface but operates on isolated test data, so no real records are created or modified.
+  <Accordion title="Can I rotate keys without downtime?">
+    Yes. Create a new key with the same permissions, deploy it, then disable the old key in the console. Both keys are valid concurrently until you disable the old one.
+  </Accordion>
+</AccordionGroup>
 
-    ```
-    https://sandbox-api.example.com/v1
-    ```
+## Requests and pagination
 
-    Authenticate with a sandbox-specific API key (created from the same **Settings → API Keys** page) and point your requests at the sandbox base URL instead of the production one.
+<AccordionGroup>
+  <Accordion title="Which endpoints return a paginated response?">
+    Every list-style endpoint (transaction records, funding-fee history) returns `pageNum`, `pageSize`, `total`, `pages`, and `list`. See [Pagination](/concepts/pagination).
   </Accordion>
 
-  <Accordion title="How do I receive real-time updates?">
-    The Open API Platform supports **webhooks** for real-time event notifications. You register an HTTPS endpoint in your dashboard, and the platform sends a `POST` request to that URL whenever a subscribed event occurs.
-
-    To get started, check out the [Webhooks guide](/guides/webhooks).
+  <Accordion title="What is the largest pageSize I can request?">
+    Most list endpoints allow up to `100`. Check the specific endpoint under [API Reference](/api-reference/overview) for its documented limit.
   </Accordion>
 
-  <Accordion title="Is there a free tier?">
-    Yes. The free tier includes:
+  <Accordion title="How do I get real-time updates?">
+    MC OpenAPI does not currently deliver webhooks or push events. Use the [polling patterns](/guides/webhooks) for detecting new activity efficiently.
+  </Accordion>
+</AccordionGroup>
 
-    - **60 requests per minute** (rolling window)
-    - **5,000 requests per day**
+## Data model
 
-    If you need higher limits, you can upgrade to a paid plan from the **Billing** section of your dashboard. Usage above the free tier limits returns a `429 Too Many Requests` response until the window resets.
+<AccordionGroup>
+  <Accordion title="What is Proof of Reserves (PoRv2)?">
+    A per-user Merkle-tree snapshot of assets held on the platform. Call `GET /openapi/v1/fund/account/por` to fetch your snapshot and audit path. See the [Fund Account endpoint](/api-reference/endpoints/fund-account) for the full response schema.
   </Accordion>
 
-  <Accordion title="What do I do if I get a 429 error?">
-    A `429 Too Many Requests` error means you've exceeded your rate limit for the current window. Read the `Retry-After` header in the response — it tells you how many seconds to wait before retrying.
-
-    Implement **exponential backoff** in your client so that retries are spaced out progressively rather than hammering the API repeatedly. For a full walkthrough, see the [Rate Limits guide](/guides/rate-limits).
+  <Accordion title="What is the difference between v1 and v2 endpoints?">
+    Some resources (spot positions, funding-fee records) have both v1 and v2 variants. The v2 versions are the current recommendation and return additional fields. See [Versioning](/api-reference/versioning) for the full list.
   </Accordion>
 
-  <Accordion title="How do I contact support?">
-    You can reach the support team in two ways:
+  <Accordion title="Are numeric fields returned as numbers or strings?">
+    All monetary amounts, prices, and rates are returned as **strings** to preserve precision. Parse them with a decimal library (Python `Decimal`, JavaScript `bignumber.js`, Java `BigDecimal`) — never with floating-point.
+  </Accordion>
+</AccordionGroup>
 
-    - **Email:** [support@example.com](mailto:support@example.com)
-    - **Dashboard ticket:** Open a ticket directly from the **Help → Support** section in your dashboard for the fastest response.
+## Operational
 
-    When contacting support about a specific failed request, include the `X-Request-ID` value from the response headers to help the team locate your request quickly.
+<AccordionGroup>
+  <Accordion title="Are there official SDKs?">
+    Not yet. Copy-paste-ready client snippets for Python, Node.js, Java, and Go are on [Code Samples](/guides/sdks).
+  </Accordion>
+
+  <Accordion title="How are rate limits enforced?">
+    Per-Access-Key at the gateway. Exceeding the limit returns HTTP `429` with `code: "42901"`. See [Rate Limits](/guides/rate-limits) for the recommended backoff strategy.
+  </Accordion>
+
+  <Accordion title="Where do I report a bug or request a feature?">
+    Contact MC support with a description of the issue, the affected endpoint, the timestamp of a failing request, and — if possible — the response body (with Secret Key redacted).
   </Accordion>
 </AccordionGroup>

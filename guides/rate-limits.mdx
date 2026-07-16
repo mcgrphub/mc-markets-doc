@@ -1,144 +1,91 @@
 ---
-title: "Understanding and Handling API Rate Limits Effectively"
+title: "MC OpenAPI Rate Limits"
 sidebarTitle: "Rate Limits"
-description: "Learn how the Open API Platform enforces rate limits, how to read rate limit response headers, and how to implement retry logic to avoid errors."
+description: "How MC OpenAPI enforces rate limits per Access Key, how to detect throttling, and how to implement exponential backoff."
 ---
 
-The Open API Platform enforces rate limits per API key to ensure fair use and reliable performance for all users. When you exceed your plan's limit, the API returns a `429 Too Many Requests` error until your window resets. Building rate-limit-aware retry logic into your integration keeps your application resilient under load.
+MC OpenAPI enforces per-Access-Key request-rate limits at the gateway to protect the platform and ensure fair capacity for every integration.
 
-## Rate limit tiers
+<Note>
+  Exact per-endpoint limits depend on your account tier. If you need higher throughput for a production integration, contact MC support.
+</Note>
 
-Limits are measured in a rolling 60-second window for per-minute quotas, and a rolling 24-hour window for daily quotas.
+## How limits are applied
 
-| Plan | Requests/minute | Requests/day |
-|---|---|---|
-| Free | 60 | 5,000 |
-| Pro | 300 | 50,000 |
-| Enterprise | 1,000 | Unlimited |
+- Limits are counted **per Access Key**, not per source IP.
+- Both the test and production gateways enforce their own independent limits.
+- Some heavy endpoints (paginated history queries, PoR snapshots) have stricter limits than lightweight metadata endpoints.
 
-<Warning>
-  Repeatedly exceeding your rate limit in a short period may result in a temporary block on your API key. If you consistently hit your plan's ceiling, [contact support](mailto:support@example.com) to discuss a limit increase or an upgrade to a higher tier.
-</Warning>
+## Detecting throttling
 
-## Rate limit headers
+When you exceed a limit, the gateway responds with **HTTP `429 Too Many Requests`** and a business error envelope:
 
-Every API response includes headers that tell you your current rate limit status. Read these headers proactively to throttle your own requests before hitting a `429`.
-
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Maximum number of requests allowed in the current window |
-| `X-RateLimit-Remaining` | Number of requests remaining in the current window |
-| `X-RateLimit-Reset` | Unix timestamp (UTC) when the current window resets |
-| `Retry-After` | Seconds to wait before retrying after a `429` response |
-
-An example response header set might look like this:
-
-```
-X-RateLimit-Limit: 300
-X-RateLimit-Remaining: 42
-X-RateLimit-Reset: 1715342460
-Retry-After: 17
+```json
+{
+  "code": "42901",
+  "msg": "Too many requests",
+  "success": false,
+  "data": null
+}
 ```
 
-## Handling 429 errors
+Always check both signals:
 
-When you receive a `429` response, read the `Retry-After` header and wait the indicated number of seconds before retrying. If `Retry-After` is absent, use truncated exponential backoff with jitter to avoid thundering-herd problems.
+- HTTP status code — reliable transport-level indicator.
+- The `code` field in the JSON envelope — `"42901"` (or another rate-limit code documented alongside the endpoint) indicates throttling.
 
-<CodeGroup>
+## Recommended handling: exponential backoff with jitter
 
-```python Python
-import time
-import random
-import requests
+When you get a `429`, do **not** retry immediately in a tight loop. Wait, then retry with an exponentially growing delay plus a small random jitter to avoid synchronized retry storms.
 
-API_KEY = "YOUR_API_KEY"
-BASE_URL = "https://api.example.com/v1"
+### Python
 
-def request_with_backoff(method: str, path: str, **kwargs) -> requests.Response:
-    max_retries = 5
-    base_delay = 1.0  # seconds
+```python
+import time, random, requests
 
+def call_with_backoff(send_request, *, max_retries=6, base=1.0, cap=30.0):
     for attempt in range(max_retries):
-        response = requests.request(
-            method,
-            f"{BASE_URL}{path}",
-            headers={"Authorization": f"Bearer {API_KEY}"},
-            **kwargs,
-        )
-
+        response = send_request()
         if response.status_code != 429:
             return response
 
-        retry_after = response.headers.get("Retry-After")
-        if retry_after:
-            wait = float(retry_after)
-        else:
-            # Exponential backoff with full jitter
-            wait = base_delay * (2 ** attempt) + random.uniform(0, 1)
+        payload = {}
+        try:
+            payload = response.json()
+        except ValueError:
+            pass
+        if payload.get("code") not in {"42901", None}:
+            return response  # Not a rate-limit error
 
-        print(f"Rate limited. Retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})...")
-        time.sleep(wait)
+        delay = min(cap, base * (2 ** attempt)) + random.uniform(0, 0.5)
+        time.sleep(delay)
 
-    response.raise_for_status()
-    return response
-
-
-# Usage
-resources = request_with_backoff("GET", "/resources").json()
+    raise RuntimeError("Exceeded max retries after repeated 429 responses")
 ```
 
-```javascript JavaScript
-const BASE_URL = "https://api.example.com/v1";
-const API_KEY = "YOUR_API_KEY";
+### JavaScript
 
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function requestWithBackoff(method, path, options = {}) {
-  const maxRetries = 5;
-  const baseDelay = 1000; // milliseconds
-
+```javascript
+async function callWithBackoff(sendRequest, { maxRetries = 6, base = 1000, cap = 30_000 } = {}) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const response = await fetch(`${BASE_URL}${path}`, {
-      method,
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-      ...options,
-    });
+    const res = await sendRequest();
+    if (res.status !== 429) return res;
 
-    if (response.status !== 429) {
-      return response;
-    }
-
-    const retryAfter = response.headers.get("Retry-After");
-    let wait;
-    if (retryAfter) {
-      wait = parseFloat(retryAfter) * 1000;
-    } else {
-      // Exponential backoff with full jitter
-      wait = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
-    }
-
-    console.log(
-      `Rate limited. Retrying in ${(wait / 1000).toFixed(1)}s (attempt ${attempt + 1}/${maxRetries})...`
-    );
-    await sleep(wait);
+    const delay = Math.min(cap, base * 2 ** attempt) + Math.floor(Math.random() * 500);
+    await new Promise((r) => setTimeout(r, delay));
   }
-
-  throw new Error(`Request failed after ${maxRetries} retries`);
+  throw new Error("Exceeded max retries after repeated 429 responses");
 }
-
-// Usage
-const response = await requestWithBackoff("GET", "/resources");
-const resources = await response.json();
 ```
 
-</CodeGroup>
+## Best practices
+
+- **Batch and page efficiently.** Use the largest `pageSize` an endpoint allows — see [Pagination](/concepts/pagination).
+- **Cache slow-changing data.** Symbol lists, exchange metadata, and USD rate tables change slowly; cache them locally for at least a few minutes.
+- **Separate keys per workload.** Use one Access Key for interactive queries and another for background jobs so a bursty job doesn't starve user traffic.
+- **Sync your clocks.** A skewed clock produces `401` signing failures, not `429` — but you'll waste your rate budget on retries. Use NTP.
+- **Handle `5xx` the same way.** For `500`, `502`, and `503`, use the same exponential-backoff strategy.
 
 <Tip>
-  Minimize unnecessary requests by caching responses locally where data changes infrequently. Use the `X-RateLimit-Remaining` header to proactively throttle your own request rate before hitting a `429`, rather than waiting for the error to trigger your retry logic.
+  Log the response `code`, `msg`, and any correlation IDs on every `429`. If throttling is frequent even under normal load, contact support with those log entries to review your tier.
 </Tip>

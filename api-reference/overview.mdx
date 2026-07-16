@@ -1,41 +1,87 @@
 ---
-title: "Open API Platform REST API — Full Endpoint Reference"
+title: "API Reference"
 sidebarTitle: "Overview"
-description: "Complete reference for the Open API Platform REST API — endpoints, authentication, request format, response envelope, and available resources."
+description: "MC OpenAPI endpoints grouped by tag: Trading, Finance Account, Currency, Fund Account, Funding Fee, Exchange Rate."
 ---
 
-This reference covers every public endpoint, request/response schemas, and error codes for the Open API Platform REST API. Use it to understand how to authenticate, structure requests, handle responses, and work with each available resource.
+This reference covers every endpoint of the MC OpenAPI (MC-account, `v0.0.1`), organized by tag. All endpoints share the same gateway host, path prefix (`/openapi/v1`), authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope.
 
 <CardGroup cols={2}>
-  <Card title="Base URL" icon="server" href="/api-reference/base-url">
-    Learn the base URL for production and sandbox environments and how to switch between them.
-  </Card>
-  <Card title="Versioning" icon="code-branch" href="/api-reference/versioning">
-    Understand how the API is versioned and what to expect when versions are deprecated.
-  </Card>
-  <Card title="Users" icon="user" href="/api-reference/endpoints/users">
-    Create, read, update, and delete user records in your account.
-  </Card>
-  <Card title="Resources" icon="box" href="/api-reference/endpoints/resources">
-    Manage the core resources exposed by the Open API Platform.
-  </Card>
-  <Card title="Webhooks" icon="webhook" href="/api-reference/endpoints/webhooks">
-    Subscribe to real-time event notifications delivered to your endpoint.
-  </Card>
   <Card title="Authentication" icon="lock" href="/authentication">
-    Learn how to authenticate requests using Bearer token API keys.
+    AK/SK credentials, HMAC-SHA256 signing, timestamps, and permissions.
+  </Card>
+
+  <Card title="Base URL" icon="server" href="/api-reference/base-url">
+    Gateway hosts for test and production, and how to switch between them.
+  </Card>
+
+  <Card title="Versioning" icon="code-branch" href="/api-reference/versioning">
+    URL-path versioning under `/openapi/v1` and deprecation policy.
+  </Card>
+
+  <Card title="Trading" icon="right-left" href="/api-reference/endpoints/trading">
+    Transaction records and fund flow history.
+  </Card>
+
+  <Card title="Finance Account" icon="piggy-bank" href="/api-reference/endpoints/finance-account">
+    Demand / fixed-term deposit & withdraw, and finance overview.
+  </Card>
+
+  <Card title="Currency" icon="coins" href="/api-reference/endpoints/currency">
+    Symbol network list, exchangeable symbols, and symbol details.
+  </Card>
+
+  <Card title="Fund Account" icon="wallet" href="/api-reference/endpoints/fund-account">
+    Spot positions (v2) and user Proof-of-Reserves.
+  </Card>
+
+  <Card title="Funding Fee" icon="receipt" href="/api-reference/endpoints/funding-fee">
+    Funding-fee & interest-fee history paginated query (v2).
+  </Card>
+
+  <Card title="Exchange Rate" icon="chart-line" href="/api-reference/endpoints/exchange-rate">
+    Pair rates, USD rates, and flash conversion quotes.
   </Card>
 </CardGroup>
 
 ## API at a glance
 
-The table below summarises the key properties of the Open API Platform REST API.
+| Property | Value |
+| --- | --- |
+| Product | MC-account (Multi-Account System) |
+| Version | `v0.0.1` |
+| Base URL (test) | `https://test-gateway.mcconnects.com` |
+| Base URL (production) | `https://gateway.mcconnects.com` |
+| Path prefix | `/openapi/v1` |
+| Protocol | HTTPS only |
+| Format | JSON |
+| Auth | AK/SK \+ HMAC-SHA256 signature |
+| Required headers | `X-Access-Key`, `X-Signature`, `X-Timestamp` |
+| Permissions | `READ`, `TRADE`, `WITHDRAW` |
 
-| Property    | Value                                          |
-| ----------- | ---------------------------------------------- |
-| Base URL    | `https://api.example.com/v1`                   |
-| Protocol    | HTTPS only                                     |
-| Format      | JSON                                           |
-| Auth        | Bearer token (API Key)                         |
-| Versioning  | URL path (`/v1`)                               |
-| Rate limits | See [/guides/rate-limits](/guides/rate-limits) |
+## Response envelope
+
+All endpoints return a common JSON envelope:
+
+```json
+{
+  "status": 200,
+  "code": "200",
+  "codeKey": "DEFAULT",
+  "message": "...",
+  "success": true,
+  "data": { }
+}
+```
+
+- `status` — HTTP status echoed in the body.
+- `code` / `codeKey` — business-level status. See the OpenAPI `codeKey` enum for the full list (e.g. `PARAM_ERROR`, `SIGN_ERROR`, `PERMISSION_DENIED`, `ACCOUNT_BALANCE_INSUFFICIENT`).
+- `success` — `true` for successful business responses.
+- `data` — endpoint-specific payload (object, array, string, or number).
+
+## Common request conventions
+
+- **`trackingId`** — most POST bodies require a `trackingId` string. Use a unique value per request for idempotency and troubleshooting.
+- **Pagination request** — page queries share `{ size, current, orderBy, orderDirection, trackingId, ...filters }`. `orderBy` supports comma-separated multi-field sort (e.g. `id,createTime`); `orderDirection` is `ASC` / `DESC`, comma-separated to match.
+- **Pagination response** — page responses share `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`.
+- **Date-time** — `yyyy-MM-dd HH:mm:ss.SSS` (ISO 8601).

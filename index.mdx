@@ -1,54 +1,76 @@
 ---
-title: "Open API Platform: Integrate Anything with Our REST API"
+title: "MC OpenAPI — Multi-Account Trading & Finance API"
 sidebarTitle: "Introduction"
-description: "Explore the Open API Platform — a RESTful API that lets you build powerful integrations, automate workflows, and connect your services in minutes."
+description: "The MC OpenAPI is a REST API for multi-account systems: balances, positions, transactions, funding fees, exchange rates, and finance-account deposits/withdrawals."
 ---
 
-The Open API Platform gives you a clean, versioned REST API to integrate your applications, automate data flows, and build new products on top of our infrastructure. Whether you're accessing user data, managing resources, or wiring up real-time webhook notifications, everything you need is exposed through a single, well-documented API.
+The MC OpenAPI is a REST API for MC's multi-account platform. Use it to query trading and fund-flow records, manage finance-account deposits and withdrawals, look up symbols and networks, retrieve exchange rates and flash-conversion quotes, and read positions and proof-of-reserves data.
+
+All requests are routed through the MC **API Gateway** and authenticated with an **Access Key / Secret Key** pair using **HMAC-SHA256** request signing.
 
 <CardGroup cols={2}>
-  <Card title="Quick Start" icon="rocket" href="/quickstart">
-    Make your first API call in under 5 minutes
-  </Card>
   <Card title="Authentication" icon="key" href="/authentication">
-    Get your API key and authenticate requests
+    AK/SK credentials, HMAC-SHA256 signing, timestamps, and permissions
   </Card>
+
+  <Card title="Base URL" icon="server" href="/api-reference/base-url">
+    Test and production gateway URLs
+  </Card>
+
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Make your first authenticated API call in under 5 minutes
+  </Card>
+
   <Card title="API Reference" icon="code" href="/api-reference/overview">
-    Browse all endpoints, parameters, and responses
-  </Card>
-  <Card title="Guides" icon="book-open" href="/guides/first-request">
-    Step-by-step guides for common use cases
+    All endpoints organized by tag: Trading, Finance, Currency, Fund Account, and more
   </Card>
 </CardGroup>
+
+## Base URLs
+
+| Environment | Base URL |
+| --- | --- |
+| Test | `https://test-gateway.mcconnects.com` |
+| Production | `https://gateway.mcconnects.com` |
 
 ## Get started in 3 steps
 
 <Steps>
   <Step title="Get your API key">
-    Sign in to the [dashboard](https://dashboard.example.com) and generate an API key from **Settings → API Keys**.
+    Log in to the MC platform, open **API Key Management**, create a new key, and select the required permissions (`READ`, `TRADE`, `WITHDRAW`). Copy the Access Key and Secret Key — the Secret Key is shown only once.
   </Step>
-  <Step title="Make your first request">
-    Pass your key in the `Authorization` header and call any endpoint:
-    ```bash
-    curl https://api.example.com/v1/users \
-      -H "Authorization: Bearer YOUR_API_KEY"
-    ```
+  <Step title="Sign your request">
+    Build the string to sign, compute an HMAC-SHA256 signature with your Secret Key, and send it along with your Access Key and a millisecond timestamp. See [Authentication](/authentication) for the exact format and examples.
   </Step>
-  <Step title="Explore & build">
-    Browse the [API Reference](/api-reference/overview) for every available endpoint, or follow the [Guides](/guides/first-request) to tackle common workflows.
+  <Step title="Call an endpoint">
+    Try the [exchange-rate query](/api-reference/endpoints/exchange-rate) to verify your integration, then browse the [full API reference](/api-reference/overview).
   </Step>
 </Steps>
 
-## What you can build
+## What's in the API
 
 <CardGroup cols={3}>
-  <Card title="User Management" icon="users" href="/api-reference/endpoints/users">
-    Create, update, and query users via the REST API
+  <Card title="Trading" icon="right-left" href="/api-reference/endpoints/trading">
+    Query transaction records and fund-flow history by transactionId or with pagination.
   </Card>
-  <Card title="Resource CRUD" icon="database" href="/api-reference/endpoints/resources">
-    Full create/read/update/delete on all resources
+
+  <Card title="Finance Account" icon="piggy-bank" href="/api-reference/endpoints/finance-account">
+    Deposit into and withdraw from demand & fixed-term finance products, view the account overview.
   </Card>
-  <Card title="Webhooks" icon="bolt" href="/guides/webhooks">
-    Receive real-time event notifications in your app
+
+  <Card title="Currency" icon="coins" href="/api-reference/endpoints/currency">
+    List symbol networks, exchangeable symbols, and query symbol details.
+  </Card>
+
+  <Card title="Fund Account" icon="wallet" href="/api-reference/endpoints/fund-account">
+    Read spot positions (v2) and user Proof-of-Reserves snapshots.
+  </Card>
+
+  <Card title="Funding Fee History" icon="receipt" href="/api-reference/endpoints/funding-fee">
+    Query the funding-fee & interest-fee history, aggregated by position and settlement time.
+  </Card>
+
+  <Card title="Exchange Rate" icon="chart-line" href="/api-reference/endpoints/exchange-rate">
+    Query pair exchange rates, USD rates, and flash-conversion quotes with fee estimation.
   </Card>
 </CardGroup>

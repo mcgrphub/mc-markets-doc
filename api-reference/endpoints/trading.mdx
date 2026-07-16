@@ -1,0 +1,158 @@
+---
+title: "Trading"
+sidebarTitle: "Trading"
+description: "Query transaction records and fund-flow history by transactionId or with pagination filters."
+---
+
+Endpoints tagged **Trading** query the account's transaction records and fund-flow (account) records. All endpoints in this group require the `READ` permission.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/openapi/v1/transaction/transaction/record/transactionId/{id}` | Query a single transaction record by `transactionId`. |
+| POST | `/openapi/v1/transaction/transaction/record/page` | Paginated query of transaction records. |
+| POST | `/openapi/v1/transaction/account/record/page` | Paginated query of fund-flow (account) records. |
+
+All endpoints return the standard envelope. Paginated endpoints return `data` shaped as `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`.
+
+---
+
+## Query transaction record by transactionId
+
+<ParamField path="id" type="string" required>
+  The `transactionId` of the record to retrieve. Sent as a path parameter.
+</ParamField>
+
+**Permission required:** `READ`
+
+```bash cURL
+curl -s -X POST \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/transaction/transaction/record/transactionId/TX-20260101-000001"
+```
+
+### Example response
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "id": 100234,
+    "uid": "u_1122334455",
+    "transactionId": "TX-20260101-000001",
+    "symbolId": 1,
+    "acSymbol": "USDT",
+    "network": "TRC20",
+    "transactionType": "WITHDRAWAL",
+    "status": "SUCCESS",
+    "amount": 1000.0,
+    "fee": 1.0,
+    "feeSymbol": "USDT",
+    "exchangeRate": 1.0,
+    "createTime": "2026-01-01T09:00:00Z",
+    "finishTime": "2026-01-01T09:03:12Z",
+    "sourceAccountType": "FUND_ACCOUNT",
+    "targetAccountType": "EXTERNAL_ACCOUNT",
+    "sourceAccountId": "FA_888",
+    "targetWalletAddress": "TX...abcd",
+    "txHash": "0xabc...",
+    "fundFlowType": "CRYPTO_ADDRESS",
+    "transactionMethod": "CHAIN_TX"
+  }
+}
+```
+
+### Response `data` — TransactionRecordRsp
+
+<ResponseField name="transactionType" type="string">
+  Enum. One of `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `SAFEBOX_TRANSFER_OUT`, `ROLLBACK`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`.
+</ResponseField>
+
+<ResponseField name="sourceAccountType" type="string">
+  One of `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`.
+</ResponseField>
+
+---
+
+## Paginated query — transaction records
+
+`POST /openapi/v1/transaction/transaction/record/page`
+
+**Permission required:** `READ`
+
+### Request body — TransactionRecordPageReq
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{
+        "trackingId": "track-20260101-0001",
+        "size": 10,
+        "current": 1,
+        "orderBy": "id,createTime",
+        "orderDirection": "DESC,ASC",
+        "transactionTypes": ["RECHARGE", "WITHDRAWAL"],
+        "createTimeStart": "2026-01-01 00:00:00.000",
+        "createTimeEnd": "2026-01-31 23:59:59.999"
+      }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/transaction/transaction/record/page"
+```
+
+### Response — BasePageRsp\<TransactionRecordRsp\>
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "total": 143,
+    "size": 10,
+    "current": 1,
+    "pages": 15,
+    "hasPrevious": false,
+    "hasNext": true,
+    "records": [
+      {
+        "transactionId": "TX-20260101-000001",
+        "acSymbol": "USDT",
+        "transactionType": "WITHDRAWAL",
+        "status": "SUCCESS",
+        "amount": 1000.0,
+        "fee": 1.0,
+        "createTime": "2026-01-01T09:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+      
+
+---
+
+## Paginated query — fund-flow (account) records
+
+`POST /openapi/v1/transaction/account/record/page`
+
+**Permission required:** `READ`
+
+Request body and response are the same shape as the transaction-records pagination above. This endpoint returns fund-flow records from the `ac_account_record` perspective (per-account debit/credit view) rather than the transaction-level view.
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{ "trackingId": "track-20260101-0002", "size": 20, "current": 1 }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/transaction/account/record/page"
+```

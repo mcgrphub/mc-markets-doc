@@ -1,0 +1,107 @@
+---
+title: "Currency"
+sidebarTitle: "Currency"
+description: "List symbol networks, list exchangeable symbols, and query per-symbol details."
+---
+
+Endpoints tagged **Currency (币种)** list the symbols configured on the platform and their per-network configuration. All endpoints in this group require the `READ` permission.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/openapi/v1/symbol/list` | Symbol × network list (deposit / withdraw availability, precision, min amounts, icons). |
+| GET | `/openapi/v1/symbol/exchange/list` | Symbols that support in-app exchange (兑换) with min amounts. |
+| GET | `/openapi/v1/symbol/detail/{id}` | Symbol network details by symbol ID. |
+
+---
+
+## Symbol network list
+
+`GET /openapi/v1/symbol/list` — permission `READ`.
+
+### Response `data` — SymbolNetworkDto\[\]
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": [
+    {
+      "symbolId": 1001,
+      "symbol": "USDT",
+      "network": "TRC20",
+      "fullName": "Tether USD",
+      "iconUrl": "https://.../usdt.png",
+      "depositEnabled": true,
+      "withdrawEnabled": true,
+      "minDepositAmount": 1.0,
+      "minWithdrawAmount": 5.0,
+      "withdrawFee": 1.0,
+      "amountPrecision": 6,
+      "confirmations": 20
+    }
+  ]
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/symbol/list"
+```
+
+---
+
+## Exchangeable symbols
+
+`GET /openapi/v1/symbol/exchange/list` — permission `READ`.
+
+### Response `data` — ExchangeSymbolDto\[\]
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": [
+    {
+      "symbolId": 1001,
+      "symbol": "USDT",
+      "quoteSymbol": "USDC",
+      "minTradeUnit": 1.0,
+      "pricePrecision": 6,
+      "exchangeRate": 1.0
+    }
+  ]
+}
+```
+
+     
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/symbol/exchange/list"
+```
+
+---
+
+## Symbol detail
+
+`GET /openapi/v1/symbol/detail/{id}` — permission `READ`.
+
+Response `data` shape matches `SymbolNetworkDto` (see the list endpoint above).
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/symbol/detail/1001"
+```

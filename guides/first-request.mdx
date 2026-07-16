@@ -1,106 +1,174 @@
 ---
-title: "Make Your First API Request: Full CRUD Walkthrough"
+title: "Make Your First MC OpenAPI Request"
 sidebarTitle: "First Request"
-description: "Walk through creating, reading, updating, and deleting a resource with the Open API Platform REST API using copy-pasteable curl examples."
+description: "End-to-end walkthrough: create an Access Key, sign a request, and call the MC OpenAPI USD exchange-rate endpoint."
 ---
 
-This guide walks you through the full CRUD lifecycle — create, read, update, and delete — on a resource using the Open API Platform REST API. By the end, you'll have a working pattern you can adapt for any resource type.
+This guide walks you through a full signed request against the MC OpenAPI gateway. By the end you will have a working call to the `GET /openapi/v1/exchange-rate/query/usd` endpoint that returns live USD conversion rates.
 
-<Note>
-  Replace `YOUR_API_KEY` with your actual key from the [dashboard](https://dashboard.example.com). Keep your key secret and never commit it to source control.
-</Note>
+## Prerequisites
 
-<Steps>
-  <Step title="Create a resource">
-    Send a `POST` request to `/v1/resources` with a JSON body describing the resource you want to create.
+Before you start, make sure you have:
 
-    ```bash
-    curl -X POST https://api.example.com/v1/resources \
-      -H "Authorization: Bearer YOUR_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{
-        "name": "My First Resource",
-        "description": "Created via the REST API",
-        "type": "example"
-      }'
-    ```
+- An MC account with API access enabled.
+- An **Access Key** and **Secret Key** — see [Authentication](/authentication#creating-api-keys) for how to create them.
+- The `READ` permission enabled on your key (required for the exchange-rate endpoint).
+- A tool that can send HTTPS requests: `curl`, Python 3.8\+, or Node.js 18\+.
 
-    A successful request returns `201 Created` with the new resource object:
+<Warning>
+  Your Secret Key is shown only once at creation time. Store it in a secrets manager or environment variable — never commit it to source control.
+</Warning>
 
-    ```json
-    {
-      "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
-      "name": "My First Resource",
-      "description": "Created via the REST API",
-      "type": "example",
-      "created_at": "2024-05-10T12:00:00Z",
-      "updated_at": "2024-05-10T12:00:00Z"
-    }
-    ```
+## Step 1 — Choose an environment
 
-    Save the `id` field — you'll use it in the next steps.
-  </Step>
+| Environment | Base URL |
+| --- | --- |
+| Test | `https://test-gateway.mcconnects.com` |
+| Production | `https://gateway.mcconnects.com` |
 
-  <Step title="Retrieve the resource">
-    Send a `GET` request to `/v1/resources/{id}` to fetch the resource you just created.
+The rest of this guide uses production. Swap the host to point at the test gateway.
 
-    ```bash
-    curl https://api.example.com/v1/resources/res_01hx9k2p3mfqe7ztw4v8n6jdc \
-      -H "Authorization: Bearer YOUR_API_KEY"
-    ```
+## Step 2 — Understand what you are signing
 
-    The API returns the same resource object with its current state:
+Every MC OpenAPI request is signed with HMAC-SHA256 over a canonical string:
 
-    ```json
-    {
-      "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
-      "name": "My First Resource",
-      "description": "Created via the REST API",
-      "type": "example",
-      "created_at": "2024-05-10T12:00:00Z",
-      "updated_at": "2024-05-10T12:00:00Z"
-    }
-    ```
-  </Step>
+```text
+{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+```
 
-  <Step title="Update the resource">
-    Send a `PUT` request to `/v1/resources/{id}` with the fields you want to change. You must include all required fields in the body — the API performs a full replacement.
+For a `GET /openapi/v1/exchange-rate/query/usd` call with no query parameters and no body, the canonical string is:
 
-    ```bash
-    curl -X PUT https://api.example.com/v1/resources/res_01hx9k2p3mfqe7ztw4v8n6jdc \
-      -H "Authorization: Bearer YOUR_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{
-        "name": "My Updated Resource",
-        "description": "Updated description via the REST API",
-        "type": "example"
-      }'
-    ```
+```text
+GET
+/openapi/v1/exchange-rate/query/usd
 
-    A successful update returns `200 OK` with the updated resource object:
 
-    ```json
-    {
-      "id": "res_01hx9k2p3mfqe7ztw4v8n6jdc",
-      "name": "My Updated Resource",
-      "description": "Updated description via the REST API",
-      "type": "example",
-      "created_at": "2024-05-10T12:00:00Z",
-      "updated_at": "2024-05-10T12:34:56Z"
-    }
-    ```
-  </Step>
+1731657600000
+```
 
-  <Step title="Delete the resource">
-    Send a `DELETE` request to `/v1/resources/{id}` to permanently remove the resource.
+Note the blank lines for the empty query string and empty body. Full details are in the [Authentication](/authentication#signing-a-request) reference.
 
-    ```bash
-    curl -X DELETE https://api.example.com/v1/resources/res_01hx9k2p3mfqe7ztw4v8n6jdc \
-      -H "Authorization: Bearer YOUR_API_KEY"
-    ```
+## Step 3 — Send the request
 
-    A successful deletion returns `204 No Content` with an empty body. The resource is permanently removed and cannot be recovered.
-  </Step>
-</Steps>
+### cURL
 
-You've now completed a full CRUD cycle against the Open API Platform. To explore all available endpoints, path parameters, and request schemas, head to the [API Reference](/api-reference/overview).
+```bash
+ACCESS_KEY="your_access_key"
+SECRET_KEY="your_secret_key"
+TS=$(date +%s000)
+METHOD="GET"
+PATH_="/openapi/v1/exchange-rate/query/usd"
+
+CANONICAL=$(printf "%s\n%s\n\n\n%s" "$METHOD" "$PATH_" "$TS")
+SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -hex | awk '{print $2}')
+
+curl --request GET \
+  --url "https://gateway.mcconnects.com${PATH_}" \
+  --header "X-Access-Key: ${ACCESS_KEY}" \
+  --header "X-Signature: ${SIGNATURE}" \
+  --header "X-Timestamp: ${TS}" \
+  --header "Accept: application/json"
+```
+
+### Python
+
+```python
+import hmac, hashlib, time, requests, os
+
+BASE_URL = "https://gateway.mcconnects.com"
+ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
+SECRET_KEY = os.environ["MC_SECRET_KEY"]
+
+method = "GET"
+path = "/openapi/v1/exchange-rate/query/usd"
+query = ""
+body = ""
+ts = str(int(time.time() * 1000))
+
+canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+signature = hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+resp = requests.get(
+    BASE_URL + path,
+    headers={
+        "X-Access-Key": ACCESS_KEY,
+        "X-Signature": signature,
+        "X-Timestamp": ts,
+        "Accept": "application/json",
+    },
+)
+print(resp.status_code, resp.json())
+```
+
+### Node.js
+
+```javascript
+import crypto from "crypto";
+
+const BASE_URL = "https://gateway.mcconnects.com";
+const ACCESS_KEY = process.env.MC_ACCESS_KEY;
+const SECRET_KEY = process.env.MC_SECRET_KEY;
+
+const method = "GET";
+const path = "/openapi/v1/exchange-rate/query/usd";
+const query = "";
+const body = "";
+const ts = Date.now().toString();
+
+const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
+const signature = crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
+
+const res = await fetch(BASE_URL + path, {
+  method,
+  headers: {
+    "X-Access-Key": ACCESS_KEY,
+    "X-Signature": signature,
+    "X-Timestamp": ts,
+    Accept: "application/json",
+  },
+});
+
+console.log(res.status, await res.json());
+```
+
+## Step 4 — Read the response
+
+A successful response looks like this:
+
+```json
+{
+  "code": "0",
+  "msg": "success",
+  "success": true,
+  "data": [
+    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "EUR", "rate": "0.9187" },
+    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "JPY", "rate": "155.42" },
+    { "symbolType": "CRYPTO", "baseCurrency": "USD", "targetCurrency": "BTC", "rate": "0.0000148" }
+  ]
+}
+```
+
+- `code == "0"` — the call succeeded.
+- `data` — the payload (see the [Exchange Rate endpoint](/api-reference/endpoints/exchange-rate) for the full schema).
+
+If `code` is not `"0"`, inspect `msg` and consult the [Error Handling](/concepts/errors) reference.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Explore all endpoints" icon="list" href="/api-reference/overview">
+    Browse the six MC OpenAPI endpoint groups and their schemas.
+  </Card>
+
+  <Card title="Handle pagination" icon="layer-group" href="/concepts/pagination">
+    Learn how to iterate through list endpoints like transaction records.
+  </Card>
+
+  <Card title="Reference implementations" icon="code" href="/guides/sdks">
+    Copy the language snippets for Python, Java, and Node.js.
+  </Card>
+
+  <Card title="Handle rate limits" icon="gauge-high" href="/guides/rate-limits">
+    Implement backoff for `429 Too Many Requests` responses.
+  </Card>
+</CardGroup>

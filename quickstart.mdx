@@ -1,86 +1,109 @@
 ---
-title: "Open API Platform Quickstart: Make Your First API Call"
+title: "MC OpenAPI Quickstart"
 sidebarTitle: "Quickstart"
-description: "Get up and running with the Open API Platform in under 5 minutes — generate your API key and make your first authenticated REST request."
+description: "Create an MC Access Key / Secret Key, build an HMAC-SHA256 signature, and make your first authenticated call through the gateway."
 ---
 
-This quickstart walks you through everything you need to get up and running with the Open API Platform: obtaining an API key and making your first authenticated REST call. By the end, you'll have a working request and a clear path to explore the rest of the platform.
+This quickstart walks you through the steps to make your first authenticated call to the MC OpenAPI: creating an API Key, signing a request with HMAC-SHA256, and calling the exchange-rate endpoint through the gateway.
 
 <Note>
-  You need a dashboard account before you begin. If you don't have one yet, sign up for free at [https://dashboard.example.com](https://dashboard.example.com).
+  You need an MC platform account before you begin. If you don't have one, contact your MC representative.
 </Note>
 
 <Steps>
-  <Step title="Create an account">
-    Navigate to [https://dashboard.example.com](https://dashboard.example.com) and click **Sign Up**. Fill in your name, email address, and a secure password, then verify your email to activate your account.
-  </Step>
+  <Step title="Create an API Key">
+    Log in to the MC platform, open **API Key Management**, and click **Create**. Give the key a descriptive name and select the permissions you need:
 
-  <Step title="Generate an API key">
-    Once you're logged in, go to **Settings → API Keys** and click **New Key**. Give your key a descriptive name (for example, `my-first-key`) so you can identify it later, then click **Create**.
+    - `READ` — read-only operations (balances, lists, queries)
+    - `TRADE` — trading operations (place / cancel orders)
+    - `WITHDRAW` — withdrawal and transfer operations
 
-    Copy your new API key and store it somewhere safe — a password manager or a secrets vault works well.
+    Optionally configure an IP whitelist (up to 15 IPv4 addresses). Copy the **Access Key** and **Secret Key** immediately — the Secret Key is shown only once.
 
     <Warning>
-      Your API key is only shown once. If you lose it, you'll need to revoke it and generate a new one. Never commit keys to source control.
+      Never commit the Secret Key to source control, and never expose it in client-side code.
     </Warning>
   </Step>
+  <Step title="Sign a request">
+    Every authenticated request needs three headers:
 
-  <Step title="Make your first request">
-    Use the API key you just generated to call the `/v1/users` endpoint. Replace `YOUR_API_KEY` with your actual key:
+    | Header | Value |
+    | --- | --- |
+    | `X-Access-Key` | Your Access Key |
+    | `X-Timestamp` | Current Unix time in **milliseconds** (must be within ±10 minutes of server time) |
+    | `X-Signature` | Base64-encoded HMAC-SHA256 of the string to sign |
 
-    ```bash
-    curl https://api.example.com/v1/users \
-      -H "Authorization: Bearer YOUR_API_KEY" \
-      -H "Accept: application/json"
+    Build the string to sign by joining the following parts with `\n`, then append a trailing `\n`:
+
+    ```text
+    {HTTP_METHOD}
+    {REQUEST_URI}
+    {QUERY_STRING}       # omit this line if there are no query parameters
+    {SIGNED_HEADERS}     # x-access-key={AK}&x-timestamp={TS}, keys lowercased & sorted
+    {TIMESTAMP}
     ```
 
-    A successful response looks like this:
+    See [Authentication](/authentication) for the exact rules and Python / Java / Node.js code samples.
+  </Step>
+  <Step title="Call the exchange-rate endpoint">
+    The `GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` endpoint requires only the `READ` permission and is ideal for verifying your signing implementation.
+
+    ```bash
+    ACCESS_KEY='YOUR_ACCESS_KEY'
+    SECRET_KEY='YOUR_SECRET_KEY'
+    URI='/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT'
+    TIMESTAMP=$(python3 -c 'import time; print(int(time.time()*1000))')
+    
+    SIGNATURE=$(python3 << 'PY'
+    import base64, hashlib, hmac, os
+    method = "GET"
+    uri = os.environ["URI"]
+    access_key = os.environ["ACCESS_KEY"]
+    secret_key = os.environ["SECRET_KEY"]
+    timestamp = os.environ["TIMESTAMP"]
+    headers = f"x-access-key={access_key}&x-timestamp={timestamp}"
+    string_to_sign = f"{method}\n{uri}\n{headers}\n{timestamp}\n"
+    sig = base64.b64encode(
+        hmac.new(secret_key.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+    ).decode()
+    print(sig)
+    PY
+    )
+    
+    curl -s \
+      -H "X-Access-Key: ${ACCESS_KEY}" \
+      -H "X-Signature: ${SIGNATURE}" \
+      -H "X-Timestamp: ${TIMESTAMP}" \
+      "https://test-gateway.mcconnects.com${URI}"
+    ```
+
+    A successful response:
 
     ```json
     {
-      "data": [
-        {
-          "id": "usr_01H...",
-          "name": "Jane Doe",
-          "email": "jane@example.com",
-          "created_at": "2024-01-15T10:30:00Z"
-        }
-      ],
-      "pagination": {
-        "page": 1,
-        "per_page": 20,
-        "total": 1
-      }
+      "status": 200,
+      "code": "200",
+      "success": true,
+      "data": 98500.12
     }
     ```
-
-    The `data` array contains the list of users your key has permission to view. The `pagination` object tells you how many results are available and how they are paged.
   </Step>
-
-  <Step title="What's next">
-    Now that you've made your first request, explore the rest of the platform to learn how authentication works in depth, understand core concepts, and browse the full API reference.
-
+  <Step title="Explore the API">
     <CardGroup cols={2}>
-      <Card
-        title="Authentication"
-        icon="key"
-        href="/authentication"
-      >
-        Learn how API keys work, how to scope them, and how to keep them secure.
+      <Card title="Authentication" icon="key" href="/authentication">
+        Full signing algorithm, permissions, IP whitelisting, and error responses.
       </Card>
-      <Card
-        title="Concepts Overview"
-        icon="book-open"
-        href="/concepts/overview"
-      >
-        Understand the core objects and data model that power the Open API Platform.
+
+      <Card title="Base URL" icon="server" href="/api-reference/base-url">
+        Test and production gateway URLs, and path conventions.
       </Card>
-      <Card
-        title="API Reference"
-        icon="code"
-        href="/api-reference/overview"
-      >
-        Browse every endpoint, parameter, and response schema in the full API reference.
+
+      <Card title="API Reference" icon="code" href="/api-reference/overview">
+        Every endpoint, organized by tag (Trading, Finance, Currency, Fund Account, Funding Fee, Exchange Rate).
+      </Card>
+
+      <Card title="First Request" icon="rocket" href="/guides/first-request">
+        End-to-end walkthrough with a signed request in code.
       </Card>
     </CardGroup>
   </Step>

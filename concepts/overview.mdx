@@ -1,68 +1,60 @@
 ---
-title: "Open API Platform Core Concepts and Building Blocks"
+title: "MC OpenAPI Core Concepts"
 sidebarTitle: "Overview"
-description: "Understand the core building blocks of the Open API Platform: how resources are structured, how requests work, how to paginate results, and handle errors."
+description: "Building blocks of the MC OpenAPI: signing, response envelope, pagination, and error handling."
 ---
 
-This section walks you through the foundational concepts you need to work effectively with the Open API Platform. Whether you are making your first request or designing a production integration, understanding these building blocks will help you build faster and debug with confidence.
+MC OpenAPI is a JSON-over-HTTPS API for the MC Multi-Account System (MC-account). This section explains the shared conventions every endpoint follows so you can integrate faster and debug with confidence.
 
 <CardGroup cols={2}>
-  <Card
-    title="Requests & Responses"
-    icon="arrow-right-arrow-left"
-    href="/concepts/request-response"
-  >
-    Learn how to structure HTTP requests and interpret JSON responses, including required headers and status codes.
+  <Card title="Requests & Responses" icon="arrow-right-arrow-left" href="/concepts/request-response">
+    Required signing headers, JSON body format, and the common response envelope with `code`, `msg`, and `data`.
   </Card>
-  <Card
-    title="Pagination"
-    icon="layer-group"
-    href="/concepts/pagination"
-  >
-    Retrieve large result sets efficiently using page-based or cursor-based pagination on list endpoints.
+
+  <Card title="Pagination" icon="layer-group" href="/concepts/pagination">
+    How `pageNum` / `pageSize` work on list endpoints and how to iterate through large result sets.
   </Card>
-  <Card
-    title="Error Handling"
-    icon="circle-exclamation"
-    href="/concepts/errors"
-  >
-    Understand the structured error response format and handle common error codes in your integration.
+
+  <Card title="Error Handling" icon="circle-exclamation" href="/concepts/errors">
+    HTTP status codes, business `code` values in the envelope, and recommended retry strategy.
   </Card>
-  <Card
-    title="Authentication"
-    icon="lock"
-    href="/authentication"
-  >
-    Authenticate every request with an API key and learn how to manage key scopes and rotation.
+
+  <Card title="Authentication" icon="lock" href="/authentication">
+    AK/SK issuance, HMAC-SHA256 signing rules, and permission scopes (`READ`, `TRADE`, `WITHDRAW`).
   </Card>
 </CardGroup>
 
-## Data model
+## Environments
 
-The Open API Platform organizes everything around two primary resource types.
+| Environment | Base URL |
+| --- | --- |
+| Test | `https://test-gateway.mcconnects.com` |
+| Production | `https://gateway.mcconnects.com` |
 
-| Resource | Description |
-|---|---|
-| **Users** | Represent individual accounts that interact with your application. |
-| **Resources** | Generic, application-defined objects that belong to your project. |
+All endpoints share the path prefix `/openapi/v1/`. See [Base URL](/api-reference/base-url) for details.
 
-Every object in the platform shares a common set of system-managed fields:
+## Endpoint groups
 
-| Field | Type | Description |
-|---|---|---|
-| `id` | string | Unique identifier for the object, assigned by the platform. |
-| `created_at` | string (ISO 8601) | Timestamp of when the object was created. |
-| `updated_at` | string (ISO 8601) | Timestamp of the most recent update to the object. |
+MC OpenAPI is organized into six functional groups. Every endpoint requires a signed request; some also require additional permissions on the Access Key.
+
+| Group | Purpose | Required scope |
+| --- | --- | --- |
+| [Trading](/api-reference/endpoints/trading) | Transaction records by ID or paginated queries | `READ` |
+| [Finance Account](/api-reference/endpoints/finance-account) | Deposits, withdrawals, fixed-term products, portfolio overview | `READ`, `TRADE`, `WITHDRAW` |
+| [Currency](/api-reference/endpoints/currency) | Symbol / exchange metadata | `READ` |
+| [Fund Account](/api-reference/endpoints/fund-account) | Spot positions and proof-of-reserves snapshots | `READ` |
+| [Funding Fee](/api-reference/endpoints/funding-fee) | Perpetual funding-fee history | `READ` |
+| [Exchange Rate](/api-reference/endpoints/exchange-rate) | FX and crypto conversion rates | `READ` |
+
+## Request lifecycle
+
+Every call follows the same lifecycle:
+
+1. **Build** the request — HTTP method, path (`/openapi/v1/...`), query string, and optional JSON body.
+2. **Sign** the request — compute an HMAC-SHA256 signature over the canonical string using your Secret Key.
+3. **Send** the request over HTTPS with the `X-Access-Key`, `X-Signature`, and `X-Timestamp` headers.
+4. **Handle** the response — inspect the HTTP status, then the `code` field in the JSON envelope.
 
 <Note>
-  The `id`, `created_at`, and `updated_at` fields are read-only. You cannot set or modify them directly.
+  Timestamps must be within a small window of the gateway clock. Always use the current UTC time in milliseconds when signing.
 </Note>
-
-## RESTful conventions
-
-The Open API Platform follows standard REST conventions so that the API behaves predictably across every endpoint.
-
-- **HTTP methods** — use `GET` to retrieve, `POST` to create, `PUT` to update, and `DELETE` to remove resources.
-- **JSON bodies** — send and receive data as JSON. Every request with a body must include the `Content-Type: application/json` header.
-- **HTTP status codes** — the API signals success or failure through standard HTTP status codes (for example, `200 OK`, `201 Created`, `404 Not Found`). See [Requests & Responses](/concepts/request-response) for the full list.
-- **Base URL** — all endpoints are relative to `https://api.example.com/v1`.

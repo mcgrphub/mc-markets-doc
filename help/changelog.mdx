@@ -1,63 +1,35 @@
 ---
-title: "Open API Platform API Changelog and Update History"
+title: "MC OpenAPI Changelog"
 sidebarTitle: "Changelog"
-description: "Track every update to the Open API Platform API — new features, improvements, bug fixes, and breaking changes in reverse chronological order."
+description: "Release notes for MC OpenAPI — new endpoints, schema updates, and integration guidance in reverse chronological order."
 ---
 
-Keep track of every update to the Open API Platform API right here. This changelog documents new features, improvements, and bug fixes in reverse chronological order so you can quickly identify what changed and when.
+<Update label="2026-07-16" description="Documentation refresh">
+  - Published a full documentation site for MC OpenAPI covering all six endpoint groups: Trading, Finance Account, Currency, Fund Account, Funding Fee, and Exchange Rate.
+  - Added [Authentication](/authentication) reference with HMAC-SHA256 canonical-string spec and copy-paste examples in Python, Java, and Node.js.
+  - Added [Rate Limits](/guides/rate-limits) with exponential-backoff helpers.
+  - Added [Polling for Updates](/guides/webhooks) — MC OpenAPI is request-response only; use these patterns to detect new activity.
+  - Added ready-to-use client [code samples](/guides/sdks) in Python, Node.js, Java, and Go.
+</Update>
 
-<Note>
-  Stay on top of new releases by enabling **Release Notifications** in your dashboard under **Settings → Notifications**. You'll receive an alert whenever a new version is published.
-</Note>
+<Update label="v2 endpoints" description="Recommended over v1">
+  These v2 endpoints supersede their v1 counterparts. Existing v1 endpoints continue to work; migrate at your own pace.
 
----
+  - `GET /openapi/v1/fund/account/spot/positions/v2` — spot positions with expanded fields.
+  - `POST /openapi/v1/funding-fee-record/page/v2` — funding-fee history grouped by `positionId` and `dealTime`.
 
-### v1.3.0 — January 2025
+  See [Versioning](/api-reference/versioning) for the full v2 list.
+</Update>
 
-<Badge>New Features</Badge>
+<Update label="Initial API surface" description="MC OpenAPI v0.0.1">
+  MC OpenAPI is generally available with the following endpoint groups:
 
-- **Cursor-based pagination on all list endpoints.** All `GET` endpoints that return collections now support cursor-based pagination via the `cursor` query parameter, in addition to the existing offset-based approach. Cursor pagination is more efficient for large datasets and prevents duplicate or skipped records when data changes between pages.
+  - **Trading** — transaction records by ID and paginated queries.
+  - **Finance Account** — deposit / withdraw / fixed-term product subscriptions plus portfolio overview.
+  - **Currency** — symbol networks, exchangeable symbols, per-symbol details.
+  - **Fund Account** — spot positions and Proof-of-Reserves (PoRv2) snapshots.
+  - **Funding Fee** — perpetual funding-fee history.
+  - **Exchange Rate** — pair, USD, and flash-conversion rate queries.
 
-- **`X-Request-ID` header on every response.** Every API response now includes an `X-Request-ID` header containing a unique identifier for that request. Reference this value when contacting support to help the team trace your request in server logs instantly.
-
-- **New `user.updated` webhook event.** You can now subscribe to `user.updated` events to receive real-time notifications whenever a user record is modified. Register the event from **Settings → Webhooks** in your dashboard.
-
----
-
-### v1.2.0 — November 2024
-
-<Badge>New Features</Badge>
-
-- **Webhook signature verification via HMAC-SHA256.** Every webhook delivery now includes an `X-Webhook-Signature` header containing an HMAC-SHA256 signature of the request body, signed with your webhook secret. Verify this signature in your endpoint handler to confirm that events are genuinely sent by the Open API Platform and haven't been tampered with.
-
-- **`per_page` limit increased to 100.** The `per_page` query parameter on list endpoints now accepts values up to `100`, raised from the previous maximum of `50`. This reduces the number of requests needed to paginate through large collections.
-
-- **Filter `GET /v1/resources` by `status`.** The resource listing endpoint now accepts a `status` query parameter so you can retrieve only the records matching a specific status value (e.g. `active`, `inactive`, `pending`) without filtering client-side.
-
-  ```http
-  GET /v1/resources?status=active
-  ```
-
----
-
-### v1.1.0 — September 2024
-
-<Badge>New Features</Badge>
-
-- **Initial webhook support.** You can now receive real-time event notifications via webhooks. This release introduces support for two events: `resource.created` and `resource.deleted`. Register your endpoint URL from **Settings → Webhooks**. See the [Webhooks guide](/guides/webhooks) for setup instructions.
-
-- **Rate limit headers on all responses.** Every API response now includes the following headers so you can monitor your consumption and back off proactively:
-
-  | Header | Description |
-  |---|---|
-  | `X-RateLimit-Limit` | The maximum number of requests allowed in the current window. |
-  | `X-RateLimit-Remaining` | The number of requests remaining in the current window. |
-  | `X-RateLimit-Reset` | The UTC epoch timestamp at which the current window resets. |
-
-- **`error.details` array in validation error responses.** `422 Unprocessable Entity` responses now include an `error.details` array that lists every field-level validation failure in a single response, so you can fix all issues in one round trip rather than discovering them one at a time.
-
----
-
-<Warning>
-  Any future breaking changes will be announced **at least 30 days in advance** via email notification and a banner in your dashboard. We are committed to giving you adequate time to update your integration before any change takes effect.
-</Warning>
+  All endpoints share the path prefix `/openapi/v1/` and are secured with AK/SK \+ HMAC-SHA256 signing.
+</Update>

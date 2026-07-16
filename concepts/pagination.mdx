@@ -1,170 +1,160 @@
 ---
-title: "Paginate and Iterate API Results in the Open API Platform"
+title: "Paginate MC OpenAPI List Endpoints"
 sidebarTitle: "Pagination"
-description: "Learn how to use cursor-based and page-number pagination to efficiently retrieve large result sets from any list endpoint in the Open API Platform."
+description: "How to use pageNum and pageSize on MC OpenAPI list endpoints and iterate through large result sets."
 ---
 
-All list endpoints in the Open API Platform return paginated results rather than dumping every record in a single response. By default, each page contains up to **20 items**; you can request up to a maximum of **100 items per page**. You can navigate result sets using either classic page-number pagination or cursor-based pagination, depending on which fits your use case best.
+MC OpenAPI uses page-number pagination on every list endpoint. You request a page with `pageNum` and `pageSize`, and the response returns the current page of items plus enough metadata to iterate to the next page.
 
-<Note>
-  Use cursor-based pagination when you need stable, consistent iteration over a large or frequently-updated dataset. Use page-number pagination when you need to jump directly to a specific offset.
-</Note>
+## Request parameters
 
-## Query parameters
+Paginated endpoints accept the following parameters (in the query string for `GET`, in the JSON body for `POST`, depending on the endpoint — see the individual endpoint pages):
 
-Append the following query parameters to any list endpoint URL to control pagination:
-
-<ParamField query="page" type="integer" default="1">
-  The page number to retrieve. Pages are 1-indexed. Use this together with `per_page` for page-number pagination. Ignored when `cursor` is provided.
+<ParamField query="pageNum" default="1" type="integer">
+  The page number to retrieve. Pages are 1-indexed.
 </ParamField>
 
-<ParamField query="per_page" type="integer" default="20">
-  The number of results to return per page. Must be between `1` and `100`. Applies to both page-number and cursor-based pagination.
+<ParamField query="pageSize" default="20" type="integer">
+  Number of items to return per page. Typical maximum is `100`; check the specific endpoint for its own limit.
 </ParamField>
 
-<ParamField query="cursor" type="string">
-  An opaque string that points to a specific position in the result set. Pass the `next_cursor` value from a previous response to retrieve the following page. When this parameter is present, `page` is ignored.
-</ParamField>
+Most list endpoints accept additional filter parameters (for example, `startTime`, `endTime`, `symbol`, `type`). See the [API Reference](/api-reference/overview) for the exact parameters supported by each endpoint.
 
-## Pagination response object
+## Response shape
 
-Every list response includes a `pagination` object alongside the `data` array. Use the fields in this object to determine whether additional pages exist and to construct your next request.
-
-<ResponseField name="pagination.page" type="integer">
-  The current page number (1-indexed). Reflects the `page` query parameter you sent, or `1` if you used cursor-based pagination.
-</ResponseField>
-
-<ResponseField name="pagination.per_page" type="integer">
-  The number of results returned on this page. May be less than the requested `per_page` value on the final page.
-</ResponseField>
-
-<ResponseField name="pagination.total" type="integer">
-  The total number of items across all pages matching your query.
-</ResponseField>
-
-<ResponseField name="pagination.next_cursor" type="string | null">
-  An opaque cursor string you can pass as the `cursor` query parameter to retrieve the next page. Returns `null` when you are on the last page.
-</ResponseField>
-
-<ResponseField name="pagination.prev_cursor" type="string | null">
-  An opaque cursor string you can pass as the `cursor` query parameter to retrieve the previous page. Returns `null` when you are on the first page.
-</ResponseField>
-
-### Example paginated response
+A paginated response places a page object inside `data`:
 
 ```json
 {
-  "data": [
-    {
-      "id": "usr_01J3K9XYZ",
-      "name": "Jane Smith",
-      "email": "jane.smith@example.com",
-      "created_at": "2024-07-15T10:32:00Z",
-      "updated_at": "2024-07-15T10:32:00Z"
-    },
-    {
-      "id": "usr_01J3K9ABC",
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-      "created_at": "2024-07-14T08:10:00Z",
-      "updated_at": "2024-07-14T08:10:00Z"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "per_page": 2,
-    "total": 53,
-    "next_cursor": "cur_eyJpZCI6InVzcl8wMUozSzlBQkMifQ",
-    "prev_cursor": null
+  "code": "0",
+  "msg": "success",
+  "success": true,
+  "data": {
+    "pageNum": 1,
+    "pageSize": 20,
+    "total": 132,
+    "pages": 7,
+    "list": [
+      {
+        "transactionId": "T-1001",
+        "amount": "125.50",
+        "currency": "USDT",
+        "createdTime": 1731657600000
+      }
+    ]
   }
 }
 ```
 
+<ResponseField name="data.pageNum" type="integer">
+  The current page number (1-indexed).
+</ResponseField>
+
+<ResponseField name="data.pageSize" type="integer">
+  Number of items requested per page.
+</ResponseField>
+
+<ResponseField name="data.total" type="integer">
+  Total number of items across all pages matching your query.
+</ResponseField>
+
+<ResponseField name="data.pages" type="integer">
+  Total number of pages available given `pageSize` and `total`.
+</ResponseField>
+
+<ResponseField name="data.list" type="array">
+  The items on the current page. Item shape depends on the endpoint.
+</ResponseField>
+
 ## Iterating all pages
 
-The examples below show how to loop through every page of results until there are no more pages to fetch.
+Loop while `pageNum < pages`, incrementing `pageNum` on each request. The example below fetches every transaction record for a given account.
 
 ### Python
 
 ```python
-import requests
+import time, hmac, hashlib, requests
 
-API_KEY = "YOUR_API_KEY"
-BASE_URL = "https://api.example.com/v1"
+BASE_URL = "https://gateway.mcconnects.com"
+ACCESS_KEY = "YOUR_ACCESS_KEY"
+SECRET_KEY = "YOUR_SECRET_KEY"
 
-def fetch_all_users():
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Accept": "application/json",
-    }
+def sign(method, path, query, body, ts):
+    canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
+    return hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
 
-    cursor = None
-    all_users = []
+def fetch_all_transactions(page_size=100):
+    path = "/openapi/v1/transaction/account/record/page"
+    page_num = 1
+    all_items = []
 
     while True:
-        params = {"per_page": 100}
-        if cursor:
-            params["cursor"] = cursor
+        body = f'{{"pageNum":{page_num},"pageSize":{page_size}}}'
+        ts = str(int(time.time() * 1000))
+        signature = sign("POST", path, "", body, ts)
+        headers = {
+            "X-Access-Key": ACCESS_KEY,
+            "X-Signature": signature,
+            "X-Timestamp": ts,
+            "Content-Type": "application/json",
+        }
+        r = requests.post(BASE_URL + path, headers=headers, data=body)
+        r.raise_for_status()
+        page = r.json()["data"]
+        all_items.extend(page["list"])
 
-        response = requests.get(f"{BASE_URL}/users", headers=headers, params=params)
-        response.raise_for_status()
-        body = response.json()
+        if page_num >= page["pages"]:
+            break
+        page_num += 1
 
-        all_users.extend(body["data"])
-
-        next_cursor = body["pagination"].get("next_cursor")
-        if not next_cursor:
-            break  # No more pages
-
-        cursor = next_cursor
-
-    return all_users
-
-users = fetch_all_users()
-print(f"Fetched {len(users)} users in total.")
+    return all_items
 ```
 
-### JavaScript
+### JavaScript (Node.js)
 
 ```javascript
-const BASE_URL = "https://api.example.com/v1";
-const API_KEY = "YOUR_API_KEY";
+import crypto from "crypto";
 
-async function fetchAllUsers() {
-  const headers = {
-    Authorization: `Bearer ${API_KEY}`,
-    Accept: "application/json",
-  };
+const BASE_URL = "https://gateway.mcconnects.com";
+const ACCESS_KEY = process.env.MC_ACCESS_KEY;
+const SECRET_KEY = process.env.MC_SECRET_KEY;
 
-  let cursor = null;
-  const allUsers = [];
-
-  do {
-    const url = new URL(`${BASE_URL}/users`);
-    url.searchParams.set("per_page", "100");
-    if (cursor) {
-      url.searchParams.set("cursor", cursor);
-    }
-
-    const response = await fetch(url.toString(), { headers });
-
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
-
-    const body = await response.json();
-    allUsers.push(...body.data);
-
-    cursor = body.pagination.next_cursor;
-  } while (cursor !== null);
-
-  console.log(`Fetched ${allUsers.length} users in total.`);
-  return allUsers;
+function sign(method, path, query, body, ts) {
+  const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
+  return crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
 }
 
-fetchAllUsers();
+async function fetchAllTransactions(pageSize = 100) {
+  const path = "/openapi/v1/transaction/account/record/page";
+  let pageNum = 1;
+  const all = [];
+
+  while (true) {
+    const body = JSON.stringify({ pageNum, pageSize });
+    const ts = Date.now().toString();
+    const signature = sign("POST", path, "", body, ts);
+
+    const res = await fetch(BASE_URL + path, {
+      method: "POST",
+      headers: {
+        "X-Access-Key": ACCESS_KEY,
+        "X-Signature": signature,
+        "X-Timestamp": ts,
+        "Content-Type": "application/json",
+      },
+      body,
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { data } = await res.json();
+    all.push(...data.list);
+    if (pageNum >= data.pages) break;
+    pageNum += 1;
+  }
+  return all;
+}
 ```
 
 <Tip>
-  Set `per_page` to `100` when iterating all pages to minimize the number of API round-trips and reduce the risk of hitting rate limits.
+  Use the largest `pageSize` your endpoint allows to minimize round-trips and reduce the chance of hitting [rate limits](/guides/rate-limits).
 </Tip>

@@ -1,0 +1,150 @@
+---
+title: "Finance Account"
+sidebarTitle: "Finance Account"
+description: "Deposit into and withdraw from demand & fixed-term finance products; read the C-side finance overview."
+---
+
+Endpoints tagged **Finance Account (理财账户)** manage demand and fixed-term finance-product balances, and provide a C-side overview aggregating positions across products.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| POST | `/openapi/v1/finance/account/deposit` | `TRADE` | Deposit from spot → fund account → finance product. |
+| POST | `/openapi/v1/finance/account/withdraw` | `WITHDRAW` | Withdraw from a **demand** finance product back to spot. |
+| POST | `/openapi/v1/finance/account/withdraw/fixed` | `WITHDRAW` | Redeem a **fixed-term** position (principal \+ interest). |
+| GET | `/openapi/v1/finance/account/overview` | `READ` | Finance overview (C-side): totals, product list, per-product user balances. |
+
+---
+
+## Deposit into a finance product
+
+`POST /openapi/v1/finance/account/deposit` — permission `TRADE`.
+
+Transfers from the user's spot account into the fund account, then subscribes to the specified finance product.
+
+### Request body — FinanceDepositReq
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{ "trackingId": "track-dep-0001", "productCode": "USDT_CURRENT", "amount": 100 }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/finance/account/deposit"
+```
+
+### Response
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "transactionId": "TX-DEP-0001",
+    "status": "SUCCESS",
+    "productCode": "USDT_CURRENT",
+    "amount": 100.0
+  }
+}
+```
+
+---
+
+## Withdraw — demand product
+
+`POST /openapi/v1/finance/account/withdraw` — permission `WITHDRAW`.
+
+Supported only for demand (activity) products. For fixed-term positions, use the fixed-position endpoint below.
+
+### Request body — FinanceWithdrawReq
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{ "trackingId": "track-wd-0001", "productCode": "USDT_CURRENT", "amount": 50 }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/finance/account/withdraw"
+```
+
+### Response
+
+---
+
+## Withdraw — fixed-term position
+
+`POST /openapi/v1/finance/account/withdraw/fixed` — permission `WITHDRAW`.
+
+Redeems a fixed-term position by its `positionId` (either holding or matured). The backend redeems principal \+ interest in full; the workflow matches the demand-withdraw flow.
+
+### Request body — FinanceFixedWithdrawReq
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{ "trackingId": "track-wdf-0001", "positionId": 1234567 }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/finance/account/withdraw/fixed"
+```
+
+### Response
+
+```json
+{ "code": "0", "message": "success", "success": true, "data": { "transactionId": "TX-WDFIX-0001", "positionId": 1234567, "status": "SUCCESS" } }
+```
+
+---
+
+## Finance overview (C-side)
+
+`GET /openapi/v1/finance/account/overview` — permission `READ`.
+
+Returns products in `product_code` ASC, then `currency` ASC order. Per-user amounts come from position summaries under each product. `totalDepositValue` is the sum of position principals × oracle price in USDC. `totalInterestValue` and `yesterdayInterestValue` come from interest-settlement records, converted to USDC. `userSpotAvailableBalance` is per-spot-currency and shared across products with the same currency. When the caller is not logged in, all user-side fields are 0.
+
+### Response `data` — FinanceOverviewRsp
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "totalDepositValue": 12500.55,
+    "totalInterestValue": 88.42,
+    "yesterdayInterestValue": 1.20,
+    "products": [
+      {
+        "productCode": "USDT_CURRENT",
+        "currency": "USDT",
+        "productType": "DEMAND",
+        "apy": 0.045,
+        "userDepositAmount": 5000.0,
+        "userInterestAmount": 12.34,
+        "userSpotAvailableBalance": 200.0,
+        "minDepositAmount": 1.0,
+        "minRedeemAmount": 1.0
+      }
+    ]
+  }
+}
+```
+
+   
+
+#### FinanceProductItemRsp
+
+            
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/finance/account/overview"
+```

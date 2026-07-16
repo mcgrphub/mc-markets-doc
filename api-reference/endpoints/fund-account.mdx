@@ -1,0 +1,109 @@
+---
+title: "Fund Account"
+sidebarTitle: "Fund Account"
+description: "Read spot positions (v2) and the user's Proof-of-Reserves (PoRv2) snapshot."
+---
+
+Endpoints tagged **Fund Account (资金账户)** expose the user's spot positions and Proof-of-Reserves snapshots. All endpoints require the `READ` permission.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/openapi/v1/fund/account/spot/positions/v2` | Get spot position information (v2). |
+| GET | `/openapi/v1/fund/account/por` | Query the user's PoRv2 Merkle proof snapshot. |
+
+---
+
+## Get positions (v2)
+
+`GET /openapi/v1/fund/account/spot/positions/v2` — permission `READ`.
+
+### Response `data` — UserPositionDTO
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "uid": "u_1122334455",
+    "totalValueUsd": 15234.02,
+    "positions": [
+      {
+        "symbolId": 1001,
+        "symbol": "USDT",
+        "totalBalance": 5000.0,
+        "availableBalance": 4800.0,
+        "frozenBalance": 200.0,
+        "usdValue": 5000.0
+      },
+      {
+        "symbolId": 1002,
+        "symbol": "BTC",
+        "totalBalance": 0.15,
+        "availableBalance": 0.15,
+        "frozenBalance": 0.0,
+        "usdValue": 10234.02
+      }
+    ]
+  }
+}
+```
+
+#### PositionDTO
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/fund/account/spot/positions/v2"
+```
+
+---
+
+## Proof of Reserves (PoRv2)
+
+`GET /openapi/v1/fund/account/por` — permission `READ`.
+
+### Response `data` — UserAssetMerkleProofSnapshotDTO
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "batchId": "2024010100",
+    "uid": "u_1122334455",
+    "merkleRoot": "0xabc...",
+    "userLeafHash": "0xdef...",
+    "userTotalUsd": 15234.02,
+    "proofPath": [
+      { "position": "LEFT", "hash": "0x111..." },
+      { "position": "RIGHT", "hash": "0x222..." }
+    ],
+    "assets": [
+      { "symbol": "USDT", "balance": 5000.0, "usdValue": 5000.0 },
+      { "symbol": "BTC", "balance": 0.15, "usdValue": 10234.02 }
+    ]
+  }
+}
+```
+
+      
+
+#### ProofOfFundDTO
+
+  
+
+### Query parameters
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/fund/account/por?batchId=2024010100"
+```

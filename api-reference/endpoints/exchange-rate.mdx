@@ -1,0 +1,121 @@
+---
+title: "Exchange Rate"
+sidebarTitle: "Exchange Rate"
+description: "Query pair exchange rates, USD rates, and flash-conversion quotes with fee estimation."
+---
+
+Endpoints tagged **Exchange Rate (汇率)** query market rates and flash-conversion quotes. All endpoints require the `READ` permission.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/openapi/v1/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` | Query a single pair rate. |
+| GET | `/openapi/v1/exchange-rate/query/usd` | Bulk query of USD rates. |
+| GET | `/openapi/v1/exchange-rate/convert-rate/{from}/{to}` | Flash-conversion quote (rate \+ fee \+ expected receipt). |
+
+---
+
+## Pair rate query
+
+`GET /openapi/v1/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` — permission `READ`.
+
+### Path parameters
+
+### Response
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "symbolType": "CRYPTO",
+    "baseCurrency": "BTC",
+    "targetCurrency": "USDT",
+    "rate": 68245.12,
+    "timestamp": "2026-01-01T09:00:00Z"
+  }
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/CRYPTO/BTC/USDT"
+```
+
+---
+
+## USD rates
+
+`GET /openapi/v1/exchange-rate/query/usd` — permission `READ`.
+
+### Response `data` — ExchangeRateDto\[\]
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": [
+    { "symbol": "BTC", "usdRate": 68245.12, "timestamp": "2026-01-01T09:00:00Z" },
+    { "symbol": "ETH", "usdRate": 3512.44, "timestamp": "2026-01-01T09:00:00Z" }
+  ]
+}
+```
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd"
+```
+
+---
+
+## Flash-conversion quote
+
+`GET /openapi/v1/exchange-rate/convert-rate/{from}/{to}` — permission `READ`.
+
+### Path parameters
+
+ 
+
+### Query parameters
+
+### Response `data` — ConvertExchangeRateRsp
+
+```json
+{
+  "code": "0",
+  "message": "success",
+  "success": true,
+  "data": {
+    "from": "BTC",
+    "to": "USDT",
+    "fromAmount": 1.23,
+    "rate": 68245.12,
+    "feeRate": 0.001,
+    "feeAmount": 83.94,
+    "toAmount": 83857.61,
+    "quoteId": "Q-20260101-000001",
+    "expireAt": "2026-01-01T09:00:15Z"
+  }
+}
+```
+
+        
+
+```bash cURL
+curl -s \
+  -G \
+  --data-urlencode "fromAmount=1.23" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/convert-rate/BTC/USDT"
+```
