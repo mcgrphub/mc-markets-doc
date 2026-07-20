@@ -1,0 +1,42 @@
+---
+title: "交易品种"
+sidebarTitle: "交易品种"
+description: "分页查询可交易品种列表。"
+---
+
+标签 **Trade Symbol（交易品种）** 用于按分组分页查询交易品种。权限 `READ`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/trade/symbol/list` | `READ` | 分页查询交易品种列表。 |
+
+---
+
+## 交易品种列表
+
+`GET /openapi/v1/trade/symbol/list` — 权限 `READ`。
+
+### 查询参数 — SymbolPageReq
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `group` | string | 否 | 产品分组短名(配置中完整路径的最后一段,如 `Forex`)。不传则返回配置内全部分组下的直接子品种。 |
+| `current` / `size` 等 | — | 否 | 标准分页字段 |
+
+<Note>
+  `group` 必须落在服务端配置的分组白名单内,否则返回参数错误。
+</Note>
+
+### 响应 `data` — BasePageRsp\<SymbolDto\>
+
+列表项含 `symbol`、`path`、`calcmode` 等字段。
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/trade/symbol/list?group=Forex&current=1&size=50"
+```

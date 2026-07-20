@@ -4,6 +4,17 @@ sidebarTitle: "Changelog"
 description: "Release notes for MC OpenAPI — new endpoints, schema updates, and integration guidance in reverse chronological order."
 ---
 
+<Update label="2026-07-20" description="OpenAPI surface expansion">
+  - **Signature v2**: Updated [Authentication](/authentication) and [Quickstart](/quickstart) to the mc-account v3.7.0 spec. Every request requires `X-Nonce`; non-empty `POST`/`PUT`/`PATCH` bodies must include SHA-256 in the string to sign; `X-Signature` is Base64. Corrected outdated signing notes in Requests & Responses, FAQ, and Troubleshooting.
+  - **Finance Account**: added product catalog, current positions, and redemption history; demand/fixed-term redemption permission is `TRADE` (not `WITHDRAW`).
+  - **Trading**: added flash conversion `POST /openapi/v1/transaction/exchange/v2` (`TRADE`).
+  - **Deal Orders**: opened paginated deal list and deal detail.
+  - **MLP**: opened deposit/withdraw, assets, charts, and config queries.
+  - **Fund Account**: added spot positions by `spotId`.
+  - **Funding Rate / Trade Symbols** (mc-risk): opened funding-rate history pagination and trade symbol list.
+  - **Market Data** (mc-aggregator-service): opened K-line and symbol ranking.
+</Update>
+
 <Update label="2026-07-16" description="Documentation refresh">
   - Published a full documentation site for MC OpenAPI covering all six endpoint groups: Trading, Finance Account, Currency, Fund Account, Funding Fee, and Exchange Rate.
   - Added [Authentication](/authentication) reference with HMAC-SHA256 canonical-string spec and copy-paste examples in Python, Java, and Node.js.

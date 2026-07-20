@@ -4,6 +4,17 @@ sidebarTitle: "变更日志"
 description: "MC OpenAPI 发布说明——新接口、 schema 更新与集成建议,按倒序时间排列。"
 ---
 
+<Update label="2026-07-20" description="开放接口扩展">
+  - **鉴权签名 v2**：按 mc-account v3.7.0 规范更新 [认证](/zh/authentication) 与 [快速开始](/zh/quickstart)。必须携带 `X-Nonce`；`POST`/`PUT`/`PATCH` 非空 body 需纳入 SHA-256；`X-Signature` 为 Base64。同步修正请求/响应、FAQ、排障中的过时签名说明。
+  - **理财账户**:新增产品目录、当前持仓、赎回明细;活期/定期赎回权限调整为 `TRADE`。
+  - **交易**:新增闪兑执行 `POST /openapi/v1/transaction/exchange/v2`(`TRADE`)。
+  - **成交订单**:开放成交分页与详情。
+  - **MLP**:开放存取、资产、图表与参数查询。
+  - **资金账户**:新增按 `spotId` 查询现货持仓。
+  - **资金费率 / 交易品种**(mc-risk):开放资金费率历史分页与交易品种列表。
+  - **行情数据**(mc-aggregator-service):开放 K 线与行情排行。
+</Update>
+
 <Update label="2026-07-16" description="文档刷新">
   - 发布 MC OpenAPI 的完整文档站点,覆盖六个接口分组:交易、理财账户、币种、资金账户、资金费、汇率。
   - 新增 [认证](/zh/authentication) 参考,包含 HMAC-SHA256 待签名字符串规范与 Python、Java、Node.js 拷贝即用示例。

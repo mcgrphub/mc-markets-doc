@@ -1,0 +1,42 @@
+---
+title: "Trade Symbols"
+sidebarTitle: "Trade Symbols"
+description: "Paginated query of tradable symbol list."
+---
+
+The **Trade Symbol (交易品种)** group provides paginated queries of tradable symbols. Permission: `READ`.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/trade/symbol/list` | `READ` | Paginated query of tradable symbols. |
+
+---
+
+## Symbol list
+
+`GET /openapi/v1/trade/symbol/list` — permission `READ`.
+
+### Query parameters — SymbolPageReq
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `group` | string | No | Product group short name (last segment of the full path in config, e.g. `Forex`). When omitted, returns direct child symbols under all configured groups. |
+| `current` / `size` etc. | — | No | Standard pagination fields |
+
+<Note>
+  `group` must be in the server-configured group allowlist; otherwise a parameter error is returned.
+</Note>
+
+### Response `data` — BasePageRsp\<SymbolDto\>
+
+List items include `symbol`, `path`, `calcmode`, and related fields.
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/trade/symbol/list?group=Forex&current=1&size=50"
+```

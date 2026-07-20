@@ -51,8 +51,8 @@ MC OpenAPI 按功能分为六组。所有接口均需签名,部分接口需求 A
 每次调用的流程相同:
 
 1. **构造** 请求—HTTP 方法、路径(`/openapi/v1/...`)、query 与可选 JSON body。
-2. **签名** 请求—使用 Secret Key 对待签名字符串计算 HMAC-SHA256。
-3. **发送** —以 HTTPS 发送,带 `X-Access-Key`、`X-Signature`、`X-Timestamp` 头。
+2. **签名** 请求—使用签名 **v2**（含唯一 `X-Nonce`；非空写请求还要纳入 body SHA-256）计算 HMAC-SHA256（Base64）。
+3. **发送** —以 HTTPS 发送，带 `X-Access-Key`、`X-Signature`、`X-Timestamp`、`X-Nonce` 头。
 4. **处理** 响应—先看 HTTP 状态码,再看 JSON 信封中的 `code`。
 
 <Note>

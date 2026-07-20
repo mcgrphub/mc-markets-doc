@@ -31,16 +31,17 @@ description: "MC OpenAPI 常见问题解答:签名、权限、环境、分页、
 
 <AccordionGroup>
   <Accordion title="到底签名什么?">
-    待签名字符串为 `METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP` — 五行,`\n` 分隔,无 query/body 时为空行。使用 Secret Key 计算 HMAC-SHA256,小写 hex 放入 `X-Signature`。参考 [认证](/zh/authentication)。
+    自 v3.7.0 起使用签名 **v2**。待签名字符串包含方法、URI、可选 query、参与签名的头（`x-access-key` / `x-nonce` / `x-timestamp`）、时间戳、nonce，以及（`POST`/`PUT`/`PATCH` 非空 body 时）body 的 SHA-256 小写 hex。`X-Signature` 为 HMAC-SHA256 的 **Base64**（不是 hex）。每次请求必须带唯一 `X-Nonce`。完整规则见 [认证](/zh/authentication)。
   </Accordion>
 
-  <Accordion title="返回 code 40001(签名无效) 怎么办?">
+  <Accordion title="返回签名无效怎么办?">
     按可能性排序:
 
-    1. 待签名字符串与网关预期不一致——打印并逐字节对比。
-    2. 签名时使用的 body 与实际发送的 body 不一致(多余空格、键顺序不同)。序列化一次,两处复用同一字符串。
-    3. 把 Access Key 当作 Secret Key。
-    4. query 参数未按 key 升序排序。
+    1. 仍在使用 v1 待签名字符串（缺少 `X-Nonce` / body hash）。
+    2. 待签名字符串与网关预期不一致——打印并逐字节对比。
+    3. 签名时使用的 body 与实际发送的 body 不一致（多余空格、重排 JSON）。序列化一次，两处复用同一字节。
+    4. 把 Access Key 当作 Secret Key。
+    5. query 参数未按 key 升序排序，或出现重复 query key。
 
     另见 [排障](/zh/help/troubleshooting)。
   </Accordion>

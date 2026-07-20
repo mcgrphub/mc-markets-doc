@@ -1,0 +1,74 @@
+---
+title: "Market Data"
+sidebarTitle: "Market Data"
+description: "Query K-line candles and symbol ranking data."
+---
+
+Endpoints tagged **Market Data (行情数据)** come from the market-data aggregation service and provide K-line candles and ranking data. All endpoints in this group require the `READ` permission.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/market-data/kline` | `READ` | Query K-line candles by symbol, period, and time range. |
+| GET | `/openapi/v1/market-data/symbol-ranking` | `READ` | Paginated symbol ranking by category and sort dimension. |
+
+---
+
+## Query K-line candles
+
+`GET /openapi/v1/market-data/kline` — permission `READ`.
+
+### Query parameters — CompactKlineQueryReq
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `symbol` | string | Yes | Trading symbol code, e.g. `EURUSD` |
+| `period` | int | Yes | Period (minutes): `1`, `5`, `15`, `60`, `240`, `1440`, `10080`, `43200`, etc. |
+| `endTime` | long | Yes | End time as a **seconds** timestamp |
+| `startTime` | long | No | Start time as a **seconds** timestamp |
+| `limit` | int | No | Max rows per request, up to `500` |
+
+### Response `data` — CompactKlineQueryRsp
+
+- `pricingDegree` — price precision
+- `klineDataList` — string list: open, close, high, low, volume, seconds timestamp (in order)
+- `klineDisplayList` — display fields in the same order as the list above
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/market-data/kline?symbol=EURUSD&period=60&endTime=1755878400&limit=100"
+```
+
+---
+
+## Symbol ranking
+
+`GET /openapi/v1/market-data/symbol-ranking` — permission `READ`.
+
+### Query parameters — SymbolRankingQueryReq
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `category` | string | Yes | `CONTRACT` / `SPOT` / `CRYPTO` / `TRADFI` |
+| `subGroup` | string | No | For `TRADFI` only: `ALL` / `FOREX` / `METALS` / `INDICES` / `ENERGY` / `STOCKS`; default `ALL` |
+| `hotOnly` | boolean | No | Hot symbols only; default `false` |
+| `sortBy` | string | No | `symbol` / `bid` / `change24hPct`; default `change24hPct` |
+| `sortOrder` | string | No | `asc` / `desc` (when omitted: ascending for `symbol`, descending otherwise) |
+| `page` | int | No | Page number, starting at 1; default `1` |
+| `pageSize` | int | No | Rows per page; default `20`, max `100` |
+
+### Response `data` — SymbolRankingPageRsp
+
+Includes `total`, `page`, `pageSize`, `snapshotVersion`, and `items`.
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/market-data/symbol-ranking?category=CRYPTO&sortBy=change24hPct&sortOrder=desc&page=1&pageSize=20"
+```

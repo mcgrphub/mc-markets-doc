@@ -1,66 +1,92 @@
 ---
 title: "认证"
 sidebarTitle: "认证"
-description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名对 MC OpenAPI 请求进行鉴权。"
+description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名 v2 对 MC OpenAPI 请求进行鉴权。"
 ---
 
-所有 OpenAPI 请求都必须发送到 **API 网关**,并使用 **Access Key (AK)** 与 **Secret Key (SK)** 密钥对进行认证。网关会校验签名、检查 API Key 权限,并将请求转发到后端服务。
+<Note>
+  **版本说明（v3.7.0）**：自 v3.7.0 起，OpenAPI C 类 AK/SK 使用签名 **v2**（硬切换，**不支持 v1**）。每次请求必须携带 `X-Nonce`；`POST` / `PUT` / `PATCH` 且请求体非空时，须将请求体 SHA-256 纳入签名。历史 v3.4.0 文档仅作参考。
+</Note>
+
+所有 OpenAPI 请求必须通过 **API 网关** 访问，并使用 **Access Key（AK）** 与 **Secret Key（SK）** 进行鉴权。网关会校验签名、检查 nonce 防重放、检查 API Key 权限，并将请求转发至对应的后端服务。
 
 ## 基础 URL
 
-| 环境 | Base URL |
+| 环境 | 基础地址 |
 | --- | --- |
 | 测试 | `https://test-gateway.mcconnects.com` |
 | 生产 | `https://gateway.mcconnects.com` |
 
-本文档中的路径均相对于上面的 Base URL。例如:
+本文档中的路径均相对于上述基础地址。例如，文档路径为 `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` 时，完整请求地址为：
 
 ```text
 https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
 ```
 
 <Warning>
-  不要直接调用后端服务。始终使用网关 URL,以确保鉴权与权限检查生效。
+  请勿直接调用后端服务地址。必须通过网关访问，以确保鉴权与权限校验生效。
 </Warning>
 
 ## 凭证
 
-每把 API Key 包含两部分:
+### Access Key 与 Secret Key
+
+每个 API Key 包含两部分：
 
 | 凭证 | 格式 | 示例 |
 | --- | --- | --- |
-| **Access Key (AK)** | `AK` \+ 16 位大写十六进制 | `AKF013EB0CC51E4BEB` |
-| **Secret Key (SK)** | `SK` \+ Base64URL 随机字符串 | `SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc` |
+| **Access Key（AK）** | `AK` \+ 16 位大写十六进制字符 | `AKF013EB0CC51E4BEB` |
+| **Secret Key（SK）** | `SK` \+ Base64URL 编码的随机字符串 | `SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc` |
 
-- **Secret Key 仅在创建时显示一次**,请安全存储,无法找回。
-- 每把 API Key 绑定到一个用户账号与业务线。
-- 可在用户后台启用、禁用或删除。
-- 每个用户最多创建 **30 把** API Key。
+- **Secret Key 仅在创建时展示一次**，请妥善保存，之后无法再次查看。
+- 每个 API Key 绑定一个用户账号和业务线。
+- 可在用户端门户中启用、禁用或删除 API Key。
+- 每个用户最多可创建 **30 个** API Key。
+
+### 如何获取凭证
+
+<Steps>
+  <Step title="使用用户账号登录 MC 平台。">
+  </Step>
+  <Step title="进入 API Key 管理页面。">
+  </Step>
+  <Step title="创建新的 API Key，并选择所需权限（READ、TRADE、WITHDRAW）。">
+  </Step>
+  <Step title="创建成功后，立即复制并安全保存 Access Key 与 Secret Key。">
+  </Step>
+</Steps>
 
 ## 必需请求头
 
-| Header | 必需 | 说明 |
+每次鉴权请求必须携带以下 HTTP 请求头：
+
+| 请求头 | 是否必填 | 说明 |
 | --- | --- | --- |
-| `X-Access-Key` | 是 | 你的 Access Key (AK) |
-| `X-Signature` | 是 | HMAC-SHA256 签名(Base64 编码) |
-| `X-Timestamp` | 是 | 当前 Unix **毫秒** 级时间戳 |
-| `Content-Type` | POST/PUT | `application/json`(发送 JSON body 时) |
+| `X-Access-Key` | 是 | 你的 Access Key（AK） |
+| `X-Signature` | 是 | HMAC-SHA256 签名 v2（Base64 编码） |
+| `X-Timestamp` | 是 | 当前 Unix 时间戳，单位为 **毫秒** |
+| `X-Nonce` | 是 | **每次请求唯一**；推荐 UUID v4，或 ≥32 位十六进制字符串 |
+| `Content-Type` | POST/PUT/PATCH 建议 | 发送 JSON 时使用 `application/json` |
+| `X-Signature-Version` | 否 | 建议填 `2`，仅用于排障 |
+
+HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均可），但待签名字符串中的头名一律使用**小写**。
 
 <Warning>
-  不要同时发送 `Authorization: Bearer ...` 与 AK/SK 头。存在 Bearer token 时,网关会将请求当作会话调用,不会使用 AK/SK 签名。
+  请勿同时发送 `Authorization: Bearer ...` 与 AK/SK 相关请求头。若请求中存在 Bearer Token，网关会将其识别为 Web 会话鉴权（B 类模式），不会使用 AK/SK 签名。
 </Warning>
 
-## 请求签名
+## 请求签名 v2
 
-签名可防止篡改与重放。每个请求:
+### 概述
 
-1. 从 HTTP 方法、URI、query 参数与选定头部构造 **待签名字符串**。
-2. 使用 Secret Key 计算 **HMAC-SHA256**。
-3. Base64 编码后作为 `X-Signature` 发送。
+签名用于防止请求被篡改或重放。每次请求需完成以下步骤：
 
-### 待签名字符串
+1. 生成唯一的 `X-Nonce`。
+2. 根据 HTTP 方法、URI、Query、参与签名的请求头、时间戳、nonce，以及（路径 B 时）请求体哈希，构建 **待签名字符串（string to sign）**。
+3. 使用 Secret Key 计算 **HMAC-SHA256**。
+4. 将结果进行 Base64 编码，放入 `X-Signature` 请求头。
 
-用换行符 `\n` 拼接:
+### 待签名字符串格式
 
 ```text
 {HTTP_METHOD}
@@ -68,32 +94,51 @@ https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CR
 {QUERY_STRING}
 {SIGNED_HEADERS}
 {TIMESTAMP}
+{NONCE}
+[{BODY_SHA256_HEX}]
 ```
 
 | 部分 | 说明 |
 | --- | --- |
-| `HTTP_METHOD` | 大写 HTTP 方法,如 `GET`、`POST`、`PUT`、`DELETE` |
-| `REQUEST_URI` | 不包含 host 的完整网关路径,如 `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` |
-| `QUERY_STRING` | 按 key(ASCII 升序)排序后的 `key1=value1&key2=value2`。无 query 时**整行省略**。 |
-| `SIGNED_HEADERS` | 按小写 key 排序的 `key1=value1&key2=value2`。无参与签名的 header 时**整行省略**。 |
-| `TIMESTAMP` | 与 `X-Timestamp` 头保持一致(毫秒) |
+| `HTTP_METHOD` | 大写 HTTP 方法，如 `GET`、`POST`、`PUT`、`PATCH`、`DELETE` |
+| `REQUEST_URI` | 不含域名的完整网关路径，如 `/openapi/v1/mc-account/symbol/list` |
+| `QUERY_STRING` | Query 按 key 字典序（ASCII 升序），格式 `key1=value1&key2=value2`。**无 Query 时整行省略**（与 v1 相同，**不要**插入空行） |
+| `SIGNED_HEADERS` | `x-access-key`、`x-nonce`、`x-timestamp` 按 key 字典序拼接为 `key=value&...` |
+| `TIMESTAMP` | 与 `X-Timestamp` 相同（毫秒） |
+| `NONCE` | 与 `X-Nonce` 相同 |
+| `BODY_SHA256_HEX` | **仅路径 B**：见下文；为小写 hex，64 字符 |
 
-#### 参与签名的头
+末尾再附加一个换行 `\n`。
 
-仅以下两个头参与签名,且均需小写:
+#### 参与签名的请求头
 
-| Header | 拼接形式 |
+| HTTP 请求头 | 在 stringToSign 中 |
 | --- | --- |
 | `X-Access-Key` | `x-access-key={value}` |
+| `X-Nonce` | `x-nonce={value}` |
 | `X-Timestamp` | `x-timestamp={value}` |
 
-其他头(如 `Content-Type`)不参与签名。
+其他请求头（如 `Content-Type`）**不参与**签名。
 
 <Info>
-  使用 **网关上可见的路径**,账户服务接口前缀为 `/openapi/v1/mc-account/`,而非 `/openapi/v1/`。
+  签名使用的 URI 必须与 API 文档中的 **网关可见路径** 完全一致（含 `/openapi/v1/mc-account/` 等服务前缀）。
 </Info>
 
-请求 body(JSON 载荷)**不参与**签名。
+#### 路径 A / 路径 B（请求体）
+
+| 路径 | 条件 | `BODY_SHA256_HEX` 行 |
+| --- | --- | --- |
+| **路径 A** | `GET`；或 `POST`/`PUT`/`PATCH` 且 **空 body**（如 `Content-Length: 0`） | **不追加** |
+| **路径 B** | `POST`/`PUT`/`PATCH` 且 **body 非空** | 追加 `SHA-256(原始 body 字节)` 的小写 hex |
+
+- 客户端签名与发送必须使用 **相同的原始 body 字节**（不要依赖网关侧重排 JSON）。
+- 请求体上限 **10MB**（与网关 `gateway.request.max-body-size-bytes` 一致），超限返回 **413**。
+
+#### Canonicalization 约束（v3.7.0）
+
+- **禁止**同一 query key 出现多次（如 `?a=1&a=2`），否则 **401**。
+- **禁止**参与签名的请求头出现多个值（如两个 `X-Nonce`），否则 **401**。
+- 每个 query key 在签名中只取一个值；URL 与 stringToSign 中的 query 必须一致。
 
 ### 签名算法
 
@@ -101,69 +146,78 @@ https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CR
 signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
 ```
 
-- 算法: **HMAC-SHA256**
-- 密钥编码: Secret Key 字符串的 UTF-8 字节
-- 输出编码: **Base64**(标准,含 padding)
+- 算法：**HMAC-SHA256**
+- 密钥编码：Secret Key 字符串的 UTF-8 字节
+- 输出编码：**Base64**（标准编码，含 padding）
 
-### 时间戳有效性
+### 时间戳与 nonce
 
-- `X-Timestamp` 为当前 **毫秒** 时间戳(13 位)。
-- 网关接受服务器时间 **±10 分钟** 内的时间戳。
-- 时间戳过期或格式错误将返回 `401 Unauthorized`。
+- `X-Timestamp` 必须为 **毫秒级** Unix 时间戳（13 位），网关接受 **±10 分钟**。
+- `X-Nonce` **每次请求必须新生成**；相同 nonce 在有效期内不可重复使用（防重放）。
+- nonce 格式：UUID v4，或长度 ≥32 的十六进制字符串。
 
 ## 权限
 
-每把 API Key 携带一个或多个权限。接口声明所需权限,你的 Key 需 **包含全部** 所需权限(AND 逻辑)。
+每个 API Key 可配置一个或多个权限。各 API 接口声明所需权限，你的 Key 必须 **同时满足** 所有声明的权限（AND 语义）。
 
-| 权限 | 代码 | 说明 |
+| 权限 | 编码 | 说明 |
 | --- | --- | --- |
-| 读 | `READ` | 只读操作(余额、列表、查询) |
-| 交易 | `TRADE` | 交易操作(下单/撤单) |
-| 提币 | `WITHDRAW` | 提币与划转操作 |
+| 读 | `READ` | 只读操作（余额查询、列表、查询等） |
+| 交易 | `TRADE` | 交易操作（下单、撤单等） |
+| 提现 | `WITHDRAW` | 提现与转账操作 |
 
-若 API Key 权限不足,网关返回 `401 Unauthorized`,消息为 `没有访问该接口的权限`。
+若 API Key 缺少接口所需权限，网关返回 `401 Unauthorized`，错误信息为 `没有访问该接口的权限`。
 
-## IP 白名单(可选)
+## IP 白名单（可选）
 
-创建或编辑 API Key 时,可以配置 IP 白名单(最多 15 个 IPv4,逗号分隔)。
+创建或编辑 API Key 时，可配置 IP 白名单（最多 15 个 IPv4 地址，英文逗号分隔）。
 
-- 已配置时,非白名单 IP 发起的请求返回 `401 Unauthorized`。
-- 未配置时,任意 IP 均可调用(仍受其他校验限制)。
+- 已配置白名单时，非白名单 IP 的请求将被拒绝，返回 `401 Unauthorized`。
+- 未配置白名单时，不限制来源 IP（仍须通过其他鉴权校验）。
 
-网关从 `X-Forwarded-For`、`X-Real-IP` 或直连地址判断客户端 IP。
+网关按以下顺序获取客户端 IP：`X-Forwarded-For` → `X-Real-IP` → 直连地址。
 
-## 示例 — 汇率查询
+## 示例
 
-查询加密资产 BTC/USDT 汇率,需 `READ` 权限。
+### 示例 1：GET 路径 A（无 query）
 
-**请求:**
-
-```text
-GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
-Host: test-gateway.mcconnects.com
-X-Access-Key: AKF013EB0CC51E4BEB
-X-Timestamp: 1747890123456
-X-Signature: <计算出的签名>
-```
-
-**待签名字符串:**
+**待签名字符串：**
 
 ```text
 GET
-/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
-x-access-key=AKF013EB0CC51E4BEB&x-timestamp=1747890123456
+/openapi/v1/mc-account/symbol/list
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
 1747890123456
+550e8400-e29b-41d4-a716-446655440000
+
 ```
 
-**成功响应:**
+### 示例 2：GET 带 query
 
-```json
-{
-  "status": 200,
-  "code": "200",
-  "success": true,
-  "data": 98500.12
-}
+URI：`/openapi/v1/mc-account/symbol/list`，Query：`current=1&size=10`
+
+```text
+GET
+/openapi/v1/mc-account/symbol/list
+current=1&size=10
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
+1747890123456
+550e8400-e29b-41d4-a716-446655440000
+
+```
+
+### 示例 3：POST 路径 B（含 body）
+
+Body 原始字节：`{"current":1,"size":10}` → SHA-256 hex（请自行计算实际值）：
+
+```text
+POST
+/openapi/v1/mc-account/transaction/account/record/page
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
+1747890123456
+550e8400-e29b-41d4-a716-446655440000
+a1b2c3...（64 位小写 hex，为 body 的 SHA-256）
+
 ```
 
 ## 代码示例
@@ -171,45 +225,190 @@ x-access-key=AKF013EB0CC51E4BEB&x-timestamp=1747890123456
 <CodeGroup>
 
 ```python Python
-import base64, hashlib, hmac, time
+import base64
+import hashlib
+import hmac
+import time
+import uuid
 import requests
 
 ACCESS_KEY = "YOUR_ACCESS_KEY"
 SECRET_KEY = "YOUR_SECRET_KEY"
 BASE_URL = "https://test-gateway.mcconnects.com"
 
-def sign_request(method, uri, query_params=None):
+def sign_request_v2(
+    method: str,
+    uri: str,
+    query_params: dict | None = None,
+    body: bytes | None = None,
+) -> dict:
     timestamp = str(int(time.time() * 1000))
-    headers_to_sign = {"x-access-key": ACCESS_KEY, "x-timestamp": timestamp}
+    nonce = str(uuid.uuid4())
+
     parts = [method.upper(), uri]
+
     if query_params:
-        parts.append("&".join(f"{k}={v}" for k, v in sorted(query_params.items())))
-    parts.append("&".join(f"{k}={v}" for k, v in sorted(headers_to_sign.items())))
-    parts.append(timestamp)
+        query_string = "&".join(f"{k}={v}" for k, v in sorted(query_params.items()))
+        parts.append(query_string)
+
+    signed_headers = "&".join(
+        f"{k}={v}"
+        for k, v in sorted(
+            {
+                "x-access-key": ACCESS_KEY,
+                "x-nonce": nonce,
+                "x-timestamp": timestamp,
+            }.items()
+        )
+    )
+    parts.extend([signed_headers, timestamp, nonce])
+
+    body_bytes = body if body is not None else b""
+    if body_bytes and method.upper() in {"POST", "PUT", "PATCH"}:
+        parts.append(hashlib.sha256(body_bytes).hexdigest())
+
     string_to_sign = "\n".join(parts) + "\n"
     signature = base64.b64encode(
         hmac.new(SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256).digest()
     ).decode()
-    return {"X-Access-Key": ACCESS_KEY, "X-Timestamp": timestamp, "X-Signature": signature}
 
-uri = "/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT"
-print(requests.get(f"{BASE_URL}{uri}", headers=sign_request("GET", uri)).json())
+    return {
+        "X-Access-Key": ACCESS_KEY,
+        "X-Timestamp": timestamp,
+        "X-Nonce": nonce,
+        "X-Signature": signature,
+        "X-Signature-Version": "2",
+    }
+
+# GET 示例
+uri = "/openapi/v1/mc-account/symbol/list"
+headers = sign_request_v2("GET", uri)
+print(requests.get(f"{BASE_URL}{uri}", headers=headers).status_code)
+
+# POST 路径 B 示例
+uri = "/openapi/v1/mc-account/transaction/account/record/page"
+body = b'{"current":1,"size":10}'
+headers = sign_request_v2("POST", uri, body=body)
+print(
+    requests.post(
+        f"{BASE_URL}{uri}",
+        headers={**headers, "Content-Type": "application/json"},
+        data=body,
+    ).status_code
+)
+```
+
+```java Java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Base64;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+public class McOpenApiSignerV2 {
+
+    public static String sign(String method, String uri,
+                              Map<String, String> queryParams,
+                              byte[] bodyBytes,
+                              String accessKey, String secretKey) throws Exception {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String nonce = UUID.randomUUID().toString();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(method.toUpperCase()).append("\n").append(uri).append("\n");
+
+        if (queryParams != null && !queryParams.isEmpty()) {
+            String query = new TreeMap<>(queryParams).entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining("&"));
+            sb.append(query).append("\n");
+        }
+
+        TreeMap<String, String> signHeaders = new TreeMap<>();
+        signHeaders.put("x-access-key", accessKey);
+        signHeaders.put("x-nonce", nonce);
+        signHeaders.put("x-timestamp", timestamp);
+        sb.append(signHeaders.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining("&"))).append("\n");
+        sb.append(timestamp).append("\n").append(nonce).append("\n");
+
+        if (bodyBytes != null && bodyBytes.length > 0
+                && isWriteMethod(method)) {
+            sb.append(sha256Hex(bodyBytes)).append("\n");
+        }
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+        return Base64.getEncoder().encodeToString(
+                mac.doFinal(sb.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static boolean isWriteMethod(String method) {
+        String m = method.toUpperCase();
+        return "POST".equals(m) || "PUT".equals(m) || "PATCH".equals(m);
+    }
+
+    private static String sha256Hex(byte[] bytes) throws Exception {
+        byte[] hash = MessageDigest.getInstance("SHA-256").digest(bytes);
+        StringBuilder hex = new StringBuilder(hash.length * 2);
+        for (byte b : hash) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
+    }
+}
 ```
 
 ```javascript Node.js
 const crypto = require("crypto");
 
-function signRequest(method, uri, queryParams, accessKey, secretKey) {
+function signRequestV2(method, uri, queryParams, bodyBuffer, accessKey, secretKey) {
   const timestamp = String(Date.now());
+  const nonce = crypto.randomUUID();
   const parts = [method.toUpperCase(), uri];
-  if (queryParams && Object.keys(queryParams).length) {
-    parts.push(Object.keys(queryParams).sort().map(k => `${k}=${queryParams[k]}`).join("&"));
+
+  if (queryParams && Object.keys(queryParams).length > 0) {
+    const query = Object.keys(queryParams)
+      .sort()
+      .map((k) => `${k}=${queryParams[k]}`)
+      .join("&");
+    parts.push(query);
   }
-  const h = { "x-access-key": accessKey, "x-timestamp": timestamp };
-  parts.push(Object.keys(h).sort().map(k => `${k}=${h[k]}`).join("&"));
-  parts.push(timestamp);
-  const signature = crypto.createHmac("sha256", secretKey).update(parts.join("\n") + "\n").digest("base64");
-  return { "X-Access-Key": accessKey, "X-Timestamp": timestamp, "X-Signature": signature };
+
+  const signHeaders = {
+    "x-access-key": accessKey,
+    "x-nonce": nonce,
+    "x-timestamp": timestamp,
+  };
+  const headerStr = Object.keys(signHeaders)
+    .sort()
+    .map((k) => `${k}=${signHeaders[k]}`)
+    .join("&");
+  parts.push(headerStr, timestamp, nonce);
+
+  const body = bodyBuffer || Buffer.alloc(0);
+  if (body.length > 0 && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
+    parts.push(crypto.createHash("sha256").update(body).digest("hex"));
+  }
+
+  const stringToSign = parts.join("\n") + "\n";
+  const signature = crypto
+    .createHmac("sha256", secretKey)
+    .update(stringToSign)
+    .digest("base64");
+
+  return {
+    "X-Access-Key": accessKey,
+    "X-Timestamp": timestamp,
+    "X-Nonce": nonce,
+    "X-Signature": signature,
+    "X-Signature-Version": "2",
+  };
 }
 ```
 
@@ -217,7 +416,7 @@ function signRequest(method, uri, queryParams, accessKey, secretKey) {
 
 ## 错误响应
 
-认证失败返回 HTTP **401 Unauthorized**,body 为 JSON:
+鉴权失败时通常返回 HTTP **401 Unauthorized**；请求体超限时返回 **413 Payload Too Large**。响应体为 JSON：
 
 ```json
 {
@@ -227,25 +426,46 @@ function signRequest(method, uri, queryParams, accessKey, secretKey) {
 }
 ```
 
-| 消息 | 原因 |
+| 错误信息 | 原因 |
 | --- | --- |
-| `缺少有效鉴权凭证` | 未提供有效鉴权头 |
-| `缺少AccessKey, 请在请求头中添加X-Access-Key` | 缺 `X-Access-Key` |
-| `缺少签名, 请在请求头中添加X-Signature` | 缺 `X-Signature` |
-| `缺少时间戳, 请在请求头中添加X-Timestamp` | 缺 `X-Timestamp` |
-| `时间戳无效或已过期` | 时间戳不在 ±10 分钟内 |
-| `[X-Access-Key]AccessKey无效` | Key 不存在、已禁用或已过期 |
-| `签名无效` | 签名不匹配 |
+| `缺少有效鉴权凭证` | 未提供有效的 AK/SK 鉴权请求头 |
+| `缺少AccessKey, 请在请求头中添加X-Access-Key` | 缺少 `X-Access-Key` |
+| `缺少签名, 请在请求头中添加X-Signature` | 缺少 `X-Signature` |
+| `缺少时间戳, 请在请求头中添加X-Timestamp` | 缺少 `X-Timestamp` |
+| `缺少 nonce, 请在请求头中添加 X-Nonce` | 缺少 `X-Nonce` |
+| `非法 nonce 格式` | nonce 不符合 UUID v4 或 hex 规则 |
+| `请求重放` | nonce 已被使用 |
+| `非法重复查询参数: {key}` | 同一 query key 出现多次 |
+| `非法重复请求头: {name}` | 参与签名的请求头出现多个值 |
+| `时间戳无效或已过期` | 时间戳超出 ±10 分钟 |
+| `[X-Access-Key]AccessKey无效` | Access Key 无效 |
+| `签名无效` | 签名不匹配（含 body 被篡改） |
+| `请求体超过限制` | body 超过 10MB（**413**） |
 | `没有访问权限, ip: {ip}` | IP 不在白名单 |
-| `没有访问该接口的权限` | Key 缺少接口需要的权限 |
+| `没有访问该接口的权限` | 缺少接口权限 |
+| `API Key 未绑定业务线或用户` | API Key 配置异常 |
 
-## 安全最佳实践
+## 安全建议
 
 <Tip>
-  1. **绝不暴露 Secret Key** 到客户端代码、公开仓库或日志。
-  2. **使用 IP 白名单**将生产环境 Key 限定到可信服务器。
-  3. **最小权限**—仅在必要时授予 `TRADE` 或 `WITHDRAW`。
-  4. **定期轮换**—团队人员变动或凭证可能泄漏时禁用旧 Key、新建 Key。
-  5. **同步系统时钟**—签名校验依赖准确时间(建议 NTP)。
-  6. **仅使用 HTTPS**—所有通信均需 TLS。
+  1. **切勿泄露 Secret Key**，不要写入前端代码、公开仓库或日志。
+  2. **每次请求使用新的 `X-Nonce`**，不要复用。
+  3. **生产环境建议配置 IP 白名单**。
+  4. **遵循最小权限原则**。
+  5. **定期轮换密钥**。
+  6. **保持系统时钟同步**（NTP）。
+  7. **仅使用 HTTPS**。
+  8. **网关发版 v2 后尽快升级客户端**；v1 签名将不再被接受。
 </Tip>
+
+## 快速检查清单
+
+- [ ] 已升级 **签名 v2**，每次请求带 **唯一** `X-Nonce`
+- [ ] 请求地址为 **网关** URL
+- [ ] URI 与文档网关路径一致
+- [ ] Query 与 stringToSign 一致，**无重复 query key**
+- [ ] POST/PUT/PATCH 非空 body 已计算 **SHA-256 hex** 并作为最后一行
+- [ ] 签名与发送的 body **字节一致**
+- [ ] `X-Timestamp` 在 ±10 分钟内
+- [ ] API Key 具备目标接口权限
+- [ ] IP 在白名单内（若已配置）

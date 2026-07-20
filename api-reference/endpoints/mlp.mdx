@@ -1,0 +1,139 @@
+---
+title: "MLP Account"
+sidebarTitle: "MLP"
+description: "MLP account deposits and withdrawals, assets and treasury stats, chart data, and configuration parameters."
+---
+
+Endpoints tagged **MLP** handle MLP account deposits and withdrawals, plus queries for assets, treasury, and yield-related data.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| POST | `/openapi/v1/mlp/account/deposit` | `TRADE` | MLP deposit (trading account → fund account → MLP). |
+| POST | `/openapi/v1/mlp/account/withdraw` | `TRADE` | MLP withdrawal (principal deducted first, then yield). |
+| GET | `/openapi/v1/mlp/account/assets` | `READ` | Query MLP account asset details. |
+| GET | `/openapi/v1/mlp/core/stats` | `READ` | Get MLP statistics. |
+| GET | `/openapi/v1/mlp/yesterday-yield-rate-data` | `READ` | MLP yesterday yield-rate chart data. |
+| GET | `/openapi/v1/mlp/tvl-data` | `READ` | MLP treasury TVL chart data. |
+| GET | `/openapi/v1/mlp/apr-data` | `READ` | MLP APR chart data. |
+| GET | `/openapi/v1/mlp/treasury-info` | `READ` | MLP treasury-related information. |
+| GET | `/openapi/v1/mlp/deposit-info` | `READ` | MLP deposit information. |
+| GET | `/openapi/v1/mlp/withdraw-info` | `READ` | MLP withdrawal information. |
+| GET | `/openapi/v1/mlp/config` | `READ` | Query MLP parameters for the current business line (annual yield, lock period, limits, etc.). |
+
+---
+
+## Deposit
+
+`POST /openapi/v1/mlp/account/deposit` — permission `TRADE`.
+
+### Request body — MlpDepositReq
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `trackingId` | string | Yes | Idempotency tracking ID |
+| `symbolId` | string | Yes | Symbol ID (`ac_symbol`) |
+| `amount` | number | Yes | Deposit amount, up to 8 decimal places |
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{ "trackingId": "track-mlp-dep-0001", "symbolId": "1001", "amount": 100 }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/mlp/account/deposit"
+```
+
+On success, `data` is a transaction/workflow ID string.
+
+---
+
+## Withdraw
+
+`POST /openapi/v1/mlp/account/withdraw` — permission `TRADE`.
+
+Transfers from MLP to the fund account, then to the trading account. Principal is deducted first, then yield.
+
+### Request body — MlpWithdrawReq
+
+Same fields as deposit: `trackingId`, `symbolId`, `amount`.
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{ "trackingId": "track-mlp-wd-0001", "symbolId": "1001", "amount": 50 }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/mlp/account/withdraw"
+```
+
+---
+
+## Assets and statistics
+
+```bash cURL
+# Asset details
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/mlp/account/assets"
+
+# Core statistics
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/mlp/core/stats"
+```
+
+---
+
+## Chart data
+
+The endpoints below accept optional query parameters `from` and `to` (dates in `yyyy-MM-dd`):
+
+| Path | Description |
+| --- | --- |
+| `/openapi/v1/mlp/yesterday-yield-rate-data` | Yesterday yield-rate series (display type: percentage) |
+| `/openapi/v1/mlp/tvl-data` | TVL series (amount) |
+| `/openapi/v1/mlp/apr-data` | APR series (percentage) |
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/mlp/tvl-data?from=2026-01-01&to=2026-01-31"
+```
+
+---
+
+## Treasury and deposit/withdraw info
+
+| Path | Description |
+| --- | --- |
+| `/openapi/v1/mlp/treasury-info` | Treasury-related information |
+| `/openapi/v1/mlp/deposit-info` | Deposit-side display information |
+| `/openapi/v1/mlp/withdraw-info` | Withdrawal-side display information |
+
+All require `READ`; no query parameters.
+
+---
+
+## MLP configuration
+
+`GET /openapi/v1/mlp/config` — permission `READ`.
+
+Returns MLP parameters for the current request-context business line, such as `annualYieldRate`, `lockPeriodDays`, `singleUserDepositLimit`, `tvlBaseAmount`, and `integralTierConfig`.
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/mlp/config"
+```

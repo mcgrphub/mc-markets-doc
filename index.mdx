@@ -40,7 +40,7 @@ All requests are routed through the MC **API Gateway** and authenticated with an
     Log in to the MC platform, open **API Key Management**, create a new key, and select the required permissions (`READ`, `TRADE`, `WITHDRAW`). Copy the Access Key and Secret Key — the Secret Key is shown only once.
   </Step>
   <Step title="Sign your request">
-    Build the string to sign, compute an HMAC-SHA256 signature with your Secret Key, and send it along with your Access Key and a millisecond timestamp. See [Authentication](/authentication) for the exact format and examples.
+    Build the string to sign (including `X-Nonce`, and body SHA-256 when required), compute an HMAC-SHA256 signature with your Secret Key (**Base64**), and send it with your Access Key, millisecond timestamp, and nonce. See [Authentication](/authentication) for signature v2.
   </Step>
   <Step title="Call an endpoint">
     Try the [exchange-rate query](/api-reference/endpoints/exchange-rate) to verify your integration, then browse the [full API reference](/api-reference/overview).
@@ -51,11 +51,19 @@ All requests are routed through the MC **API Gateway** and authenticated with an
 
 <CardGroup cols={3}>
   <Card title="Trading" icon="right-left" href="/api-reference/endpoints/trading">
-    Query transaction records and fund-flow history by transactionId or with pagination.
+    Flash conversion execution, and query transaction records and fund-flow history by transactionId or with pagination.
+  </Card>
+
+  <Card title="Deal Orders" icon="receipt" href="/api-reference/endpoints/deal-order">
+    Paginated query of deal orders and deal-order details.
   </Card>
 
   <Card title="Finance Account" icon="piggy-bank" href="/api-reference/endpoints/finance-account">
-    Deposit into and withdraw from demand & fixed-term finance products, view the account overview.
+    Product catalog, positions, demand/fixed-term subscriptions and redemptions, account overview.
+  </Card>
+
+  <Card title="MLP" icon="chart-pie" href="/api-reference/endpoints/mlp">
+    MLP deposits/withdrawals, assets, charts, and configuration.
   </Card>
 
   <Card title="Currency" icon="coins" href="/api-reference/endpoints/currency">
@@ -63,14 +71,26 @@ All requests are routed through the MC **API Gateway** and authenticated with an
   </Card>
 
   <Card title="Fund Account" icon="wallet" href="/api-reference/endpoints/fund-account">
-    Read spot positions (v2) and user Proof-of-Reserves snapshots.
+    Read spot positions and user Proof-of-Reserves snapshots.
   </Card>
 
-  <Card title="Funding Fee History" icon="receipt" href="/api-reference/endpoints/funding-fee">
-    Query the funding-fee & interest-fee history, aggregated by position and settlement time.
+  <Card title="Funding Fee History" icon="file-invoice-dollar" href="/api-reference/endpoints/funding-fee">
+    Query funding-fee & interest-fee history, aggregated by position and settlement time.
   </Card>
 
-  <Card title="Exchange Rate" icon="chart-line" href="/api-reference/endpoints/exchange-rate">
+  <Card title="Funding Rate" icon="percent" href="/api-reference/endpoints/funding-rate">
+    Market funding-rate history pagination.
+  </Card>
+
+  <Card title="Trade Symbols" icon="list" href="/api-reference/endpoints/trade-symbol">
+    Tradable symbol list.
+  </Card>
+
+  <Card title="Market Data" icon="chart-line" href="/api-reference/endpoints/market-data">
+    K-line candles and symbol ranking.
+  </Card>
+
+  <Card title="Exchange Rate" icon="money-bill-transfer" href="/api-reference/endpoints/exchange-rate">
     Query pair exchange rates, USD rates, and flash-conversion quotes with fee estimation.
   </Card>
 </CardGroup>

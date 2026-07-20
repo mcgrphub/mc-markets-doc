@@ -1,0 +1,60 @@
+---
+title: "成交订单"
+sidebarTitle: "成交订单"
+description: "分页查询成交订单与成交单详情。"
+---
+
+标签 **Deal Order（成交订单）** 下的接口用于查询用户成交记录。本组接口均需 `READ` 权限。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/deal-order` | `READ` | 分页查询成交订单。 |
+| GET | `/openapi/v1/deal-order/{dealId}` | `READ` | 按成交单号查询详情。 |
+
+---
+
+## 分页查询成交订单
+
+`GET /openapi/v1/deal-order` — 权限 `READ`。
+
+### 查询参数
+
+标准分页字段:`size`、`current`、`orderBy`、`orderDirection` 等。
+
+### 响应 `data` — BasePageRsp\<DealOrderRemarkPageRsp\>
+
+列表行主要字段:`remark`、`dealAmount` / `dealAmountDisplay`、`commission` / `commissionDisplay`、`profit` / `profitDisplay`(及对应 scale)。
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/deal-order?current=1&size=20"
+```
+
+---
+
+## 成交单详情
+
+`GET /openapi/v1/deal-order/{dealId}` — 权限 `READ`。
+
+### 路径参数
+
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| `dealId` | long | 成交单号 |
+
+### 响应 `data` — DealOrderDetailRsp
+
+主要字段:`dealId`、`orderId`、`positionId`、`dealTime` / `dealTimeTimestamp`、`type`、`symbolPair`、`entry`、`price`、`pricePosition`、`lot`、`volumeClosed`、`commission`、`profit`、`storage`、`stopLoss`、`takeProfit`、`onChainStatus`、`txHash`、`accountType`、`remark` 等。
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/deal-order/100234"
+```

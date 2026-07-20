@@ -11,7 +11,7 @@ This guide walks you through a full signed request against the MC OpenAPI gatewa
 Before you start, make sure you have:
 
 - An MC account with API access enabled.
-- An **Access Key** and **Secret Key** — see [Authentication](/authentication#creating-api-keys) for how to create them.
+- An **Access Key** and **Secret Key** — see [Authentication](/authentication) for how to create them.
 - The `READ` permission enabled on your key (required for the exchange-rate endpoint).
 - A tool that can send HTTPS requests: `curl`, Python 3.8\+, or Node.js 18\+.
 
@@ -30,23 +30,32 @@ The rest of this guide uses production. Swap the host to point at the test gatew
 
 ## Step 2 — Understand what you are signing
 
-Every MC OpenAPI request is signed with HMAC-SHA256 over a canonical string:
+Every MC OpenAPI request uses **signature v2**: HMAC-SHA256 over a string to sign, with the result **Base64-encoded** in `X-Signature`. Each request must also include a unique `X-Nonce`.
+
+The v2 string to sign consists of the following lines (omit the query line when there are no query parameters; omit the body hash line for GET or empty-body requests):
 
 ```text
-{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+{HTTP_METHOD}
+{REQUEST_URI}
+{QUERY_STRING}
+{SIGNED_HEADERS}
+{TIMESTAMP}
+{NONCE}
+[{BODY_SHA256_HEX}]
 ```
 
-For a `GET /openapi/v1/exchange-rate/query/usd` call with no query parameters and no body, the canonical string is:
+For `GET /openapi/v1/exchange-rate/query/usd` (path A, no query, no body):
 
 ```text
 GET
 /openapi/v1/exchange-rate/query/usd
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
+1747890123456
+550e8400-e29b-41d4-a716-446655440000
 
-
-1731657600000
 ```
 
-Note the blank lines for the empty query string and empty body. Full details are in the [Authentication](/authentication#signing-a-request) reference.
+Full details are in the [Authentication](/authentication) reference.
 
 ## Step 3 — Send the request
 
@@ -56,24 +65,28 @@ Note the blank lines for the empty query string and empty body. Full details are
 ACCESS_KEY="your_access_key"
 SECRET_KEY="your_secret_key"
 TS=$(date +%s000)
+NONCE=$(uuidgen | tr '[:upper:]' '[:lower:]')
 METHOD="GET"
 PATH_="/openapi/v1/exchange-rate/query/usd"
 
-CANONICAL=$(printf "%s\n%s\n\n\n%s" "$METHOD" "$PATH_" "$TS")
-SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -hex | awk '{print $2}')
+SIGNED_HEADERS="x-access-key=${ACCESS_KEY}&x-nonce=${NONCE}&x-timestamp=${TS}"
+CANONICAL=$(printf "%s\n%s\n%s\n%s\n%s\n" "$METHOD" "$PATH_" "$SIGNED_HEADERS" "$TS" "$NONCE")
+SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -binary | openssl base64)
 
 curl --request GET \
   --url "https://gateway.mcconnects.com${PATH_}" \
   --header "X-Access-Key: ${ACCESS_KEY}" \
   --header "X-Signature: ${SIGNATURE}" \
   --header "X-Timestamp: ${TS}" \
+  --header "X-Nonce: ${NONCE}" \
+  --header "X-Signature-Version: 2" \
   --header "Accept: application/json"
 ```
 
 ### Python
 
 ```python
-import hmac, hashlib, time, requests, os
+import base64, hmac, hashlib, time, uuid, requests, os
 
 BASE_URL = "https://gateway.mcconnects.com"
 ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
@@ -81,12 +94,23 @@ SECRET_KEY = os.environ["MC_SECRET_KEY"]
 
 method = "GET"
 path = "/openapi/v1/exchange-rate/query/usd"
-query = ""
-body = ""
 ts = str(int(time.time() * 1000))
+nonce = str(uuid.uuid4())
 
-canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
-signature = hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+signed_headers = "&".join(
+    f"{k}={v}"
+    for k, v in sorted(
+        {
+            "x-access-key": ACCESS_KEY,
+            "x-nonce": nonce,
+            "x-timestamp": ts,
+        }.items()
+    )
+)
+string_to_sign = "\n".join([method, path, signed_headers, ts, nonce]) + "\n"
+signature = base64.b64encode(
+    hmac.new(SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+).decode()
 
 resp = requests.get(
     BASE_URL + path,
@@ -94,6 +118,8 @@ resp = requests.get(
         "X-Access-Key": ACCESS_KEY,
         "X-Signature": signature,
         "X-Timestamp": ts,
+        "X-Nonce": nonce,
+        "X-Signature-Version": "2",
         "Accept": "application/json",
     },
 )
@@ -111,12 +137,24 @@ const SECRET_KEY = process.env.MC_SECRET_KEY;
 
 const method = "GET";
 const path = "/openapi/v1/exchange-rate/query/usd";
-const query = "";
-const body = "";
 const ts = Date.now().toString();
+const nonce = crypto.randomUUID();
 
-const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
-const signature = crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
+const signHeaders = {
+  "x-access-key": ACCESS_KEY,
+  "x-nonce": nonce,
+  "x-timestamp": ts,
+};
+const signedHeaders = Object.keys(signHeaders)
+  .sort()
+  .map((k) => `${k}=${signHeaders[k]}`)
+  .join("&");
+
+const stringToSign = [method, path, signedHeaders, ts, nonce].join("\n") + "\n";
+const signature = crypto
+  .createHmac("sha256", SECRET_KEY)
+  .update(stringToSign)
+  .digest("base64");
 
 const res = await fetch(BASE_URL + path, {
   method,
@@ -124,6 +162,8 @@ const res = await fetch(BASE_URL + path, {
     "X-Access-Key": ACCESS_KEY,
     "X-Signature": signature,
     "X-Timestamp": ts,
+    "X-Nonce": nonce,
+    "X-Signature-Version": "2",
     Accept: "application/json",
   },
 });

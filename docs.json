@@ -1,11 +1,16 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "luma",
-  "name": "Open API Platform",
+  "name": "MC Markets",
   "colors": {
     "primary": "#ef7025",
     "light": "#eec9bc",
     "dark": "#4fa1ab"
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://www.mcmarkets.com/zh-Hant"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -68,10 +73,15 @@
                 "group": "Endpoints",
                 "pages": [
                   "api-reference/endpoints/trading",
+                  "api-reference/endpoints/deal-order",
                   "api-reference/endpoints/finance-account",
+                  "api-reference/endpoints/mlp",
                   "api-reference/endpoints/currency",
                   "api-reference/endpoints/fund-account",
                   "api-reference/endpoints/funding-fee",
+                  "api-reference/endpoints/funding-rate",
+                  "api-reference/endpoints/trade-symbol",
+                  "api-reference/endpoints/market-data",
                   "api-reference/endpoints/exchange-rate"
                 ]
               }
@@ -136,10 +146,15 @@
                 "group": "接口",
                 "pages": [
                   "zh/api-reference/endpoints/trading",
+                  "zh/api-reference/endpoints/deal-order",
                   "zh/api-reference/endpoints/finance-account",
+                  "zh/api-reference/endpoints/mlp",
                   "zh/api-reference/endpoints/currency",
                   "zh/api-reference/endpoints/fund-account",
                   "zh/api-reference/endpoints/funding-fee",
+                  "zh/api-reference/endpoints/funding-rate",
+                  "zh/api-reference/endpoints/trade-symbol",
+                  "zh/api-reference/endpoints/market-data",
                   "zh/api-reference/endpoints/exchange-rate"
                 ]
               }
@@ -151,12 +166,12 @@
   },
   "navbar": {
     "links": [
-      { "label": "Support", "href": "mailto:support@example.com" }
+      { "label": "Support", "href": "mailto:cs@mcmarkets.com" }
     ],
     "primary": {
       "type": "button",
-      "label": "Get API Key",
-      "href": "https://dashboard.example.com"
+      "label": "MC Markets",
+      "href": "https://www.mcmarkets.com/zh-Hant"
     }
   },
   "footer": {

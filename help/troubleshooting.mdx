@@ -14,21 +14,21 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 
 ### Checklist
 
-- **Canonical string.** Print exactly what you signed. It must be five lines: `METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP`. Empty query string or body means an empty line, not the string `"null"`.
-- **Body match.** Serialize the JSON body **once** and reuse the same string for both signing and the HTTP request. `JSON.stringify(obj)` after signing gives a subtly different string than the one you signed.
-- **Query ordering.** Sort query parameters by key ascending, joined `key=value` with `&`. Do not URL-encode differently between signing and sending.
-- **Method / path case.** Method is uppercase (`GET`, not `get`). Path starts with `/openapi/v1/` and does not include the base URL or the query string.
-- **Correct key.** `X-Access-Key` is the Access Key; sign with the Secret Key. It is easy to swap them.
-- **Digest format.** `X-Signature` is the **lowercase hex** encoding of the HMAC-SHA256 digest, not base64.
+- **Signature v2.** Confirm a unique `X-Nonce` is present and the string to sign includes `SIGNED_HEADERS` (with `x-nonce`), `TIMESTAMP`, and `NONCE`. For non-empty `POST`/`PUT`/`PATCH` bodies, append the body SHA-256 as lowercase hex.
+- **No blank query line.** When there is no query, omit the `QUERY_STRING` line entirely — do not insert a blank line.
+- **Body match.** Serialize the JSON body **once** and reuse the same bytes for signing and the HTTP request.
+- **Query ordering.** Sort query parameters by key ascending, joined `key=value` with `&`. Duplicate query keys are rejected.
+- **Method / path case.** Method is uppercase (`GET`, not `get`). Path is the gateway-visible path without the base URL.
+- **Correct key.** `X-Access-Key` is the Access Key; sign with the Secret Key.
+- **Digest format.** `X-Signature` is the **Base64** encoding of the HMAC-SHA256 digest (with padding), not lowercase hex.
 
 ```json
 { "code": "40002", "msg": "Timestamp expired", "success": false }
 ```
 
-- `X-Timestamp` must be current UTC time in **milliseconds** (13 digits, e.g. `1731657600000`), not seconds.
+- `X-Timestamp` must be current time in **milliseconds** (13 digits, e.g. `1731657600000`), not seconds.
 - Sync your machine clock via NTP. A drift of only a few seconds can trigger this error.
-- If you generate `ts` once and reuse it for a batch of requests, re-generate for every call.
-
+- For batches, regenerate both the timestamp and the **nonce** on every call.
 ## HTTP 403 — insufficient permission
 
 ```json

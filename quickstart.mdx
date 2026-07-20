@@ -1,13 +1,13 @@
 ---
 title: "MC OpenAPI Quickstart"
 sidebarTitle: "Quickstart"
-description: "Create an MC Access Key / Secret Key, build an HMAC-SHA256 signature, and make your first authenticated call through the gateway."
+description: "Create an MC Access Key / Secret Key and make your first signed gateway call with signature v2 (including X-Nonce)."
 ---
 
-This quickstart walks you through the steps to make your first authenticated call to the MC OpenAPI: creating an API Key, signing a request with HMAC-SHA256, and calling the exchange-rate endpoint through the gateway.
+This quickstart walks you through your first MC OpenAPI call: create an API Key, sign the request with **HMAC-SHA256 signature v2**, and call the exchange-rate endpoint through the gateway.
 
 <Note>
-  You need an MC platform account before you begin. If you don't have one, contact your MC representative.
+  You need an MC platform account before you begin. If you don't have one, contact your MC representative. From v3.7.0, clients must use signature **v2** (a unique `X-Nonce` on every request).
 </Note>
 
 <Steps>
@@ -24,45 +24,59 @@ This quickstart walks you through the steps to make your first authenticated cal
       Never commit the Secret Key to source control, and never expose it in client-side code.
     </Warning>
   </Step>
-  <Step title="Sign a request">
-    Every authenticated request needs three headers:
+  <Step title="Sign a request (v2)">
+    Every authenticated request needs at least four headers:
 
     | Header | Value |
     | --- | --- |
     | `X-Access-Key` | Your Access Key |
-    | `X-Timestamp` | Current Unix time in **milliseconds** (must be within ±10 minutes of server time) |
-    | `X-Signature` | Base64-encoded HMAC-SHA256 of the string to sign |
+    | `X-Timestamp` | Current Unix time in **milliseconds** (within ±10 minutes of server time) |
+    | `X-Nonce` | **Unique per request** (UUID v4 recommended) |
+    | `X-Signature` | **Base64**-encoded HMAC-SHA256 of the string to sign |
 
     Build the string to sign by joining the following parts with `\n`, then append a trailing `\n`:
 
     ```text
     {HTTP_METHOD}
     {REQUEST_URI}
-    {QUERY_STRING}       # omit this line if there are no query parameters
-    {SIGNED_HEADERS}     # x-access-key={AK}&x-timestamp={TS}, keys lowercased & sorted
+    {QUERY_STRING}       # omit entire line if no query (do not insert a blank line)
+    {SIGNED_HEADERS}     # x-access-key, x-nonce, x-timestamp — lowercase keys, sorted
     {TIMESTAMP}
+    {NONCE}
+    [{BODY_SHA256_HEX}]  # only for POST/PUT/PATCH with a non-empty body
     ```
 
-    See [Authentication](/authentication) for the exact rules and Python / Java / Node.js code samples.
+    See [Authentication](/authentication) for the full rules and Python / Java / Node.js samples.
   </Step>
   <Step title="Call the exchange-rate endpoint">
-    The `GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` endpoint requires only the `READ` permission and is ideal for verifying your signing implementation.
+    `GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` requires only `READ` and is ideal for verifying your signing implementation.
 
     ```bash
     ACCESS_KEY='YOUR_ACCESS_KEY'
     SECRET_KEY='YOUR_SECRET_KEY'
     URI='/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT'
     TIMESTAMP=$(python3 -c 'import time; print(int(time.time()*1000))')
+    NONCE=$(python3 -c 'import uuid; print(uuid.uuid4())')
     
-    SIGNATURE=$(python3 << 'PY'
+    SIGNATURE=$(ACCESS_KEY="$ACCESS_KEY" SECRET_KEY="$SECRET_KEY" URI="$URI" TIMESTAMP="$TIMESTAMP" NONCE="$NONCE" python3 << 'PY'
     import base64, hashlib, hmac, os
     method = "GET"
     uri = os.environ["URI"]
     access_key = os.environ["ACCESS_KEY"]
     secret_key = os.environ["SECRET_KEY"]
     timestamp = os.environ["TIMESTAMP"]
-    headers = f"x-access-key={access_key}&x-timestamp={timestamp}"
-    string_to_sign = f"{method}\n{uri}\n{headers}\n{timestamp}\n"
+    nonce = os.environ["NONCE"]
+    headers = "&".join(
+        f"{k}={v}"
+        for k, v in sorted(
+            {
+                "x-access-key": access_key,
+                "x-nonce": nonce,
+                "x-timestamp": timestamp,
+            }.items()
+        )
+    )
+    string_to_sign = f"{method}\n{uri}\n{headers}\n{timestamp}\n{nonce}\n"
     sig = base64.b64encode(
         hmac.new(secret_key.encode(), string_to_sign.encode(), hashlib.sha256).digest()
     ).decode()
@@ -74,6 +88,8 @@ This quickstart walks you through the steps to make your first authenticated cal
       -H "X-Access-Key: ${ACCESS_KEY}" \
       -H "X-Signature: ${SIGNATURE}" \
       -H "X-Timestamp: ${TIMESTAMP}" \
+      -H "X-Nonce: ${NONCE}" \
+      -H "X-Signature-Version: 2" \
       "https://test-gateway.mcconnects.com${URI}"
     ```
 
@@ -91,19 +107,19 @@ This quickstart walks you through the steps to make your first authenticated cal
   <Step title="Explore the API">
     <CardGroup cols={2}>
       <Card title="Authentication" icon="key" href="/authentication">
-        Full signing algorithm, permissions, IP whitelisting, and error responses.
+        Full signature v2 rules, path A/B, errors, and multi-language samples.
       </Card>
 
       <Card title="Base URL" icon="server" href="/api-reference/base-url">
-        Test and production gateway URLs, and path conventions.
+        Test and production gateway URLs.
       </Card>
 
       <Card title="API Reference" icon="code" href="/api-reference/overview">
-        Every endpoint, organized by tag (Trading, Finance, Currency, Fund Account, Funding Fee, Exchange Rate).
+        All public endpoints.
       </Card>
 
       <Card title="First Request" icon="rocket" href="/guides/first-request">
-        End-to-end walkthrough with a signed request in code.
+        End-to-end signed request walkthrough.
       </Card>
     </CardGroup>
   </Step>

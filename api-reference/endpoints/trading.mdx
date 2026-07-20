@@ -1,20 +1,62 @@
 ---
 title: "Trading"
 sidebarTitle: "Trading"
-description: "Query transaction records and fund-flow history by transactionId or with pagination filters."
+description: "Flash conversion execution, and query transaction records and fund-flow history by transactionId or with pagination filters."
 ---
 
-Endpoints tagged **Trading** query the account's transaction records and fund-flow (account) records. All endpoints in this group require the `READ` permission.
+Endpoints tagged **Trading** execute flash conversion (exchange v2) and query account transaction and fund-flow records.
 
 ## Endpoints
 
-| Method | Path | Description |
-| --- | --- | --- |
-| POST | `/openapi/v1/transaction/transaction/record/transactionId/{id}` | Query a single transaction record by `transactionId`. |
-| POST | `/openapi/v1/transaction/transaction/record/page` | Paginated query of transaction records. |
-| POST | `/openapi/v1/transaction/account/record/page` | Paginated query of fund-flow (account) records. |
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| POST | `/openapi/v1/transaction/exchange/v2` | `TRADE` | Exchange v2 (supports quote sessions). |
+| POST | `/openapi/v1/transaction/transaction/record/transactionId/{id}` | `READ` | Query a single transaction by `transactionId`. |
+| POST | `/openapi/v1/transaction/transaction/record/page` | `READ` | Paginated query of transaction records. |
+| POST | `/openapi/v1/transaction/account/record/page` | `READ` | Paginated query of fund-flow records. |
 
 All endpoints return the standard envelope. Paginated endpoints return `data` shaped as `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`.
+
+---
+
+## Exchange v2 (flash conversion)
+
+`POST /openapi/v1/transaction/exchange/v2` — permission `TRADE`.
+
+Executes an exchange with quote-session support.
+
+<Warning>
+  The endpoint requires completing the 2FA verification flow before calling. Include `verify2FaTokens` in the body when needed, and ensure you hold a valid `quoteSessionId`.
+</Warning>
+
+### Request body — ExchangeV2Req
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `trackingId` | string | Yes | Idempotency tracking ID |
+| `quoteSessionId` | string | Yes | Quote session ID |
+| `symbol` | string | Yes | Source symbol name, e.g. `USDT` |
+| `exchangeSymbol` | string | Yes | Target symbol name, e.g. `BTC` |
+| `amount` | number | Yes | Exchange amount, up to 8 decimal places |
+| `verify2FaTokens` | array | No | List of temporary 2FA verification tokens |
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{
+        "trackingId": "track-ex-0001",
+        "quoteSessionId": "qs_abc123",
+        "symbol": "USDT",
+        "exchangeSymbol": "BTC",
+        "amount": 100
+      }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/transaction/exchange/v2"
+```
+
+On success, `data` is a transaction ID string. Use [Exchange Rate](/api-reference/endpoints/exchange-rate) first to obtain quote context.
 
 ---
 
@@ -135,11 +177,9 @@ curl -s -X POST \
 }
 ```
 
-      
-
 ---
 
-## Paginated query — fund-flow (account) records
+## Paginated query — fund-flow records
 
 `POST /openapi/v1/transaction/account/record/page`
 

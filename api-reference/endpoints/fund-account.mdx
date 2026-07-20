@@ -1,17 +1,42 @@
 ---
 title: "Fund Account"
 sidebarTitle: "Fund Account"
-description: "Read spot positions (v2) and the user's Proof-of-Reserves (PoRv2) snapshot."
+description: "Read spot positions, query positions by spot account ID, and the user's Proof-of-Reserves (PoRv2) snapshot."
 ---
 
-Endpoints tagged **Fund Account (资金账户)** expose the user's spot positions and Proof-of-Reserves snapshots. All endpoints require the `READ` permission.
+Endpoints tagged **Fund Account (资金账户)** expose the user's spot positions and Proof-of-Reserves snapshots. All endpoints in this group require the `READ` permission.
 
 ## Endpoints
 
 | Method | Path | Description |
 | --- | --- | --- |
+| GET | `/openapi/v1/fund/account/spot-account/positions` | Get spot account positions by `spotId`. |
 | GET | `/openapi/v1/fund/account/spot/positions/v2` | Get spot position information (v2). |
 | GET | `/openapi/v1/fund/account/por` | Query the user's PoRv2 Merkle proof snapshot. |
+
+---
+
+## Query positions by spot account
+
+`GET /openapi/v1/fund/account/spot-account/positions` — permission `READ`.
+
+### Query parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `spotId` | string | Yes | Spot account ID |
+
+### Response `data` — SpotAccountPositionDTO
+
+Includes `spotId` and `symbolInfo` (position details mapped by trading symbol).
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/fund/account/spot-account/positions?spotId=SPOT_001"
+```
 
 ---
 
@@ -51,8 +76,6 @@ Endpoints tagged **Fund Account (资金账户)** expose the user's spot position
 }
 ```
 
-#### PositionDTO
-
 ```bash cURL
 curl -s \
   -H "X-Access-Key: ${ACCESS_KEY}" \
@@ -91,14 +114,6 @@ curl -s \
   }
 }
 ```
-
-      
-
-#### ProofOfFundDTO
-
-  
-
-### Query parameters
 
 ```bash cURL
 curl -s \

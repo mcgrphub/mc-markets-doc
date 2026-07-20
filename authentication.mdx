@@ -1,10 +1,14 @@
 ---
 title: "Authentication"
 sidebarTitle: "Authentication"
-description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key (SK) and HMAC-SHA256 signing."
+description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key (SK) and HMAC-SHA256 signature v2."
 ---
 
-All OpenAPI requests must be sent to the **API Gateway** and authenticated with an **Access Key (AK)** and **Secret Key (SK)** pair. The gateway validates your signature, checks API Key permissions, and forwards the request to the appropriate backend service.
+<Note>
+  **Version note (v3.7.0):** Starting with v3.7.0, OpenAPI Category C AK/SK uses **signature v2** (hard cutover; **v1 is not supported**). Every request must include `X-Nonce`. For `POST` / `PUT` / `PATCH` with a non-empty body, the request body SHA-256 must be included in the signature. The v3.4.0 documentation is retained for historical reference only.
+</Note>
+
+All OpenAPI requests must be sent to the **API Gateway** and authenticated with an **Access Key (AK)** and **Secret Key (SK)** pair. The gateway validates your signature, enforces nonce replay protection, checks API Key permissions, and forwards the request to the appropriate backend service.
 
 ## Base URLs
 
@@ -13,7 +17,7 @@ All OpenAPI requests must be sent to the **API Gateway** and authenticated with 
 | Test | `https://test-gateway.mcconnects.com` |
 | Production | `https://gateway.mcconnects.com` |
 
-All paths in this documentation are relative to the base URL above. For example, a documented path of `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` should be requested as:
+All paths in this documentation are relative to the base URL above. For example, when the documented path is `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT`, the full request URL is:
 
 ```text
 https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
@@ -24,6 +28,8 @@ https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CR
 </Warning>
 
 ## Credentials
+
+### Access Key and Secret Key
 
 Each API Key consists of two parts:
 
@@ -57,25 +63,30 @@ Every authenticated request must include the following HTTP headers:
 | Header | Required | Description |
 | --- | --- | --- |
 | `X-Access-Key` | Yes | Your Access Key (AK) |
-| `X-Signature` | Yes | HMAC-SHA256 signature (Base64-encoded) |
+| `X-Signature` | Yes | HMAC-SHA256 signature v2 (Base64-encoded) |
 | `X-Timestamp` | Yes | Current Unix timestamp in **milliseconds** |
-| `Content-Type` | For POST/PUT | `application/json` (when sending a JSON body) |
+| `X-Nonce` | Yes | **Unique per request**; UUID v4 recommended, or ≥32 hex characters |
+| `Content-Type` | Recommended for POST/PUT/PATCH | Use `application/json` when sending JSON |
+| `X-Signature-Version` | No | Suggested value `2` for troubleshooting |
+
+HTTP header names are **case-insensitive** (for example, `x-access-key` and `X-Access-Key` are equivalent). In the string to sign, header names are always **lowercase**.
 
 <Warning>
-  Do not send `Authorization: Bearer ...` together with AK/SK headers. If a Bearer token is present, the gateway treats the request as a web session call and will not use your AK/SK signature.
+  Do not send `Authorization: Bearer ...` together with AK/SK headers. If a Bearer token is present, the gateway treats the request as a web session call (Category B mode) and will not use your AK/SK signature.
 </Warning>
 
-## Request signing
+## Request signing v2
+
+### Overview
 
 Signing prevents tampering and replay attacks. For each request:
 
-1. Build a **string to sign** from the HTTP method, URI, query parameters, and selected headers.
-2. Compute **HMAC-SHA256** using your Secret Key.
-3. Base64-encode the result and send it as `X-Signature`.
+1. Generate a unique `X-Nonce`.
+2. Build the **string to sign** from the HTTP method, URI, query parameters, signed headers, timestamp, nonce, and (for path B) the request body hash.
+3. Compute **HMAC-SHA256** using your Secret Key.
+4. Base64-encode the result and send it as the `X-Signature` header.
 
 ### String to sign
-
-The string to sign concatenates the following parts, separated by newline characters (`\n`):
 
 ```text
 {HTTP_METHOD}
@@ -83,32 +94,51 @@ The string to sign concatenates the following parts, separated by newline charac
 {QUERY_STRING}
 {SIGNED_HEADERS}
 {TIMESTAMP}
+{NONCE}
+[{BODY_SHA256_HEX}]
 ```
 
 | Part | Description |
 | --- | --- |
-| `HTTP_METHOD` | Uppercase HTTP method, e.g. `GET`, `POST`, `PUT`, `DELETE` |
-| `REQUEST_URI` | Full gateway path **without** the host, e.g. `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` |
-| `QUERY_STRING` | Query parameters sorted by key (ASCII ascending), formatted as `key1=value1&key2=value2`. **Omit this line entirely** if there are no query parameters. |
-| `SIGNED_HEADERS` | Selected request headers sorted by key (lowercase), formatted as `key1=value1&key2=value2`. **Omit this line entirely** if no signed headers are present. |
-| `TIMESTAMP` | Same value as the `X-Timestamp` header (milliseconds) |
+| `HTTP_METHOD` | Uppercase HTTP method, e.g. `GET`, `POST`, `PUT`, `PATCH`, `DELETE` |
+| `REQUEST_URI` | Full gateway path without the host, e.g. `/openapi/v1/mc-account/symbol/list` |
+| `QUERY_STRING` | Query parameters sorted by key (ASCII ascending), formatted as `key1=value1&key2=value2`. **Omit the entire line** if there are no query parameters (same as v1; do **not** insert a blank line) |
+| `SIGNED_HEADERS` | `x-access-key`, `x-nonce`, and `x-timestamp` sorted by key and joined as `key=value&...` |
+| `TIMESTAMP` | Same value as `X-Timestamp` (milliseconds) |
+| `NONCE` | Same value as `X-Nonce` |
+| `BODY_SHA256_HEX` | **Path B only**: see below; lowercase hex, 64 characters |
+
+Append a final newline `\n` at the end.
 
 #### Signed headers
 
-Only the following headers participate in the signature:
-
-| Header | Included as |
+| HTTP header | In string to sign |
 | --- | --- |
 | `X-Access-Key` | `x-access-key={value}` |
+| `X-Nonce` | `x-nonce={value}` |
 | `X-Timestamp` | `x-timestamp={value}` |
 
-Header names are **lowercased** when building the string. Other headers (e.g. `Content-Type`, `X-Custom-Header`) are **not** included.
+Other headers (such as `Content-Type`) **do not** participate in the signature.
 
 <Info>
-  Use the **gateway-visible path** exactly as documented in the API reference. For example, account service endpoints are prefixed with `/openapi/v1/mc-account/`, not `/openapi/v1/`.
+  The URI used in the signature must match the **gateway-visible path** in the API documentation exactly (including service prefixes such as `/openapi/v1/mc-account/`).
 </Info>
 
-The request body (JSON payload) is **not** included in the signature. Only method, URI, query string, and the two signed headers are used.
+#### Path A / Path B (request body)
+
+| Path | Condition | `BODY_SHA256_HEX` line |
+| --- | --- | --- |
+| **Path A** | `GET`; or `POST`/`PUT`/`PATCH` with an **empty body** (e.g. `Content-Length: 0`) | **Not appended** |
+| **Path B** | `POST`/`PUT`/`PATCH` with a **non-empty body** | Append lowercase hex of `SHA-256(raw body bytes)` |
+
+- The client must use the **same raw body bytes** for signing and sending (do not rely on the gateway to re-serialize JSON).
+- Maximum request body size is **10 MB** (consistent with gateway `gateway.request.max-body-size-bytes`); exceeding the limit returns **413**.
+
+#### Canonicalization rules (v3.7.0)
+
+- **Do not** repeat the same query key (e.g. `?a=1&a=2`); otherwise **401**.
+- **Do not** send multiple values for signed headers (e.g. two `X-Nonce` headers); otherwise **401**.
+- Each query key contributes only one value in the signature; the query in the URL must match the query in the string to sign.
 
 ### Signature algorithm
 
@@ -118,17 +148,17 @@ signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
 
 - Algorithm: **HMAC-SHA256**
 - Key encoding: UTF-8 bytes of the Secret Key string
-- Output encoding: **Base64** (standard, with padding)
+- Output encoding: **Base64** (standard encoding, with padding)
 
-### Timestamp validity
+### Timestamp and nonce
 
-- `X-Timestamp` must be the current time in **milliseconds** (13-digit Unix epoch).
-- The gateway accepts timestamps within **±10 minutes** of server time.
-- Requests with expired or malformed timestamps are rejected with `401 Unauthorized`.
+- `X-Timestamp` must be a **millisecond** Unix timestamp (13 digits). The gateway accepts **±10 minutes** of server time.
+- `X-Nonce` must be **newly generated for every request**; the same nonce cannot be reused within its validity window (replay protection).
+- Nonce format: UUID v4, or a hex string of length ≥32.
 
 ## Permissions
 
-Each API Key carries one or more permission scopes. Individual API endpoints declare which permissions are required. Your key must include **all** required permissions (AND logic).
+Each API Key can be configured with one or more permissions. Individual API endpoints declare required permissions; your key must satisfy **all** declared permissions (AND logic).
 
 | Permission | Code | Description |
 | --- | --- | --- |
@@ -143,73 +173,52 @@ If your API Key lacks the required permission for an endpoint, the gateway retur
 When creating or editing an API Key, you can configure an IP whitelist (up to 15 IPv4 addresses, comma-separated).
 
 - If a whitelist is configured, requests from non-whitelisted IPs are rejected with `401 Unauthorized`.
-- If no whitelist is configured, requests from any IP are allowed (subject to other checks).
+- If no whitelist is configured, source IP is not restricted (other authentication checks still apply).
 
-The gateway determines the client IP from `X-Forwarded-For`, `X-Real-IP`, or the direct connection address.
+The gateway determines the client IP in this order: `X-Forwarded-For` → `X-Real-IP` → direct connection address.
 
-## Example — exchange rate query
+## Examples
 
-Query the BTC/USDT exchange rate for crypto assets. This endpoint requires the `READ` permission.
-
-**Request:**
-
-```text
-GET /openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
-Host: test-gateway.mcconnects.com
-X-Access-Key: AKF013EB0CC51E4BEB
-X-Timestamp: 1747890123456
-X-Signature: <computed signature>
-```
+### Example 1: GET path A (no query)
 
 **String to sign:**
 
 ```text
 GET
-/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
-x-access-key=AKF013EB0CC51E4BEB&x-timestamp=1747890123456
+/openapi/v1/mc-account/symbol/list
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
 1747890123456
+550e8400-e29b-41d4-a716-446655440000
+
 ```
 
-**cURL:**
+### Example 2: GET with query
 
-```bash
-ACCESS_KEY='AKF013EB0CC51E4BEB'
-SECRET_KEY='SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc'
-URI='/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT'
-TIMESTAMP=$(python3 -c 'import time; print(int(time.time()*1000))')
+URI: `/openapi/v1/mc-account/symbol/list`, Query: `current=1&size=10`
 
-SIGNATURE=$(python3 << 'PY'
-import base64, hashlib, hmac, os
-method = "GET"
-uri = os.environ["URI"]
-access_key = os.environ["ACCESS_KEY"]
-secret_key = os.environ["SECRET_KEY"]
-timestamp = os.environ["TIMESTAMP"]
-headers = f"x-access-key={access_key}&x-timestamp={timestamp}"
-string_to_sign = f"{method}\n{uri}\n{headers}\n{timestamp}\n"
-sig = base64.b64encode(
-    hmac.new(secret_key.encode(), string_to_sign.encode(), hashlib.sha256).digest()
-).decode()
-print(sig)
-PY
-)
+```text
+GET
+/openapi/v1/mc-account/symbol/list
+current=1&size=10
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
+1747890123456
+550e8400-e29b-41d4-a716-446655440000
 
-curl -s \
-  -H "X-Access-Key: ${ACCESS_KEY}" \
-  -H "X-Signature: ${SIGNATURE}" \
-  -H "X-Timestamp: ${TIMESTAMP}" \
-  "https://test-gateway.mcconnects.com${URI}"
 ```
 
-**Success response:**
+### Example 3: POST path B (with body)
 
-```json
-{
-  "status": 200,
-  "code": "200",
-  "success": true,
-  "data": 98500.12
-}
+Raw body bytes: `{"current":1,"size":10}` → SHA-256 hex (compute the actual value yourself):
+
+```text
+POST
+/openapi/v1/mc-account/transaction/account/record/page
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
+1747890123456
+550e8400-e29b-41d4-a716-446655440000
+a1b2c3... (64-char lowercase hex of the body SHA-256)
+
+
 ```
 
 ## Code examples
@@ -221,32 +230,43 @@ import base64
 import hashlib
 import hmac
 import time
+import uuid
 import requests
 
 ACCESS_KEY = "YOUR_ACCESS_KEY"
 SECRET_KEY = "YOUR_SECRET_KEY"
 BASE_URL = "https://test-gateway.mcconnects.com"
 
-def sign_request(method: str, uri: str, query_params: dict | None = None) -> dict:
+def sign_request_v2(
+    method: str,
+    uri: str,
+    query_params: dict | None = None,
+    body: bytes | None = None,
+) -> dict:
     timestamp = str(int(time.time() * 1000))
-    headers_to_sign = {
-        "x-access-key": ACCESS_KEY,
-        "x-timestamp": timestamp,
-    }
+    nonce = str(uuid.uuid4())
 
     parts = [method.upper(), uri]
 
     if query_params:
-        query_string = "&".join(
-            f"{k}={v}" for k, v in sorted(query_params.items())
-        )
+        query_string = "&".join(f"{k}={v}" for k, v in sorted(query_params.items()))
         parts.append(query_string)
 
     signed_headers = "&".join(
-        f"{k}={v}" for k, v in sorted(headers_to_sign.items())
+        f"{k}={v}"
+        for k, v in sorted(
+            {
+                "x-access-key": ACCESS_KEY,
+                "x-nonce": nonce,
+                "x-timestamp": timestamp,
+            }.items()
+        )
     )
-    parts.append(signed_headers)
-    parts.append(timestamp)
+    parts.extend([signed_headers, timestamp, nonce])
+
+    body_bytes = body if body is not None else b""
+    if body_bytes and method.upper() in {"POST", "PUT", "PATCH"}:
+        parts.append(hashlib.sha256(body_bytes).hexdigest())
 
     string_to_sign = "\n".join(parts) + "\n"
     signature = base64.b64encode(
@@ -256,34 +276,51 @@ def sign_request(method: str, uri: str, query_params: dict | None = None) -> dic
     return {
         "X-Access-Key": ACCESS_KEY,
         "X-Timestamp": timestamp,
+        "X-Nonce": nonce,
         "X-Signature": signature,
+        "X-Signature-Version": "2",
     }
 
-uri = "/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT"
-auth_headers = sign_request("GET", uri)
-response = requests.get(f"{BASE_URL}{uri}", headers=auth_headers)
-print(response.json())
+# GET example
+uri = "/openapi/v1/mc-account/symbol/list"
+headers = sign_request_v2("GET", uri)
+print(requests.get(f"{BASE_URL}{uri}", headers=headers).status_code)
+
+# POST path B example
+uri = "/openapi/v1/mc-account/transaction/account/record/page"
+body = b'{"current":1,"size":10}'
+headers = sign_request_v2("POST", uri, body=body)
+print(
+    requests.post(
+        f"{BASE_URL}{uri}",
+        headers={**headers, "Content-Type": "application/json"},
+        data=body,
+    ).status_code
+)
 ```
 
 ```java Java
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class McOpenApiSigner {
+public class McOpenApiSignerV2 {
 
     public static String sign(String method, String uri,
                               Map<String, String> queryParams,
+                              byte[] bodyBytes,
                               String accessKey, String secretKey) throws Exception {
         String timestamp = String.valueOf(System.currentTimeMillis());
+        String nonce = UUID.randomUUID().toString();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(method.toUpperCase()).append("\n");
-        sb.append(uri).append("\n");
+        sb.append(method.toUpperCase()).append("\n").append(uri).append("\n");
 
         if (queryParams != null && !queryParams.isEmpty()) {
             String query = new TreeMap<>(queryParams).entrySet().stream()
@@ -294,17 +331,36 @@ public class McOpenApiSigner {
 
         TreeMap<String, String> signHeaders = new TreeMap<>();
         signHeaders.put("x-access-key", accessKey);
+        signHeaders.put("x-nonce", nonce);
         signHeaders.put("x-timestamp", timestamp);
-        String headerStr = signHeaders.entrySet().stream()
+        sb.append(signHeaders.entrySet().stream()
                 .map(e -> e.getKey() + "=" + e.getValue())
-                .collect(Collectors.joining("&"));
-        sb.append(headerStr).append("\n");
-        sb.append(timestamp).append("\n");
+                .collect(Collectors.joining("&"))).append("\n");
+        sb.append(timestamp).append("\n").append(nonce).append("\n");
+
+        if (bodyBytes != null && bodyBytes.length > 0
+                && isWriteMethod(method)) {
+            sb.append(sha256Hex(bodyBytes)).append("\n");
+        }
 
         Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
         return Base64.getEncoder().encodeToString(
                 mac.doFinal(sb.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static boolean isWriteMethod(String method) {
+        String m = method.toUpperCase();
+        return "POST".equals(m) || "PUT".equals(m) || "PATCH".equals(m);
+    }
+
+    private static String sha256Hex(byte[] bytes) throws Exception {
+        byte[] hash = MessageDigest.getInstance("SHA-256").digest(bytes);
+        StringBuilder hex = new StringBuilder(hash.length * 2);
+        for (byte b : hash) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
     }
 }
 ```
@@ -312,8 +368,9 @@ public class McOpenApiSigner {
 ```javascript Node.js
 const crypto = require("crypto");
 
-function signRequest(method, uri, queryParams, accessKey, secretKey) {
+function signRequestV2(method, uri, queryParams, bodyBuffer, accessKey, secretKey) {
   const timestamp = String(Date.now());
+  const nonce = crypto.randomUUID();
   const parts = [method.toUpperCase(), uri];
 
   if (queryParams && Object.keys(queryParams).length > 0) {
@@ -326,13 +383,19 @@ function signRequest(method, uri, queryParams, accessKey, secretKey) {
 
   const signHeaders = {
     "x-access-key": accessKey,
+    "x-nonce": nonce,
     "x-timestamp": timestamp,
   };
   const headerStr = Object.keys(signHeaders)
     .sort()
     .map((k) => `${k}=${signHeaders[k]}`)
     .join("&");
-  parts.push(headerStr, timestamp);
+  parts.push(headerStr, timestamp, nonce);
+
+  const body = bodyBuffer || Buffer.alloc(0);
+  if (body.length > 0 && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
+    parts.push(crypto.createHash("sha256").update(body).digest("hex"));
+  }
 
   const stringToSign = parts.join("\n") + "\n";
   const signature = crypto
@@ -343,7 +406,9 @@ function signRequest(method, uri, queryParams, accessKey, secretKey) {
   return {
     "X-Access-Key": accessKey,
     "X-Timestamp": timestamp,
+    "X-Nonce": nonce,
     "X-Signature": signature,
+    "X-Signature-Version": "2",
   };
 }
 ```
@@ -352,7 +417,7 @@ function signRequest(method, uri, queryParams, accessKey, secretKey) {
 
 ## Error responses
 
-Authentication failures return HTTP **401 Unauthorized** with a JSON body:
+Authentication failures typically return HTTP **401 Unauthorized**; request body size violations return **413 Payload Too Large**. The response body is JSON:
 
 ```json
 {
@@ -364,28 +429,44 @@ Authentication failures return HTTP **401 Unauthorized** with a JSON body:
 
 | Message | Cause |
 | --- | --- |
-| `缺少有效鉴权凭证` | No valid auth headers provided |
-| `缺少AccessKey, 请在请求头中添加X-Access-Key` | Missing `X-Access-Key` header |
-| `缺少签名, 请在请求头中添加X-Signature` | Missing `X-Signature` header |
-| `缺少时间戳, 请在请求头中添加X-Timestamp` | Missing `X-Timestamp` header |
-| `时间戳无效或已过期` | Timestamp outside the ±10-minute window |
-| `[X-Access-Key]AccessKey无效` | Access Key not found, disabled, or expired |
-| `签名无效` | Signature does not match |
-| `没有访问权限, ip: {ip}` | Client IP not in the API Key whitelist |
-| `没有访问该接口的权限` | API Key lacks required permission for this endpoint |
-| `API Key 未绑定业务线或用户` | API Key configuration error (contact support) |
+| `缺少有效鉴权凭证` | No valid AK/SK authentication headers provided |
+| `缺少AccessKey, 请在请求头中添加X-Access-Key` | Missing `X-Access-Key` |
+| `缺少签名, 请在请求头中添加X-Signature` | Missing `X-Signature` |
+| `缺少时间戳, 请在请求头中添加X-Timestamp` | Missing `X-Timestamp` |
+| `缺少 nonce, 请在请求头中添加 X-Nonce` | Missing `X-Nonce` |
+| `非法 nonce 格式` | Nonce does not match UUID v4 or hex rules |
+| `请求重放` | Nonce has already been used |
+| `非法重复查询参数: {key}` | Duplicate query key |
+| `非法重复请求头: {name}` | Signed header has multiple values |
+| `时间戳无效或已过期` | Timestamp outside ±10 minutes |
+| `[X-Access-Key]AccessKey无效` | Access Key is invalid |
+| `签名无效` | Signature mismatch (including body tampering) |
+| `请求体超过限制` | Body exceeds 10 MB (**413**) |
+| `没有访问权限, ip: {ip}` | IP not in whitelist |
+| `没有访问该接口的权限` | Missing endpoint permission |
+| `API Key 未绑定业务线或用户` | API Key configuration error |
 
 ## Security best practices
 
 <Tip>
   1. **Never expose your Secret Key** in client-side code, public repositories, or logs.
-  2. **Use IP whitelisting** in production to restrict API Key usage to known server IPs.
-  3. **Grant minimum permissions** — only assign `TRADE` or `WITHDRAW` if your integration requires them.
-  4. **Rotate keys regularly** — disable old keys and create new ones when team members leave or credentials may be compromised.
-  5. **Sync your system clock** — signature validation requires accurate timestamps (NTP recommended).
-  6. **Use HTTPS only** — all API communication must go through TLS.
+  2. **Use a new `X-Nonce` on every request** — do not reuse nonces.
+  3. **Configure an IP whitelist in production**.
+  4. **Grant minimum permissions**.
+  5. **Rotate keys regularly**.
+  6. **Keep your system clock synchronized** (NTP).
+  7. **Use HTTPS only**.
+  8. **Upgrade clients to v2 promptly after the gateway deploys v2**; v1 signatures will no longer be accepted.
 </Tip>
 
 ## Quick checklist
 
-Before making your first API call, verify:
+- [ ] Upgraded to **signature v2** with a **unique** `X-Nonce` on every request
+- [ ] Request URL uses the **gateway** base URL
+- [ ] URI matches the documented gateway path
+- [ ] Query matches the string to sign; **no duplicate query keys**
+- [ ] Non-empty POST/PUT/PATCH body includes **SHA-256 hex** as the final line
+- [ ] Signed body bytes **match** sent body bytes
+- [ ] `X-Timestamp` is within ±10 minutes
+- [ ] API Key has required permissions for the target endpoint
+- [ ] IP is whitelisted (if configured)

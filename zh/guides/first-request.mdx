@@ -30,23 +30,32 @@ description: "端到端演示:创建 Access Key、对请求签名,并调用 USD 
 
 ## 步骤 2 — 了解你在签名什么
 
-每个 MC OpenAPI 请求都对以下待签名字符串进行 HMAC-SHA256 签名:
+每个 MC OpenAPI 请求使用 **签名 v2**：对待签名字符串做 HMAC-SHA256,结果 **Base64** 编码后放入 `X-Signature`。每次请求还须携带唯一的 `X-Nonce`。
+
+v2 待签名字符串由以下行组成(无 Query 时省略 Query 行;GET 或无 body 时不追加 body 哈希行):
 
 ```text
-{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+{HTTP_METHOD}
+{REQUEST_URI}
+{QUERY_STRING}
+{SIGNED_HEADERS}
+{TIMESTAMP}
+{NONCE}
+[{BODY_SHA256_HEX}]
 ```
 
-对 `GET /openapi/v1/exchange-rate/query/usd` 无 query、无 body 的调用:
+对 `GET /openapi/v1/exchange-rate/query/usd`(路径 A,无 query、无 body):
 
 ```text
 GET
 /openapi/v1/exchange-rate/query/usd
+x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
+1747890123456
+550e8400-e29b-41d4-a716-446655440000
 
-
-1731657600000
 ```
 
-注意空 query 与空 body 对应的空行。完整规则见 [认证](/zh/authentication)。
+完整规则见 [认证](/zh/authentication)。
 
 ## 步骤 3 — 发送请求
 
@@ -56,24 +65,28 @@ GET
 ACCESS_KEY="your_access_key"
 SECRET_KEY="your_secret_key"
 TS=$(date +%s000)
+NONCE=$(uuidgen | tr '[:upper:]' '[:lower:]')
 METHOD="GET"
 PATH_="/openapi/v1/exchange-rate/query/usd"
 
-CANONICAL=$(printf "%s\n%s\n\n\n%s" "$METHOD" "$PATH_" "$TS")
-SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -hex | awk '{print $2}')
+SIGNED_HEADERS="x-access-key=${ACCESS_KEY}&x-nonce=${NONCE}&x-timestamp=${TS}"
+CANONICAL=$(printf "%s\n%s\n%s\n%s\n%s\n" "$METHOD" "$PATH_" "$SIGNED_HEADERS" "$TS" "$NONCE")
+SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -binary | openssl base64)
 
 curl --request GET \
   --url "https://gateway.mcconnects.com${PATH_}" \
   --header "X-Access-Key: ${ACCESS_KEY}" \
   --header "X-Signature: ${SIGNATURE}" \
   --header "X-Timestamp: ${TS}" \
+  --header "X-Nonce: ${NONCE}" \
+  --header "X-Signature-Version: 2" \
   --header "Accept: application/json"
 ```
 
 ### Python
 
 ```python
-import hmac, hashlib, time, requests, os
+import base64, hmac, hashlib, time, uuid, requests, os
 
 BASE_URL = "https://gateway.mcconnects.com"
 ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
@@ -81,12 +94,23 @@ SECRET_KEY = os.environ["MC_SECRET_KEY"]
 
 method = "GET"
 path = "/openapi/v1/exchange-rate/query/usd"
-query = ""
-body = ""
 ts = str(int(time.time() * 1000))
+nonce = str(uuid.uuid4())
 
-canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
-signature = hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+signed_headers = "&".join(
+    f"{k}={v}"
+    for k, v in sorted(
+        {
+            "x-access-key": ACCESS_KEY,
+            "x-nonce": nonce,
+            "x-timestamp": ts,
+        }.items()
+    )
+)
+string_to_sign = "\n".join([method, path, signed_headers, ts, nonce]) + "\n"
+signature = base64.b64encode(
+    hmac.new(SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+).decode()
 
 resp = requests.get(
     BASE_URL + path,
@@ -94,6 +118,8 @@ resp = requests.get(
         "X-Access-Key": ACCESS_KEY,
         "X-Signature": signature,
         "X-Timestamp": ts,
+        "X-Nonce": nonce,
+        "X-Signature-Version": "2",
         "Accept": "application/json",
     },
 )
@@ -111,12 +137,24 @@ const SECRET_KEY = process.env.MC_SECRET_KEY;
 
 const method = "GET";
 const path = "/openapi/v1/exchange-rate/query/usd";
-const query = "";
-const body = "";
 const ts = Date.now().toString();
+const nonce = crypto.randomUUID();
 
-const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
-const signature = crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
+const signHeaders = {
+  "x-access-key": ACCESS_KEY,
+  "x-nonce": nonce,
+  "x-timestamp": ts,
+};
+const signedHeaders = Object.keys(signHeaders)
+  .sort()
+  .map((k) => `${k}=${signHeaders[k]}`)
+  .join("&");
+
+const stringToSign = [method, path, signedHeaders, ts, nonce].join("\n") + "\n";
+const signature = crypto
+  .createHmac("sha256", SECRET_KEY)
+  .update(stringToSign)
+  .digest("base64");
 
 const res = await fetch(BASE_URL + path, {
   method,
@@ -124,6 +162,8 @@ const res = await fetch(BASE_URL + path, {
     "X-Access-Key": ACCESS_KEY,
     "X-Signature": signature,
     "X-Timestamp": ts,
+    "X-Nonce": nonce,
+    "X-Signature-Version": "2",
     Accept: "application/json",
   },
 });

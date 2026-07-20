@@ -1,10 +1,10 @@
 ---
 title: "API Reference"
 sidebarTitle: "Overview"
-description: "MC OpenAPI endpoints grouped by tag: Trading, Finance Account, Currency, Fund Account, Funding Fee, Exchange Rate."
+description: "MC OpenAPI endpoints grouped by tag: Trading, Deal Orders, Finance, MLP, Currency, Fund Account, Market Data, Funding Fee, and related."
 ---
 
-This reference covers every endpoint of the MC OpenAPI (MC-account, `v0.0.1`), organized by tag. All endpoints share the same gateway host, path prefix (`/openapi/v1`), authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope.
+This reference covers every public MC OpenAPI endpoint (gateway paths documented with `@OpenApiPermission`), organized by tag. All endpoints share the same gateway host, path prefix (`/openapi/v1`), authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope.
 
 <CardGroup cols={2}>
   <Card title="Authentication" icon="lock" href="/authentication">
@@ -20,11 +20,19 @@ This reference covers every endpoint of the MC OpenAPI (MC-account, `v0.0.1`), o
   </Card>
 
   <Card title="Trading" icon="right-left" href="/api-reference/endpoints/trading">
-    Transaction records and fund flow history.
+    Flash conversion, transaction records, and fund-flow history.
+  </Card>
+
+  <Card title="Deal Orders" icon="receipt" href="/api-reference/endpoints/deal-order">
+    Paginated deal orders and deal-order details.
   </Card>
 
   <Card title="Finance Account" icon="piggy-bank" href="/api-reference/endpoints/finance-account">
-    Demand / fixed-term deposit & withdraw, and finance overview.
+    Product catalog, positions, subscriptions/redemptions, and overview.
+  </Card>
+
+  <Card title="MLP" icon="chart-pie" href="/api-reference/endpoints/mlp">
+    MLP deposits/withdrawals, assets, charts, and configuration.
   </Card>
 
   <Card title="Currency" icon="coins" href="/api-reference/endpoints/currency">
@@ -32,14 +40,26 @@ This reference covers every endpoint of the MC OpenAPI (MC-account, `v0.0.1`), o
   </Card>
 
   <Card title="Fund Account" icon="wallet" href="/api-reference/endpoints/fund-account">
-    Spot positions (v2) and user Proof-of-Reserves.
+    Spot positions and user Proof-of-Reserves.
   </Card>
 
-  <Card title="Funding Fee" icon="receipt" href="/api-reference/endpoints/funding-fee">
+  <Card title="Funding Fee" icon="file-invoice-dollar" href="/api-reference/endpoints/funding-fee">
     Funding-fee & interest-fee history paginated query (v2).
   </Card>
 
-  <Card title="Exchange Rate" icon="chart-line" href="/api-reference/endpoints/exchange-rate">
+  <Card title="Funding Rate" icon="percent" href="/api-reference/endpoints/funding-rate">
+    Market funding-rate history pagination.
+  </Card>
+
+  <Card title="Trade Symbols" icon="list" href="/api-reference/endpoints/trade-symbol">
+    Tradable symbol list.
+  </Card>
+
+  <Card title="Market Data" icon="chart-line" href="/api-reference/endpoints/market-data">
+    K-line candles and symbol ranking.
+  </Card>
+
+  <Card title="Exchange Rate" icon="money-bill-transfer" href="/api-reference/endpoints/exchange-rate">
     Pair rates, USD rates, and flash conversion quotes.
   </Card>
 </CardGroup>
@@ -48,15 +68,14 @@ This reference covers every endpoint of the MC OpenAPI (MC-account, `v0.0.1`), o
 
 | Property | Value |
 | --- | --- |
-| Product | MC-account (Multi-Account System) |
-| Version | `v0.0.1` |
+| Product | MC Markets OpenAPI |
 | Base URL (test) | `https://test-gateway.mcconnects.com` |
 | Base URL (production) | `https://gateway.mcconnects.com` |
 | Path prefix | `/openapi/v1` |
 | Protocol | HTTPS only |
 | Format | JSON |
 | Auth | AK/SK \+ HMAC-SHA256 signature |
-| Required headers | `X-Access-Key`, `X-Signature`, `X-Timestamp` |
+| Required headers | `X-Access-Key`, `X-Signature`, `X-Timestamp`, `X-Nonce` |
 | Permissions | `READ`, `TRADE`, `WITHDRAW` |
 
 ## Response envelope
@@ -75,7 +94,7 @@ All endpoints return a common JSON envelope:
 ```
 
 - `status` — HTTP status echoed in the body.
-- `code` / `codeKey` — business-level status. See the OpenAPI `codeKey` enum for the full list (e.g. `PARAM_ERROR`, `SIGN_ERROR`, `PERMISSION_DENIED`, `ACCOUNT_BALANCE_INSUFFICIENT`).
+- `code` / `codeKey` — business-level status (e.g. `PARAM_ERROR`, `SIGN_ERROR`, `PERMISSION_DENIED`, `ACCOUNT_BALANCE_INSUFFICIENT`).
 - `success` — `true` for successful business responses.
 - `data` — endpoint-specific payload (object, array, string, or number).
 

@@ -31,16 +31,17 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, envi
 
 <AccordionGroup>
   <Accordion title="What exactly do I sign?">
-    The canonical string is `METHOD\nPATH\nSORTED_QUERY_STRING\nBODY_OR_EMPTY\nTIMESTAMP` — five lines separated by `\n`, with empty lines for empty query strings or bodies. Sign it with HMAC-SHA256 using your Secret Key, and put the lowercase hex digest in `X-Signature`. Reference implementations: [Authentication](/authentication#signing-a-request).
+    From v3.7.0, use signature **v2**. The string to sign includes method, URI, optional query, signed headers (`x-access-key` / `x-nonce` / `x-timestamp`), timestamp, nonce, and (for non-empty `POST`/`PUT`/`PATCH` bodies) the lowercase SHA-256 hex of the raw body. Put the HMAC-SHA256 digest in `X-Signature` as **Base64** (not hex). Every request needs a unique `X-Nonce`. Full rules: [Authentication](/authentication).
   </Accordion>
 
-  <Accordion title="I get code 40001 (invalid signature). What's wrong?">
+  <Accordion title="I get an invalid signature. What's wrong?">
     In order of likelihood:
 
-    1. The canonical string does not match what the gateway expects — print it and compare byte-for-byte with the [reference examples](/authentication#signing-a-request).
-    2. You signed a **stringified** body but sent a different one on the wire (extra whitespace, different key ordering). Serialize once and reuse the exact string in both places.
-    3. You used the Access Key in place of the Secret Key.
-    4. Query parameters are not sorted by key ascending.
+    1. Still using the v1 string to sign (missing `X-Nonce` / body hash).
+    2. The string to sign does not match what the gateway expects — print it and compare byte-for-byte.
+    3. You signed different body bytes than you sent (extra whitespace, reordered JSON). Serialize once and reuse the exact bytes.
+    4. You used the Access Key in place of the Secret Key.
+    5. Query parameters are not sorted by key ascending, or a query key is repeated.
 
     See also [Troubleshooting](/help/troubleshooting).
   </Accordion>

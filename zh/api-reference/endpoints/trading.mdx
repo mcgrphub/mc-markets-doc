@@ -1,20 +1,62 @@
 ---
 title: "交易"
 sidebarTitle: "交易"
-description: "按 transactionId 或分页条件查询交易记录与资金流水。"
+description: "闪兑执行,以及按 transactionId 或分页条件查询交易记录与资金流水。"
 ---
 
-标签 **Trading** 下的接口用于查询账户交易记录与资金流水(account)记录。本组接口均需 `READ` 权限。
+标签 **Trading** 下的接口用于闪兑(兑换 v2)与查询账户交易/资金流水记录。
 
 ## 接口列表
 
-| 方法 | 路径 | 描述 |
-| --- | --- | --- |
-| POST | `/openapi/v1/transaction/transaction/record/transactionId/{id}` | 按 `transactionId` 查询单条交易。 |
-| POST | `/openapi/v1/transaction/transaction/record/page` | 分页查询交易记录。 |
-| POST | `/openapi/v1/transaction/account/record/page` | 分页查询资金流水记录。 |
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| POST | `/openapi/v1/transaction/exchange/v2` | `TRADE` | 兑换 v2(支持询价会话)。 |
+| POST | `/openapi/v1/transaction/transaction/record/transactionId/{id}` | `READ` | 按 `transactionId` 查询单条交易。 |
+| POST | `/openapi/v1/transaction/transaction/record/page` | `READ` | 分页查询交易记录。 |
+| POST | `/openapi/v1/transaction/account/record/page` | `READ` | 分页查询资金流水记录。 |
 
 所有接口返回标准信封。分页接口的 `data` 形式为 `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`。
+
+---
+
+## 兑换 v2(闪兑执行)
+
+`POST /openapi/v1/transaction/exchange/v2` — 权限 `TRADE`。
+
+支持询价会话的兑换执行。
+
+<Warning>
+  接口说明要求先完成 2FA 验证流程后再调用。请在 body 中按需携带 `verify2FaTokens`,并确保已持有有效的 `quoteSessionId`。
+</Warning>
+
+### 请求体 — ExchangeV2Req
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `trackingId` | string | 是 | 幂等追踪 ID |
+| `quoteSessionId` | string | 是 | 询价会话 ID |
+| `symbol` | string | 是 | 源币种名称,如 `USDT` |
+| `exchangeSymbol` | string | 是 | 目标币种名称,如 `BTC` |
+| `amount` | number | 是 | 兑换数量,最多 8 位小数 |
+| `verify2FaTokens` | array | 否 | 2FA 临时验证令牌列表 |
+
+```bash cURL
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -d '{
+        "trackingId": "track-ex-0001",
+        "quoteSessionId": "qs_abc123",
+        "symbol": "USDT",
+        "exchangeSymbol": "BTC",
+        "amount": 100
+      }' \
+  "https://test-gateway.mcconnects.com/openapi/v1/transaction/exchange/v2"
+```
+
+成功时 `data` 为交易 ID 字符串。可先用 [闪兑汇率查询](/zh/api-reference/endpoints/exchange-rate) 获取报价上下文。
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "资金账户"
 sidebarTitle: "资金账户"
-description: "读取现货持仓(v2)与用户储备金证明(PoRv2)快照。"
+description: "读取现货持仓、按现货账户 ID 查询持仓,以及用户储备金证明(PoRv2)快照。"
 ---
 
 标签 **Fund Account（资金账户）** 下的接口提供用户现货持仓与储备金证明快照。本组接口均需 `READ` 权限。
@@ -10,8 +10,33 @@ description: "读取现货持仓(v2)与用户储备金证明(PoRv2)快照。"
 
 | 方法 | 路径 | 描述 |
 | --- | --- | --- |
+| GET | `/openapi/v1/fund/account/spot-account/positions` | 按 `spotId` 获取现货账户持仓信息。 |
 | GET | `/openapi/v1/fund/account/spot/positions/v2` | 获取现货持仓信息(v2)。 |
 | GET | `/openapi/v1/fund/account/por` | 查询用户 PoRv2 Merkle 证明快照。 |
+
+---
+
+## 按现货账户查询持仓
+
+`GET /openapi/v1/fund/account/spot-account/positions` — 权限 `READ`。
+
+### 查询参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `spotId` | string | 是 | 现货账户 ID |
+
+### 响应 `data` — SpotAccountPositionDTO
+
+含 `spotId` 与 `symbolInfo`(按交易品种映射的持仓详情)。
+
+```bash cURL
+curl -s \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  "https://test-gateway.mcconnects.com/openapi/v1/fund/account/spot-account/positions?spotId=SPOT_001"
+```
 
 ---
 

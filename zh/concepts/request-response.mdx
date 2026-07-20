@@ -4,7 +4,7 @@ sidebarTitle: "请求与响应"
 description: "MC OpenAPI HTTP 请求与 JSON 响应参考:签名头、body 格式、响应信封与 HTTP 状态码。"
 ---
 
-MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关,携带三个签名头;请求带 body 时为 JSON。所有响应都是包含 `code`、`msg`、`data`、`success` 的 JSON 信封。
+MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关，携带签名 v2 所需请求头；请求带 body 时为 JSON。所有响应都是包含 `code`、`msg`、`data`、`success` 的 JSON 信封。
 
 ## 请求格式
 
@@ -13,30 +13,37 @@ MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的
 | Header | 必需 | 值 |
 | --- | --- | --- |
 | `X-Access-Key` | 是 | 你的 Access Key ID |
-| `X-Signature` | 是 | 待签名字符串的小写 hex HMAC-SHA256 签名 |
-| `X-Timestamp` | 是 | 当前 UTC 时间(毫秒) |
-| `Content-Type` | POST/PUT | `application/json` |
+| `X-Signature` | 是 | 待签名字符串的 HMAC-SHA256 签名（**Base64**） |
+| `X-Timestamp` | 是 | 当前 Unix 时间（**毫秒**） |
+| `X-Nonce` | 是 | 每次请求唯一的 nonce（UUID v4 或 ≥32 位 hex） |
+| `Content-Type` | POST/PUT/PATCH 建议 | `application/json` |
 | `Accept` | 建议 | `application/json` |
+| `X-Signature-Version` | 否 | 建议填 `2`（排障用） |
 
 <Warning>
-  缺少有效签名头或 `X-Timestamp` 超出允许区间的请求将被拒绝。切勿将 Secret Key 提交到代码仓库或在客户端暴露。
+  缺少有效签名头、`X-Nonce`，或 `X-Timestamp` 超出允许区间的请求将被拒绝。切勿将 Secret Key 提交到代码仓库或在客户端暴露。
 </Warning>
 
-待签名字符串的确切格式与 Python/Java/Node.js 参考实现见 [认证](/zh/authentication)。
+待签名字符串的确切格式与 Python/Java/Node.js 参考实现见 [认证](/zh/authentication)（签名 **v2**）。
 
-### 待签名字符串
+### 待签名字符串（v2 概要）
 
 ```text
-{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+{HTTP_METHOD}
+{REQUEST_URI}
+{QUERY_STRING}
+{SIGNED_HEADERS}
+{TIMESTAMP}
+{NONCE}
+[{BODY_SHA256_HEX}]
 ```
 
-- `METHOD` — 大写 HTTP 方法。
-- `PATH` — 以 `/openapi/v1/...` 开头的完整路径,不包含 query。
-- `SORTED_QUERY_STRING` — 按 key 升序排列的 `key=value` 拼接,无 query 时为空字符串。
-- `BODY_OR_EMPTY` — 实际发送的 JSON body 原文;无 body 时为空。
-- `TIMESTAMP` — 与 `X-Timestamp` 头一致。
+- 无 query 时 **整行省略** `QUERY_STRING`（不要插入空行）。
+- `SIGNED_HEADERS` 含 `x-access-key`、`x-nonce`、`x-timestamp`（小写 key，字典序）。
+- `POST`/`PUT`/`PATCH` 且 body 非空时，追加 body 原始字节的 SHA-256 **小写 hex**。
+- `X-Signature` 为 Base64，不是 hex。
 
-### 示例:查询 USD 汇率
+### 示例：查询 USD 汇率
 
 ```bash
 curl --request GET \
@@ -44,6 +51,7 @@ curl --request GET \
   --header "X-Access-Key: $MC_ACCESS_KEY" \
   --header "X-Signature: $MC_SIGNATURE" \
   --header "X-Timestamp: $MC_TIMESTAMP" \
+  --header "X-Nonce: $MC_NONCE" \
   --header "Accept: application/json"
 ```
 

@@ -4,7 +4,7 @@ sidebarTitle: "Requests & Responses"
 description: "Reference for MC OpenAPI HTTP requests and JSON responses: signing headers, request body format, response envelope, and HTTP status codes."
 ---
 
-MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the three signing headers, and — where applicable — a JSON body. Every response is a JSON envelope with `code`, `msg`, `data`, and `success`.
+MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the signature v2 headers, and — where applicable — a JSON body. Every response is a JSON envelope with `code`, `msg`, `data`, and `success`.
 
 ## Request format
 
@@ -15,30 +15,35 @@ Include the following headers on every request:
 | Header | Required | Value |
 | --- | --- | --- |
 | `X-Access-Key` | Yes | Your Access Key ID |
-| `X-Signature` | Yes | Lowercase hex HMAC-SHA256 signature over the canonical string |
-| `X-Timestamp` | Yes | Current UTC time in **milliseconds** |
-| `Content-Type` | For `POST` / `PUT` | `application/json` |
+| `X-Signature` | Yes | HMAC-SHA256 signature over the canonical string (**Base64**) |
+| `X-Timestamp` | Yes | Current Unix time in **milliseconds** |
+| `X-Nonce` | Yes | Unique per request (UUID v4 or ≥32 hex chars) |
+| `Content-Type` | Recommended for `POST` / `PUT` / `PATCH` | `application/json` |
 | `Accept` | Recommended | `application/json` |
+| `X-Signature-Version` | Optional | Suggested value `2` (troubleshooting) |
 
 <Warning>
-  Requests without valid signing headers, or with a `X-Timestamp` outside the allowed window, are rejected. Never commit your Secret Key to source control or expose it in client-side code.
+  Requests without valid signing headers or `X-Nonce`, or with a `X-Timestamp` outside the allowed window, are rejected. Never commit your Secret Key to source control or expose it in client-side code.
 </Warning>
 
-See [Authentication](/authentication) for the exact canonical-string format and reference implementations in Python, Java, and Node.js.
+See [Authentication](/authentication) for the exact signature **v2** format and reference implementations in Python, Java, and Node.js.
 
-### Canonical string
-
-The string that is signed with HMAC-SHA256 is:
+### String to sign (v2 summary)
 
 ```text
-{METHOD}\n{PATH}\n{SORTED_QUERY_STRING}\n{BODY_OR_EMPTY}\n{TIMESTAMP}
+{HTTP_METHOD}
+{REQUEST_URI}
+{QUERY_STRING}
+{SIGNED_HEADERS}
+{TIMESTAMP}
+{NONCE}
+[{BODY_SHA256_HEX}]
 ```
 
-- `METHOD` — uppercase HTTP method (`GET`, `POST`, ...).
-- `PATH` — the full request path starting with `/openapi/v1/...`, without the query string.
-- `SORTED_QUERY_STRING` — query parameters sorted by key ascending, `key=value` joined by `&`; empty string when there are no query parameters.
-- `BODY_OR_EMPTY` — the raw JSON body sent on the wire; empty string for methods without a body.
-- `TIMESTAMP` — the exact same value sent in the `X-Timestamp` header.
+- Omit the entire `QUERY_STRING` line when there is no query (do **not** insert a blank line).
+- `SIGNED_HEADERS` includes `x-access-key`, `x-nonce`, and `x-timestamp` (lowercase keys, sorted).
+- For `POST`/`PUT`/`PATCH` with a non-empty body, append the SHA-256 of the raw body bytes as **lowercase hex**.
+- `X-Signature` is Base64, not hex.
 
 ### Example: query the USD exchange rates
 
@@ -48,6 +53,7 @@ curl --request GET \
   --header "X-Access-Key: $MC_ACCESS_KEY" \
   --header "X-Signature: $MC_SIGNATURE" \
   --header "X-Timestamp: $MC_TIMESTAMP" \
+  --header "X-Nonce: $MC_NONCE" \
   --header "Accept: application/json"
 ```
 
