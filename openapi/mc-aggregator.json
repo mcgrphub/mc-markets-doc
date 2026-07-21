@@ -1,0 +1,862 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "MC-Aggregator Service",
+    "description": "流动性聚合项目 Service 服务\n\n本 Spec 仅包含标注 @OpenApiPermission 的接口，即透出给终端用户 / 集成方、通过 API 网关使用 Access Key / Secret Key（AK/SK）签名访问的公开 OpenAPI 子集。不含后台 Admin、内部 Feign 等未透出接口。",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://springdoc.org"
+    },
+    "version": "v0.0.1"
+  },
+  "externalDocs": {
+    "description": "MC-Aggregator Wiki Documentation",
+    "url": "https://docs.magiccompasspay.com/"
+  },
+  "servers": [
+    {
+      "url": "https://test-gateway.mcconnects.com",
+      "description": "测试环境 API 网关"
+    },
+    {
+      "url": "https://gateway.mcconnects.com",
+      "description": "生产环境 API 网关"
+    }
+  ],
+  "security": [
+    {
+      "McAccessKey": [],
+      "McSignature": [],
+      "McTimestamp": [],
+      "McNonce": []
+    }
+  ],
+  "paths": {
+    "/openapi/v1/mc-aggregator/market-data/symbol-ranking": {
+      "get": {
+        "tags": [
+          "行情数据"
+        ],
+        "summary": "币种行情排行",
+        "description": "按分类与排序维度分页查询币种行情排行榜\n所需权限: READ",
+        "operationId": "symbolRanking",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "required": [
+                "category"
+              ],
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "description": "Tab 分类：CONTRACT/SPOT/CRYPTO/TRADFI"
+                },
+                "subGroup": {
+                  "type": "string",
+                  "description": "传统金融二级 Tab：ALL/FOREX/METALS/INDICES/ENERGY/STOCKS"
+                },
+                "hotOnly": {
+                  "type": "boolean",
+                  "description": "是否仅返回热门品种（isHot=1 且 status=1）"
+                },
+                "sortBy": {
+                  "type": "string",
+                  "description": "排序字段：symbol/bid/change24hPct"
+                },
+                "sortOrder": {
+                  "type": "string",
+                  "description": "排序方向：asc/desc"
+                },
+                "page": {
+                  "type": "integer",
+                  "description": "页码，从 1 开始",
+                  "format": "int32"
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "每页条数",
+                  "format": "int32"
+                }
+              },
+              "description": "币种行情排行查询请求",
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "description": "当前分类下品种总数",
+                          "format": "int64"
+                        },
+                        "page": {
+                          "type": "integer",
+                          "description": "当前页码",
+                          "format": "int32"
+                        },
+                        "pageSize": {
+                          "type": "integer",
+                          "description": "每页条数",
+                          "format": "int32"
+                        },
+                        "snapshotVersion": {
+                          "type": "integer",
+                          "description": "排行快照版本号",
+                          "format": "int64"
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "当前页排行条目",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "rank": {
+                                "type": "integer",
+                                "description": "全局名次",
+                                "format": "int32"
+                              },
+                              "symbol": {
+                                "type": "string",
+                                "description": "品种代码"
+                              },
+                              "bid": {
+                                "type": "string",
+                                "description": "买价"
+                              },
+                              "change24hAbs": {
+                                "type": "string",
+                                "description": "24h 涨跌额"
+                              },
+                              "change24hPct": {
+                                "type": "string",
+                                "description": "24h 涨跌幅（小数形式，如 -0.0146 表示 -1.46%）"
+                              },
+                              "isHot": {
+                                "type": "boolean",
+                                "description": "是否热门"
+                              },
+                              "pricingDegree": {
+                                "type": "integer",
+                                "description": "价格小数位",
+                                "format": "int32"
+                              }
+                            },
+                            "description": "币种行情排行条目",
+                            "example": null
+                          }
+                        }
+                      },
+                      "description": "币种行情排行分页响应",
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi/v1/mc-aggregator/market-data/kline": {
+      "get": {
+        "tags": [
+          "行情数据"
+        ],
+        "summary": "查询K线数据",
+        "description": "根据币种、时间间隔、时间范围查询K线数据\n所需权限: READ",
+        "operationId": "klineList",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "required": [
+                "endTime",
+                "period",
+                "symbol"
+              ],
+              "type": "object",
+              "properties": {
+                "symbol": {
+                  "type": "string",
+                  "description": "交易品种代码",
+                  "example": "EURUSD"
+                },
+                "period": {
+                  "type": "integer",
+                  "description": "1分钟-1, 5分钟-5, 15分钟-15, 1小时-60, 4小时-240, 1天-1440, 1周-1440*7, 1月-1440*30",
+                  "format": "int32"
+                },
+                "startTime": {
+                  "type": "integer",
+                  "description": "开始时间, 秒级时间戳",
+                  "format": "int64",
+                  "example": 1755792000
+                },
+                "endTime": {
+                  "type": "integer",
+                  "description": "结束时间, 秒级时间戳",
+                  "format": "int64",
+                  "example": 1755878400
+                },
+                "limit": {
+                  "type": "integer",
+                  "description": "单次最大返回条数, 允许传入最大值500",
+                  "format": "int32",
+                  "example": 500
+                }
+              },
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "pricingDegree": {
+                          "type": "integer",
+                          "description": "价格精度, 用于把数值转换浮点数",
+                          "format": "int32"
+                        },
+                        "klineDataList": {
+                          "type": "array",
+                          "description": "K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳",
+                          "items": {
+                            "type": "string",
+                            "description": "K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳"
+                          }
+                        },
+                        "klineDisplayList": {
+                          "type": "array",
+                          "description": "K线展示字段列表, 与 klineDataList 顺序一致",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "openStr": {
+                                "type": "string",
+                                "description": "开盘价原始 plain string"
+                              },
+                              "openDisplay": {
+                                "type": "string",
+                                "description": "开盘价展示文本"
+                              },
+                              "openScale": {
+                                "type": "integer",
+                                "description": "开盘价展示小数位",
+                                "format": "int32"
+                              },
+                              "closeStr": {
+                                "type": "string",
+                                "description": "收盘价原始 plain string"
+                              },
+                              "closeDisplay": {
+                                "type": "string",
+                                "description": "收盘价展示文本"
+                              },
+                              "closeScale": {
+                                "type": "integer",
+                                "description": "收盘价展示小数位",
+                                "format": "int32"
+                              },
+                              "highStr": {
+                                "type": "string",
+                                "description": "最高价原始 plain string"
+                              },
+                              "highDisplay": {
+                                "type": "string",
+                                "description": "最高价展示文本"
+                              },
+                              "highScale": {
+                                "type": "integer",
+                                "description": "最高价展示小数位",
+                                "format": "int32"
+                              },
+                              "lowStr": {
+                                "type": "string",
+                                "description": "最低价原始 plain string"
+                              },
+                              "lowDisplay": {
+                                "type": "string",
+                                "description": "最低价展示文本"
+                              },
+                              "lowScale": {
+                                "type": "integer",
+                                "description": "最低价展示小数位",
+                                "format": "int32"
+                              },
+                              "volumeStr": {
+                                "type": "string",
+                                "description": "交易量原始 plain string"
+                              },
+                              "volumeDisplay": {
+                                "type": "string",
+                                "description": "交易量展示文本"
+                              },
+                              "volumeScale": {
+                                "type": "integer",
+                                "description": "交易量展示小数位",
+                                "format": "int32"
+                              },
+                              "timestamp": {
+                                "type": "integer",
+                                "description": "秒级时间戳",
+                                "format": "int64"
+                              }
+                            },
+                            "description": "compact K线展示字段",
+                            "example": null
+                          }
+                        }
+                      },
+                      "description": "K线数据查询响应",
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RetResultObject": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string",
+            "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SymbolRankingQueryReq": {
+        "required": [
+          "category"
+        ],
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Tab 分类：CONTRACT/SPOT/CRYPTO/TRADFI"
+          },
+          "subGroup": {
+            "type": "string",
+            "description": "传统金融二级 Tab：ALL/FOREX/METALS/INDICES/ENERGY/STOCKS",
+            "default": "ALL"
+          },
+          "hotOnly": {
+            "type": "boolean",
+            "description": "是否仅返回热门品种（isHot=1 且 status=1）",
+            "default": false
+          },
+          "sortBy": {
+            "type": "string",
+            "description": "排序字段：symbol/bid/change24hPct",
+            "default": "change24hPct"
+          },
+          "sortOrder": {
+            "type": "string",
+            "description": "排序方向：asc/desc",
+            "default": "desc"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "页码，从 1 开始",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "description": "每页条数",
+            "format": "int32",
+            "default": 20
+          }
+        },
+        "description": "币种行情排行查询请求"
+      },
+      "RetResultSymbolRankingPageRsp": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string",
+            "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SymbolRankingPageRsp"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SymbolRankingItemRsp": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "description": "全局名次",
+            "format": "int32"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "品种代码"
+          },
+          "bid": {
+            "type": "string",
+            "description": "买价"
+          },
+          "change24hAbs": {
+            "type": "string",
+            "description": "24h 涨跌额"
+          },
+          "change24hPct": {
+            "type": "string",
+            "description": "24h 涨跌幅（小数形式，如 -0.0146 表示 -1.46%）"
+          },
+          "isHot": {
+            "type": "boolean",
+            "description": "是否热门"
+          },
+          "pricingDegree": {
+            "type": "integer",
+            "description": "价格小数位",
+            "format": "int32"
+          }
+        },
+        "description": "币种行情排行条目"
+      },
+      "SymbolRankingPageRsp": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "当前分类下品种总数",
+            "format": "int64"
+          },
+          "page": {
+            "type": "integer",
+            "description": "当前页码",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "每页条数",
+            "format": "int32"
+          },
+          "snapshotVersion": {
+            "type": "integer",
+            "description": "排行快照版本号",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "description": "当前页排行条目",
+            "items": {
+              "$ref": "#/components/schemas/SymbolRankingItemRsp"
+            }
+          }
+        },
+        "description": "币种行情排行分页响应"
+      },
+      "CompactKlineQueryReq": {
+        "required": [
+          "endTime",
+          "period",
+          "symbol"
+        ],
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "交易品种代码",
+            "example": "EURUSD"
+          },
+          "period": {
+            "title": "时间周期(分钟)",
+            "type": "integer",
+            "description": "1分钟-1, 5分钟-5, 15分钟-15, 1小时-60, 4小时-240, 1天-1440, 1周-1440*7, 1月-1440*30",
+            "format": "int32"
+          },
+          "startTime": {
+            "type": "integer",
+            "description": "开始时间, 秒级时间戳",
+            "format": "int64",
+            "example": 1755792000
+          },
+          "endTime": {
+            "type": "integer",
+            "description": "结束时间, 秒级时间戳",
+            "format": "int64",
+            "example": 1755878400
+          },
+          "limit": {
+            "type": "integer",
+            "description": "单次最大返回条数, 允许传入最大值500",
+            "format": "int32",
+            "example": 500
+          }
+        }
+      },
+      "CompactKlineDataDisplayRsp": {
+        "type": "object",
+        "properties": {
+          "openStr": {
+            "type": "string",
+            "description": "开盘价原始 plain string"
+          },
+          "openDisplay": {
+            "type": "string",
+            "description": "开盘价展示文本"
+          },
+          "openScale": {
+            "type": "integer",
+            "description": "开盘价展示小数位",
+            "format": "int32"
+          },
+          "closeStr": {
+            "type": "string",
+            "description": "收盘价原始 plain string"
+          },
+          "closeDisplay": {
+            "type": "string",
+            "description": "收盘价展示文本"
+          },
+          "closeScale": {
+            "type": "integer",
+            "description": "收盘价展示小数位",
+            "format": "int32"
+          },
+          "highStr": {
+            "type": "string",
+            "description": "最高价原始 plain string"
+          },
+          "highDisplay": {
+            "type": "string",
+            "description": "最高价展示文本"
+          },
+          "highScale": {
+            "type": "integer",
+            "description": "最高价展示小数位",
+            "format": "int32"
+          },
+          "lowStr": {
+            "type": "string",
+            "description": "最低价原始 plain string"
+          },
+          "lowDisplay": {
+            "type": "string",
+            "description": "最低价展示文本"
+          },
+          "lowScale": {
+            "type": "integer",
+            "description": "最低价展示小数位",
+            "format": "int32"
+          },
+          "volumeStr": {
+            "type": "string",
+            "description": "交易量原始 plain string"
+          },
+          "volumeDisplay": {
+            "type": "string",
+            "description": "交易量展示文本"
+          },
+          "volumeScale": {
+            "type": "integer",
+            "description": "交易量展示小数位",
+            "format": "int32"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "秒级时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "compact K线展示字段"
+      },
+      "CompactKlineQueryRsp": {
+        "type": "object",
+        "properties": {
+          "pricingDegree": {
+            "type": "integer",
+            "description": "价格精度, 用于把数值转换浮点数",
+            "format": "int32"
+          },
+          "klineDataList": {
+            "type": "array",
+            "description": "K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳",
+            "items": {
+              "type": "string",
+              "description": "K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳"
+            }
+          },
+          "klineDisplayList": {
+            "type": "array",
+            "description": "K线展示字段列表, 与 klineDataList 顺序一致",
+            "items": {
+              "$ref": "#/components/schemas/CompactKlineDataDisplayRsp"
+            }
+          }
+        },
+        "description": "K线数据查询响应"
+      },
+      "RetResultCompactKlineQueryRsp": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string",
+            "description": "业务错误键（ExceptionTypeEnum 名称）。完整列表见 /zh/api-reference/error-codes。"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CompactKlineQueryRsp"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "McAccessKey": {
+        "type": "apiKey",
+        "description": "Access Key（AK），由用户在 API Key 管理中创建",
+        "name": "X-Access-Key",
+        "in": "header"
+      },
+      "McSignature": {
+        "type": "apiKey",
+        "description": "HMAC-SHA256 签名 v2（Base64）。算法与待签名字符串见鉴权 Getting Started 文档",
+        "name": "X-Signature",
+        "in": "header"
+      },
+      "McTimestamp": {
+        "type": "apiKey",
+        "description": "当前 Unix 时间戳，单位毫秒（13 位），与服务器时间相差 ±10 分钟内有效",
+        "name": "X-Timestamp",
+        "in": "header"
+      },
+      "McNonce": {
+        "type": "apiKey",
+        "description": "每次请求唯一的 nonce（推荐 UUID v4），用于防重放；参与签名 v2",
+        "name": "X-Nonce",
+        "in": "header"
+      }
+    }
+  }
+}

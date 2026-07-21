@@ -4,7 +4,7 @@ sidebarTitle: "基础 URL"
 description: "MC OpenAPI 测试与生产环境的网关基础 URL。"
 ---
 
-MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使用下方环境 Base URL \+ 路径前缀(`/openapi/v1`)\+ 具体路径,例如 `https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`。
+MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使用下方环境 Base URL \+ 路径前缀(`/openapi/v1`)\+ 具体路径,例如 `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`。
 
 ## 环境
 
@@ -27,8 +27,8 @@ MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使�
 
 例如:
 
-- `https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`
-- `https://gateway.mcconnects.com/openapi/v1/finance/account/overview`
+- `https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`
+- `https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview`
 
 ## 切换环境
 
@@ -38,14 +38,14 @@ MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使�
 
 ```bash cURL
 # 测试
-curl -X POST https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+curl -X POST https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
   -H "X-Access-Key: $MC_ACCESS_KEY" \
   -H "X-Signature: $MC_SIGNATURE" \
   -H "X-Timestamp: $MC_TIMESTAMP" \
   -H "Content-Type: application/json"
 
 # 生产
-curl -X POST https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+curl -X POST https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
   -H "X-Access-Key: $MC_ACCESS_KEY" \
   -H "X-Signature: $MC_SIGNATURE" \
   -H "X-Timestamp: $MC_TIMESTAMP" \
@@ -56,12 +56,12 @@ curl -X POST https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
 import os
 
 MC_GATEWAY = os.environ.get("MC_GATEWAY", "https://test-gateway.mcconnects.com")
-url = f"{MC_GATEWAY}/openapi/v1/exchange-rate/query/usd"
+url = f"{MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd"
 ```
 
 ```javascript Node.js
 const MC_GATEWAY = process.env.MC_GATEWAY ?? "https://test-gateway.mcconnects.com";
-const url = `${MC_GATEWAY}/openapi/v1/exchange-rate/query/usd`;
+const url = `${MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd`;
 ```
 
 </CodeGroup>

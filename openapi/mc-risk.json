@@ -1,0 +1,725 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "mc-risk",
+    "description": "风控系统\n\n本 Spec 仅包含标注 @OpenApiPermission 的接口，即透出给终端用户 / 集成方、通过 API 网关使用 Access Key / Secret Key（AK/SK）签名访问的公开 OpenAPI 子集。不含后台 Admin、内部 Feign 等未透出接口。",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://springdoc.org"
+    },
+    "version": "v0.0.1"
+  },
+  "externalDocs": {
+    "description": "mc-risk Wiki Documentation",
+    "url": ""
+  },
+  "servers": [
+    {
+      "url": "https://test-gateway.mcconnects.com",
+      "description": "测试环境 API 网关"
+    },
+    {
+      "url": "https://gateway.mcconnects.com",
+      "description": "生产环境 API 网关"
+    }
+  ],
+  "security": [
+    {
+      "McAccessKey": [],
+      "McSignature": [],
+      "McTimestamp": [],
+      "McNonce": []
+    }
+  ],
+  "paths": {
+    "/openapi/v1/mc-risk/trade/symbol/list": {
+      "get": {
+        "tags": [
+          "交易"
+        ],
+        "summary": "交易品种列表",
+        "description": "根据当前用户的UID查询交易品种列表\n所需权限: READ",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 10
+                },
+                "current": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 1
+                },
+                "orderBy": {
+                  "type": "string",
+                  "description": "支持多字段排序，用逗号分隔",
+                  "example": "id,createTime"
+                },
+                "orderDirection": {
+                  "type": "string",
+                  "description": "ASC升序/DESC降序，多字段时用逗号分隔",
+                  "example": "DESC,ASC",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ]
+                },
+                "group": {
+                  "type": "string"
+                }
+              },
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "description": "产品名称"
+                              },
+                              "group": {
+                                "type": "string",
+                                "description": "产品分组"
+                              },
+                              "flags": {
+                                "type": "string",
+                                "description": "品种标签, MORTGAGE:抵押品，TRADE:交易品种,SPOT:现货",
+                                "enum": [
+                                  "MORTGAGE",
+                                  "TRADE",
+                                  "SPOT",
+                                  "TRADE",
+                                  "MORTGAGE",
+                                  "SPOT"
+                                ]
+                              }
+                            },
+                            "example": null
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "size": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "current": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "pages": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "hasPrevious": {
+                          "type": "boolean"
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi/v1/mc-risk/funding-rate": {
+      "get": {
+        "tags": [
+          "资金费率"
+        ],
+        "summary": "分页查询交易币种资金费率历史数据",
+        "description": "所需权限: READ",
+        "operationId": "page",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "required": [
+                "symbol"
+              ],
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 10
+                },
+                "current": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 1
+                },
+                "orderBy": {
+                  "type": "string",
+                  "description": "支持多字段排序，用逗号分隔",
+                  "example": "id,createTime"
+                },
+                "orderDirection": {
+                  "type": "string",
+                  "description": "ASC升序/DESC降序，多字段时用逗号分隔",
+                  "example": "DESC,ASC",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ]
+                },
+                "symbol": {
+                  "type": "string",
+                  "description": "交易币种"
+                },
+                "isSettlementRate": {
+                  "type": "boolean",
+                  "description": "是否是结算价",
+                  "enum": [
+                    true,
+                    false
+                  ]
+                }
+              },
+              "description": "风控参数配置分页查询请求",
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "example": "BTCUSDT"
+                              },
+                              "fundingRate": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "fundingRateStr": {
+                                "type": "string",
+                                "example": "1.0E-4"
+                              },
+                              "fundingRateDisplay": {
+                                "type": "string",
+                                "example": "0.0125%"
+                              },
+                              "fundingRateScale": {
+                                "type": "integer",
+                                "format": "int32",
+                                "example": 4
+                              },
+                              "annualRateDisplay": {
+                                "type": "string",
+                                "example": "13.69%"
+                              },
+                              "settlementPrice": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "settlementPriceStr": {
+                                "type": "string",
+                                "example": "3964.2"
+                              },
+                              "settlementPriceDisplay": {
+                                "type": "string",
+                                "example": "3964.2"
+                              },
+                              "settlementPriceScale": {
+                                "type": "integer",
+                                "format": "int32",
+                                "example": 2
+                              },
+                              "longInterestRate": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "longInterestRateStr": {
+                                "type": "string",
+                                "example": "1.0E-4"
+                              },
+                              "shortInterestRate": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "shortInterestRateStr": {
+                                "type": "string",
+                                "example": "1.0E-4"
+                              },
+                              "isSettlementRate": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "nextSettlementTime": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1697331200000
+                              },
+                              "timestamp": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1697331200000
+                              },
+                              "settlementCycle": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 3600
+                              }
+                            },
+                            "example": null
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "size": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "current": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "pages": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "hasPrevious": {
+                          "type": "boolean"
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SymbolPageReq": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "title": "每页显示条数",
+            "type": "integer",
+            "format": "int64",
+            "example": 10
+          },
+          "current": {
+            "title": "当前页",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "orderBy": {
+            "title": "排序字段",
+            "type": "string",
+            "description": "支持多字段排序，用逗号分隔",
+            "example": "id,createTime"
+          },
+          "orderDirection": {
+            "title": "排序方向",
+            "type": "string",
+            "description": "ASC升序/DESC降序，多字段时用逗号分隔",
+            "example": "DESC,ASC",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "group": {
+            "title": "产品分组",
+            "type": "string"
+          }
+        }
+      },
+      "BasePageRspSymbolDto": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SymbolDto"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasPrevious": {
+            "type": "boolean"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RetResultBasePageRspSymbolDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BasePageRspSymbolDto"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SymbolDto": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "产品名称"
+          },
+          "group": {
+            "type": "string",
+            "description": "产品分组"
+          },
+          "flags": {
+            "type": "string",
+            "description": "品种标签, MORTGAGE:抵押品，TRADE:交易品种,SPOT:现货",
+            "enum": [
+              "MORTGAGE",
+              "TRADE",
+              "SPOT",
+              "TRADE",
+              "MORTGAGE",
+              "SPOT"
+            ]
+          }
+        }
+      },
+      "FundingRatePageReq": {
+        "required": [
+          "symbol"
+        ],
+        "type": "object",
+        "properties": {
+          "size": {
+            "title": "每页显示条数",
+            "type": "integer",
+            "format": "int64",
+            "example": 10
+          },
+          "current": {
+            "title": "当前页",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "orderBy": {
+            "title": "排序字段",
+            "type": "string",
+            "description": "支持多字段排序，用逗号分隔",
+            "example": "id,createTime"
+          },
+          "orderDirection": {
+            "title": "排序方向",
+            "type": "string",
+            "description": "ASC升序/DESC降序，多字段时用逗号分隔",
+            "example": "DESC,ASC",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "symbol": {
+            "type": "string",
+            "description": "交易币种"
+          },
+          "isSettlementRate": {
+            "type": "boolean",
+            "description": "是否是结算价",
+            "enum": [
+              true,
+              false
+            ]
+          }
+        },
+        "description": "风控参数配置分页查询请求"
+      },
+      "BasePageRspFundingRateDto": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingRateDto"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasPrevious": {
+            "type": "boolean"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FundingRateDto": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "title": "币种",
+            "type": "string",
+            "example": "BTCUSDT"
+          },
+          "fundingRate": {
+            "title": "资金费率",
+            "type": "number",
+            "example": 0.0001
+          },
+          "fundingRateStr": {
+            "title": "资金费率原始decimal字符串",
+            "type": "string",
+            "example": "1.0E-4"
+          },
+          "fundingRateDisplay": {
+            "title": "资金费率展示值",
+            "type": "string",
+            "example": "0.0125%"
+          },
+          "fundingRateScale": {
+            "title": "资金费率展示小数位",
+            "type": "integer",
+            "format": "int32",
+            "example": 4
+          },
+          "annualRateDisplay": {
+            "title": "年化资金费率展示值",
+            "type": "string",
+            "example": "13.69%"
+          },
+          "settlementPrice": {
+            "title": "平仓价格",
+            "type": "number",
+            "example": 0.0001
+          },
+          "settlementPriceStr": {
+            "title": "平仓价格原始decimal字符串",
+            "type": "string",
+            "example": "3964.2"
+          },
+          "settlementPriceDisplay": {
+            "title": "平仓价格展示值",
+            "type": "string",
+            "example": "3964.2"
+          },
+          "settlementPriceScale": {
+            "title": "平仓价格展示小数位",
+            "type": "integer",
+            "format": "int32",
+            "example": 2
+          },
+          "longInterestRate": {
+            "title": "多头利息费率",
+            "type": "number",
+            "example": 0.0001
+          },
+          "longInterestRateStr": {
+            "title": "多头利息费率原始decimal字符串",
+            "type": "string",
+            "example": "1.0E-4"
+          },
+          "shortInterestRate": {
+            "title": "空头利息费率",
+            "type": "number",
+            "example": 0.0001
+          },
+          "shortInterestRateStr": {
+            "title": "空头利息费率原始decimal字符串",
+            "type": "string",
+            "example": "1.0E-4"
+          },
+          "isSettlementRate": {
+            "title": "是否是结算费率",
+            "type": "boolean",
+            "example": true
+          },
+          "nextSettlementTime": {
+            "title": "下次结算时间 unix时间戳",
+            "type": "integer",
+            "format": "int64",
+            "example": 1697331200000
+          },
+          "timestamp": {
+            "title": "资金费率生成时间 unix时间戳",
+            "type": "integer",
+            "format": "int64",
+            "example": 1697331200000
+          },
+          "settlementCycle": {
+            "title": "结算周期（单位：秒）",
+            "type": "integer",
+            "format": "int64",
+            "example": 3600
+          }
+        }
+      },
+      "RetResultBasePageRspFundingRateDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BasePageRspFundingRateDto"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "McAccessKey": {
+        "type": "apiKey",
+        "description": "Access Key（AK），由用户在 API Key 管理中创建",
+        "name": "X-Access-Key",
+        "in": "header"
+      },
+      "McSignature": {
+        "type": "apiKey",
+        "description": "HMAC-SHA256 签名 v2（Base64）。算法与待签名字符串见鉴权 Getting Started 文档",
+        "name": "X-Signature",
+        "in": "header"
+      },
+      "McTimestamp": {
+        "type": "apiKey",
+        "description": "当前 Unix 时间戳，单位毫秒（13 位），与服务器时间相差 ±10 分钟内有效",
+        "name": "X-Timestamp",
+        "in": "header"
+      },
+      "McNonce": {
+        "type": "apiKey",
+        "description": "每次请求唯一的 nonce（推荐 UUID v4），用于防重放；参与签名 v2",
+        "name": "X-Nonce",
+        "in": "header"
+      }
+    }
+  }
+}

@@ -35,16 +35,16 @@ All endpoints share the path prefix `/openapi/v1/`. See [Base URL](/api-referenc
 
 ## Endpoint groups
 
-MC OpenAPI is organized into six functional groups. Every endpoint requires a signed request; some also require additional permissions on the Access Key.
+MC OpenAPI endpoints are generated from `openapi-exposed` Specs and grouped by gateway service in the API Reference sidebar.
 
-| Group | Purpose | Required scope |
+| Group | Purpose | Required scope (typical) |
 | --- | --- | --- |
-| [Trading](/api-reference/endpoints/trading) | Transaction records by ID or paginated queries | `READ` |
-| [Finance Account](/api-reference/endpoints/finance-account) | Deposits, withdrawals, fixed-term products, portfolio overview | `READ`, `TRADE`, `WITHDRAW` |
-| [Currency](/api-reference/endpoints/currency) | Symbol / exchange metadata | `READ` |
-| [Fund Account](/api-reference/endpoints/fund-account) | Spot positions and proof-of-reserves snapshots | `READ` |
-| [Funding Fee](/api-reference/endpoints/funding-fee) | Perpetual funding-fee history | `READ` |
-| [Exchange Rate](/api-reference/endpoints/exchange-rate) | FX and crypto conversion rates | `READ` |
+| Account (`/openapi/v1/mc-account/`) | Trading records, finance, MLP, currency, fund account, exchange rate | `READ`, `TRADE`, `WITHDRAW` |
+| Trade (`/openapi/v1/mc-trade/`) | Orders, positions, deals, trade account | `READ`, `TRADE` |
+| Risk (`/openapi/v1/mc-risk/`) | Funding rate, trade symbols | `READ` |
+| Aggregator (`/openapi/v1/mc-aggregator/`) | K-line and symbol ranking | `READ` |
+
+See the [API Reference overview](/api-reference/overview) for Spec file mapping.
 
 ## Request lifecycle
 

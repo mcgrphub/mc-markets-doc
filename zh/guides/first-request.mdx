@@ -4,7 +4,7 @@ sidebarTitle: "首次请求"
 description: "端到端演示:创建 Access Key、对请求签名,并调用 USD 汇率接口。"
 ---
 
-本指南带你完成一次完整的已签名 MC OpenAPI 调用。完成后你将获得一个可用的 `GET /openapi/v1/exchange-rate/query/usd` 请求实现,返回实时 USD 汇率。
+本指南带你完成一次完整的已签名 MC OpenAPI 调用。完成后你将获得一个可用的 `GET /openapi/v1/mc-account/exchange-rate/query/usd` 请求实现,返回实时 USD 汇率。
 
 ## 前置条件
 
@@ -44,11 +44,11 @@ v2 待签名字符串由以下行组成(无 Query 时省略 Query 行;GET 或无
 [{BODY_SHA256_HEX}]
 ```
 
-对 `GET /openapi/v1/exchange-rate/query/usd`(路径 A,无 query、无 body):
+对 `GET /openapi/v1/mc-account/exchange-rate/query/usd`(路径 A,无 query、无 body):
 
 ```text
 GET
-/openapi/v1/exchange-rate/query/usd
+/openapi/v1/mc-account/exchange-rate/query/usd
 x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
 1747890123456
 550e8400-e29b-41d4-a716-446655440000
@@ -67,7 +67,7 @@ SECRET_KEY="your_secret_key"
 TS=$(date +%s000)
 NONCE=$(uuidgen | tr '[:upper:]' '[:lower:]')
 METHOD="GET"
-PATH_="/openapi/v1/exchange-rate/query/usd"
+PATH_="/openapi/v1/mc-account/exchange-rate/query/usd"
 
 SIGNED_HEADERS="x-access-key=${ACCESS_KEY}&x-nonce=${NONCE}&x-timestamp=${TS}"
 CANONICAL=$(printf "%s\n%s\n%s\n%s\n%s\n" "$METHOD" "$PATH_" "$SIGNED_HEADERS" "$TS" "$NONCE")
@@ -93,7 +93,7 @@ ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
 SECRET_KEY = os.environ["MC_SECRET_KEY"]
 
 method = "GET"
-path = "/openapi/v1/exchange-rate/query/usd"
+path = "/openapi/v1/mc-account/exchange-rate/query/usd"
 ts = str(int(time.time() * 1000))
 nonce = str(uuid.uuid4())
 
@@ -136,7 +136,7 @@ const ACCESS_KEY = process.env.MC_ACCESS_KEY;
 const SECRET_KEY = process.env.MC_SECRET_KEY;
 
 const method = "GET";
-const path = "/openapi/v1/exchange-rate/query/usd";
+const path = "/openapi/v1/mc-account/exchange-rate/query/usd";
 const ts = Date.now().toString();
 const nonce = crypto.randomUUID();
 
@@ -189,7 +189,7 @@ console.log(res.status, await res.json());
 ```
 
 - `code == "0"` 调用成功。
-- `data` 载荷 — 完整 schema 见 [汇率接口](/zh/api-reference/endpoints/exchange-rate)。
+- `data` 载荷 — 完整 schema 见 [API 参考](/zh/api-reference/overview) 侧边栏 **Account** 下的汇率相关 operation。
 
 如 `code` 不为 `"0"`,查看 `msg` 并参阅 [错误处理](/zh/concepts/errors)。
 

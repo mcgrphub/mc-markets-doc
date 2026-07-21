@@ -80,7 +80,7 @@ class MCClient:
 
 # 使用
 client = MCClient(os.environ["MC_ACCESS_KEY"], os.environ["MC_SECRET_KEY"])
-rates = client.request("GET", "/openapi/v1/exchange-rate/query/usd")
+rates = client.request("GET", "/openapi/v1/mc-account/exchange-rate/query/usd")
 print(rates)
 ```
 
@@ -160,7 +160,7 @@ const client = new MCClient({
   accessKey: process.env.MC_ACCESS_KEY,
   secretKey: process.env.MC_SECRET_KEY,
 });
-const rates = await client.request("GET", "/openapi/v1/exchange-rate/query/usd");
+const rates = await client.request("GET", "/openapi/v1/mc-account/exchange-rate/query/usd");
 console.log(rates);
 ```
 

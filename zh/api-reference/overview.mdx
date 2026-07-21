@@ -1,106 +1,38 @@
 ---
 title: "API 参考"
 sidebarTitle: "概览"
-description: "MC OpenAPI 接口按标签分组:交易、成交、理财、MLP、币种、资金账户、行情、风控相关等。"
+description: "MC OpenAPI 公开接口由 openapi-exposed Spec 生成，按网关服务分组。"
 ---
 
-本参考涵盖 MC OpenAPI 的公开接口(仅文档带 `@OpenApiPermission` 的网关路径),按标签分组。所有接口共享相同的网关主机、路径前缀(`/openapi/v1`)、鉴权方式(AK/SK \+ HMAC-SHA256)以及 JSON 响应信封。
+本参考涵盖 MC OpenAPI 的公开接口（仅含标注 `@OpenApiPermission` 的网关路径）。侧边栏 **Account**、**Trade**、**Risk**、**Aggregator** 下的页面由 `openapi/` 中的 Spec 自动生成。
+
+所有接口共享相同的网关主机、鉴权方式（AK/SK + HMAC-SHA256）以及 JSON 响应信封。Spec 中的路径已包含签名所需的服务段（例如 `/openapi/v1/mc-account/...`）。
 
 <CardGroup cols={2}>
   <Card title="认证" icon="lock" href="/zh/authentication">
-    AK/SK 凭证、HMAC-SHA256 签名、时间戳与权限。
+    AK/SK 凭证、HMAC-SHA256 签名、时间戳、Nonce 与权限。
   </Card>
 
   <Card title="基础 URL" icon="server" href="/zh/api-reference/base-url">
-    测试与生产网关,以及如何切换。
+    测试与生产网关，以及如何切换。
   </Card>
 
   <Card title="版本管理" icon="code-branch" href="/zh/api-reference/versioning">
     `/openapi/v1` 路径版本与废弃策略。
   </Card>
 
-  <Card title="交易" icon="right-left" href="/zh/api-reference/endpoints/trading">
-    闪兑执行、交易记录与资金流水。
-  </Card>
-
-  <Card title="成交订单" icon="receipt" href="/zh/api-reference/endpoints/deal-order">
-    成交订单分页与详情。
-  </Card>
-
-  <Card title="理财账户" icon="piggy-bank" href="/zh/api-reference/endpoints/finance-account">
-    产品目录、持仓、申购/赎回与概览。
-  </Card>
-
-  <Card title="MLP" icon="chart-pie" href="/zh/api-reference/endpoints/mlp">
-    MLP 存取、资产、图表与参数。
-  </Card>
-
-  <Card title="币种" icon="coins" href="/zh/api-reference/endpoints/currency">
-    币种网络列表、可兑换币种与币种详情。
-  </Card>
-
-  <Card title="资金账户" icon="wallet" href="/zh/api-reference/endpoints/fund-account">
-    现货持仓与用户储备金证明。
-  </Card>
-
-  <Card title="资金费" icon="file-invoice-dollar" href="/zh/api-reference/endpoints/funding-fee">
-    资金费与利息费历史分页查询(v2)。
-  </Card>
-
-  <Card title="资金费率" icon="percent" href="/zh/api-reference/endpoints/funding-rate">
-    市场资金费率历史分页。
-  </Card>
-
-  <Card title="交易品种" icon="list" href="/zh/api-reference/endpoints/trade-symbol">
-    可交易品种列表。
-  </Card>
-
-  <Card title="行情数据" icon="chart-line" href="/zh/api-reference/endpoints/market-data">
-    K 线与行情排行。
-  </Card>
-
-  <Card title="汇率" icon="money-bill-transfer" href="/zh/api-reference/endpoints/exchange-rate">
-    币对汇率、USD 汇率与闪兑报价。
+  <Card title="错误码" icon="triangle-exclamation" href="/zh/api-reference/error-codes">
+    完整 `code` / `codeKey` 目录（整理自 `ExceptionTypeEnum`）。
   </Card>
 </CardGroup>
 
-## API 一览
+## 接口分组
 
-| 属性 | 值 |
-| --- | --- |
-| 产品 | MC Markets OpenAPI |
-| Base URL(测试) | `https://test-gateway.mcconnects.com` |
-| Base URL(生产) | `https://gateway.mcconnects.com` |
-| 路径前缀 | `/openapi/v1` |
-| 协议 | 仅 HTTPS |
-| 格式 | JSON |
-| 鉴权 | AK/SK \+ HMAC-SHA256 |
-| 必需头 | `X-Access-Key`、`X-Signature`、`X-Timestamp`、`X-Nonce` |
-| 权限 | `READ`、`TRADE`、`WITHDRAW` |
+| 分组 | Spec | 网关路径前缀 |
+| --- | --- | --- |
+| Account | `openapi/mc-account.json` | `/openapi/v1/mc-account/` |
+| Trade | `openapi/mc-trade.json` | `/openapi/v1/mc-trade/` |
+| Risk | `openapi/mc-risk.json` | `/openapi/v1/mc-risk/` |
+| Aggregator | `openapi/mc-aggregator.json` | `/openapi/v1/mc-aggregator/` |
 
-## 响应信封
-
-所有接口返回统一的 JSON 信封:
-
-```json
-{
-  "status": 200,
-  "code": "200",
-  "codeKey": "DEFAULT",
-  "message": "...",
-  "success": true,
-  "data": { }
-}
-```
-
-- `status` — body 中回传的 HTTP 状态。
-- `code` / `codeKey` — 业务级状态(如 `PARAM_ERROR`、`SIGN_ERROR`、`PERMISSION_DENIED`、`ACCOUNT_BALANCE_INSUFFICIENT`)。
-- `success` — 业务成功时为 `true`。
-- `data` — 具体接口的数据(对象、数组、字符串或数字)。
-
-## 通用约定
-
-- **`trackingId`** — 大多数 POST body 需传 `trackingId` 字符串,每次请求不同,用于幂等与追踪。
-- **分页请求** — 共享 `{ size, current, orderBy, orderDirection, trackingId, ...filters }`。`orderBy` 支持逗号分隔多字段(如 `id,createTime`);`orderDirection` 为 `ASC`/`DESC`,逗号对应。
-- **分页响应** — 共享 `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`。
-- **时间格式** — `yyyy-MM-dd HH:mm:ss.SSS`(ISO 8601)。
+在侧边栏打开具体 operation。交互式 Playground 已关闭（请求需自定义 AK/SK 签名），请按 [认证](/zh/authentication) 与 [第一次请求](/zh/guides/first-request) 调用。

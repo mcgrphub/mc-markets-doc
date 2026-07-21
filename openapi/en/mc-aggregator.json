@@ -1,0 +1,862 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "MC-Aggregator Service",
+    "description": "Liquidity Aggregation Service\n\nThis spec only includes interfaces annotated with @OpenApiPermission, i.e., the public OpenAPI subset exposed to end users/integrators and accessed via API Gateway using Access Key / Secret Key (AK/SK) signature authentication. It excludes backend Admin, internal Feign, and other non-exposed interfaces.",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://springdoc.org"
+    },
+    "version": "v0.0.1"
+  },
+  "externalDocs": {
+    "description": "MC-Aggregator Wiki Documentation",
+    "url": "https://docs.magiccompasspay.com/"
+  },
+  "servers": [
+    {
+      "url": "https://test-gateway.mcconnects.com",
+      "description": "Test Environment API Gateway"
+    },
+    {
+      "url": "https://gateway.mcconnects.com",
+      "description": "Production Environment API Gateway"
+    }
+  ],
+  "security": [
+    {
+      "McAccessKey": [],
+      "McSignature": [],
+      "McTimestamp": [],
+      "McNonce": []
+    }
+  ],
+  "paths": {
+    "/openapi/v1/mc-aggregator/market-data/symbol-ranking": {
+      "get": {
+        "tags": [
+          "Market Data API"
+        ],
+        "summary": "Symbol Market Ranking",
+        "description": "Paginated query of symbol market rankings by category and sort dimension\nRequired Permission: READ",
+        "operationId": "symbolRanking",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "required": [
+                "category"
+              ],
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "description": "Tab category: CONTRACT/SPOT/CRYPTO/TRADFI"
+                },
+                "subGroup": {
+                  "type": "string",
+                  "description": "Traditional finance secondary tab: ALL/FOREX/METALS/INDICES/ENERGY/STOCKS"
+                },
+                "hotOnly": {
+                  "type": "boolean",
+                  "description": "Whether to return only hot symbols (isHot=1 and status=1)"
+                },
+                "sortBy": {
+                  "type": "string",
+                  "description": "Sort field: symbol/bid/change24hPct"
+                },
+                "sortOrder": {
+                  "type": "string",
+                  "description": "Sort direction: asc/desc"
+                },
+                "page": {
+                  "type": "integer",
+                  "description": "Page number, starting from 1",
+                  "format": "int32"
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "Number of records per page",
+                  "format": "int32"
+                }
+              },
+              "description": "Symbol market ranking query request",
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of symbols in current category",
+                          "format": "int64"
+                        },
+                        "page": {
+                          "type": "integer",
+                          "description": "Current page number",
+                          "format": "int32"
+                        },
+                        "pageSize": {
+                          "type": "integer",
+                          "description": "Number of records per page",
+                          "format": "int32"
+                        },
+                        "snapshotVersion": {
+                          "type": "integer",
+                          "description": "Ranking snapshot version number",
+                          "format": "int64"
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "Ranking entries on current page",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "rank": {
+                                "type": "integer",
+                                "description": "Global rank",
+                                "format": "int32"
+                              },
+                              "symbol": {
+                                "type": "string",
+                                "description": "Symbol Code"
+                              },
+                              "bid": {
+                                "type": "string",
+                                "description": "Bid Price"
+                              },
+                              "change24hAbs": {
+                                "type": "string",
+                                "description": "24h change amount"
+                              },
+                              "change24hPct": {
+                                "type": "string",
+                                "description": "24h change percentage (decimal form, e.g., -0.0146 means -1.46%)"
+                              },
+                              "isHot": {
+                                "type": "boolean",
+                                "description": "Whether hot"
+                              },
+                              "pricingDegree": {
+                                "type": "integer",
+                                "description": "Price Decimal Places",
+                                "format": "int32"
+                              }
+                            },
+                            "description": "Symbol market ranking entry",
+                            "example": null
+                          }
+                        }
+                      },
+                      "description": "Symbol market ranking paginated response",
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi/v1/mc-aggregator/market-data/kline": {
+      "get": {
+        "tags": [
+          "Market Data API"
+        ],
+        "summary": "Query K-line Data",
+        "description": "Query K-line data by symbol, time interval, and time range\nRequired Permission: READ",
+        "operationId": "klineList",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "required": [
+                "endTime",
+                "period",
+                "symbol"
+              ],
+              "type": "object",
+              "properties": {
+                "symbol": {
+                  "type": "string",
+                  "description": "Symbol Code",
+                  "example": "EURUSD"
+                },
+                "period": {
+                  "type": "integer",
+                  "description": "1min-1, 5min-5, 15min-15, 1hour-60, 4hour-240, 1day-1440, 1week-1440*7, 1month-1440*30",
+                  "format": "int32"
+                },
+                "startTime": {
+                  "type": "integer",
+                  "description": "Start time, second-level timestamp",
+                  "format": "int64",
+                  "example": 1755792000
+                },
+                "endTime": {
+                  "type": "integer",
+                  "description": "End time, second-level timestamp",
+                  "format": "int64",
+                  "example": 1755878400
+                },
+                "limit": {
+                  "type": "integer",
+                  "description": "Maximum number of records per request, max allowed value is 500",
+                  "format": "int32",
+                  "example": 500
+                }
+              },
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "pricingDegree": {
+                          "type": "integer",
+                          "description": "Price precision, used to convert values to floating point numbers",
+                          "format": "int32"
+                        },
+                        "klineDataList": {
+                          "type": "array",
+                          "description": "K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp",
+                          "items": {
+                            "type": "string",
+                            "description": "K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp"
+                          }
+                        },
+                        "klineDisplayList": {
+                          "type": "array",
+                          "description": "K-line display field list, consistent with klineDataList order",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "openStr": {
+                                "type": "string",
+                                "description": "Open price raw plain string"
+                              },
+                              "openDisplay": {
+                                "type": "string",
+                                "description": "Open price display text"
+                              },
+                              "openScale": {
+                                "type": "integer",
+                                "description": "Open price display decimal places",
+                                "format": "int32"
+                              },
+                              "closeStr": {
+                                "type": "string",
+                                "description": "Close price raw plain string"
+                              },
+                              "closeDisplay": {
+                                "type": "string",
+                                "description": "Close price display text"
+                              },
+                              "closeScale": {
+                                "type": "integer",
+                                "description": "Close price display decimal places",
+                                "format": "int32"
+                              },
+                              "highStr": {
+                                "type": "string",
+                                "description": "High price raw plain string"
+                              },
+                              "highDisplay": {
+                                "type": "string",
+                                "description": "High price display text"
+                              },
+                              "highScale": {
+                                "type": "integer",
+                                "description": "High price display decimal places",
+                                "format": "int32"
+                              },
+                              "lowStr": {
+                                "type": "string",
+                                "description": "Low price raw plain string"
+                              },
+                              "lowDisplay": {
+                                "type": "string",
+                                "description": "Low price display text"
+                              },
+                              "lowScale": {
+                                "type": "integer",
+                                "description": "Low price display decimal places",
+                                "format": "int32"
+                              },
+                              "volumeStr": {
+                                "type": "string",
+                                "description": "Trading volume raw plain string"
+                              },
+                              "volumeDisplay": {
+                                "type": "string",
+                                "description": "Trading volume display text"
+                              },
+                              "volumeScale": {
+                                "type": "integer",
+                                "description": "Trading volume display decimal places",
+                                "format": "int32"
+                              },
+                              "timestamp": {
+                                "type": "integer",
+                                "description": "Second-level timestamp",
+                                "format": "int64"
+                              }
+                            },
+                            "description": "Compact K-line display fields",
+                            "example": null
+                          }
+                        }
+                      },
+                      "description": "K-line data query response",
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+                    },
+                    "params": {
+                      "type": "object"
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RetResultObject": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string",
+            "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SymbolRankingQueryReq": {
+        "required": [
+          "category"
+        ],
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Tab category: CONTRACT/SPOT/CRYPTO/TRADFI"
+          },
+          "subGroup": {
+            "type": "string",
+            "description": "Traditional finance secondary tab: ALL/FOREX/METALS/INDICES/ENERGY/STOCKS",
+            "default": "ALL"
+          },
+          "hotOnly": {
+            "type": "boolean",
+            "description": "Whether to return only hot symbols (isHot=1 and status=1)",
+            "default": false
+          },
+          "sortBy": {
+            "type": "string",
+            "description": "Sort field: symbol/bid/change24hPct",
+            "default": "change24hPct"
+          },
+          "sortOrder": {
+            "type": "string",
+            "description": "Sort direction: asc/desc",
+            "default": "desc"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "Page number, starting from 1",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Number of records per page",
+            "format": "int32",
+            "default": 20
+          }
+        },
+        "description": "Symbol market ranking query request"
+      },
+      "RetResultSymbolRankingPageRsp": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string",
+            "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SymbolRankingPageRsp"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SymbolRankingItemRsp": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "description": "Global rank",
+            "format": "int32"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Symbol Code"
+          },
+          "bid": {
+            "type": "string",
+            "description": "Bid Price"
+          },
+          "change24hAbs": {
+            "type": "string",
+            "description": "24h change amount"
+          },
+          "change24hPct": {
+            "type": "string",
+            "description": "24h change percentage (decimal form, e.g., -0.0146 means -1.46%)"
+          },
+          "isHot": {
+            "type": "boolean",
+            "description": "Whether hot"
+          },
+          "pricingDegree": {
+            "type": "integer",
+            "description": "Price Decimal Places",
+            "format": "int32"
+          }
+        },
+        "description": "Symbol market ranking entry"
+      },
+      "SymbolRankingPageRsp": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Total number of symbols in current category",
+            "format": "int64"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Number of records per page",
+            "format": "int32"
+          },
+          "snapshotVersion": {
+            "type": "integer",
+            "description": "Ranking snapshot version number",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "description": "Ranking entries on current page",
+            "items": {
+              "$ref": "#/components/schemas/SymbolRankingItemRsp"
+            }
+          }
+        },
+        "description": "Symbol market ranking paginated response"
+      },
+      "CompactKlineQueryReq": {
+        "required": [
+          "endTime",
+          "period",
+          "symbol"
+        ],
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Symbol Code",
+            "example": "EURUSD"
+          },
+          "period": {
+            "title": "Time period (minutes)",
+            "type": "integer",
+            "description": "1min-1, 5min-5, 15min-15, 1hour-60, 4hour-240, 1day-1440, 1week-1440*7, 1month-1440*30",
+            "format": "int32"
+          },
+          "startTime": {
+            "type": "integer",
+            "description": "Start time, second-level timestamp",
+            "format": "int64",
+            "example": 1755792000
+          },
+          "endTime": {
+            "type": "integer",
+            "description": "End time, second-level timestamp",
+            "format": "int64",
+            "example": 1755878400
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of records per request, max allowed value is 500",
+            "format": "int32",
+            "example": 500
+          }
+        }
+      },
+      "CompactKlineDataDisplayRsp": {
+        "type": "object",
+        "properties": {
+          "openStr": {
+            "type": "string",
+            "description": "Open price raw plain string"
+          },
+          "openDisplay": {
+            "type": "string",
+            "description": "Open price display text"
+          },
+          "openScale": {
+            "type": "integer",
+            "description": "Open price display decimal places",
+            "format": "int32"
+          },
+          "closeStr": {
+            "type": "string",
+            "description": "Close price raw plain string"
+          },
+          "closeDisplay": {
+            "type": "string",
+            "description": "Close price display text"
+          },
+          "closeScale": {
+            "type": "integer",
+            "description": "Close price display decimal places",
+            "format": "int32"
+          },
+          "highStr": {
+            "type": "string",
+            "description": "High price raw plain string"
+          },
+          "highDisplay": {
+            "type": "string",
+            "description": "High price display text"
+          },
+          "highScale": {
+            "type": "integer",
+            "description": "High price display decimal places",
+            "format": "int32"
+          },
+          "lowStr": {
+            "type": "string",
+            "description": "Low price raw plain string"
+          },
+          "lowDisplay": {
+            "type": "string",
+            "description": "Low price display text"
+          },
+          "lowScale": {
+            "type": "integer",
+            "description": "Low price display decimal places",
+            "format": "int32"
+          },
+          "volumeStr": {
+            "type": "string",
+            "description": "Trading volume raw plain string"
+          },
+          "volumeDisplay": {
+            "type": "string",
+            "description": "Trading volume display text"
+          },
+          "volumeScale": {
+            "type": "integer",
+            "description": "Trading volume display decimal places",
+            "format": "int32"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "Second-level timestamp",
+            "format": "int64"
+          }
+        },
+        "description": "Compact K-line display fields"
+      },
+      "CompactKlineQueryRsp": {
+        "type": "object",
+        "properties": {
+          "pricingDegree": {
+            "type": "integer",
+            "description": "Price precision, used to convert values to floating point numbers",
+            "format": "int32"
+          },
+          "klineDataList": {
+            "type": "array",
+            "description": "K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp",
+            "items": {
+              "type": "string",
+              "description": "K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp"
+            }
+          },
+          "klineDisplayList": {
+            "type": "array",
+            "description": "K-line display field list, consistent with klineDataList order",
+            "items": {
+              "$ref": "#/components/schemas/CompactKlineDataDisplayRsp"
+            }
+          }
+        },
+        "description": "K-line data query response"
+      },
+      "RetResultCompactKlineQueryRsp": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string",
+            "description": "Business error key (ExceptionTypeEnum name). Full list: /api-reference/error-codes."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CompactKlineQueryRsp"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "McAccessKey": {
+        "type": "apiKey",
+        "description": "Access Key (AK), created by the user in API Key Management",
+        "name": "X-Access-Key",
+        "in": "header"
+      },
+      "McSignature": {
+        "type": "apiKey",
+        "description": "HMAC-SHA256 Signature v2 (Base64). See the Authentication Getting Started documentation for algorithm and signing string details",
+        "name": "X-Signature",
+        "in": "header"
+      },
+      "McTimestamp": {
+        "type": "apiKey",
+        "description": "Current Unix timestamp in milliseconds (13 digits). Must be within ±10 minutes of server time",
+        "name": "X-Timestamp",
+        "in": "header"
+      },
+      "McNonce": {
+        "type": "apiKey",
+        "description": "Unique nonce per request (UUID v4 recommended), used for anti-replay; participates in signature v2",
+        "name": "X-Nonce",
+        "in": "header"
+      }
+    }
+  }
+}

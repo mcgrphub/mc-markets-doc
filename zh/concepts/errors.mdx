@@ -1,39 +1,58 @@
 ---
 title: "MC OpenAPI 错误处理"
 sidebarTitle: "错误处理"
-description: "MC OpenAPI 错误格式、常见业务码、HTTP 状态码与推荐重试策略。"
+description: "MC OpenAPI 错误格式、codeKey 目录、HTTP 状态码与推荐重试策略。"
 ---
 
-MC OpenAPI 在**两层**报告失败:标准 HTTP 状态码,以及 JSON 信封中的业务 `code`。健壮的集成应同时检查两者。
+MC OpenAPI 在**两层**报告失败：标准 HTTP 状态码，以及 JSON 信封中的业务字段（`code` / `codeKey`）。健壮的集成应同时检查两者。
 
 ## 两层错误模型
 
-1. **传输层** — HTTP 状态码。`4xx` 为客户端问题,`5xx` 为网关/服务问题。
-2. **业务层** — JSON 信封中的 `code`。`200 OK` 仍可能携带业务错误(如余额不足、币种不存在)。
+1. **传输层** — HTTP 状态码。`4xx` 为客户端问题，`5xx` 为网关/服务问题。
+2. **业务层** — JSON 信封中的 `code` 与 `codeKey`。`200 OK` 仍可能携带业务错误（如余额不足、币种不存在）。
 
-无论 HTTP 状态码如何,都应检查 `code`。
+无论 HTTP 状态码如何，都应检查 `success` / `code` / `codeKey`。
 
 ## 错误响应格式
 
-失败响应保持相同信封,`code` 为非 `"0"`,`success` 为 `false`:
+失败响应保持相同信封，`success` 为 `false`，并返回非成功业务 `code`：
 
 ```json
 {
-  "code": "40001",
-  "msg": "Invalid signature",
+  "code": 1000005,
+  "codeKey": "PARAM_ERROR",
+  "msg": "Invalid request parameter",
   "success": false,
   "data": null
 }
 ```
 
-   
+<ResponseField name="code" type="integer | string">
+  业务状态码。成功时常见为 `0` / `200`（视封装路径而定）。失败时为 `ExceptionTypeEnum` 中的 **7 位**错误码。
+</ResponseField>
+
+<ResponseField name="codeKey" type="string">
+  稳定的错误键（枚举名），例如 `PARAM_ERROR`、`SIGN_ERROR`。分支逻辑优先使用 `codeKey` 或 `code`，不要依赖 `msg`。
+</ResponseField>
+
+<ResponseField name="msg" type="string">
+  人可读消息，适合日志；不要依赖其精确文案做分支。
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  业务失败时为 `false`。
+</ResponseField>
+
+<ResponseField name="data" type="object | null">
+  失败时通常为 `null`。部分校验错误会在 `data` 中返回字段级详情。
+</ResponseField>
 
 ## HTTP 状态码
 
 | 码 | 发生时机 | 应对 |
 | --- | --- | --- |
 | `400` | JSON 格式错误、参数缺失 | 修正后重试。 |
-| `401` | `X-Signature` 缺失/无效或 `X-Timestamp` 偏离 | 校对签名与时钟,重新签名后重试。 |
+| `401` | `X-Signature` 缺失/无效或 `X-Timestamp` 偏离 | 校对签名与时钟，重新签名后重试。 |
 | `403` | Access Key 缺少必需权限 | 在 Key 管理台勾选 `READ`/`TRADE`/`WITHDRAW`。 |
 | `404` | 路径错误或资源 ID 不存在 | 核对 URL 与 ID。 |
 | `429` | 频率限制 | 退避重试—见 [频率限制](/zh/guides/rate-limits)。 |
@@ -41,20 +60,20 @@ MC OpenAPI 在**两层**报告失败:标准 HTTP 状态码,以及 JSON 信封中
 
 ## 常见业务码
 
-| `code` | 含义 | 建议处理 |
-| --- | --- | --- |
-| `"0"` | 成功 | 消费 `data`。 |
-| `40001` | 签名无效 | 重算签名;核对 Secret Key 与待签名字符串。 |
-| `40002` | 时间戳过期/偏离 | 同步时钟;使用当前 UTC 毫秒。 |
-| `40003` | Access Key 不存在/已禁用 | 在后台检查状态。 |
-| `40301` | 权限不足 | 为 Key 添加对应权限。 |
-| `40401` | 资源不存在 | 核对请求中的 ID。 |
-| `42201` | 参数校验失败 | 根据 `msg` 修正参数。 |
-| `42901` | 频率限制 | 退避后重试。 |
-| `50001` | 内部错误 | 指数退避重试;持续时联系支持。 |
+完整目录（全部 `codeKey`）：[错误码](/zh/api-reference/error-codes)。
+
+| `codeKey` | `code` | 含义 | 建议处理 |
+| --- | --- | --- | --- |
+| `SIGN_ERROR` | `1000001` | 签名校验失败 | 重算签名；核对 Secret Key 与待签名字符串。 |
+| `PARAM_ERROR` | `1000005` | 请求参数无效 | 根据 `msg` 修正参数。 |
+| `PERMISSION_DENIED` | `1000006` | 权限不足 | 为 Key 添加对应权限。 |
+| `NOT_EXIST` | `1000002` | 资源不存在 | 核对请求中的 ID。 |
+| `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | 余额不足 | 充值或减小金额。 |
+| `ORDER_OPERATION_FAILED` | `2100001` | 订单操作失败 | 查看 `msg`；仅在瞬时错误时重试。 |
+| `DEFAULT` | `1000000` | 内部错误 | 指数退避重试；持续时联系支持。 |
 
 <Note>
-  `code` 为字符串,非整数——始终以字符串相等比较(`code === "0"`)。
+  分支逻辑优先使用稳定的 `codeKey`。完整列表见 [错误码](/zh/api-reference/error-codes)（整理自 `ExceptionTypeEnum`）。
 </Note>
 
 ## 错误处理示例
@@ -72,17 +91,14 @@ def call(method, path, body=""):
         raise TransientError(response.status_code, response.text)
 
     payload = response.json()
-    code = payload.get("code")
+    if payload.get("success") is True:
+        return payload.get("data")
 
-    if code == "0":
-        return payload["data"]
+    code_key = payload.get("codeKey") or str(payload.get("code"))
+    if code_key in {"SIGN_ERROR", "1000001"}:
+        raise AuthError(code_key, payload.get("msg"))
 
-    if code in {"40001", "40002"}:
-        raise AuthError(code, payload["msg"])
-    if code == "42901":
-        raise TransientError(code, payload["msg"])
-
-    raise BusinessError(code, payload["msg"])
+    raise BusinessError(code_key, payload.get("msg"))
 
 
 def with_backoff(fn, *args, max_retries=5, **kwargs):
@@ -109,19 +125,16 @@ async function call(method, path, body = "") {
   }
 
   const payload = await res.json();
+  if (payload.success === true) return payload.data;
 
-  if (payload.code === "0") return payload.data;
-
-  if (payload.code === "40001" || payload.code === "40002") {
-    throw new AuthError(payload.code, payload.msg);
+  const codeKey = payload.codeKey || String(payload.code);
+  if (codeKey === "SIGN_ERROR" || codeKey === "1000001") {
+    throw new AuthError(codeKey, payload.msg);
   }
-  if (payload.code === "42901") {
-    throw new TransientError(payload.code, payload.msg);
-  }
-  throw new BusinessError(payload.code, payload.msg);
+  throw new BusinessError(codeKey, payload.msg);
 }
 ```
 
 <Tip>
-  对于 `429` 与 `5xx`,采用**带抖动的指数退避**:初始 ~1s,每次失败翻倍,封顶 ~30s,并添加少量随机偏移以避免同步重试。
+  对于 `429` 与 `5xx`，采用**带抖动的指数退避**：初始 ~1s，每次失败翻倍，封顶 ~30s，并添加少量随机偏移以避免同步重试。
 </Tip>

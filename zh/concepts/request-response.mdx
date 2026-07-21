@@ -47,7 +47,7 @@ MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的
 
 ```bash
 curl --request GET \
-  --url "https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd" \
+  --url "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
   --header "X-Access-Key: $MC_ACCESS_KEY" \
   --header "X-Signature: $MC_SIGNATURE" \
   --header "X-Timestamp: $MC_TIMESTAMP" \

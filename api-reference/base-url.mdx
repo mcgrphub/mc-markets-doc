@@ -4,7 +4,7 @@ sidebarTitle: "Base URL"
 description: "Gateway base URLs for MC OpenAPI test and production environments."
 ---
 
-The MC OpenAPI is served exclusively over HTTPS through the **MC API Gateway**. Every request must target one of the environment base URLs below, followed by the API path prefix (`/openapi/v1`) and the specific endpoint — for example, `https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`.
+The MC OpenAPI is served exclusively over HTTPS through the **MC API Gateway**. Every request must target one of the environment base URLs below, followed by the API path prefix (`/openapi/v1`) and the specific endpoint — for example, `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`.
 
 ## Environments
 
@@ -27,8 +27,8 @@ All resource paths are versioned under `/openapi/v1/…`. Combine the gateway ho
 
 For example:
 
-- `https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd`
-- `https://gateway.mcconnects.com/openapi/v1/finance/account/overview`
+- `https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`
+- `https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview`
 
 ## Switching environments
 
@@ -38,14 +38,14 @@ To move from test to production, change only the gateway host in your configurat
 
 ```bash cURL
 # Test
-curl -X POST https://test-gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+curl -X POST https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
   -H "X-Access-Key: $MC_ACCESS_KEY" \
   -H "X-Signature: $MC_SIGNATURE" \
   -H "X-Timestamp: $MC_TIMESTAMP" \
   -H "Content-Type: application/json"
 
 # Production
-curl -X POST https://gateway.mcconnects.com/openapi/v1/exchange-rate/query/usd \
+curl -X POST https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
   -H "X-Access-Key: $MC_ACCESS_KEY" \
   -H "X-Signature: $MC_SIGNATURE" \
   -H "X-Timestamp: $MC_TIMESTAMP" \
@@ -60,14 +60,14 @@ MC_GATEWAY = os.environ.get(
     "https://test-gateway.mcconnects.com",
 )
 
-url = f"{MC_GATEWAY}/openapi/v1/exchange-rate/query/usd"
+url = f"{MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd"
 ```
 
 ```javascript Node.js
 const MC_GATEWAY =
   process.env.MC_GATEWAY ?? "https://test-gateway.mcconnects.com";
 
-const url = `${MC_GATEWAY}/openapi/v1/exchange-rate/query/usd`;
+const url = `${MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd`;
 ```
 
 ```go Go
@@ -83,7 +83,7 @@ func main() {
 	if gateway == "" {
 		gateway = "https://test-gateway.mcconnects.com"
 	}
-	url := fmt.Sprintf("%s/openapi/v1/exchange-rate/query/usd", gateway)
+	url := fmt.Sprintf("%s/openapi/v1/mc-account/exchange-rate/query/usd", gateway)
 	fmt.Println(url)
 }
 ```

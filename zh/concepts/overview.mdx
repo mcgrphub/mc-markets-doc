@@ -35,16 +35,16 @@ MC OpenAPI 是面向 MC 多账户系统(MC-account)的 JSON-over-HTTPS API。本
 
 ## 接口分组
 
-MC OpenAPI 按功能分为六组。所有接口均需签名,部分接口需求 Access Key 具备对应权限。
+MC OpenAPI 接口由 `openapi-exposed` Spec 生成，在 API 参考侧边栏按网关服务分组。
 
-| 分组 | 用途 | 需要权限 |
+| 分组 | 用途 | 常见权限 |
 | --- | --- | --- |
-| [交易](/zh/api-reference/endpoints/trading) | 交易记录(按 ID 或分页) | `READ` |
-| [理财账户](/zh/api-reference/endpoints/finance-account) | 申购、赎回、定期产品、投组概览 | `READ`、`TRADE`、`WITHDRAW` |
-| [币种](/zh/api-reference/endpoints/currency) | 币种/兑换元数据 | `READ` |
-| [资金账户](/zh/api-reference/endpoints/fund-account) | 现货持仓与储备金证明 | `READ` |
-| [资金费](/zh/api-reference/endpoints/funding-fee) | 永续合约资金费历史 | `READ` |
-| [汇率](/zh/api-reference/endpoints/exchange-rate) | 法币与加密资产汇率 | `READ` |
+| Account（`/openapi/v1/mc-account/`） | 交易记录、理财、MLP、币种、资金账户、汇率等 | `READ`、`TRADE`、`WITHDRAW` |
+| Trade（`/openapi/v1/mc-trade/`） | 订单、持仓、成交、交易账户 | `READ`、`TRADE` |
+| Risk（`/openapi/v1/mc-risk/`） | 资金费率、交易品种 | `READ` |
+| Aggregator（`/openapi/v1/mc-aggregator/`） | K 线与行情排行 | `READ` |
+
+Spec 文件映射见 [API 参考概览](/zh/api-reference/overview)。
 
 ## 请求生命周期
 

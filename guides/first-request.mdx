@@ -4,7 +4,7 @@ sidebarTitle: "First Request"
 description: "End-to-end walkthrough: create an Access Key, sign a request, and call the MC OpenAPI USD exchange-rate endpoint."
 ---
 
-This guide walks you through a full signed request against the MC OpenAPI gateway. By the end you will have a working call to the `GET /openapi/v1/exchange-rate/query/usd` endpoint that returns live USD conversion rates.
+This guide walks you through a full signed request against the MC OpenAPI gateway. By the end you will have a working call to the `GET /openapi/v1/mc-account/exchange-rate/query/usd` endpoint that returns live USD conversion rates.
 
 ## Prerequisites
 
@@ -44,11 +44,11 @@ The v2 string to sign consists of the following lines (omit the query line when 
 [{BODY_SHA256_HEX}]
 ```
 
-For `GET /openapi/v1/exchange-rate/query/usd` (path A, no query, no body):
+For `GET /openapi/v1/mc-account/exchange-rate/query/usd` (path A, no query, no body):
 
 ```text
 GET
-/openapi/v1/exchange-rate/query/usd
+/openapi/v1/mc-account/exchange-rate/query/usd
 x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
 1747890123456
 550e8400-e29b-41d4-a716-446655440000
@@ -67,7 +67,7 @@ SECRET_KEY="your_secret_key"
 TS=$(date +%s000)
 NONCE=$(uuidgen | tr '[:upper:]' '[:lower:]')
 METHOD="GET"
-PATH_="/openapi/v1/exchange-rate/query/usd"
+PATH_="/openapi/v1/mc-account/exchange-rate/query/usd"
 
 SIGNED_HEADERS="x-access-key=${ACCESS_KEY}&x-nonce=${NONCE}&x-timestamp=${TS}"
 CANONICAL=$(printf "%s\n%s\n%s\n%s\n%s\n" "$METHOD" "$PATH_" "$SIGNED_HEADERS" "$TS" "$NONCE")
@@ -93,7 +93,7 @@ ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
 SECRET_KEY = os.environ["MC_SECRET_KEY"]
 
 method = "GET"
-path = "/openapi/v1/exchange-rate/query/usd"
+path = "/openapi/v1/mc-account/exchange-rate/query/usd"
 ts = str(int(time.time() * 1000))
 nonce = str(uuid.uuid4())
 
@@ -136,7 +136,7 @@ const ACCESS_KEY = process.env.MC_ACCESS_KEY;
 const SECRET_KEY = process.env.MC_SECRET_KEY;
 
 const method = "GET";
-const path = "/openapi/v1/exchange-rate/query/usd";
+const path = "/openapi/v1/mc-account/exchange-rate/query/usd";
 const ts = Date.now().toString();
 const nonce = crypto.randomUUID();
 
@@ -189,7 +189,7 @@ A successful response looks like this:
 ```
 
 - `code == "0"` — the call succeeded.
-- `data` — the payload (see the [Exchange Rate endpoint](/api-reference/endpoints/exchange-rate) for the full schema).
+- `data` — the payload (see the exchange-rate operations under **Account** in the [API Reference](/api-reference/overview) for the full schema).
 
 If `code` is not `"0"`, inspect `msg` and consult the [Error Handling](/concepts/errors) reference.
 

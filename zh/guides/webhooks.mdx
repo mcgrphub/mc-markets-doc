@@ -15,10 +15,10 @@ description: "MC OpenAPI 仅支持请求-响应——使用以下轮询模式检
 | 你想检测 | 轮询接口 | 建议频率 |
 | --- | --- | --- |
 | 新交易记录 | `POST /openapi/v1/transaction/transaction/record/page` | 30–60 秒 |
-| 余额/申购/赎回变化 | `POST /openapi/v1/finance/account/overview` | 60 秒 |
-| 现货持仓变化 | `GET /openapi/v1/fund/account/spot/positions/v2` | 60–300 秒 |
-| 资金费事件 | `POST /openapi/v1/funding-fee-record/page/v2` | 300 秒(上游 8 小时结算) |
-| 汇率更新 | `GET /openapi/v1/exchange-rate/query/usd` | 60–300 秒 |
+| 余额/申购/赎回变化 | `POST /openapi/v1/mc-account/finance/account/overview` | 60 秒 |
+| 现货持仓变化 | `GET /openapi/v1/mc-account/fund/account/spot/positions/v2` | 60–300 秒 |
+| 资金费事件 | `POST /openapi/v1/mc-account/funding-fee-record/page/v2` | 300 秒(上游 8 小时结算) |
+| 汇率更新 | `GET /openapi/v1/mc-account/exchange-rate/query/usd` | 60–300 秒 |
 
 具体形式见 [API 参考](/zh/api-reference/overview)。
 

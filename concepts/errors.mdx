@@ -1,33 +1,38 @@
 ---
 title: "MC OpenAPI Error Handling"
 sidebarTitle: "Error Handling"
-description: "MC OpenAPI error format, common business codes, HTTP status codes, and recommended retry strategy."
+description: "MC OpenAPI error format, codeKey catalog, HTTP status codes, and recommended retry strategy."
 ---
 
-MC OpenAPI reports failures through **two layers**: a standard HTTP status code, and a business `code` field inside the JSON envelope. Robust integrations check both.
+MC OpenAPI reports failures through **two layers**: a standard HTTP status code, and business fields inside the JSON envelope (`code` / `codeKey`). Robust integrations check both.
 
 ## Two-layer error model
 
 1. **Transport layer** — the HTTP status code. `4xx` indicates a client problem, `5xx` a gateway problem.
-2. **Business layer** — the `code` field in the JSON envelope. A `200 OK` HTTP response can still carry a business error such as insufficient balance or a symbol not found.
+2. **Business layer** — `code` and `codeKey` in the JSON envelope. A `200 OK` HTTP response can still carry a business error such as insufficient balance or a symbol not found.
 
-Always inspect `code` even when the HTTP status is `200`.
+Always inspect `success` / `code` / `codeKey` even when the HTTP status is `200`.
 
 ## Error response format
 
-Failed calls return the same envelope shape as successful ones, with a non-`"0"` `code` and `success: false`:
+Failed calls keep the same envelope shape, with `success: false` and a non-success business `code`:
 
 ```json
 {
-  "code": "40001",
-  "msg": "Invalid signature",
+  "code": 1000005,
+  "codeKey": "PARAM_ERROR",
+  "msg": "Invalid request parameter",
   "success": false,
   "data": null
 }
 ```
 
-<ResponseField name="code" type="string">
-  Business status code. `"0"` is success. Non-zero values identify the specific error class — use this to drive retry / user-facing logic.
+<ResponseField name="code" type="integer | string">
+  Business status code. Success responses typically use `0` / `200` depending on the envelope path. Failures use a **7-digit** code from `ExceptionTypeEnum`.
+</ResponseField>
+
+<ResponseField name="codeKey" type="string">
+  Stable error key (enum name), for example `PARAM_ERROR` or `SIGN_ERROR`. Prefer branching on `codeKey` or `code`, not on `msg`.
 </ResponseField>
 
 <ResponseField name="msg" type="string">
@@ -35,7 +40,7 @@ Failed calls return the same envelope shape as successful ones, with a non-`"0"`
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
-  `false` on any non-`"0"` `code`.
+  `false` on business failures.
 </ResponseField>
 
 <ResponseField name="data" type="object | null">
@@ -55,22 +60,20 @@ Failed calls return the same envelope shape as successful ones, with a non-`"0"`
 
 ## Common business codes
 
-The table below lists frequently-seen business `code` values. This is not exhaustive — new codes are added over time; treat unknown codes as retryable / user-facing errors based on context.
+Full catalog (all `codeKey` values): [Error codes](/api-reference/error-codes).
 
-| `code` | Meaning | Suggested action |
-| --- | --- | --- |
-| `"0"` | Success | Consume `data`. |
-| `40001` | Invalid signature | Recompute signature; verify Secret Key and canonical string. |
-| `40002` | Timestamp expired or skewed | Sync clock; use current UTC ms. |
-| `40003` | Access Key not found or disabled | Check key status in the console. |
-| `40301` | Insufficient permission | Add the required scope to the key. |
-| `40401` | Resource not found | Verify IDs in the request. |
-| `42201` | Parameter validation failed | Fix parameters per `msg`. |
-| `42901` | Rate limit exceeded | Back off and retry. |
-| `50001` | Internal error | Retry with backoff; contact support if it persists. |
+| `codeKey` | `code` | Meaning | Suggested action |
+| --- | --- | --- | --- |
+| `SIGN_ERROR` | `1000001` | Signature verification failed | Recompute signature; verify Secret Key and canonical string. |
+| `PARAM_ERROR` | `1000005` | Invalid request parameter | Fix parameters per `msg`. |
+| `PERMISSION_DENIED` | `1000006` | Permission denied | Add the required scope to the key. |
+| `NOT_EXIST` | `1000002` | Resource does not exist | Verify IDs in the request. |
+| `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | Insufficient balance | Top up or reduce the amount. |
+| `ORDER_OPERATION_FAILED` | `2100001` | Order operation failed | Inspect `msg`; retry only if transient. |
+| `DEFAULT` | `1000000` | Internal server error | Retry with backoff; contact support if it persists. |
 
 <Note>
-  Codes are strings, not integers — always compare with string equality (`code === "0"`).
+  Prefer `codeKey` (stable string) for switch/case logic. See the full [Error codes](/api-reference/error-codes) page for every value from `ExceptionTypeEnum`.
 </Note>
 
 ## Handling errors
@@ -88,17 +91,14 @@ def call(method, path, body=""):
         raise TransientError(response.status_code, response.text)
 
     payload = response.json()
-    code = payload.get("code")
+    if payload.get("success") is True:
+        return payload.get("data")
 
-    if code == "0":
-        return payload["data"]
+    code_key = payload.get("codeKey") or str(payload.get("code"))
+    if code_key in {"SIGN_ERROR", "1000001"}:
+        raise AuthError(code_key, payload.get("msg"))
 
-    if code in {"40001", "40002"}:
-        raise AuthError(code, payload["msg"])
-    if code == "42901":
-        raise TransientError(code, payload["msg"])
-
-    raise BusinessError(code, payload["msg"])
+    raise BusinessError(code_key, payload.get("msg"))
 
 
 def with_backoff(fn, *args, max_retries=5, **kwargs):
@@ -125,16 +125,13 @@ async function call(method, path, body = "") {
   }
 
   const payload = await res.json();
+  if (payload.success === true) return payload.data;
 
-  if (payload.code === "0") return payload.data;
-
-  if (payload.code === "40001" || payload.code === "40002") {
-    throw new AuthError(payload.code, payload.msg);
+  const codeKey = payload.codeKey || String(payload.code);
+  if (codeKey === "SIGN_ERROR" || codeKey === "1000001") {
+    throw new AuthError(codeKey, payload.msg);
   }
-  if (payload.code === "42901") {
-    throw new TransientError(payload.code, payload.msg);
-  }
-  throw new BusinessError(payload.code, payload.msg);
+  throw new BusinessError(codeKey, payload.msg);
 }
 ```
 

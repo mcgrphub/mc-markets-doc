@@ -4,6 +4,12 @@ sidebarTitle: "Changelog"
 description: "Release notes for MC OpenAPI — new endpoints, schema updates, and integration guidance in reverse chronological order."
 ---
 
+<Update label="2026-07-21" description="Spec-driven API Reference">
+  - Endpoint docs are now generated from `openapi/*.json` (`openapi-exposed` exports), grouped by Account / Trade / Risk / Aggregator.
+  - Removed hand-written `api-reference/endpoints/*` pages; guide example paths now use gateway service prefixes (for example `/openapi/v1/mc-account/...`).
+  - API playground disabled (custom AK/SK signing required).
+</Update>
+
 <Update label="2026-07-20" description="OpenAPI surface expansion">
   - **Signature v2**: Updated [Authentication](/authentication) and [Quickstart](/quickstart) to the mc-account v3.7.0 spec. Every request requires `X-Nonce`; non-empty `POST`/`PUT`/`PATCH` bodies must include SHA-256 in the string to sign; `X-Signature` is Base64. Corrected outdated signing notes in Requests & Responses, FAQ, and Troubleshooting.
   - **Finance Account**: added product catalog, current positions, and redemption history; demand/fixed-term redemption permission is `TRADE` (not `WITHDRAW`).
@@ -26,8 +32,8 @@ description: "Release notes for MC OpenAPI — new endpoints, schema updates, an
 <Update label="v2 endpoints" description="Recommended over v1">
   These v2 endpoints supersede their v1 counterparts. Existing v1 endpoints continue to work; migrate at your own pace.
 
-  - `GET /openapi/v1/fund/account/spot/positions/v2` — spot positions with expanded fields.
-  - `POST /openapi/v1/funding-fee-record/page/v2` — funding-fee history grouped by `positionId` and `dealTime`.
+  - `GET /openapi/v1/mc-account/fund/account/spot/positions/v2` — spot positions with expanded fields.
+  - `POST /openapi/v1/mc-account/funding-fee-record/page/v2` — funding-fee history grouped by `positionId` and `dealTime`.
 
   See [Versioning](/api-reference/versioning) for the full v2 list.
 </Update>

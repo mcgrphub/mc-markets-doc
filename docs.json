@@ -13,6 +13,11 @@
     "href": "https://www.mcmarkets.com/zh-Hant"
   },
   "favicon": "/favicon.svg",
+  "api": {
+    "playground": {
+      "display": "none"
+    }
+  },
   "navigation": {
     "languages": [
       {
@@ -66,24 +71,25 @@
                 "pages": [
                   "api-reference/overview",
                   "api-reference/base-url",
-                  "api-reference/versioning"
+                  "api-reference/versioning",
+                  "api-reference/error-codes"
                 ]
               },
               {
-                "group": "Endpoints",
-                "pages": [
-                  "api-reference/endpoints/trading",
-                  "api-reference/endpoints/deal-order",
-                  "api-reference/endpoints/finance-account",
-                  "api-reference/endpoints/mlp",
-                  "api-reference/endpoints/currency",
-                  "api-reference/endpoints/fund-account",
-                  "api-reference/endpoints/funding-fee",
-                  "api-reference/endpoints/funding-rate",
-                  "api-reference/endpoints/trade-symbol",
-                  "api-reference/endpoints/market-data",
-                  "api-reference/endpoints/exchange-rate"
-                ]
+                "group": "Account",
+                "openapi": "openapi/en/mc-account.json"
+              },
+              {
+                "group": "Trade",
+                "openapi": "openapi/en/mc-trade.json"
+              },
+              {
+                "group": "Risk",
+                "openapi": "openapi/en/mc-risk.json"
+              },
+              {
+                "group": "Aggregator",
+                "openapi": "openapi/en/mc-aggregator.json"
               }
             ]
           }
@@ -139,24 +145,25 @@
                 "pages": [
                   "zh/api-reference/overview",
                   "zh/api-reference/base-url",
-                  "zh/api-reference/versioning"
+                  "zh/api-reference/versioning",
+                  "zh/api-reference/error-codes"
                 ]
               },
               {
-                "group": "接口",
-                "pages": [
-                  "zh/api-reference/endpoints/trading",
-                  "zh/api-reference/endpoints/deal-order",
-                  "zh/api-reference/endpoints/finance-account",
-                  "zh/api-reference/endpoints/mlp",
-                  "zh/api-reference/endpoints/currency",
-                  "zh/api-reference/endpoints/fund-account",
-                  "zh/api-reference/endpoints/funding-fee",
-                  "zh/api-reference/endpoints/funding-rate",
-                  "zh/api-reference/endpoints/trade-symbol",
-                  "zh/api-reference/endpoints/market-data",
-                  "zh/api-reference/endpoints/exchange-rate"
-                ]
+                "group": "Account",
+                "openapi": "openapi/mc-account.json"
+              },
+              {
+                "group": "Trade",
+                "openapi": "openapi/mc-trade.json"
+              },
+              {
+                "group": "Risk",
+                "openapi": "openapi/mc-risk.json"
+              },
+              {
+                "group": "Aggregator",
+                "openapi": "openapi/mc-aggregator.json"
               }
             ]
           }

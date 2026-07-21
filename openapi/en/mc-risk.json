@@ -1,0 +1,725 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "mc-risk",
+    "description": "Risk Control System\n\nThis spec only includes interfaces annotated with @OpenApiPermission, i.e., the public OpenAPI subset exposed to end users/integrators and accessed via API Gateway using Access Key / Secret Key (AK/SK) signature authentication. It excludes backend Admin, internal Feign, and other non-exposed interfaces.",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://springdoc.org"
+    },
+    "version": "v0.0.1"
+  },
+  "externalDocs": {
+    "description": "mc-risk Wiki Documentation",
+    "url": ""
+  },
+  "servers": [
+    {
+      "url": "https://test-gateway.mcconnects.com",
+      "description": "Test Environment API Gateway"
+    },
+    {
+      "url": "https://gateway.mcconnects.com",
+      "description": "Production Environment API Gateway"
+    }
+  ],
+  "security": [
+    {
+      "McAccessKey": [],
+      "McSignature": [],
+      "McTimestamp": [],
+      "McNonce": []
+    }
+  ],
+  "paths": {
+    "/openapi/v1/mc-risk/trade/symbol/list": {
+      "get": {
+        "tags": [
+          "Trading"
+        ],
+        "summary": "Trading Symbol List",
+        "description": "Query the trading symbol list based on the current user's UID\nRequired Permission: READ",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 10
+                },
+                "current": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 1
+                },
+                "orderBy": {
+                  "type": "string",
+                  "description": "Supports multi-field sorting, separated by commas",
+                  "example": "id,createTime"
+                },
+                "orderDirection": {
+                  "type": "string",
+                  "description": "ASC for ascending / DESC for descending; separate multiple fields with commas",
+                  "example": "DESC,ASC",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ]
+                },
+                "group": {
+                  "type": "string"
+                }
+              },
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "description": "Product Name"
+                              },
+                              "group": {
+                                "type": "string",
+                                "description": "Product Group"
+                              },
+                              "flags": {
+                                "type": "string",
+                                "description": "Symbol tags: MORTGAGE: Collateral, TRADE: Trading Symbol, SPOT: Spot",
+                                "enum": [
+                                  "MORTGAGE",
+                                  "TRADE",
+                                  "SPOT",
+                                  "TRADE",
+                                  "MORTGAGE",
+                                  "SPOT"
+                                ]
+                              }
+                            },
+                            "example": null
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "size": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "current": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "pages": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "hasPrevious": {
+                          "type": "boolean"
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi/v1/mc-risk/funding-rate": {
+      "get": {
+        "tags": [
+          "Funding Rate"
+        ],
+        "summary": "Paginated query of trading currency funding rate history",
+        "description": "Required Permission: READ",
+        "operationId": "page",
+        "parameters": [
+          {
+            "name": "req",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "required": [
+                "symbol"
+              ],
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 10
+                },
+                "current": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 1
+                },
+                "orderBy": {
+                  "type": "string",
+                  "description": "Supports multi-field sorting, separated by commas",
+                  "example": "id,createTime"
+                },
+                "orderDirection": {
+                  "type": "string",
+                  "description": "ASC for ascending / DESC for descending; separate multiple fields with commas",
+                  "example": "DESC,ASC",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ]
+                },
+                "symbol": {
+                  "type": "string",
+                  "description": "Trading Currency"
+                },
+                "isSettlementRate": {
+                  "type": "boolean",
+                  "description": "Whether it is the settlement price",
+                  "enum": [
+                    true,
+                    false
+                  ]
+                }
+              },
+              "description": "Risk control parameter configuration paginated query request",
+              "example": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "example": "BTCUSDT"
+                              },
+                              "fundingRate": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "fundingRateStr": {
+                                "type": "string",
+                                "example": "1.0E-4"
+                              },
+                              "fundingRateDisplay": {
+                                "type": "string",
+                                "example": "0.0125%"
+                              },
+                              "fundingRateScale": {
+                                "type": "integer",
+                                "format": "int32",
+                                "example": 4
+                              },
+                              "annualRateDisplay": {
+                                "type": "string",
+                                "example": "13.69%"
+                              },
+                              "settlementPrice": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "settlementPriceStr": {
+                                "type": "string",
+                                "example": "3964.2"
+                              },
+                              "settlementPriceDisplay": {
+                                "type": "string",
+                                "example": "3964.2"
+                              },
+                              "settlementPriceScale": {
+                                "type": "integer",
+                                "format": "int32",
+                                "example": 2
+                              },
+                              "longInterestRate": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "longInterestRateStr": {
+                                "type": "string",
+                                "example": "1.0E-4"
+                              },
+                              "shortInterestRate": {
+                                "type": "number",
+                                "example": 0.0001
+                              },
+                              "shortInterestRateStr": {
+                                "type": "string",
+                                "example": "1.0E-4"
+                              },
+                              "isSettlementRate": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "nextSettlementTime": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1697331200000
+                              },
+                              "timestamp": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1697331200000
+                              },
+                              "settlementCycle": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 3600
+                              }
+                            },
+                            "example": null
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "size": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "current": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "pages": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "hasPrevious": {
+                          "type": "boolean"
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        }
+                      },
+                      "example": null
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SymbolPageReq": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "title": "Number of records per page",
+            "type": "integer",
+            "format": "int64",
+            "example": 10
+          },
+          "current": {
+            "title": "Current page",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "orderBy": {
+            "title": "Sort field",
+            "type": "string",
+            "description": "Supports multi-field sorting, separated by commas",
+            "example": "id,createTime"
+          },
+          "orderDirection": {
+            "title": "Sort direction",
+            "type": "string",
+            "description": "ASC for ascending / DESC for descending; separate multiple fields with commas",
+            "example": "DESC,ASC",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "group": {
+            "title": "Product Group",
+            "type": "string"
+          }
+        }
+      },
+      "BasePageRspSymbolDto": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SymbolDto"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasPrevious": {
+            "type": "boolean"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RetResultBasePageRspSymbolDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BasePageRspSymbolDto"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SymbolDto": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Product Name"
+          },
+          "group": {
+            "type": "string",
+            "description": "Product Group"
+          },
+          "flags": {
+            "type": "string",
+            "description": "Symbol tags: MORTGAGE: Collateral, TRADE: Trading Symbol, SPOT: Spot",
+            "enum": [
+              "MORTGAGE",
+              "TRADE",
+              "SPOT",
+              "TRADE",
+              "MORTGAGE",
+              "SPOT"
+            ]
+          }
+        }
+      },
+      "FundingRatePageReq": {
+        "required": [
+          "symbol"
+        ],
+        "type": "object",
+        "properties": {
+          "size": {
+            "title": "Number of records per page",
+            "type": "integer",
+            "format": "int64",
+            "example": 10
+          },
+          "current": {
+            "title": "Current page",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "orderBy": {
+            "title": "Sort field",
+            "type": "string",
+            "description": "Supports multi-field sorting, separated by commas",
+            "example": "id,createTime"
+          },
+          "orderDirection": {
+            "title": "Sort direction",
+            "type": "string",
+            "description": "ASC for ascending / DESC for descending; separate multiple fields with commas",
+            "example": "DESC,ASC",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Trading Currency"
+          },
+          "isSettlementRate": {
+            "type": "boolean",
+            "description": "Whether it is the settlement price",
+            "enum": [
+              true,
+              false
+            ]
+          }
+        },
+        "description": "Risk control parameter configuration paginated query request"
+      },
+      "BasePageRspFundingRateDto": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingRateDto"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasPrevious": {
+            "type": "boolean"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FundingRateDto": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "title": "Currency",
+            "type": "string",
+            "example": "BTCUSDT"
+          },
+          "fundingRate": {
+            "title": "Funding Rate",
+            "type": "number",
+            "example": 0.0001
+          },
+          "fundingRateStr": {
+            "title": "Funding rate raw decimal string",
+            "type": "string",
+            "example": "1.0E-4"
+          },
+          "fundingRateDisplay": {
+            "title": "Funding rate display value",
+            "type": "string",
+            "example": "0.0125%"
+          },
+          "fundingRateScale": {
+            "title": "Funding rate display decimal places",
+            "type": "integer",
+            "format": "int32",
+            "example": 4
+          },
+          "annualRateDisplay": {
+            "title": "Annualized funding rate display value",
+            "type": "string",
+            "example": "13.69%"
+          },
+          "settlementPrice": {
+            "title": "Close Price",
+            "type": "number",
+            "example": 0.0001
+          },
+          "settlementPriceStr": {
+            "title": "Close price raw decimal string",
+            "type": "string",
+            "example": "3964.2"
+          },
+          "settlementPriceDisplay": {
+            "title": "Close price display value",
+            "type": "string",
+            "example": "3964.2"
+          },
+          "settlementPriceScale": {
+            "title": "Close price display decimal places",
+            "type": "integer",
+            "format": "int32",
+            "example": 2
+          },
+          "longInterestRate": {
+            "title": "Long Interest Rate",
+            "type": "number",
+            "example": 0.0001
+          },
+          "longInterestRateStr": {
+            "title": "Long interest rate raw decimal string",
+            "type": "string",
+            "example": "1.0E-4"
+          },
+          "shortInterestRate": {
+            "title": "Short Interest Rate",
+            "type": "number",
+            "example": 0.0001
+          },
+          "shortInterestRateStr": {
+            "title": "Short interest rate raw decimal string",
+            "type": "string",
+            "example": "1.0E-4"
+          },
+          "isSettlementRate": {
+            "title": "Whether it is the settlement rate",
+            "type": "boolean",
+            "example": true
+          },
+          "nextSettlementTime": {
+            "title": "Next settlement time Unix timestamp",
+            "type": "integer",
+            "format": "int64",
+            "example": 1697331200000
+          },
+          "timestamp": {
+            "title": "Funding rate generation time Unix timestamp",
+            "type": "integer",
+            "format": "int64",
+            "example": 1697331200000
+          },
+          "settlementCycle": {
+            "title": "Settlement cycle (unit: seconds)",
+            "type": "integer",
+            "format": "int64",
+            "example": 3600
+          }
+        }
+      },
+      "RetResultBasePageRspFundingRateDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BasePageRspFundingRateDto"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "McAccessKey": {
+        "type": "apiKey",
+        "description": "Access Key (AK), created by the user in API Key Management",
+        "name": "X-Access-Key",
+        "in": "header"
+      },
+      "McSignature": {
+        "type": "apiKey",
+        "description": "HMAC-SHA256 Signature v2 (Base64). See the Authentication Getting Started documentation for algorithm and signing string details",
+        "name": "X-Signature",
+        "in": "header"
+      },
+      "McTimestamp": {
+        "type": "apiKey",
+        "description": "Current Unix timestamp in milliseconds (13 digits). Must be within ±10 minutes of server time",
+        "name": "X-Timestamp",
+        "in": "header"
+      },
+      "McNonce": {
+        "type": "apiKey",
+        "description": "Unique nonce per request (UUID v4 recommended), used for anti-replay; participates in signature v2",
+        "name": "X-Nonce",
+        "in": "header"
+      }
+    }
+  }
+}

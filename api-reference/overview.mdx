@@ -1,14 +1,16 @@
 ---
 title: "API Reference"
 sidebarTitle: "Overview"
-description: "MC OpenAPI endpoints grouped by tag: Trading, Deal Orders, Finance, MLP, Currency, Fund Account, Market Data, Funding Fee, and related."
+description: "MC OpenAPI public endpoints generated from the openapi-exposed specifications, grouped by gateway service."
 ---
 
-This reference covers every public MC OpenAPI endpoint (gateway paths documented with `@OpenApiPermission`), organized by tag. All endpoints share the same gateway host, path prefix (`/openapi/v1`), authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope.
+This reference covers every public MC OpenAPI endpoint (gateway paths with `@OpenApiPermission`). Pages under **Account**, **Trade**, **Risk**, and **Aggregator** are generated from OpenAPI Spec files in `openapi/`.
+
+All endpoints share the same gateway host, authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope. Request URIs in the Spec already include the service segment used for signing (for example `/openapi/v1/mc-account/...`).
 
 <CardGroup cols={2}>
   <Card title="Authentication" icon="lock" href="/authentication">
-    AK/SK credentials, HMAC-SHA256 signing, timestamps, and permissions.
+    AK/SK credentials, HMAC-SHA256 signing, timestamps, nonce, and permissions.
   </Card>
 
   <Card title="Base URL" icon="server" href="/api-reference/base-url">
@@ -19,88 +21,18 @@ This reference covers every public MC OpenAPI endpoint (gateway paths documented
     URL-path versioning under `/openapi/v1` and deprecation policy.
   </Card>
 
-  <Card title="Trading" icon="right-left" href="/api-reference/endpoints/trading">
-    Flash conversion, transaction records, and fund-flow history.
-  </Card>
-
-  <Card title="Deal Orders" icon="receipt" href="/api-reference/endpoints/deal-order">
-    Paginated deal orders and deal-order details.
-  </Card>
-
-  <Card title="Finance Account" icon="piggy-bank" href="/api-reference/endpoints/finance-account">
-    Product catalog, positions, subscriptions/redemptions, and overview.
-  </Card>
-
-  <Card title="MLP" icon="chart-pie" href="/api-reference/endpoints/mlp">
-    MLP deposits/withdrawals, assets, charts, and configuration.
-  </Card>
-
-  <Card title="Currency" icon="coins" href="/api-reference/endpoints/currency">
-    Symbol network list, exchangeable symbols, and symbol details.
-  </Card>
-
-  <Card title="Fund Account" icon="wallet" href="/api-reference/endpoints/fund-account">
-    Spot positions and user Proof-of-Reserves.
-  </Card>
-
-  <Card title="Funding Fee" icon="file-invoice-dollar" href="/api-reference/endpoints/funding-fee">
-    Funding-fee & interest-fee history paginated query (v2).
-  </Card>
-
-  <Card title="Funding Rate" icon="percent" href="/api-reference/endpoints/funding-rate">
-    Market funding-rate history pagination.
-  </Card>
-
-  <Card title="Trade Symbols" icon="list" href="/api-reference/endpoints/trade-symbol">
-    Tradable symbol list.
-  </Card>
-
-  <Card title="Market Data" icon="chart-line" href="/api-reference/endpoints/market-data">
-    K-line candles and symbol ranking.
-  </Card>
-
-  <Card title="Exchange Rate" icon="money-bill-transfer" href="/api-reference/endpoints/exchange-rate">
-    Pair rates, USD rates, and flash conversion quotes.
+  <Card title="Error codes" icon="triangle-exclamation" href="/api-reference/error-codes">
+    Full `code` / `codeKey` catalog from `ExceptionTypeEnum`.
   </Card>
 </CardGroup>
 
-## API at a glance
+## Endpoint groups
 
-| Property | Value |
-| --- | --- |
-| Product | MC Markets OpenAPI |
-| Base URL (test) | `https://test-gateway.mcconnects.com` |
-| Base URL (production) | `https://gateway.mcconnects.com` |
-| Path prefix | `/openapi/v1` |
-| Protocol | HTTPS only |
-| Format | JSON |
-| Auth | AK/SK \+ HMAC-SHA256 signature |
-| Required headers | `X-Access-Key`, `X-Signature`, `X-Timestamp`, `X-Nonce` |
-| Permissions | `READ`, `TRADE`, `WITHDRAW` |
+| Group | Spec | Gateway path prefix |
+| --- | --- | --- |
+| Account | `openapi/mc-account.json` | `/openapi/v1/mc-account/` |
+| Trade | `openapi/mc-trade.json` | `/openapi/v1/mc-trade/` |
+| Risk | `openapi/mc-risk.json` | `/openapi/v1/mc-risk/` |
+| Aggregator | `openapi/mc-aggregator.json` | `/openapi/v1/mc-aggregator/` |
 
-## Response envelope
-
-All endpoints return a common JSON envelope:
-
-```json
-{
-  "status": 200,
-  "code": "200",
-  "codeKey": "DEFAULT",
-  "message": "...",
-  "success": true,
-  "data": { }
-}
-```
-
-- `status` — HTTP status echoed in the body.
-- `code` / `codeKey` — business-level status (e.g. `PARAM_ERROR`, `SIGN_ERROR`, `PERMISSION_DENIED`, `ACCOUNT_BALANCE_INSUFFICIENT`).
-- `success` — `true` for successful business responses.
-- `data` — endpoint-specific payload (object, array, string, or number).
-
-## Common request conventions
-
-- **`trackingId`** — most POST bodies require a `trackingId` string. Use a unique value per request for idempotency and troubleshooting.
-- **Pagination request** — page queries share `{ size, current, orderBy, orderDirection, trackingId, ...filters }`. `orderBy` supports comma-separated multi-field sort (e.g. `id,createTime`); `orderDirection` is `ASC` / `DESC`, comma-separated to match.
-- **Pagination response** — page responses share `{ records: [...], total, size, current, pages, hasPrevious, hasNext }`.
-- **Date-time** — `yyyy-MM-dd HH:mm:ss.SSS` (ISO 8601).
+Use the sidebar groups to open individual operations. The interactive playground is disabled because requests require custom AK/SK signing — follow [Authentication](/authentication) and [First request](/guides/first-request).

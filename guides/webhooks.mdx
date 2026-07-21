@@ -15,10 +15,10 @@ Choose the endpoint that most tightly matches the event you care about:
 | You want to detect | Poll this endpoint | Suggested frequency |
 | --- | --- | --- |
 | New transaction records | `POST /openapi/v1/transaction/transaction/record/page` | 30–60 s |
-| Balance / deposit / withdrawal changes | `POST /openapi/v1/finance/account/overview` | 60 s |
-| Spot position changes | `GET /openapi/v1/fund/account/spot/positions/v2` | 60–300 s |
-| Funding-fee events | `POST /openapi/v1/funding-fee-record/page/v2` | 300 s (settled every 8 h upstream) |
-| Exchange-rate updates | `GET /openapi/v1/exchange-rate/query/usd` | 60–300 s |
+| Balance / deposit / withdrawal changes | `POST /openapi/v1/mc-account/finance/account/overview` | 60 s |
+| Spot position changes | `GET /openapi/v1/mc-account/fund/account/spot/positions/v2` | 60–300 s |
+| Funding-fee events | `POST /openapi/v1/mc-account/funding-fee-record/page/v2` | 300 s (settled every 8 h upstream) |
+| Exchange-rate updates | `GET /openapi/v1/mc-account/exchange-rate/query/usd` | 60–300 s |
 
 See the [API Reference](/api-reference/overview) for the full request/response shape of each endpoint.
 
