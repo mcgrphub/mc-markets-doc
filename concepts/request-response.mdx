@@ -4,7 +4,7 @@ sidebarTitle: "Requests & Responses"
 description: "Reference for MC OpenAPI HTTP requests and JSON responses: signing headers, request body format, response envelope, and HTTP status codes."
 ---
 
-MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the signature v2 headers, and — where applicable — a JSON body. Every response is a JSON envelope with `code`, `msg`, `data`, and `success`.
+MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the required signing headers, and — where applicable — a JSON body. Every response is a JSON envelope with `code`, `msg`, `data`, and `success`.
 
 ## Request format
 
@@ -17,7 +17,7 @@ Include the following headers on every request:
 | `X-Access-Key` | Yes | Your Access Key ID |
 | `X-Signature` | Yes | HMAC-SHA256 signature over the canonical string (**Base64**) |
 | `X-Timestamp` | Yes | Current Unix time in **milliseconds** |
-| `X-Nonce` | Yes | Unique per request (UUID v4 or ≥32 hex chars) |
+| `X-Nonce` | Yes | New value per request; **UUID v4**, or ≥32 hex characters (`0-9a-fA-F`) |
 | `Content-Type` | Recommended for `POST` / `PUT` / `PATCH` | `application/json` |
 | `Accept` | Recommended | `application/json` |
 | `X-Signature-Version` | Optional | Suggested value `2` (troubleshooting) |
@@ -26,9 +26,9 @@ Include the following headers on every request:
   Requests without valid signing headers or `X-Nonce`, or with a `X-Timestamp` outside the allowed window, are rejected. Never commit your Secret Key to source control or expose it in client-side code.
 </Warning>
 
-See [Authentication](/authentication) for the exact signature **v2** format and reference implementations in Python, Java, and Node.js.
+See [Authentication](/authentication) for the exact string-to-sign format and reference implementations in Python, Java, and Node.js.
 
-### String to sign (v2 summary)
+### String to sign (summary)
 
 ```text
 {HTTP_METHOD}

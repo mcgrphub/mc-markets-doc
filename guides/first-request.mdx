@@ -29,9 +29,9 @@ https://gateway.mcconnects.com
 
 ## Step 2 — Understand what you are signing
 
-Every MC OpenAPI request uses **signature v2**: HMAC-SHA256 over a string to sign, with the result **Base64-encoded** in `X-Signature`. Each request must also include a unique `X-Nonce`.
+Every MC OpenAPI request is signed with HMAC-SHA256 over a string to sign, with the result **Base64-encoded** in `X-Signature`. Each request must also include a new `X-Nonce` (**UUID v4**, or ≥32 hex characters). Full rules: [Authentication](/authentication).
 
-The v2 string to sign consists of the following lines (omit the query line when there are no query parameters; omit the body hash line for GET or empty-body requests):
+The string to sign consists of the following lines (omit the query line when there are no query parameters; omit the body hash line for GET or empty-body requests):
 
 ```text
 {HTTP_METHOD}
@@ -64,7 +64,7 @@ Full details are in the [Authentication](/authentication) reference.
 ACCESS_KEY="your_access_key"
 SECRET_KEY="your_secret_key"
 TS=$(date +%s000)
-NONCE=$(uuidgen | tr '[:upper:]' '[:lower:]')
+NONCE=$(python3 -c 'import uuid; print(uuid.uuid4())')
 METHOD="GET"
 PATH_="/openapi/v1/mc-account/exchange-rate/query/usd"
 

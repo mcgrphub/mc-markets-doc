@@ -4,7 +4,7 @@ sidebarTitle: "请求与响应"
 description: "MC OpenAPI HTTP 请求与 JSON 响应参考:签名头、body 格式、响应信封与 HTTP 状态码。"
 ---
 
-MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关，携带签名 v2 所需请求头；请求带 body 时为 JSON。所有响应都是包含 `code`、`msg`、`data`、`success` 的 JSON 信封。
+MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关，携带鉴权所需请求头；请求带 body 时为 JSON。所有响应都是包含 `code`、`msg`、`data`、`success` 的 JSON 信封。
 
 ## 请求格式
 
@@ -15,7 +15,7 @@ MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的
 | `X-Access-Key` | 是 | 你的 Access Key ID |
 | `X-Signature` | 是 | 待签名字符串的 HMAC-SHA256 签名（**Base64**） |
 | `X-Timestamp` | 是 | 当前 Unix 时间（**毫秒**） |
-| `X-Nonce` | 是 | 每次请求唯一的 nonce（UUID v4 或 ≥32 位 hex） |
+| `X-Nonce` | 是 | 每次请求新生成；**UUID v4**，或 ≥32 位十六进制（`0-9a-fA-F`） |
 | `Content-Type` | POST/PUT/PATCH 建议 | `application/json` |
 | `Accept` | 建议 | `application/json` |
 | `X-Signature-Version` | 否 | 建议填 `2`（排障用） |
@@ -24,9 +24,9 @@ MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的
   缺少有效签名头、`X-Nonce`，或 `X-Timestamp` 超出允许区间的请求将被拒绝。切勿将 Secret Key 提交到代码仓库或在客户端暴露。
 </Warning>
 
-待签名字符串的确切格式与 Python/Java/Node.js 参考实现见 [认证](/zh/authentication)（签名 **v2**）。
+待签名字符串的确切格式与 Python/Java/Node.js 参考实现见 [认证](/zh/authentication)。
 
-### 待签名字符串（v2 概要）
+### 待签名字符串（概要）
 
 ```text
 {HTTP_METHOD}

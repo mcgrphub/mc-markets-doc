@@ -1,11 +1,11 @@
 ---
 title: "认证"
 sidebarTitle: "认证"
-description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名 v2 对 MC OpenAPI 请求进行鉴权。"
+description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名对 MC OpenAPI 请求进行鉴权。"
 ---
 
 <Note>
-  **版本说明（v3.7.0）**：自 v3.7.0 起，OpenAPI C 类 AK/SK 使用签名 **v2**（硬切换，**不支持 v1**）。每次请求必须携带 `X-Nonce`；`POST` / `PUT` / `PATCH` 且请求体非空时，须将请求体 SHA-256 纳入签名。历史 v3.4.0 文档仅作参考。
+  每次请求必须携带 `X-Nonce`（**UUID v4**，或 ≥32 位十六进制）；`POST` / `PUT` / `PATCH` 且请求体非空时，须将请求体 SHA-256 纳入签名。
 </Note>
 
 所有 OpenAPI 请求必须通过 **API 网关** 访问，并使用 **Access Key（AK）** 与 **Secret Key（SK）** 进行鉴权。网关会校验签名、检查 nonce 防重放、检查 API Key 权限，并将请求转发至对应的后端服务。
@@ -58,9 +58,9 @@ https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/
 | 请求头 | 是否必填 | 说明 |
 | --- | --- | --- |
 | `X-Access-Key` | 是 | 你的 Access Key（AK） |
-| `X-Signature` | 是 | HMAC-SHA256 签名 v2（Base64 编码） |
+| `X-Signature` | 是 | HMAC-SHA256 签名（Base64 编码） |
 | `X-Timestamp` | 是 | 当前 Unix 时间戳，单位为 **毫秒** |
-| `X-Nonce` | 是 | **每次请求唯一**；推荐 UUID v4，或 ≥32 位十六进制字符串 |
+| `X-Nonce` | 是 | 每次请求新生成；**UUID v4**，或 ≥32 位十六进制（`0-9a-fA-F`） |
 | `Content-Type` | POST/PUT/PATCH 建议 | 发送 JSON 时使用 `application/json` |
 | `X-Signature-Version` | 否 | 建议填 `2`，仅用于排障 |
 
@@ -70,13 +70,13 @@ HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均
   请勿同时发送 `Authorization: Bearer ...` 与 AK/SK 相关请求头。若请求中存在 Bearer Token，网关会将其识别为 Web 会话鉴权（B 类模式），不会使用 AK/SK 签名。
 </Warning>
 
-## 请求签名 v2
+## 请求签名
 
 ### 概述
 
 签名用于防止请求被篡改或重放。每次请求需完成以下步骤：
 
-1. 生成唯一的 `X-Nonce`。
+1. 生成新的 `X-Nonce`（UUID v4，或 ≥32 位 hex）。
 2. 根据 HTTP 方法、URI、Query、参与签名的请求头、时间戳、nonce，以及（路径 B 时）请求体哈希，构建 **待签名字符串（string to sign）**。
 3. 使用 Secret Key 计算 **HMAC-SHA256**。
 4. 将结果进行 Base64 编码，放入 `X-Signature` 请求头。
@@ -97,7 +97,7 @@ HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均
 | --- | --- |
 | `HTTP_METHOD` | 大写 HTTP 方法，如 `GET`、`POST`、`PUT`、`PATCH`、`DELETE` |
 | `REQUEST_URI` | 不含域名的完整网关路径，如 `/openapi/v1/mc-account/symbol/list` |
-| `QUERY_STRING` | Query 按 key 字典序（ASCII 升序），格式 `key1=value1&key2=value2`。**无 Query 时整行省略**（与 v1 相同，**不要**插入空行） |
+| `QUERY_STRING` | Query 按 key 字典序（ASCII 升序），格式 `key1=value1&key2=value2`。**无 Query 时整行省略**（**不要**插入空行） |
 | `SIGNED_HEADERS` | `x-access-key`、`x-nonce`、`x-timestamp` 按 key 字典序拼接为 `key=value&...` |
 | `TIMESTAMP` | 与 `X-Timestamp` 相同（毫秒） |
 | `NONCE` | 与 `X-Nonce` 相同 |
@@ -129,7 +129,7 @@ HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均
 - 客户端签名与发送必须使用 **相同的原始 body 字节**（不要依赖网关侧重排 JSON）。
 - 请求体上限 **10MB**（与网关 `gateway.request.max-body-size-bytes` 一致），超限返回 **413**。
 
-#### Canonicalization 约束（v3.7.0）
+#### Canonicalization 约束
 
 - **禁止**同一 query key 出现多次（如 `?a=1&a=2`），否则 **401**。
 - **禁止**参与签名的请求头出现多个值（如两个 `X-Nonce`），否则 **401**。
@@ -147,9 +147,16 @@ signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
 
 ### 时间戳与 nonce
 
-- `X-Timestamp` 必须为 **毫秒级** Unix 时间戳（13 位），网关接受 **±10 分钟**。
-- `X-Nonce` **每次请求必须新生成**；相同 nonce 在有效期内不可重复使用（防重放）。
-- nonce 格式：UUID v4，或长度 ≥32 的十六进制字符串。
+- `X-Timestamp` 必须为 **毫秒级** Unix 时间戳（13 位），网关接受相对服务器时间 **±10 分钟**。
+- `X-Nonce`：
+  - **必填**，每次请求必须**新生成**，不要复用。
+  - **格式（二选一）**：
+    - **UUID v4**（须为 v4；v1 等其他版本会被拒绝）
+    - 或长度 **≥32** 的十六进制字符串（仅 `0-9`、`a-f`、`A-F`）
+  - 推荐用 `UUID.randomUUID()` / `crypto.randomUUID()` 生成 UUID v4。
+  - 不要带首尾空格；请求头中的值须与待签名字符串里的 `x-nonce=` 与 `NONCE` 行**完全一致**。
+  - 同一 **Access Key** 下，相同 nonce 在防重放窗口内不可复用（默认约 **11 分钟**）。不同 Access Key 互不影响。
+  - 格式非法返回 `401`，消息 `非法 nonce 格式`；复用返回 `401`，消息 `请求重放`。
 
 ## 权限
 
@@ -231,7 +238,7 @@ ACCESS_KEY = "YOUR_ACCESS_KEY"
 SECRET_KEY = "YOUR_SECRET_KEY"
 BASE_URL = "https://gateway.mcconnects.com"
 
-def sign_request_v2(
+def sign_request(
     method: str,
     uri: str,
     query_params: dict | None = None,
@@ -277,13 +284,13 @@ def sign_request_v2(
 
 # GET 示例
 uri = "/openapi/v1/mc-account/symbol/list"
-headers = sign_request_v2("GET", uri)
+headers = sign_request("GET", uri)
 print(requests.get(f"{BASE_URL}{uri}", headers=headers).status_code)
 
 # POST 路径 B 示例
 uri = "/openapi/v1/mc-account/transaction/account/record/page"
 body = b'{"current":1,"size":10}'
-headers = sign_request_v2("POST", uri, body=body)
+headers = sign_request("POST", uri, body=body)
 print(
     requests.post(
         f"{BASE_URL}{uri}",
@@ -304,7 +311,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class McOpenApiSignerV2 {
+public class McOpenApiSigner {
 
     public static String sign(String method, String uri,
                               Map<String, String> queryParams,
@@ -362,7 +369,7 @@ public class McOpenApiSignerV2 {
 ```javascript Node.js
 const crypto = require("crypto");
 
-function signRequestV2(method, uri, queryParams, bodyBuffer, accessKey, secretKey) {
+function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey) {
   const timestamp = String(Date.now());
   const nonce = crypto.randomUUID();
   const parts = [method.toUpperCase(), uri];
@@ -428,8 +435,8 @@ function signRequestV2(method, uri, queryParams, bodyBuffer, accessKey, secretKe
 | `缺少签名, 请在请求头中添加X-Signature` | 缺少 `X-Signature` |
 | `缺少时间戳, 请在请求头中添加X-Timestamp` | 缺少 `X-Timestamp` |
 | `缺少 nonce, 请在请求头中添加 X-Nonce` | 缺少 `X-Nonce` |
-| `非法 nonce 格式` | nonce 不符合 UUID v4 或 hex 规则 |
-| `请求重放` | nonce 已被使用 |
+| `非法 nonce 格式` | 不是 UUID v4，也不是 ≥32 位十六进制 |
+| `请求重放` | 同一 Access Key 下该 nonce 仍在防重放窗口内 |
 | `非法重复查询参数: {key}` | 同一 query key 出现多次 |
 | `非法重复请求头: {name}` | 参与签名的请求头出现多个值 |
 | `时间戳无效或已过期` | 时间戳超出 ±10 分钟 |
@@ -444,18 +451,17 @@ function signRequestV2(method, uri, queryParams, bodyBuffer, accessKey, secretKe
 
 <Tip>
   1. **切勿泄露 Secret Key**，不要写入前端代码、公开仓库或日志。
-  2. **每次请求使用新的 `X-Nonce`**，不要复用。
+  2. **每次请求使用新的 `X-Nonce`**（UUID v4，或 ≥32 位 hex），不要复用。
   3. **生产环境建议配置 IP 白名单**。
   4. **遵循最小权限原则**。
   5. **定期轮换密钥**。
   6. **保持系统时钟同步**（NTP）。
   7. **仅使用 HTTPS**。
-  8. **网关发版 v2 后尽快升级客户端**；v1 签名将不再被接受。
 </Tip>
 
 ## 快速检查清单
 
-- [ ] 已升级 **签名 v2**，每次请求带 **唯一** `X-Nonce`
+- [ ] 每次请求带新的 `X-Nonce`（**UUID v4**，或 ≥32 位 hex），且与签名字符串一致
 - [ ] 请求地址为 **网关** URL
 - [ ] URI 与文档网关路径一致
 - [ ] Query 与 stringToSign 一致，**无重复 query key**

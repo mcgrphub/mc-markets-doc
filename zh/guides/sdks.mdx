@@ -1,21 +1,21 @@
 ---
 title: "MC OpenAPI 客户端代码示例"
 sidebarTitle: "代码示例"
-description: "Python、Node.js、Java、Go 的 MC OpenAPI HMAC-SHA256 签名 v2 客户端,开箱即用。"
+description: "Python、Node.js、Java、Go 的 MC OpenAPI HMAC-SHA256 签名客户端,开箱即用。"
 ---
 
 <Note>
-  自 v3.7.0 起,OpenAPI 必须使用 **签名 v2**(含 `X-Nonce`、Base64 签名;非空 body 时纳入 SHA-256)。完整规则见 [认证](/zh/authentication)。
+  OpenAPI 请求使用 HMAC-SHA256 签名(含 `X-Nonce`——**UUID v4** 或 ≥32 位 hex、Base64 签名;非空 body 时纳入 SHA-256)。完整规则见 [认证](/zh/authentication)。
 </Note>
 
-MC OpenAPI 目前没有官方 SDK。因为所有请求的签名规则一致([认证](/zh/authentication)),只需一个轻量封装 HMAC-SHA256 签名 v2 \+ 标准 HTTP 库的客户端即可。
+MC OpenAPI 目前没有官方 SDK。因为所有请求的签名规则一致([认证](/zh/authentication)),只需一个轻量封装 HMAC-SHA256 签名 \+ 标准 HTTP 库的客户端即可。
 
 以下参考片段为生产可用的起点,可直接拷贝到你的代码库并适配。
 
 ## Python
 
 ```python
-"""mc_client.py — 最小 MC OpenAPI 客户端(签名 v2)。"""
+"""mc_client.py — 最小 MC OpenAPI 客户端。"""
 import base64, hmac, hashlib, json, time, uuid, os
 from urllib.parse import urlencode
 import requests
@@ -87,7 +87,7 @@ print(rates)
 ## Node.js
 
 ```javascript
-// mcClient.js — 最小 MC OpenAPI 客户端(签名 v2, Node.js 18+, ESM)。
+// mcClient.js — 最小 MC OpenAPI 客户端(Node.js 18+, ESM)。
 import crypto from "crypto";
 
 export class MCClient {
@@ -167,7 +167,7 @@ console.log(rates);
 ## Java
 
 ```java
-// MCClient.java — 最小 MC OpenAPI 客户端(签名 v2, Java 11+)。
+// MCClient.java — 最小 MC OpenAPI 客户端(Java 11+)。
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -275,7 +275,7 @@ public class MCClient {
 ## Go
 
 ```go
-// mcclient.go — 最小 MC OpenAPI 客户端(签名 v2)。
+// mcclient.go — 最小 MC OpenAPI 客户端。
 package mc
 
 import (
@@ -398,5 +398,5 @@ func (c *Client) Do(method, path string, params url.Values, body string) ([]byte
 ```
 
 <Tip>
-  以上片段均按 [认证](/zh/authentication) 中的签名 v2 规则实现。若签名被拒(HTTP 401、`签名无效`),打印待签名字符串并与参考实现逐字节对比。
+  以上片段均按 [认证](/zh/authentication) 中的签名规则实现。若签名被拒(HTTP 401、`签名无效`),打印待签名字符串并与参考实现逐字节对比。
 </Tip>

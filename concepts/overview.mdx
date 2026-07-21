@@ -46,7 +46,7 @@ See the [API Reference overview](/api-reference/overview).
 Every call follows the same lifecycle:
 
 1. **Build** the request — HTTP method, path (`/openapi/v1/...`), query string, and optional JSON body.
-2. **Sign** the request — compute signature **v2** (unique `X-Nonce`; include body SHA-256 for non-empty write bodies) with HMAC-SHA256 (**Base64**).
+2. **Sign** the request — compute HMAC-SHA256 (**Base64**) with a new `X-Nonce` (**UUID v4**, or ≥32 hex characters; include body SHA-256 for non-empty write bodies).
 3. **Send** the request over HTTPS with the `X-Access-Key`, `X-Signature`, `X-Timestamp`, and `X-Nonce` headers.
 4. **Handle** the response — inspect the HTTP status, then the `code` field in the JSON envelope.
 

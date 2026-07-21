@@ -39,7 +39,7 @@ All requests are routed through the MC **API Gateway** and authenticated with an
     Log in to the MC platform, open **API Key Management**, create a new key, and select the required permissions (`READ`, `TRADE`, `WITHDRAW`). Copy the Access Key and Secret Key — the Secret Key is shown only once.
   </Step>
   <Step title="Sign your request">
-    Build the string to sign (including `X-Nonce`, and body SHA-256 when required), compute an HMAC-SHA256 signature with your Secret Key (**Base64**), and send it with your Access Key, millisecond timestamp, and nonce. See [Authentication](/authentication) for signature v2.
+    Build the string to sign (including `X-Nonce`, and body SHA-256 when required), compute an HMAC-SHA256 signature with your Secret Key (**Base64**), and send it with your Access Key, millisecond timestamp, and nonce. See [Authentication](/authentication).
   </Step>
   <Step title="Call an endpoint">
     Try `GET /openapi/v1/mc-account/exchange-rate/query/usd` to verify your integration, then browse the [full API reference](/api-reference/overview).
@@ -52,6 +52,6 @@ All requests are routed through the MC **API Gateway** and authenticated with an
   </Card>
 
   <Card title="Authentication" icon="lock" href="/authentication">
-    Signature v2 headers, nonce, and body hash rules.
+    Signing headers, nonce, and body hash rules.
   </Card>
 </CardGroup>

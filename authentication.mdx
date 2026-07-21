@@ -1,11 +1,11 @@
 ---
 title: "Authentication"
 sidebarTitle: "Authentication"
-description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key (SK) and HMAC-SHA256 signature v2."
+description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key (SK) and HMAC-SHA256 signing."
 ---
 
 <Note>
-  **Version note (v3.7.0):** Starting with v3.7.0, OpenAPI Category C AK/SK uses **signature v2** (hard cutover; **v1 is not supported**). Every request must include `X-Nonce`. For `POST` / `PUT` / `PATCH` with a non-empty body, the request body SHA-256 must be included in the signature. The v3.4.0 documentation is retained for historical reference only.
+  Every request must include `X-Nonce` (**UUID v4**, or ≥32 hex characters). For `POST` / `PUT` / `PATCH` with a non-empty body, include the request body SHA-256 in the signature.
 </Note>
 
 All OpenAPI requests must be sent to the **API Gateway** and authenticated with an **Access Key (AK)** and **Secret Key (SK)** pair. The gateway validates your signature, enforces nonce replay protection, checks API Key permissions, and forwards the request to the appropriate backend service.
@@ -58,9 +58,9 @@ Every authenticated request must include the following HTTP headers:
 | Header | Required | Description |
 | --- | --- | --- |
 | `X-Access-Key` | Yes | Your Access Key (AK) |
-| `X-Signature` | Yes | HMAC-SHA256 signature v2 (Base64-encoded) |
+| `X-Signature` | Yes | HMAC-SHA256 signature (Base64-encoded) |
 | `X-Timestamp` | Yes | Current Unix timestamp in **milliseconds** |
-| `X-Nonce` | Yes | **Unique per request**; UUID v4 recommended, or ≥32 hex characters |
+| `X-Nonce` | Yes | New value per request; **UUID v4**, or ≥32 hex characters (`0-9a-fA-F`) |
 | `Content-Type` | Recommended for POST/PUT/PATCH | Use `application/json` when sending JSON |
 | `X-Signature-Version` | No | Suggested value `2` for troubleshooting |
 
@@ -70,13 +70,13 @@ HTTP header names are **case-insensitive** (for example, `x-access-key` and `X-A
   Do not send `Authorization: Bearer ...` together with AK/SK headers. If a Bearer token is present, the gateway treats the request as a web session call (Category B mode) and will not use your AK/SK signature.
 </Warning>
 
-## Request signing v2
+## Request signing
 
 ### Overview
 
 Signing prevents tampering and replay attacks. For each request:
 
-1. Generate a unique `X-Nonce`.
+1. Generate a new `X-Nonce` (UUID v4, or ≥32 hex characters).
 2. Build the **string to sign** from the HTTP method, URI, query parameters, signed headers, timestamp, nonce, and (for path B) the request body hash.
 3. Compute **HMAC-SHA256** using your Secret Key.
 4. Base64-encode the result and send it as the `X-Signature` header.
@@ -97,7 +97,7 @@ Signing prevents tampering and replay attacks. For each request:
 | --- | --- |
 | `HTTP_METHOD` | Uppercase HTTP method, e.g. `GET`, `POST`, `PUT`, `PATCH`, `DELETE` |
 | `REQUEST_URI` | Full gateway path without the host, e.g. `/openapi/v1/mc-account/symbol/list` |
-| `QUERY_STRING` | Query parameters sorted by key (ASCII ascending), formatted as `key1=value1&key2=value2`. **Omit the entire line** if there are no query parameters (same as v1; do **not** insert a blank line) |
+| `QUERY_STRING` | Query parameters sorted by key (ASCII ascending), formatted as `key1=value1&key2=value2`. **Omit the entire line** if there are no query parameters (do **not** insert a blank line) |
 | `SIGNED_HEADERS` | `x-access-key`, `x-nonce`, and `x-timestamp` sorted by key and joined as `key=value&...` |
 | `TIMESTAMP` | Same value as `X-Timestamp` (milliseconds) |
 | `NONCE` | Same value as `X-Nonce` |
@@ -129,7 +129,7 @@ Other headers (such as `Content-Type`) **do not** participate in the signature.
 - The client must use the **same raw body bytes** for signing and sending (do not rely on the gateway to re-serialize JSON).
 - Maximum request body size is **10 MB** (consistent with gateway `gateway.request.max-body-size-bytes`); exceeding the limit returns **413**.
 
-#### Canonicalization rules (v3.7.0)
+#### Canonicalization rules
 
 - **Do not** repeat the same query key (e.g. `?a=1&a=2`); otherwise **401**.
 - **Do not** send multiple values for signed headers (e.g. two `X-Nonce` headers); otherwise **401**.
@@ -147,9 +147,16 @@ signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
 
 ### Timestamp and nonce
 
-- `X-Timestamp` must be a **millisecond** Unix timestamp (13 digits). The gateway accepts **±10 minutes** of server time.
-- `X-Nonce` must be **newly generated for every request**; the same nonce cannot be reused within its validity window (replay protection).
-- Nonce format: UUID v4, or a hex string of length ≥32.
+- `X-Timestamp` must be a **millisecond** Unix timestamp (13 digits). The gateway accepts **±10 minutes** relative to server time.
+- `X-Nonce`:
+  - **Required**. Generate a **new** value for every request — do not reuse.
+  - **Format (either)**:
+    - **UUID v4** (must be version 4; other versions such as v1 are rejected)
+    - Or a hex string of length **≥32** (`0-9`, `a-f`, `A-F` only)
+  - Prefer `UUID.randomUUID()` / `crypto.randomUUID()` to generate UUID v4.
+  - Do not include leading or trailing spaces. The header value must match the `x-nonce=` entry and the `NONCE` line in the string to sign **exactly**.
+  - Under the same **Access Key**, the same nonce cannot be reused within the replay-protection window (about **11 minutes** by default). Different Access Keys do not share this constraint.
+  - Invalid format → `401` with message `非法 nonce 格式`. Reuse → `401` with message `请求重放`.
 
 ## Permissions
 
@@ -232,7 +239,7 @@ ACCESS_KEY = "YOUR_ACCESS_KEY"
 SECRET_KEY = "YOUR_SECRET_KEY"
 BASE_URL = "https://gateway.mcconnects.com"
 
-def sign_request_v2(
+def sign_request(
     method: str,
     uri: str,
     query_params: dict | None = None,
@@ -278,13 +285,13 @@ def sign_request_v2(
 
 # GET example
 uri = "/openapi/v1/mc-account/symbol/list"
-headers = sign_request_v2("GET", uri)
+headers = sign_request("GET", uri)
 print(requests.get(f"{BASE_URL}{uri}", headers=headers).status_code)
 
 # POST path B example
 uri = "/openapi/v1/mc-account/transaction/account/record/page"
 body = b'{"current":1,"size":10}'
-headers = sign_request_v2("POST", uri, body=body)
+headers = sign_request("POST", uri, body=body)
 print(
     requests.post(
         f"{BASE_URL}{uri}",
@@ -305,7 +312,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class McOpenApiSignerV2 {
+public class McOpenApiSigner {
 
     public static String sign(String method, String uri,
                               Map<String, String> queryParams,
@@ -363,7 +370,7 @@ public class McOpenApiSignerV2 {
 ```javascript Node.js
 const crypto = require("crypto");
 
-function signRequestV2(method, uri, queryParams, bodyBuffer, accessKey, secretKey) {
+function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey) {
   const timestamp = String(Date.now());
   const nonce = crypto.randomUUID();
   const parts = [method.toUpperCase(), uri];
@@ -429,8 +436,8 @@ Authentication failures typically return HTTP **401 Unauthorized**; request body
 | `缺少签名, 请在请求头中添加X-Signature` | Missing `X-Signature` |
 | `缺少时间戳, 请在请求头中添加X-Timestamp` | Missing `X-Timestamp` |
 | `缺少 nonce, 请在请求头中添加 X-Nonce` | Missing `X-Nonce` |
-| `非法 nonce 格式` | Nonce does not match UUID v4 or hex rules |
-| `请求重放` | Nonce has already been used |
+| `非法 nonce 格式` | Not UUID v4 and not ≥32 hex characters |
+| `请求重放` | Nonce already used for this Access Key within the replay window |
 | `非法重复查询参数: {key}` | Duplicate query key |
 | `非法重复请求头: {name}` | Signed header has multiple values |
 | `时间戳无效或已过期` | Timestamp outside ±10 minutes |
@@ -445,18 +452,17 @@ Authentication failures typically return HTTP **401 Unauthorized**; request body
 
 <Tip>
   1. **Never expose your Secret Key** in client-side code, public repositories, or logs.
-  2. **Use a new `X-Nonce` on every request** — do not reuse nonces.
+  2. **Use a new `X-Nonce` on every request** (UUID v4, or ≥32 hex chars) — do not reuse nonces.
   3. **Configure an IP whitelist in production**.
   4. **Grant minimum permissions**.
   5. **Rotate keys regularly**.
   6. **Keep your system clock synchronized** (NTP).
   7. **Use HTTPS only**.
-  8. **Upgrade clients to v2 promptly after the gateway deploys v2**; v1 signatures will no longer be accepted.
 </Tip>
 
 ## Quick checklist
 
-- [ ] Upgraded to **signature v2** with a **unique** `X-Nonce` on every request
+- [ ] Every request includes a new `X-Nonce` (**UUID v4**, or ≥32 hex chars) that matches the string to sign
 - [ ] Request URL uses the **gateway** base URL
 - [ ] URI matches the documented gateway path
 - [ ] Query matches the string to sign; **no duplicate query keys**

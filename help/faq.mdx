@@ -28,17 +28,18 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
 
 <AccordionGroup>
   <Accordion title="What exactly do I sign?">
-    From v3.7.0, use signature **v2**. The string to sign includes method, URI, optional query, signed headers (`x-access-key` / `x-nonce` / `x-timestamp`), timestamp, nonce, and (for non-empty `POST`/`PUT`/`PATCH` bodies) the lowercase SHA-256 hex of the raw body. Put the HMAC-SHA256 digest in `X-Signature` as **Base64** (not hex). Every request needs a unique `X-Nonce`. Full rules: [Authentication](/authentication).
+    The string to sign includes method, URI, optional query, signed headers (`x-access-key` / `x-nonce` / `x-timestamp`), timestamp, nonce, and (for non-empty `POST`/`PUT`/`PATCH` bodies) the lowercase SHA-256 hex of the raw body. Put the HMAC-SHA256 digest in `X-Signature` as **Base64** (not hex). Every request needs a new `X-Nonce` (**UUID v4**, or ≥32 hex characters). Full rules: [Authentication](/authentication).
   </Accordion>
 
   <Accordion title="I get an invalid signature. What's wrong?">
     In order of likelihood:
 
-    1. Still using the v1 string to sign (missing `X-Nonce` / body hash).
-    2. The string to sign does not match what the gateway expects — print it and compare byte-for-byte.
+    1. The string to sign is missing `X-Nonce` or (for non-empty `POST`/`PUT`/`PATCH`) the body SHA-256.
+    2. The string to sign does not match what the gateway expects — print it and compare byte-for-byte (including whether `X-Nonce` matches the header).
     3. You signed different body bytes than you sent (extra whitespace, reordered JSON). Serialize once and reuse the exact bytes.
     4. You used the Access Key in place of the Secret Key.
     5. Query parameters are not sorted by key ascending, or a query key is repeated.
+    6. `X-Nonce` is neither UUID v4 nor ≥32 hex characters.
 
     See also [Troubleshooting](/help/troubleshooting).
   </Accordion>

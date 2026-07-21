@@ -1,21 +1,21 @@
 ---
 title: "MC OpenAPI Client Code Samples"
 sidebarTitle: "Code Samples"
-description: "Ready-to-use HMAC-SHA256 signature v2 signing helpers for MC OpenAPI in Python, Node.js, Java, and Go."
+description: "Ready-to-use HMAC-SHA256 signing helpers for MC OpenAPI in Python, Node.js, Java, and Go."
 ---
 
 <Note>
-  Starting with v3.7.0, OpenAPI requires **signature v2** (`X-Nonce`, Base64 signature; SHA-256 of non-empty bodies). See [Authentication](/authentication) for the full rules.
+  OpenAPI requests use HMAC-SHA256 signing (`X-Nonce` as **UUID v4** or ≥32 hex characters, Base64 signature; SHA-256 of non-empty bodies). See [Authentication](/authentication) for the full rules.
 </Note>
 
-MC OpenAPI does not currently ship an official SDK. Because every request follows the same signing rules ([Authentication](/authentication)), a thin client that wraps HMAC-SHA256 signature v2 plus a standard HTTP library is all you need.
+MC OpenAPI does not currently ship an official SDK. Because every request follows the same signing rules ([Authentication](/authentication)), a thin client that wraps HMAC-SHA256 signing plus a standard HTTP library is all you need.
 
 The reference snippets below are production-ready starting points. Copy, adapt, and integrate them into your codebase.
 
 ## Python
 
 ```python
-"""mc_client.py — minimal MC OpenAPI client (signature v2)."""
+"""mc_client.py — minimal MC OpenAPI client."""
 import base64, hmac, hashlib, json, time, uuid, os
 from urllib.parse import urlencode
 import requests
@@ -87,7 +87,7 @@ print(rates)
 ## Node.js
 
 ```javascript
-// mcClient.js — minimal MC OpenAPI client (signature v2, Node.js 18+, ESM).
+// mcClient.js — minimal MC OpenAPI client (Node.js 18+, ESM).
 import crypto from "crypto";
 
 export class MCClient {
@@ -167,7 +167,7 @@ console.log(rates);
 ## Java
 
 ```java
-// MCClient.java — minimal MC OpenAPI client (signature v2, Java 11+).
+// MCClient.java — minimal MC OpenAPI client (Java 11+).
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -275,7 +275,7 @@ public class MCClient {
 ## Go
 
 ```go
-// mcclient.go — minimal MC OpenAPI client (signature v2).
+// mcclient.go — minimal MC OpenAPI client.
 package mc
 
 import (
@@ -398,5 +398,5 @@ func (c *Client) Do(method, path string, params url.Values, body string) ([]byte
 ```
 
 <Tip>
-  All snippets sign requests using **signature v2** as described in [Authentication](/authentication). If a signature is rejected (HTTP 401, message `签名无效`), print your string to sign and compare it byte-for-byte with the reference implementation.
+  All snippets sign requests using the rules in [Authentication](/authentication). If a signature is rejected (HTTP 401, message `签名无效`), print your string to sign and compare it byte-for-byte with the reference implementation.
 </Tip>

@@ -12,6 +12,7 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | --- | --- | --- |
 | MC Markets OpenAPI / MC OpenAPI | MC Markets OpenAPI / MC OpenAPI | Prefer full name on first mention |
 | Access Key / Secret Key（AK/SK） | Access Key / Secret Key (AK/SK) | Not API token / Bearer (except warnings) |
+| `X-Nonce` | `X-Nonce` | New per request; **UUID v4** or ≥32 hex (`0-9a-fA-F`); replay-scoped per Access Key (~11 min default); must match string to sign exactly |
 | API 网关 | API Gateway | |
 | 资金账户 | Fund account | Not finance account |
 | 理财账户 | Finance account | Prefer over Spec en “Wealth Management Account” |

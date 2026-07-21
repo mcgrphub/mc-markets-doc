@@ -29,9 +29,9 @@ https://gateway.mcconnects.com
 
 ## 步骤 2 — 了解你在签名什么
 
-每个 MC OpenAPI 请求使用 **签名 v2**：对待签名字符串做 HMAC-SHA256,结果 **Base64** 编码后放入 `X-Signature`。每次请求还须携带唯一的 `X-Nonce`。
+每个 MC OpenAPI 请求使用 HMAC-SHA256 签名：对待签名字符串做 HMAC-SHA256,结果 **Base64** 编码后放入 `X-Signature`。每次请求还须携带新的 `X-Nonce`（**UUID v4**，或 ≥32 位十六进制）。完整规则见 [认证](/zh/authentication)。
 
-v2 待签名字符串由以下行组成(无 Query 时省略 Query 行;GET 或无 body 时不追加 body 哈希行):
+待签名字符串由以下行组成(无 Query 时省略 Query 行;GET 或无 body 时不追加 body 哈希行):
 
 ```text
 {HTTP_METHOD}
@@ -64,7 +64,7 @@ x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-t
 ACCESS_KEY="your_access_key"
 SECRET_KEY="your_secret_key"
 TS=$(date +%s000)
-NONCE=$(uuidgen | tr '[:upper:]' '[:lower:]')
+NONCE=$(python3 -c 'import uuid; print(uuid.uuid4())')
 METHOD="GET"
 PATH_="/openapi/v1/mc-account/exchange-rate/query/usd"
 

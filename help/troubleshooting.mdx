@@ -14,7 +14,8 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 
 ### Checklist
 
-- **Signature v2.** Confirm a unique `X-Nonce` is present and the string to sign includes `SIGNED_HEADERS` (with `x-nonce`), `TIMESTAMP`, and `NONCE`. For non-empty `POST`/`PUT`/`PATCH` bodies, append the body SHA-256 as lowercase hex.
+- **Signature check.** Confirm a new `X-Nonce` is present (**UUID v4**, or ≥32 hex characters) and the string to sign includes `SIGNED_HEADERS` (with `x-nonce`), `TIMESTAMP`, and `NONCE`. The header value must match the string to sign exactly. For non-empty `POST`/`PUT`/`PATCH` bodies, append the body SHA-256 as lowercase hex.
+- **Nonce format and reuse.** Not UUID v4 and not ≥32 hex → message `非法 nonce 格式`. Reusing a nonce under the same Access Key within the replay window → message `请求重放`.
 - **No blank query line.** When there is no query, omit the `QUERY_STRING` line entirely — do not insert a blank line.
 - **Body match.** Serialize the JSON body **once** and reuse the same bytes for signing and the HTTP request.
 - **Query ordering.** Sort query parameters by key ascending, joined `key=value` with `&`. Duplicate query keys are rejected.
@@ -28,7 +29,7 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 
 - `X-Timestamp` must be current time in **milliseconds** (13 digits, e.g. `1731657600000`), not seconds.
 - Sync your machine clock via NTP. A drift of only a few seconds can trigger this error.
-- For batches, regenerate both the timestamp and the **nonce** on every call.
+- For batches, regenerate both the timestamp and the **nonce** on every call (new UUID v4 or ≥32 hex characters each time).
 ## HTTP 403 — insufficient permission
 
 ```json

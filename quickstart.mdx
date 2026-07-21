@@ -1,13 +1,13 @@
 ---
 title: "MC OpenAPI Quickstart"
 sidebarTitle: "Quickstart"
-description: "Create an MC Access Key / Secret Key and make your first signed gateway call with signature v2 (including X-Nonce)."
+description: "Create an MC Access Key / Secret Key and make your first signed gateway call with HMAC-SHA256 (including X-Nonce)."
 ---
 
-This quickstart walks you through your first MC OpenAPI call: create an API Key, sign the request with **HMAC-SHA256 signature v2**, and call the exchange-rate endpoint through the gateway.
+This quickstart walks you through your first MC OpenAPI call: create an API Key, sign the request with **HMAC-SHA256**, and call the exchange-rate endpoint through the gateway.
 
 <Note>
-  You need an MC platform account before you begin. If you don't have one, contact your MC representative. From v3.7.0, clients must use signature **v2** (a unique `X-Nonce` on every request).
+  You need an MC platform account before you begin. If you don't have one, contact your MC representative. Every request needs a new `X-Nonce` (**UUID v4**, or ≥32 hex characters).
 </Note>
 
 <Steps>
@@ -24,14 +24,14 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
       Never commit the Secret Key to source control, and never expose it in client-side code.
     </Warning>
   </Step>
-  <Step title="Sign a request (v2)">
+  <Step title="Sign a request">
     Every authenticated request needs at least four headers:
 
     | Header | Value |
     | --- | --- |
     | `X-Access-Key` | Your Access Key |
     | `X-Timestamp` | Current Unix time in **milliseconds** (within ±10 minutes of server time) |
-    | `X-Nonce` | **Unique per request** (UUID v4 recommended) |
+    | `X-Nonce` | New value per request; **UUID v4**, or ≥32 hex characters (`0-9a-fA-F`) |
     | `X-Signature` | **Base64**-encoded HMAC-SHA256 of the string to sign |
 
     Build the string to sign by joining the following parts with `\n`, then append a trailing `\n`:
@@ -107,7 +107,7 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
   <Step title="Explore the API">
     <CardGroup cols={2}>
       <Card title="Authentication" icon="key" href="/authentication">
-        Full signature v2 rules, path A/B, errors, and multi-language samples.
+        Full signing rules, path A/B, errors, and multi-language samples.
       </Card>
 
       <Card title="Base URL" icon="server" href="/api-reference/base-url">

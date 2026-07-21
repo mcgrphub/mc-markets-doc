@@ -11,7 +11,7 @@ description: "Release notes for MC OpenAPI — new endpoints, schema updates, an
 </Update>
 
 <Update label="2026-07-20" description="OpenAPI surface expansion">
-  - **Signature v2**: Updated [Authentication](/authentication) and [Quickstart](/quickstart). Every request requires `X-Nonce`; non-empty `POST`/`PUT`/`PATCH` bodies must include SHA-256 in the string to sign; `X-Signature` is Base64. Corrected outdated signing notes in Requests & Responses, FAQ, and Troubleshooting.
+  - **Signing**: Updated [Authentication](/authentication) and [Quickstart](/quickstart). Every request requires `X-Nonce`; non-empty `POST`/`PUT`/`PATCH` bodies must include SHA-256 in the string to sign; `X-Signature` is Base64. Corrected outdated signing notes in Requests & Responses, FAQ, and Troubleshooting.
   - **Finance Account**: added product catalog, current positions, and redemption history; demand/fixed-term redemption permission is `TRADE` (not `WITHDRAW`).
   - **Trading**: added flash conversion `POST /openapi/v1/transaction/exchange/v2` (`TRADE`).
   - **Deal Orders**: opened paginated deal list and deal detail.
