@@ -13,13 +13,54 @@
 
 ## Source of truth for APIs
 
-Document **only** HTTP endpoints whose controllers/methods are annotated with `@OpenApiPermission` in sibling backend repos.
+Daily fact source for endpoint docs: the **Chinese** OpenAPI Specs in this repo:
 
-- Sibling repos live under the same parent directory as this repo, named with the `mc-` prefix (for example `../mc-account`, `../mc-trade`, `../mc-risk`, `../mc-aggregator-service`)
-- Annotation definition: `com.mc.account.api.openapi.annotation.OpenApiPermission` (in `mc-account`)
-- Typical locations: `**/web/openapi/**` controllers under `mc-*-service` modules
-- Before adding or updating an endpoint page, search those repos for `@OpenApiPermission` and confirm method, path, and required permission (`value` / `publicAccess`)
-- Do **not** document controllers, admin APIs, or internal routes that lack `@OpenApiPermission`
+- `openapi/mc-account.json`
+- `openapi/mc-trade.json`
+- `openapi/mc-risk.json`
+- `openapi/mc-aggregator.json`
+
+These Specs are the `@OpenApiPermission`-filtered public subset. Prefer them over scanning sibling `mc-*` repos for routine edits.
+
+`openapi/en/` is optional backup only — non-required and deprecated for daily agent workflow. English pages are translated from Chinese MDX via [`glossary.zh-en.md`](glossary.zh-en.md), not from `openapi/en/`.
+
+Hand-written MDX is the reader-facing deliverable. Target state: API Reference pages are hand-written and `docs.json` does **not** embed Specs via `"openapi"`. Until that migration ships, `docs.json` may still temporarily reference Spec files — follow the repo as it is; do not remove those entries unless the user asks to start migration.
+
+Sibling-repo / `@OpenApiPermission` checks are reserved for:
+
+- Suspicious or incomplete Specs
+- Explicit export validation requests
+
+Annotation definition (for validation only): `com.mc.account.api.openapi.annotation.OpenApiPermission` in `mc-account`. Typical controller locations: `**/web/openapi/**` under `mc-*-service` modules.
+
+## OpenAPI Spec → docs workflow
+
+When Chinese Specs under `openapi/` are updated (or the maintainer confirms they were):
+
+1. **Export** — Maintainer overwrites the latest Chinese Spec into `openapi/mc-*.json`.
+2. **Diff and summarize** — Agent compares Specs and writes a **change summary** before any MDX or navigation edits. The summary must include:
+   - **Scope** — which Spec files changed
+   - **Path list** by service — added / changed / deleted (note method, path, tag, permission, notable param/schema changes)
+   - **External mapping** — Spec tag → glossary external name; mark missing entries as 待确认
+   - **Suggested MDX targets** using target paths even if files do not exist yet (for example `zh/api-reference/account/finance-account.mdx` and its English mirror)
+   - **Glossary updates needed** — new terms, tags, slugs
+   - **Risks** — breaking changes, permission changes, renames, description-only diffs
+3. **Confirm** — Do **not** edit MDX or `docs.json` navigation until the user confirms the summary.
+4. **After confirmation** — Update [`glossary.zh-en.md`](glossary.zh-en.md) if needed → edit `zh/` MDX → sync English via the glossary → then run the Quality checklist.
+
+### Target page split
+
+- Top-level groups: one per Spec service (Account, Trade, Risk, Aggregator).
+- Second-level pages: one page per **external** tag (after glossary internal→external mapping).
+- Suggested file paths: `zh/api-reference/{service}/{slug}.mdx` ↔ English mirror without `zh/`.
+
+### Phase 1 limits
+
+Tag pages may not exist yet. Unless the user asks to migrate, limit post-confirmation edits to applicable prose (overview, changelog, etc.) and note that full tag-page migration is pending. Do **not** remove `docs.json` `"openapi"` entries or bulk-create tag MDX pages in phase 1.
+
+### Naming and glossary
+
+Consult [`glossary.zh-en.md`](glossary.zh-en.md) for zh↔en terms, Spec internal→external tag mappings, and page title/slug registry. Reader-facing MDX titles, sidebar labels, and body copy must use **external** names only — never raw internal Spec tags (for example `业务前端-交易`). Change summaries may still mention the original Spec tag for verification.
 
 ## Terminology
 
@@ -34,6 +75,8 @@ Document **only** HTTP endpoints whose controllers/methods are annotated with `@
 | Flash conversion / 闪兑 | Vague "swap" unless quoting UI copy |
 | Proof of Reserves / 储备金证明 (PoR) | Informal "reserve check" |
 | Symbol / 币种 | Prefer consistency with existing endpoint pages |
+
+Fuller zh↔en and internal→external mappings live in [`glossary.zh-en.md`](glossary.zh-en.md).
 
 Keep English technical identifiers (`X-Access-Key`, path prefixes, enum names) unchanged in Chinese pages.
 
@@ -51,26 +94,26 @@ Keep English technical identifiers (`X-Access-Key`, path prefixes, enum names) u
 ## Bilingual workflow
 
 1. Write or update the Chinese page under `zh/` first
-2. Sync the English counterpart at the mirrored path (for example `zh/authentication.mdx` → `authentication.mdx`)
-3. Keep structure, examples, and endpoint facts aligned; only prose/locale differs
-4. Internal links:
+2. Before translating, consult [`glossary.zh-en.md`](glossary.zh-en.md); write new renderings back to the glossary; keep technical identifiers untranslated (headers, paths, enum names)
+3. Sync the English counterpart at the mirrored path (for example `zh/authentication.mdx` → `authentication.mdx`)
+4. Keep structure, examples, and endpoint facts aligned; only prose/locale differs
+5. Internal links:
    - English pages: `/authentication`, `/api-reference/overview`
    - Chinese pages: `/zh/authentication`, `/zh/api-reference/overview`
-5. When adding a page, register both language entries in `docs.json` navigation
-6. Do not flip the site default language away from `en`
+6. When adding a page, register both language entries in `docs.json` navigation
+7. Do not flip the site default language away from `en`
 
 ## Content boundaries
 
 **Document**
 
-- Public OpenAPI endpoints marked with `@OpenApiPermission`
+- Public OpenAPI endpoints in the Chinese Specs under `openapi/` (the `@OpenApiPermission`-filtered subset)
 - Gateway base URL already published in this repo (production `gateway.mcconnects.com`)
 - Signing, permissions, pagination, error envelope, and integration guides for those APIs
 
 **Do not document**
 
-- Internal admin, ops, CRM, or unpublished services
-- Endpoints without `@OpenApiPermission`
+- Endpoints not present in those Chinese Specs (internal admin, ops, CRM, or unpublished services)
 - Real secrets, production credentials, or private/internal hostnames
 - Implementation details that are not needed for successful integration (unless explicitly requested)
 
@@ -120,10 +163,12 @@ Optional: `sidebarTitle` when the nav label should differ from `title`.
 
 Before finishing a docs task:
 
-- [ ] Endpoint is backed by `@OpenApiPermission` in a sibling `mc-*` repo (or the change is non-endpoint prose)
-- [ ] Chinese page updated first; English page synced when both exist
+- [ ] Facts checked against the latest Chinese Spec under `openapi/` (or the change is non-endpoint prose)
+- [ ] For Spec-driven API changes: change summary produced and user-confirmed before MDX edits
+- [ ] External naming via `glossary.zh-en.md` (no raw internal Spec tags in reader copy)
+- [ ] Chinese page updated first; English synced via glossary when both exist
 - [ ] Frontmatter has `title` and `description`
 - [ ] Code blocks have language tags; no real secrets
 - [ ] Internal links are root-relative and locale-correct (`/zh/...` vs `/...`)
-- [ ] New pages added to both language trees in `docs.json` when applicable
+- [ ] (After API Reference migration) new pages added to both language trees in `docs.json` when applicable
 - [ ] Site default language remains `en`
