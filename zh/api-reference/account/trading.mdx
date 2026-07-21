@@ -1,0 +1,220 @@
+---
+title: "交易"
+sidebarTitle: "交易"
+description: "交易相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `交易`（对外名称 **交易**）。路径前缀为 `/openapi/v1/mc-account/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | 根据transactionId查询交易记录详情 |
+| POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | 分页查询交易记录 |
+| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | 兑换v2, 支持询价 |
+| POST | /openapi/v1/mc-account/transaction/account/record/page | READ | 分页查询资金流水记录 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 根据transactionId查询交易记录详情
+
+`POST /openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| id | string | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| id | integer |  |
+| uid | string | 关联账户表 |
+| transactionId | string |  |
+| symbolId | integer |  |
+| acSymbol | string |  |
+| network | string |  |
+| exchangeSymbolId | integer |  |
+| exchangeSymbol | string |  |
+| transactionType | string | 交易类型枚举 |
+| status | string |  |
+| amount | number |  |
+| amountStr | string |  |
+| amountDisplay | string |  |
+| amountScale | integer |  |
+| exchangeAmount | number |  |
+| exchangeAmountDisplay | string |  |
+| fee | number |  |
+| feeDisplay | string |  |
+| createTime | string |  |
+| finishTime | string |  |
+| failureReason | string |  |
+| errorCode | string |  |
+| exchangeRate | number |  |
+| convertExchangeRate | number |  |
+| rateDisplay | string |  |
+| txHash | string |  |
+| feeSymbol | string |  |
+| sourceAccountType | string |  |
+| targetAccountType | string |  |
+| sourceAccountId | string |  |
+| targetAccountId | string |  |
+| sourceWalletAddress | string |  |
+| targetWalletAddress | string |  |
+| extParams | string |  |
+| sourceAccountBalance | number |  |
+| targetAccountBalance | number |  |
+| fundFlowType | string |  |
+| transactionMethod | string | 交易方式枚举 |
+| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
+| payerUid | string | RECHARGE 用户间划转时有值 |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{}' 
+```
+
+---
+
+## 分页查询交易记录
+
+`POST /openapi/v1/mc-account/transaction/transaction/record/page` — 权限 `READ`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
+| symbolId | integer | 否 |  |
+| exchangeSymbolId | integer | 否 |  |
+| transactionType | string | 否 | 交易类型枚举 |
+| transactionTypes | array | 否 | 仅 transactionType==null 时生效 |
+| status | string | 否 |  |
+| statuses | array | 否 | 仅 status==null 时生效 |
+| createTimeStart | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
+| createTimeStartTimestamp | integer | 否 | 毫秒级 Unix timestamp |
+| createTimeEnd | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
+| createTimeEndTimestamp | integer | 否 | 毫秒级 Unix timestamp |
+| transactionMethod | string | 否 | 交易方式枚举 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/page" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 兑换v2, 支持询价
+
+`POST /openapi/v1/mc-account/transaction/exchange/v2` — 权限 `TRADE`。
+
+需要先调用[触发2FA验证]接口,触发2FA验证
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
+| symbol | string | 是 | 如 BTC/USDT |
+| exchangeSymbol | string | 是 | 如 BTC/USDT |
+| amount | number | 是 | 兑换金额/兑换币种的数量 |
+| verify2FaTokens | array | 否 | 通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证 |
+| quoteSessionId | string | 是 | asw1w123a |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/exchange/v2" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 分页查询资金流水记录
+
+`POST /openapi/v1/mc-account/transaction/account/record/page` — 权限 `READ`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
+| symbolId | integer | 否 |  |
+| exchangeSymbolId | integer | 否 |  |
+| transactionType | string | 否 | 交易类型枚举 |
+| transactionTypes | array | 否 | 仅 transactionType==null 时生效 |
+| status | string | 否 |  |
+| statuses | array | 否 | 仅 status==null 时生效 |
+| createTimeStart | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
+| createTimeStartTimestamp | integer | 否 | 毫秒级 Unix timestamp |
+| createTimeEnd | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
+| createTimeEndTimestamp | integer | 否 | 毫秒级 Unix timestamp |
+| transactionMethod | string | 否 | 交易方式枚举 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/account/record/page" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```

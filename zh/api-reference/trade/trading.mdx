@@ -1,0 +1,339 @@
+---
+title: "交易"
+sidebarTitle: "交易"
+description: "交易相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `交易`（对外名称 **交易**）。路径前缀为 `/openapi/v1/mc-trade/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| PUT | /openapi/v1/mc-trade/trade/positions/modify | TRADE | 修改持仓 |
+| PUT | /openapi/v1/mc-trade/trade/orders/modify | TRADE | 订单操作：改单 |
+| POST | /openapi/v1/mc-trade/trade/orders/create | TRADE | 订单操作：下单 |
+| POST | /openapi/v1/mc-trade/trade/orders/close | TRADE | 订单操作：平仓 |
+| GET | /openapi/v1/mc-trade/trade/symbol/staticConfig | 公开访问 | 交易标的信息 |
+| GET | /openapi/v1/mc-trade/trade/slippage/estimate | READ | 获取预估滑点 |
+| GET | /openapi/v1/mc-trade/trade/mt5-group/staticInfo | READ | mt5分组相关静态信息 |
+| GET | /openapi/v1/mc-trade/trade/account/assets | READ | 获取用户资产 |
+| DELETE | /openapi/v1/mc-trade/trade/orders/cancel | TRADE | 订单操作：撤单 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 修改持仓
+
+`PUT /openapi/v1/mc-trade/trade/positions/modify` — 权限 `TRADE`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| order | integer | 是 | 订单ID |
+| symbol | string | 是 | 交易对，例如 BTCUSDT, 仅下单有效 |
+| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| priceSL | number | 否 | 新的止损价格 |
+| priceTP | number | 否 | 新的止盈价格 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+
+```bash
+curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 订单操作：改单
+
+`PUT /openapi/v1/mc-trade/trade/orders/modify` — 权限 `TRADE`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| symbol | string | 是 | 交易对，例如 BTCUSDT, 仅下单有效 |
+| price | number | 是 | 下单价格 |
+| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| typeTime | integer | 是 | 有效期类型, 不传默认0&quot;, &quot;0-取消前有效&quot;, &quot;1-当天有效&quot;, &quot;2-指定时间&quot;, &quot;3-指定某日。到期时间为指定某日的00:00或最近的交易时间&quot; |
+| expiration | integer | 是 | 过期时间戳（typeTime=2时必填） |
+| priceTrigger | number | 是 | 止损限价单触发价格 |
+| priceSL | number | 是 | 止损 |
+| priceTP | number | 是 | 止盈, |
+| order | integer | 是 | 订单ID |
+| volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000, 需与下单时传入的volumeExt一致 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+
+```bash
+curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 订单操作：下单
+
+`POST /openapi/v1/mc-trade/trade/orders/create` — 权限 `TRADE`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| symbol | string | 是 | 交易对，例如 BTCUSDT |
+| volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
+| price | number | 否 | 下单价格，不传默认0, 0为市价，其他为限价 |
+| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| position | integer | 否 | 持仓ID, 默认0 |
+| typeFill | integer | 是 | 成交类型 &quot;0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。&lt;&quot;, &quot;1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。&lt;&quot;, &quot;2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
+| typeTime | integer | 否 | 有效期类型, 不传默认0&quot;, &quot;0-取消前有效&quot;, &quot;1-当天有效&quot;, &quot;2-指定时间&quot;, &quot;3-指定某日。到期时间为指定某日的00:00或最近的交易时间&quot; |
+| expiration | integer | 否 | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
+| priceTrigger | number | 否 | 止损限价单触发价格, 不传默认0 |
+| priceSL | number | 否 | 止损 |
+| priceTP | number | 否 | 止盈, |
+| userSlippageLimit | number | 否 | 用户填入的市价单最大滑点限制(仅市价单有效) |
+| frontMarketPrice | number | 否 | 前端市价参考价格(可选)，不能小于0 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 订单操作：平仓
+
+`POST /openapi/v1/mc-trade/trade/orders/close` — 权限 `TRADE`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| symbol | string | 是 | 交易对，例如 BTCUSDT |
+| volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
+| price | number | 否 | 下单价格，不传默认0, 0为市价，其他为限价 |
+| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| position | integer | 否 | 持仓ID, 默认0 |
+| typeFill | integer | 是 | 成交类型 &quot;0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。&lt;&quot;, &quot;1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。&lt;&quot;, &quot;2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
+| typeTime | integer | 否 | 有效期类型, 不传默认0&quot;, &quot;0-取消前有效&quot;, &quot;1-当天有效&quot;, &quot;2-指定时间&quot;, &quot;3-指定某日。到期时间为指定某日的00:00或最近的交易时间&quot; |
+| expiration | integer | 否 | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
+| priceTrigger | number | 否 | 止损限价单触发价格, 不传默认0 |
+| priceSL | number | 否 | 止损 |
+| priceTP | number | 否 | 止盈, |
+| frontMarketPrice | number | 否 | 前端市价参考价格(可选)，不能小于0 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 交易标的信息
+
+`GET /openapi/v1/mc-trade/trade/symbol/staticConfig` — 权限 `公开访问`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| symbols | array | 是 |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "symbols=VALUE"
+```
+
+---
+
+## 获取预估滑点
+
+`GET /openapi/v1/mc-trade/trade/slippage/estimate` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;, &quot;7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单&quot;, &quot;8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式&quot; |
+| volumeExt | integer | 是 | 下单数量（*100000000扩展精度）， 如用户下单量是0.01， 则传入0.01*100000000 |
+| symbol | string | 是 | 交易对/品种 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| estimatedSlippage | number | 预估滑点 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "login=VALUE" \
+  --data-urlencode "type=1" \
+  --data-urlencode "volumeExt=1" \
+  --data-urlencode "symbol=BTCUSDT"
+```
+
+---
+
+## mt5分组相关静态信息
+
+`GET /openapi/v1/mc-trade/trade/mt5-group/staticInfo` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| uid | string | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| groupName | string |  |
+| commissionCfg | array |  |
+| leverageCfg | array |  |
+| marginCall | string |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/staticInfo" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "uid=VALUE"
+```
+
+---
+
+## 获取用户资产
+
+`GET /openapi/v1/mc-trade/trade/account/assets` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| userAssets | object |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "login=VALUE"
+```
+
+---
+
+## 订单操作：撤单
+
+`DELETE /openapi/v1/mc-trade/trade/orders/cancel` — 权限 `TRADE`。
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| order | integer | 是 | 订单ID |
+| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| symbol | string | 是 | 交易对，例如 BTCUSDT |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+
+```bash
+curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```

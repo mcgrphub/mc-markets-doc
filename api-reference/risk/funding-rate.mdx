@@ -1,0 +1,57 @@
+---
+title: "Funding rate"
+sidebarTitle: "Funding rate"
+description: "OpenAPI endpoints for Funding rate."
+---
+
+This group maps Spec tag `资金费率` (external name **Funding rate**). Paths use the `/openapi/v1/mc-risk/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-risk/funding-rate | READ | 分页查询交易币种资金费率历史数据 |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## 分页查询交易币种资金费率历史数据
+
+`GET /openapi/v1/mc-risk/funding-rate` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| size | integer | No |  |
+| current | integer | No |  |
+| orderBy | string | No | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+| symbol | string | Yes | 交易币种 |
+| isSettlementRate | boolean | No | 是否是结算价 |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/funding-rate" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1" \
+  --data-urlencode "symbol=BTCUSDT"
+```

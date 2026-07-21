@@ -30,11 +30,11 @@ MC OpenAPI 是面向 MC 多账户系统(MC-account)的 JSON-over-HTTPS API。本
 
 ## 接口分组
 
-MC OpenAPI 接口由 `openapi-exposed` Spec 生成，在 API 参考侧边栏按网关服务分组。
+MC OpenAPI 接口事实来自 `openapi/` 中文 Spec，API 参考侧边栏按网关服务分组，页面为手写 MDX。
 
 | 分组 | 用途 | 常见权限 |
 | --- | --- | --- |
-| Account（`/openapi/v1/mc-account/`） | 交易记录、理财、MLP、币种、资金账户、汇率等 | `READ`、`TRADE`、`WITHDRAW` |
+| Account（`/openapi/v1/mc-account/`） | 交易记录、理财、金库账户、币种、资金账户、汇率等 | `READ`、`TRADE`、`WITHDRAW` |
 | Trade（`/openapi/v1/mc-trade/`） | 订单、持仓、成交、交易账户 | `READ`、`TRADE` |
 | Risk（`/openapi/v1/mc-risk/`） | 资金费率、交易品种 | `READ` |
 | Aggregator（`/openapi/v1/mc-aggregator/`） | K 线与行情排行 | `READ` |

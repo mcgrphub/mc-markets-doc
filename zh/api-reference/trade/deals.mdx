@@ -1,0 +1,88 @@
+---
+title: "成交"
+sidebarTitle: "成交"
+description: "成交相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `成交`（对外名称 **成交**）。路径前缀为 `/openapi/v1/mc-trade/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-trade/trade/deals/history/v3 | READ | 查询历史成交列表V3 |
+| GET | /openapi/v1/mc-trade/trade/deals/history/recent | 公开访问 | 获取品种最近成交列表 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 查询历史成交列表V3
+
+`GET /openapi/v1/mc-trade/trade/deals/history/v3` — 权限 `READ`。
+
+根据 uid 和账户数据类型(SPOT/CONTRACT/SPOT_CONTRACT)查询历史成交列表
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 |  |
+| sortOrder | string | 否 |  |
+| type | string | 是 | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并 |
+| from | integer | 是 | 开始时间戳（Unix时间戳，秒） |
+| to | integer | 是 | 结束时间戳（Unix时间戳，秒） |
+| symbol | string | 否 | 交易品种名 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/v3" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1" \
+  --data-urlencode "type=VALUE" \
+  --data-urlencode "from=1755792000"
+```
+
+---
+
+## 获取品种最近成交列表
+
+`GET /openapi/v1/mc-trade/trade/deals/history/recent` — 权限 `公开访问`。
+
+根据 symbol 查询最近成交，返回条数由 limit 控制
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| symbol | string | 是 |  |
+| limit | integer | 是 |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "symbol=BTCUSDT" \
+  --data-urlencode "limit=1"
+```

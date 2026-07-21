@@ -1,12 +1,12 @@
 ---
 title: "API 参考"
 sidebarTitle: "概览"
-description: "MC OpenAPI 公开接口由 openapi-exposed Spec 生成，按网关服务分组。"
+description: "MC OpenAPI 公开接口按网关服务分组；事实来自 openapi/ 中文 Spec，页面为手写 MDX。"
 ---
 
-本参考涵盖 MC OpenAPI 的公开接口（仅含标注 `@OpenApiPermission` 的网关路径）。侧边栏 **Account**、**Trade**、**Risk**、**Aggregator** 下的页面由 `openapi/` 中的 Spec 自动生成。
+本参考涵盖 MC OpenAPI 的公开接口（中文 Spec 中的 `@OpenApiPermission` 过滤子集）。侧边栏 **Account**、**Trade**、**Risk**、**Aggregator** 均为手写 MDX，按对外 tag 分页。
 
-所有接口共享相同的网关主机、鉴权方式（AK/SK + HMAC-SHA256）以及 JSON 响应信封。Spec 中的路径已包含签名所需的服务段（例如 `/openapi/v1/mc-account/...`）。
+所有接口共享相同的网关主机、鉴权方式（AK/SK + HMAC-SHA256）以及 JSON 响应信封。路径已包含签名所需的服务段（例如 `/openapi/v1/mc-account/...`）。
 
 <CardGroup cols={2}>
   <Card title="认证" icon="lock" href="/zh/authentication">
@@ -35,4 +35,4 @@ description: "MC OpenAPI 公开接口由 openapi-exposed Spec 生成，按网关
 | Risk | `openapi/mc-risk.json` | `/openapi/v1/mc-risk/` |
 | Aggregator | `openapi/mc-aggregator.json` | `/openapi/v1/mc-aggregator/` |
 
-在侧边栏打开具体 operation。交互式 Playground 已关闭（请求需自定义 AK/SK 签名），请按 [认证](/zh/authentication) 与 [第一次请求](/zh/guides/first-request) 调用。
+在侧边栏打开具体分组。交互式 Playground 已关闭（请求需自定义 AK/SK 签名），请按 [认证](/zh/authentication) 与 [第一次请求](/zh/guides/first-request) 调用。

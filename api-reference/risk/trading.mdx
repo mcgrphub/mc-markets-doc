@@ -1,0 +1,57 @@
+---
+title: "Trading"
+sidebarTitle: "Trading"
+description: "Trade symbol list and related Risk trading endpoints."
+---
+
+This group maps Spec tag `交易` (external name **Trading**). Paths use the `/openapi/v1/mc-risk/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-risk/trade/symbol/list | READ | 交易品种列表 |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## 交易品种列表
+
+`GET /openapi/v1/mc-risk/trade/symbol/list` — permission `READ`.
+
+根据当前用户的UID查询交易品种列表
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| size | integer | No |  |
+| current | integer | No |  |
+| orderBy | string | No | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+| group | string | No |  |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1"
+```

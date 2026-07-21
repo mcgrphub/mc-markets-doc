@@ -77,19 +77,38 @@
               },
               {
                 "group": "Account",
-                "openapi": "openapi/en/mc-account.json"
+                "pages": [
+                  "api-reference/account/vault-account",
+                  "api-reference/account/finance-account",
+                  "api-reference/account/trading",
+                  "api-reference/account/currency",
+                  "api-reference/account/fund-account",
+                  "api-reference/account/exchange-rate",
+                  "api-reference/account/deal-orders",
+                  "api-reference/account/funding-fee-history"
+                ]
               },
               {
                 "group": "Trade",
-                "openapi": "openapi/en/mc-trade.json"
+                "pages": [
+                  "api-reference/trade/trading",
+                  "api-reference/trade/trading-account",
+                  "api-reference/trade/orders",
+                  "api-reference/trade/deals"
+                ]
               },
               {
                 "group": "Risk",
-                "openapi": "openapi/en/mc-risk.json"
+                "pages": [
+                  "api-reference/risk/trading",
+                  "api-reference/risk/funding-rate"
+                ]
               },
               {
                 "group": "Aggregator",
-                "openapi": "openapi/en/mc-aggregator.json"
+                "pages": [
+                  "api-reference/aggregator/market-data"
+                ]
               }
             ]
           }
@@ -151,19 +170,38 @@
               },
               {
                 "group": "Account",
-                "openapi": "openapi/mc-account.json"
+                "pages": [
+                  "zh/api-reference/account/vault-account",
+                  "zh/api-reference/account/finance-account",
+                  "zh/api-reference/account/trading",
+                  "zh/api-reference/account/currency",
+                  "zh/api-reference/account/fund-account",
+                  "zh/api-reference/account/exchange-rate",
+                  "zh/api-reference/account/deal-orders",
+                  "zh/api-reference/account/funding-fee-history"
+                ]
               },
               {
                 "group": "Trade",
-                "openapi": "openapi/mc-trade.json"
+                "pages": [
+                  "zh/api-reference/trade/trading",
+                  "zh/api-reference/trade/trading-account",
+                  "zh/api-reference/trade/orders",
+                  "zh/api-reference/trade/deals"
+                ]
               },
               {
                 "group": "Risk",
-                "openapi": "openapi/mc-risk.json"
+                "pages": [
+                  "zh/api-reference/risk/trading",
+                  "zh/api-reference/risk/funding-rate"
+                ]
               },
               {
                 "group": "Aggregator",
-                "openapi": "openapi/mc-aggregator.json"
+                "pages": [
+                  "zh/api-reference/aggregator/market-data"
+                ]
               }
             ]
           }

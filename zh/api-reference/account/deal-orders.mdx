@@ -1,0 +1,120 @@
+---
+title: "成交订单"
+sidebarTitle: "成交订单"
+description: "成交订单相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `成交订单服务`（对外名称 **成交订单**）。路径前缀为 `/openapi/v1/mc-account/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/deal-order | READ | 分页查询成交订单 |
+| GET | /openapi/v1/mc-account/deal-order/&#123;dealId&#125; | READ | 成交单详情查询 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 分页查询成交订单
+
+`GET /openapi/v1/mc-account/deal-order` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1"
+```
+
+---
+
+## 成交单详情查询
+
+`GET /openapi/v1/mc-account/deal-order/{dealId}` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| dealId | integer | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| businessLineId | integer | 业务线ID |
+| uid | string | 用户ID |
+| positionId | integer | 持仓单ID |
+| orderId | integer | 订单号 |
+| dealId | integer | 成交单号 |
+| dealTime | string | 成交时间 |
+| dealTimeTimestamp | integer | 成交时间毫秒时间戳 |
+| type | string | 交易类型 |
+| symbolPair | string | 交易对 |
+| baseSymbolId | integer | 基础币种ID |
+| quoteSymbolId | integer | 计价币种ID |
+| entry | string | 方向 |
+| price | number | 委托价格 |
+| pricePosition | number | 成交均价 |
+| lot | number | 委托数量 |
+| volumeClosed | number | 成交数量 |
+| storage | number | 库存费 |
+| commission | number | 手续费 |
+| commissionDisplay | string | 手续费展示值，带符号向上取整后固定6位小数 |
+| commissionScale | integer | 手续费展示精度 |
+| profit | number | 交易盈亏额 |
+| profitDisplay | string | 盈亏展示值，四舍五入后固定6位小数 |
+| profitScale | integer | 盈亏展示精度 |
+| contractSize | integer | 合约大小 |
+| stopLoss | number | 止损价 |
+| takeProfit | number | 止盈价 |
+| onChainStatus | string | 上链状态 |
+| txHash | string | 区块链交易哈希 |
+| retryCount | integer | 重试次数 |
+| gasUsed | integer | 实际消耗的Gas |
+| gasPrice | integer | Gas价格 |
+| blockNumber | integer | 区块号 |
+| blockConfirmation | integer | 区块确认数 |
+| submitTime | string | 提交时间 |
+| submitTimeTimestamp | integer | 提交时间毫秒时间戳 |
+| confirmTime | string | 确认时间 |
+| confirmTimeTimestamp | integer | 确认时间毫秒时间戳 |
+| remark | string | 备注信息 |
+| accountType | string | 账户类型 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/{dealId}" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "dealId=1"
+```

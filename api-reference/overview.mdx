@@ -1,12 +1,12 @@
 ---
 title: "API Reference"
 sidebarTitle: "Overview"
-description: "MC OpenAPI public endpoints generated from the openapi-exposed specifications, grouped by gateway service."
+description: "MC OpenAPI public endpoints grouped by gateway service; facts come from Chinese Specs under openapi/, pages are hand-written MDX."
 ---
 
-This reference covers every public MC OpenAPI endpoint (gateway paths with `@OpenApiPermission`). Pages under **Account**, **Trade**, **Risk**, and **Aggregator** are generated from OpenAPI Spec files in `openapi/`.
+This reference covers public MC OpenAPI endpoints (the `@OpenApiPermission`-filtered subset in the Chinese Specs). Sidebar groups **Account**, **Trade**, **Risk**, and **Aggregator** are hand-written MDX pages, one page per external tag.
 
-All endpoints share the same gateway host, authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope. Request URIs in the Spec already include the service segment used for signing (for example `/openapi/v1/mc-account/...`).
+All endpoints share the same gateway host, authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope. Request paths already include the service segment used for signing (for example `/openapi/v1/mc-account/...`).
 
 <CardGroup cols={2}>
   <Card title="Authentication" icon="lock" href="/authentication">
@@ -35,4 +35,4 @@ All endpoints share the same gateway host, authentication scheme (AK/SK with HMA
 | Risk | `openapi/mc-risk.json` | `/openapi/v1/mc-risk/` |
 | Aggregator | `openapi/mc-aggregator.json` | `/openapi/v1/mc-aggregator/` |
 
-Use the sidebar groups to open individual operations. The interactive playground is disabled because requests require custom AK/SK signing — follow [Authentication](/authentication) and [First request](/guides/first-request).
+Use the sidebar to open each group. The interactive playground is disabled because requests require custom AK/SK signing — follow [Authentication](/authentication) and [First request](/guides/first-request).

@@ -1,0 +1,115 @@
+---
+title: "Exchange rate"
+sidebarTitle: "Exchange rate"
+description: "OpenAPI endpoints for Exchange rate."
+---
+
+This group maps Spec tag `汇率` (external name **Exchange rate**). Paths use the `/openapi/v1/mc-account/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/exchange-rate/query/&#123;symbolType&#125;/&#123;baseCurrency&#125;/&#123;targetCurrency&#125; | READ | 汇率查询 |
+| GET | /openapi/v1/mc-account/exchange-rate/query/usd | READ | 美元汇率查询 |
+| GET | /openapi/v1/mc-account/exchange-rate/convert-rate/&#123;from&#125;/&#123;to&#125; | READ | 闪兑汇率查询 |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## 汇率查询
+
+`GET /openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| symbolType | string | Yes | 资产类型 |
+| baseCurrency | string | Yes | 基础货币代码（ISO 4217标准） |
+| targetCurrency | string | Yes | 目标货币代码（ISO 4217标准） |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "symbolType=VALUE" \
+  --data-urlencode "baseCurrency=VALUE" \
+  --data-urlencode "targetCurrency=VALUE"
+```
+
+---
+
+## 美元汇率查询
+
+`GET /openapi/v1/mc-account/exchange-rate/query/usd` — permission `READ`.
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 闪兑汇率查询
+
+`GET /openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}` — permission `READ`.
+
+若 USDT 兑 BTC , 则 from 为 USDT, to 为 BTC
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| from | string | Yes | 兑出币种/兑换前币种 |
+| to | string | Yes | 兑入币种/兑换后币种 |
+| fromAmount | number | No | 用户输入的消耗币种数量（from 数量），用于试算手续费与预计到账 |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| exchangeRate | number | 汇率 |
+| timestamp | integer |  |
+| oneFromToQuantity | number | 1个[from]币可兑换[to]币的数量 |
+| oneToFromQuantity | number | 1 个[to]币可兑换[from]币的数量 |
+| bookPriceDotMap | object | 汇率转换过程的的报价-包含多个汇率转换步骤,key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
+| baseExchangeRate | number | 基础汇率（未扣手续费/未应用免费额度前），用于测试验证 |
+| baseExchangeRateDisplay | string | 基础汇率展示值 |
+| fromAmount | number | 用户输入的消耗币种数量（from 数量） |
+| fromAmountDisplay | string | 用户输入的消耗币种数量展示值 |
+| fromAmountScale | integer | 用户输入的消耗币种数量展示精度 |
+| freeQuotaFromAmount | number | 当日剩余免费额度（from 数量，用于计算免手续费区间） |
+| freeQuotaFromAmountDisplay | string | 当日剩余免费额度（from 数量）展示值 |
+| feeAmount | number | 实收手续费（from 数量） |
+| feeAmountDisplay | string | 实收手续费（from 数量）展示值 |
+| feeAmountScale | integer | 实收手续费（from 数量）展示精度 |
+| netFromAmount | number | 实际参与兑换的净额（from 数量）= fromAmount - feeAmount |
+| netFromAmountDisplay | string | 实际参与兑换的净额（from 数量）展示值 |
+| toAmount | number | 预计获得数量（to 数量） |
+| toAmountDisplay | string | 预计获得数量（to 数量）展示值 |
+| toAmountScale | integer | 预计获得数量（to 数量）展示精度 |
+| convertFeePercent | number | 闪兑手续费百分比(对兑出的数量进行扣减) |
+| dailyFreeConvertFeeQuotaUsd | number | 每日免费闪兑手续费额度（USDC等值，按用户累计，UTC+8日切） |
+| dailyRemainingFreeConvertFeeQuotaUsd | number | 今日剩余免费闪兑手续费额度（USDC等值，按用户累计，UTC+8日切） |
+| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | 今日剩余免费闪兑手续费额度（USDC等值）展示值 |
+| expireTimestamp | integer | 报价过期时间戳, 毫秒级 |
+| quoteSessionId | string | 报价会话ID |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "from=1755792000" \
+  --data-urlencode "to=1755792000"
+```

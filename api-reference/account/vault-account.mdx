@@ -1,0 +1,319 @@
+---
+title: "Vault account"
+sidebarTitle: "Vault account"
+description: "OpenAPI endpoints for Vault account."
+---
+
+This group maps Spec tag `MLP账户` (external name **Vault account**). Paths use the `/openapi/v1/mc-account/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| POST | /openapi/v1/mc-account/mlp/account/withdraw | TRADE | MLP账户提现 |
+| POST | /openapi/v1/mc-account/mlp/account/deposit | TRADE | MLP账户存款 |
+| GET | /openapi/v1/mc-account/mlp/yesterday-yield-rate-data | READ | 获取MLP昨日回报率数据 |
+| GET | /openapi/v1/mc-account/mlp/withdraw-info | READ | 获取MLP提款信息 |
+| GET | /openapi/v1/mc-account/mlp/tvl-data | READ | 获取MLP金库TVL数据 |
+| GET | /openapi/v1/mc-account/mlp/treasury-info | READ | 获取MLP金库相关信息 |
+| GET | /openapi/v1/mc-account/mlp/deposit-info | READ | 获取MLP存款信息 |
+| GET | /openapi/v1/mc-account/mlp/core/stats | READ | 获取MLP统计信息 |
+| GET | /openapi/v1/mc-account/mlp/config | READ | 查询MLP参数 |
+| GET | /openapi/v1/mc-account/mlp/apr-data | READ | 获取MLP APR数据 |
+| GET | /openapi/v1/mc-account/mlp/account/assets | READ | 查询MLP账户资产详情 |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## MLP账户提现
+
+`POST /openapi/v1/mc-account/mlp/account/withdraw` — permission `TRADE`.
+
+MLP账户提现，从MLP账户转出到资金账户，然后划入交易账户。优先扣减本金，再扣减收益
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| symbolId | string | Yes | 关联ac_symbol表 |
+| amount | number | Yes | 提现金额 |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/withdraw" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## MLP账户存款
+
+`POST /openapi/v1/mc-account/mlp/account/deposit` — permission `TRADE`.
+
+MLP账户存款，从交易账户转出到资金账户，然后存入MLP账户
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| symbolId | string | Yes | 关联ac_symbol表 |
+| amount | number | Yes | 存款金额 |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/deposit" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 获取MLP昨日回报率数据
+
+`GET /openapi/v1/mc-account/mlp/yesterday-yield-rate-data` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| from | string | No |  |
+| to | string | No |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-yield-rate-data" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取MLP提款信息
+
+`GET /openapi/v1/mc-account/mlp/withdraw-info` — permission `READ`.
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| maxWithdrawAmount | number | 最大可提款金额（可提金额） |
+| withdrawablePrincipal | number | 可提本金 |
+| withdrawableEarnings | number | 可提收益 |
+| withdrawableEarningsDisplay | string | 可提收益展示值 |
+| maxWithdrawAmountDisplay | string | 最大可提款金额展示值 |
+| withdrawablePrincipalDisplay | string | 可提本金展示值 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-info" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取MLP金库TVL数据
+
+`GET /openapi/v1/mc-account/mlp/tvl-data` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| from | string | No |  |
+| to | string | No |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取MLP金库相关信息
+
+`GET /openapi/v1/mc-account/mlp/treasury-info` — permission `READ`.
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| treasuryIntroduction | string | 金库介绍 |
+| treasuryYield | number | 统计数据-金库收益 |
+| currentAnnualYieldRate | number | 统计数据-当前年化收益率 |
+| currentDailyYieldRate | number | 统计数据-当前每日回报率 |
+| treasuryBalance | number | 我的表现-金库余额 |
+| withdrawableEarnings | number | 我的表现-可提收益 |
+| yesterdayEarnings | number | 我的表现-昨日收益 |
+| lockedDeposit | number | 我的表现-锁定存款 |
+| withdrawableAmount | number | 我的表现-可提金额 |
+| currentAnnualYieldRateDisplay | string | 统计数据-当前年化收益率展示值 |
+| currentDailyYieldRateDisplay | string | 统计数据-当前每日回报率展示值 |
+| withdrawableEarningsDisplay | string | 我的表现-可提收益展示值 |
+| yesterdayEarningsDisplay | string | 我的表现-昨日收益展示值 |
+| withdrawableAmountDisplay | string | 我的表现-可提金额展示值 |
+| treasuryYieldDisplay | string | 统计数据-金库收益展示值 |
+| treasuryBalanceDisplay | string | 我的表现-金库余额展示值 |
+| lockedDepositDisplay | string | 我的表现-锁定存款展示值 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-info" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取MLP存款信息
+
+`GET /openapi/v1/mc-account/mlp/deposit-info` — permission `READ`.
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| maxDepositAmount | number | 最大可存款金额 |
+| availableMargin | number | 合约账户可用保证金 |
+| maxDepositLimitPercentage | number | 最大存款限额百分比 |
+| userPoints | integer | 用户当前积分 |
+| depositedAmount | number | 已存入金额 |
+| remainingDepositAmount | number | 剩余可存金额 |
+| hasPosition | boolean | 是否有持仓 |
+| maxDepositLimitPercentageDisplay | string | 最大存款限额百分比展示值 |
+| remainingDepositAmountDisplay | string | 剩余可存金额展示值 |
+| maxDepositAmountDisplay | string | 最大可存款金额展示值 |
+| availableMarginDisplay | string | 合约账户可用保证金展示值 |
+| depositedAmountDisplay | string | 已存入金额展示值 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-info" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取MLP统计信息
+
+`GET /openapi/v1/mc-account/mlp/core/stats` — permission `READ`.
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| totalLockedAmount | number | 总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值 |
+| annualYieldRate | number | 年化收益率 |
+| myTotalDeposit | number | 我的总存款 |
+| totalHistoricalEarnings | number | 历史总收益 |
+| totalLockedAmountDisplay | string |  |
+| portfolioVaultBalanceDisplay | string |  |
+| portfolioVaultBalanceScale | integer |  |
+| totalHistoricalEarningsDisplay | string |  |
+| totalHistoricalEarningsScale | integer |  |
+| totalLockedAmountScale | integer |  |
+| annualYieldRateDisplay | string |  |
+| annualYieldRateScale | integer |  |
+| myTotalDepositDisplay | string |  |
+| myTotalDepositScale | integer |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 查询MLP参数
+
+`GET /openapi/v1/mc-account/mlp/config` — permission `READ`.
+
+查询当前请求上下文业务线下的 MLP 收益率等参数，逻辑与后台 MlpConfigController#getConfig 一致，响应为 OpenAPI 专用模型。
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| id | integer | 配置ID |
+| businessLineId | integer | 业务线ID |
+| annualYieldRate | number | 调整收益率（年化），单位：百分比 |
+| lockPeriodDays | integer | 锁仓期，单位：天 |
+| singleUserDepositLimit | number | 单用户存款上限，单位：USDC |
+| tvlBaseAmount | number | TVL金额基准值，单位：USDC |
+| integralTierConfig | string | 积分档位配置，格式：积分最小值:存款限额比例,...，例如：50:25,300:50,1500:75,10000:100 |
+| createBy | string | 创建人 |
+| createTime | string | 创建时间 |
+| updateBy | string | 更新人 |
+| updateTime | string | 更新时间 |
+| createTimeTimestamp | integer | 创建时间毫秒时间戳 |
+| updateTimeTimestamp | integer | 更新时间毫秒时间戳 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取MLP APR数据
+
+`GET /openapi/v1/mc-account/mlp/apr-data` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| from | string | No |  |
+| to | string | No |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 查询MLP账户资产详情
+
+`GET /openapi/v1/mc-account/mlp/account/assets` — permission `READ`.
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

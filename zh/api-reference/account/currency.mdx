@@ -1,0 +1,86 @@
+---
+title: "币种"
+sidebarTitle: "币种"
+description: "币种相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `币种`（对外名称 **币种**）。路径前缀为 `/openapi/v1/mc-account/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/symbol/list | READ | 查询币种网络列表 |
+| GET | /openapi/v1/mc-account/symbol/exchange/list | READ | 查询可兑换币种列表 |
+| GET | /openapi/v1/mc-account/symbol/detail/&#123;id&#125; | READ | 查询币种详情 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 查询币种网络列表
+
+`GET /openapi/v1/mc-account/symbol/list` — 权限 `READ`。
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 查询可兑换币种列表
+
+`GET /openapi/v1/mc-account/symbol/exchange/list` — 权限 `READ`。
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchange/list" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 查询币种详情
+
+`GET /openapi/v1/mc-account/symbol/detail/{id}` — 权限 `READ`。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| id | string | 是 | 币种ID |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| symbolId | integer | 币种ID |
+| assetType | string | 币种类型 |
+| symbol | string | 币种名称 |
+| network | string | 币种网络协议 |
+| minTradeUnit | number | 最小动账单位 |
+| pricePrecision | integer | 价格精度 |
+| exchangeRate | number | 汇率 |
+| minRechargeAmount | number |  |
+| minWithdrawAmount | number |  |
+| assetNet | string |  |
+| iconData | string |  |
+| depositStatus | integer |  |
+| withdrawalStatus | integer |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/detail/{id}" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "id=VALUE"
+```

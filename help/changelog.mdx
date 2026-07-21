@@ -4,9 +4,9 @@ sidebarTitle: "Changelog"
 description: "Release notes for MC OpenAPI — new endpoints, schema updates, and integration guidance in reverse chronological order."
 ---
 
-<Update label="2026-07-21" description="Spec-driven API Reference">
-  - Endpoint docs are now generated from `openapi/*.json` (`openapi-exposed` exports), grouped by Account / Trade / Risk / Aggregator.
-  - Removed hand-written `api-reference/endpoints/*` pages; guide example paths now use gateway service prefixes (for example `/openapi/v1/mc-account/...`).
+<Update label="2026-07-21" description="Hand-written API Reference MDX">
+  - Endpoint facts still come from Chinese Specs under `openapi/*.json`; sidebar Account / Trade / Risk / Aggregator pages are hand-written MDX by external tag (no direct Spec embedding).
+  - MLP is labeled **Vault account** for readers; removed the retired App global search endpoint.
   - API playground disabled (custom AK/SK signing required).
 </Update>
 

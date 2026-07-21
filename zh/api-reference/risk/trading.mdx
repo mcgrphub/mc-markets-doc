@@ -1,0 +1,57 @@
+---
+title: "交易"
+sidebarTitle: "交易"
+description: "交易品种列表等 Risk 交易相关接口。"
+---
+
+本组对应 Spec tag `交易`（对外名称 **交易**）。路径前缀为 `/openapi/v1/mc-risk/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-risk/trade/symbol/list | READ | 交易品种列表 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 交易品种列表
+
+`GET /openapi/v1/mc-risk/trade/symbol/list` — 权限 `READ`。
+
+根据当前用户的UID查询交易品种列表
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+| group | string | 否 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1"
+```

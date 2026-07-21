@@ -4,9 +4,9 @@ sidebarTitle: "变更日志"
 description: "MC OpenAPI 发布说明——新接口、 schema 更新与集成建议,按倒序时间排列。"
 ---
 
-<Update label="2026-07-21" description="API Reference 改为 Spec 驱动">
-  - 接口文档改为使用 `openapi/*.json`（`openapi-exposed` 导出）自动生成，按 Account / Trade / Risk / Aggregator 分组。
-  - 删除原手写 `api-reference/endpoints/*` 页面；指南中的示例路径统一为含服务段的网关路径（如 `/openapi/v1/mc-account/...`）。
+<Update label="2026-07-21" description="API Reference 改为手写 MDX">
+  - 接口事实仍以 `openapi/*.json` 中文 Spec 为准；侧边栏 Account / Trade / Risk / Aggregator 改为按对外 tag 手写 MDX（不再直挂 Spec）。
+  - MLP 对外命名为 **金库账户**；移除已下线的 App 全局搜索接口。
   - Playground 关闭（需自定义 AK/SK 签名）。
 </Update>
 

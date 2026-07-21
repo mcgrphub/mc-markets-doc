@@ -1,0 +1,187 @@
+---
+title: "交易账户"
+sidebarTitle: "交易账户"
+description: "交易账户相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `交易账户`（对外名称 **交易账户**）。路径前缀为 `/openapi/v1/mc-trade/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-trade/account/positions | READ | 资金动账列表 |
+| GET | /openapi/v1/mc-trade/account/positions/current/v2 | READ | 当前持仓查询V2 |
+| GET | /openapi/v1/mc-trade/account/pnl | READ | 一段时间总盈亏统计 |
+| GET | /openapi/v1/mc-trade/account/contract-volume-by-symbol | 公开访问 | 按交易品种 symbol 查询合约多空总持仓手数 |
+| GET | /openapi/v1/mc-trade/account/contract-notional-by-symbol | 公开访问 | 按交易品种 symbol 查询合约多空总持仓名义价值 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 资金动账列表
+
+`GET /openapi/v1/mc-trade/account/positions` — 权限 `READ`。
+
+根据当前用户的UID查询交易账户的资金动账列表，即抵押品的增减历史，UID从请求头X-UID中获取
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 |  |
+| sortOrder | string | 否 |  |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| from | integer | 是 |  |
+| to | integer | 是 |  |
+| symbol | string | 否 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1" \
+  --data-urlencode "login=VALUE" \
+  --data-urlencode "from=1755792000"
+```
+
+---
+
+## 当前持仓查询V2
+
+`GET /openapi/v1/mc-trade/account/positions/current/v2` — 权限 `READ`。
+
+根据当前用户的UID查询当前所有未平仓的持仓，UID从请求头X-UID中获取, mt5很多地方用整形表示浮点型，避免精度问题 规则为： 不带ext的是表示4位小数，转浮点数需要除10000 带ext的是表示8位小数，转浮点数需要除100000000 举个例子： mt5_positions表中持仓量有Volume和VolumeExt
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| login | string | 是 | MT5合约账户ID/现货账户ID |
+| symbol | string | 否 | 持仓号 |
+| positionType | string | 否 | 不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions/current/v2" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "login=VALUE"
+```
+
+---
+
+## 一段时间总盈亏统计
+
+`GET /openapi/v1/mc-trade/account/pnl` — 权限 `READ`。
+
+根据当前用户的UID查询一段时间区间内的盈亏统计，如近一周盈亏，UID从请求头X-UID中获取,form&to不传默认查最近七天
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| from | integer | 否 |  |
+| to | integer | 否 |  |
+| login | string | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| uid | integer | 账户登录号 |
+| totalProfit | number | 区间总盈利 |
+| totalLoss | number | 区间总亏损（为负数） |
+| netPnl | number | 区间净盈亏 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "login=VALUE"
+```
+
+---
+
+## 按交易品种 symbol 查询合约多空总持仓手数
+
+`GET /openapi/v1/mc-trade/account/contract-volume-by-symbol` — 权限 `公开访问`。
+
+symbol 对应 mt5_positions.Symbol；仅统计 Path 以 CFD 开头的品种；手数 = VolumeExt/1e8。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| symbol | string | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| symbol | string |  |
+| longVolume | number |  |
+| shortVolume | number |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract-volume-by-symbol" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "symbol=BTCUSDT"
+```
+
+---
+
+## 按交易品种 symbol 查询合约多空总持仓名义价值
+
+`GET /openapi/v1/mc-trade/account/contract-notional-by-symbol` — 权限 `公开访问`。
+
+symbol 对应 mt5_positions.Symbol；仅统计 Path 以 CFD 开头的品种；名义 = VolumeExt/1e8 * PriceCurrent * RateProfit * ContractSize（不按 Symbol 区分）。
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| symbol | string | 是 |  |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| symbol | string |  |
+| longNotional | number |  |
+| shortNotional | number |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract-notional-by-symbol" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "symbol=BTCUSDT"
+```

@@ -1,0 +1,235 @@
+---
+title: "Finance account"
+sidebarTitle: "Finance account"
+description: "OpenAPI endpoints for Finance account."
+---
+
+This group maps Spec tag `理财账户` (external name **Finance account**). Paths use the `/openapi/v1/mc-account/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| POST | /openapi/v1/mc-account/finance/account/withdraw | TRADE | 理财账户提现（活期） |
+| POST | /openapi/v1/mc-account/finance/account/withdraw/fixed | TRADE | 理财定期持仓提现 |
+| POST | /openapi/v1/mc-account/finance/account/deposit | TRADE | 理财账户存款 |
+| GET | /openapi/v1/mc-account/finance/products/catalog | READ | 理财产品目录 |
+| GET | /openapi/v1/mc-account/finance/account/positions/holding | READ | 理财当前持仓 |
+| GET | /openapi/v1/mc-account/finance/account/positions/history | READ | 用户赎回明细 |
+| GET | /openapi/v1/mc-account/finance/account/overview | READ | 理财概览 |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## 理财账户提现（活期）
+
+`POST /openapi/v1/mc-account/finance/account/withdraw` — permission `TRADE`.
+
+仅支持活期产品：传入产品代码与提现金额，从理财转出到资金账户再划入现货。定期多笔持仓请使用「定期持仓提现」接口并指定持仓明细 id
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| productCode | string | Yes | 活期理财产品代码 |
+| amount | number | Yes | 提现金额 |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 理财定期持仓提现
+
+`POST /openapi/v1/mc-account/finance/account/withdraw/fixed` — permission `TRADE`.
+
+仅支持定期产品：指定持仓明细 id（持有中或已到期均可；与当前持仓接口 positionId 一致），后端按该笔本金+利息全额赎回，工作流与活期提现一致
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| positionId | integer | Yes | 定期持仓主键 id（持有中或已到期均可赎回；与当前持仓接口返回的 positionId 一致） |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw/fixed" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 理财账户存款
+
+`POST /openapi/v1/mc-account/finance/account/deposit` — permission `TRADE`.
+
+理财账户存款，从现货账户划出到资金账户，然后存入理财产品
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| productCode | string | Yes | 理财产品代码，如 USDT_CURRENT |
+| amount | number | Yes | 存款金额 |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/deposit" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "example": "see fields above"
+}' 
+```
+
+---
+
+## 理财产品目录
+
+`GET /openapi/v1/mc-account/finance/products/catalog` — permission `READ`.
+
+按类型（活期/定期）查询已启用产品配置全量列表（不分页），按基础年化+超额奖励年化降序；查询参数仅 type 必填
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| type | string | Yes | 产品类型：活期 / 定期 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/products/catalog" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "type=VALUE"
+```
+
+---
+
+## 理财当前持仓
+
+`GET /openapi/v1/mc-account/finance/account/positions/holding` — permission `READ`.
+
+根据上下文 uid 分页查询持有中/已到期持仓；活期同产品多笔汇总为一行。返回列表按 product_code 升序、再 currency 升序。positionAmount 为持仓本金合计（不含未结利息，利息见 currentRewardAmount）；cumulativeRewardAmount 为该产品该币种下历史结息原币种合计，不折 USDC。未登录或缺少业务线时返回空页
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| size | integer | No |  |
+| current | integer | No |  |
+| orderBy | string | No | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/holding" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1"
+```
+
+---
+
+## 用户赎回明细
+
+`GET /openapi/v1/mc-account/finance/account/positions/history` — permission `READ`.
+
+与后台赎回明细一致：主表 ac_transaction_history（EARN_WITHDRAWAL），按 create_time 分页；productCode、类型、持仓关联等来自 ac_finance_transaction（tx_id = transaction_id，WITHDRAW）；赎回金额与时间为动账主单 amount、create_time
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| size | integer | No |  |
+| current | integer | No |  |
+| orderBy | string | No | 支持多字段排序，用逗号分隔 |
+| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/history" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1"
+```
+
+---
+
+## 理财概览
+
+`GET /openapi/v1/mc-account/finance/account/overview` — permission `READ`.
+
+按产品维度返回 products，顺序为 product_code 升序、再 currency 升序；用户侧 userDepositedAmount/userInterestAmount/availableBalance 来自该产品在 ac_user_finance_position 的持仓汇总（该产品币种）。totalDepositValue 为各产品持仓本金×预言机价折 USDC 之和。totalInterestValue、yesterdayInterestValue 仍为结息流水按币种折 USDC。userSpotAvailableBalance 为现货币种维度，同币种产品值相同。未登录时用户侧为0
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| totalDepositValue | number | 用户存入总额（各币种本金 × 对应预言机价，折 USDC；未登录为0） |
+| totalInterestValue | number | 用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestVal |
+| yesterdayInterestValue | number | 昨日利息（自然日昨日 Asia/Shanghai 已入账结息流水，按同套预言机折 USDC；未登录为0） |
+| products | array | 按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBal |
+| totalDepositValueDisplay | string | 用户存入总额展示值 |
+| totalInterestValueDisplay | string | 用户历史结息总额展示值 |
+| yesterdayInterestValueDisplay | string | 昨日利息展示值 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

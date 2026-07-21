@@ -1,0 +1,87 @@
+---
+title: "订单"
+sidebarTitle: "订单"
+description: "订单相关 OpenAPI 接口。"
+---
+
+本组对应 Spec tag `订单`（对外名称 **订单**）。路径前缀为 `/openapi/v1/mc-trade/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-trade/trade/orders/pending/v2 | READ | 查询未成单订单列表V2 |
+| GET | /openapi/v1/mc-trade/trade/orders/history/v3 | READ | 查询历史订单列表V3 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 查询未成单订单列表V2
+
+`GET /openapi/v1/mc-trade/trade/orders/pending/v2` — 权限 `READ`。
+
+根据当前用户的UID查询未成单订单列表（挂单），UID从请求头X-UID中获取
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| symbol | string | 否 |  |
+| login | string | 是 |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/pending/v2" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "login=VALUE"
+```
+
+---
+
+## 查询历史订单列表V3
+
+`GET /openapi/v1/mc-trade/trade/orders/history/v3` — 权限 `READ`。
+
+根据 uid 和账户数据类型(SPOT/CONTRACT/SPOT_CONTRACT)查询历史委托订单列表，包含现货和合约数据
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| size | integer | 否 |  |
+| current | integer | 否 |  |
+| orderBy | string | 否 |  |
+| sortOrder | string | 否 |  |
+| type | string | 是 | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并 |
+| from | integer | 是 | 开始时间戳（Unix时间戳，秒） |
+| to | integer | 是 | 结束时间戳（Unix时间戳，秒） |
+| symbol | string | 否 | 交易品种名 |
+
+### 响应 `data` 字段（摘要）
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array |  |
+| total | integer |  |
+| size | integer |  |
+| current | integer |  |
+| pages | integer |  |
+| hasPrevious | boolean |  |
+| hasNext | boolean |  |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/history/v3" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "size=1" \
+  --data-urlencode "current=1" \
+  --data-urlencode "type=VALUE" \
+  --data-urlencode "from=1755792000"
+```

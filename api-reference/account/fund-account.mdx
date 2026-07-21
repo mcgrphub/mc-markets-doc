@@ -1,0 +1,104 @@
+---
+title: "Fund account"
+sidebarTitle: "Fund account"
+description: "OpenAPI endpoints for Fund account."
+---
+
+This group maps Spec tag `资金账户` (external name **Fund account**). Paths use the `/openapi/v1/mc-account/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/fund/account/spot/positions/v2 | READ | 获取持仓信息V2 |
+| GET | /openapi/v1/mc-account/fund/account/spot-account/positions | READ | 获取现货账户持仓信息 |
+| GET | /openapi/v1/mc-account/fund/account/por | READ | 查询用户资金证明 |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## 获取持仓信息V2
+
+`GET /openapi/v1/mc-account/fund/account/spot/positions/v2` — permission `READ`.
+
+获取持仓信息
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| uid | string | 用户ID |
+| symbolInfo | object | 持仓信息，key为交易品种，value为持仓详情 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot/positions/v2" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 获取现货账户持仓信息
+
+`GET /openapi/v1/mc-account/fund/account/spot-account/positions` — permission `READ`.
+
+获取现货账户持仓信息
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| spotId | string | Yes |  |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| spotId | string | 现货账户ID |
+| symbolInfo | object | 持仓信息，key为交易品种，value为持仓详情 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+  --data-urlencode "spotId=VALUE"
+```
+
+---
+
+## 查询用户资金证明
+
+`GET /openapi/v1/mc-account/fund/account/por` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| batchId | integer | No |  |
+
+### Response `data` fields (summary)
+
+| Field | Type | Description |
+| --- | --- | --- |
+| treeBatchId | integer | Merkle Tree构建批次 |
+| userId | string | 用户ID |
+| userHash | string | PoRv2 用户哈希（user_hash） |
+| assetInfo | string | 资产信息 |
+| leafHash | string | Merkle leaf 的 hash 值 |
+| pathLayers | string | 递归层路径，每层一个 group + 自己在其中的位置 |
+| platformAssetProof | array | 平台资产证明 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/por" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

@@ -30,11 +30,11 @@ The production base URL is `https://gateway.mcconnects.com`. All endpoints share
 
 ## Endpoint groups
 
-MC OpenAPI endpoints are generated from `openapi-exposed` Specs and grouped by gateway service in the API Reference sidebar.
+MC OpenAPI facts come from the Chinese Specs under `openapi/`. API Reference pages are hand-written MDX, grouped by gateway service in the sidebar.
 
 | Group | Purpose | Required scope (typical) |
 | --- | --- | --- |
-| Account (`/openapi/v1/mc-account/`) | Trading records, finance, MLP, currency, fund account, exchange rate | `READ`, `TRADE`, `WITHDRAW` |
+| Account (`/openapi/v1/mc-account/`) | Trading records, finance, vault account, currency, fund account, exchange rate | `READ`, `TRADE`, `WITHDRAW` |
 | Trade (`/openapi/v1/mc-trade/`) | Orders, positions, deals, trade account | `READ`, `TRADE` |
 | Risk (`/openapi/v1/mc-risk/`) | Funding rate, trade symbols | `READ` |
 | Aggregator (`/openapi/v1/mc-aggregator/`) | K-line and symbol ranking | `READ` |
