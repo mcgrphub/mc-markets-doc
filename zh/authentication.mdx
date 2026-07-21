@@ -67,7 +67,7 @@ https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/
 HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均可），但待签名字符串中的头名一律使用**小写**。
 
 <Warning>
-  请勿同时发送 `Authorization: Bearer ...` 与 AK/SK 相关请求头。若请求中存在 Bearer Token，网关会将其识别为 Web 会话鉴权（B 类模式），不会使用 AK/SK 签名。
+  请勿同时发送 `Authorization: Bearer ...` 与 AK/SK 相关请求头。若请求中存在 Bearer Token，网关会将其识别为 Web 会话鉴权（Category B 模式），不会使用 AK/SK 签名。
 </Warning>
 
 ## 请求签名

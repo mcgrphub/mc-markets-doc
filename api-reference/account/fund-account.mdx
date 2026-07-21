@@ -12,7 +12,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/fund/account/spot/positions/v2 | READ | 获取持仓信息V2 |
 | GET | /openapi/v1/mc-account/fund/account/spot-account/positions | READ | 获取现货账户持仓信息 |
-| GET | /openapi/v1/mc-account/fund/account/por | READ | 查询用户资金证明 |
+| GET | /openapi/v1/mc-account/fund/account/por | READ | Query Proof of Reserves (PoR) |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -73,7 +73,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 ---
 
-## 查询用户资金证明
+## Query Proof of Reserves (PoR)
 
 `GET /openapi/v1/mc-account/fund/account/por` — permission `READ`.
 

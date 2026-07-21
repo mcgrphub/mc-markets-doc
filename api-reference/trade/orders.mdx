@@ -10,7 +10,7 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-trade/trade/orders/pending/v2 | READ | 查询未成单订单列表V2 |
+| GET | /openapi/v1/mc-trade/trade/orders/pending/v2 | READ | Query pending (unfilled) orders V2 |
 | GET | /openapi/v1/mc-trade/trade/orders/history/v3 | READ | 查询历史订单列表V3 |
 
 <Note>
@@ -19,11 +19,11 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 ---
 
-## 查询未成单订单列表V2
+## Query pending (unfilled) orders V2
 
 `GET /openapi/v1/mc-trade/trade/orders/pending/v2` — permission `READ`.
 
-根据当前用户的UID查询未成单订单列表（挂单），UID从请求头X-UID中获取
+Query pending (unfilled) orders for the current user. UID is taken from the `X-UID` request header.
 
 ### Query / path parameters
 

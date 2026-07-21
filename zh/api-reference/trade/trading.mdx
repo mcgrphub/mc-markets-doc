@@ -37,7 +37,7 @@ description: "交易相关 OpenAPI 接口。"
 | login | string | 是 | MT5合约账户ID/现货账户ID |
 | order | integer | 是 | 订单ID |
 | symbol | string | 是 | 交易对，例如 BTCUSDT, 仅下单有效 |
-| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
 | priceSL | number | 否 | 新的止损价格 |
 | priceTP | number | 否 | 新的止盈价格 |
 
@@ -74,8 +74,8 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 | login | string | 是 | MT5合约账户ID/现货账户ID |
 | symbol | string | 是 | 交易对，例如 BTCUSDT, 仅下单有效 |
 | price | number | 是 | 下单价格 |
-| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
-| typeTime | integer | 是 | 有效期类型, 不传默认0&quot;, &quot;0-取消前有效&quot;, &quot;1-当天有效&quot;, &quot;2-指定时间&quot;, &quot;3-指定某日。到期时间为指定某日的00:00或最近的交易时间&quot; |
+| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
+| typeTime | integer | 是 | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
 | expiration | integer | 是 | 过期时间戳（typeTime=2时必填） |
 | priceTrigger | number | 是 | 止损限价单触发价格 |
 | priceSL | number | 是 | 止损 |
@@ -117,10 +117,10 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
 | volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
 | price | number | 否 | 下单价格，不传默认0, 0为市价，其他为限价 |
-| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
 | position | integer | 否 | 持仓ID, 默认0 |
-| typeFill | integer | 是 | 成交类型 &quot;0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。&lt;&quot;, &quot;1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。&lt;&quot;, &quot;2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
-| typeTime | integer | 否 | 有效期类型, 不传默认0&quot;, &quot;0-取消前有效&quot;, &quot;1-当天有效&quot;, &quot;2-指定时间&quot;, &quot;3-指定某日。到期时间为指定某日的00:00或最近的交易时间&quot; |
+| typeFill | integer | 是 | 成交类型 "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。", "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。", "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
+| typeTime | integer | 否 | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
 | expiration | integer | 否 | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
 | priceTrigger | number | 否 | 止损限价单触发价格, 不传默认0 |
 | priceSL | number | 否 | 止损 |
@@ -162,10 +162,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
 | volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
 | price | number | 否 | 下单价格，不传默认0, 0为市价，其他为限价 |
-| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
 | position | integer | 否 | 持仓ID, 默认0 |
-| typeFill | integer | 是 | 成交类型 &quot;0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。&lt;&quot;, &quot;1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。&lt;&quot;, &quot;2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
-| typeTime | integer | 否 | 有效期类型, 不传默认0&quot;, &quot;0-取消前有效&quot;, &quot;1-当天有效&quot;, &quot;2-指定时间&quot;, &quot;3-指定某日。到期时间为指定某日的00:00或最近的交易时间&quot; |
+| typeFill | integer | 是 | 成交类型 "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。", "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。", "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
+| typeTime | integer | 否 | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
 | expiration | integer | 否 | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
 | priceTrigger | number | 否 | 止损限价单触发价格, 不传默认0 |
 | priceSL | number | 否 | 止损 |
@@ -224,7 +224,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | login | string | 是 | MT5合约账户ID/现货账户ID |
-| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;, &quot;7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单&quot;, &quot;8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式&quot; |
+| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单", "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单", "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
 | volumeExt | integer | 是 | 下单数量（*100000000扩展精度）， 如用户下单量是0.01， 则传入0.01*100000000 |
 | symbol | string | 是 | 交易对/品种 |
 
@@ -315,7 +315,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 | --- | --- | --- | --- |
 | login | string | 是 | MT5合约账户ID/现货账户ID |
 | order | integer | 是 | 订单ID |
-| type | integer | 是 | 订单类型 &quot;0-OP_BUY: 市价买入&quot;, &quot;1-OP_SELL: 市价卖出&quot;, &quot;2-OP_BUY_LIMIT: 限价买入挂单&quot;, &quot;3-OP_SELL_LIMIT: 限价卖出挂单&quot;, &quot;4-OP_BUY_STOP: 止损买入挂单&quot;, &quot;5-OP_SELL_STOP: 止损卖出挂单&quot;, &quot;6-OP_BUY_STOP_LIMIT: 止损限价买入挂单&quot;… |
+| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
 
 ### 响应 `data` 字段（摘要）

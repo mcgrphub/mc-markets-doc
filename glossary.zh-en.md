@@ -21,6 +21,7 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | 储备金证明（PoR） | Proof of Reserves (PoR) | |
 | 币种 | Symbol / Currency | Prefer consistency with endpoint pages; Spec tag en uses Currency |
 | `READ` / `TRADE` / `WITHDRAW` | `READ` / `TRADE` / `WITHDRAW` | Keep as-is |
+| 遍历 | iterate / iterate through | Not 遗历; use when translating pagination “iterate” |
 
 ## Table 2 — Spec internal → external
 

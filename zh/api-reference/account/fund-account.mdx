@@ -12,7 +12,7 @@ description: "资金账户相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/fund/account/spot/positions/v2 | READ | 获取持仓信息V2 |
 | GET | /openapi/v1/mc-account/fund/account/spot-account/positions | READ | 获取现货账户持仓信息 |
-| GET | /openapi/v1/mc-account/fund/account/por | READ | 查询用户资金证明 |
+| GET | /openapi/v1/mc-account/fund/account/por | READ | 查询用户储备金证明（PoR） |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -73,7 +73,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 ---
 
-## 查询用户资金证明
+## 查询用户储备金证明（PoR）
 
 `GET /openapi/v1/mc-account/fund/account/por` — 权限 `READ`。
 

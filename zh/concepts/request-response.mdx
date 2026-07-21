@@ -75,7 +75,7 @@ curl --request GET \
 </ResponseField>
 
 <ResponseField name="msg" type="string">
-  人可读消息。成功时通常为 `"success"`;失败时描述原因。
+  人类可读的消息。成功时通常为 `"success"`;失败时描述原因。
 </ResponseField>
 
 <ResponseField name="data" type="object | array | null">
@@ -83,7 +83,7 @@ curl --request GET \
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
-  方便标志;`code == "0"` 时为 `true`。
+  便捷标志;`code == "0"` 时为 `true`。
 </ResponseField>
 
 ### 分页响应
@@ -123,5 +123,5 @@ MC OpenAPI 使用标准 HTTP 状态码表示传输层结果。即使返回 `200 
 | `503` | 网关临时不可用。指数退避重试。 |
 
 <Tip>
-  非 `200` 响应时记录 `code`、`msg` 与响应头中的 correlation ID,循迹与支持将更高效。
+  非 `200` 响应时记录 `code`、`msg` 与响应头中的 correlation ID,便于排障与联系支持。
 </Tip>

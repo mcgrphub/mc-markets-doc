@@ -71,14 +71,14 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 `GET /openapi/v1/mc-trade/account/positions/current/v2` — permission `READ`.
 
-根据当前用户的UID查询当前所有未平仓的持仓，UID从请求头X-UID中获取, mt5很多地方用整形表示浮点型，避免精度问题 规则为： 不带ext的是表示4位小数，转浮点数需要除10000 带ext的是表示8位小数，转浮点数需要除100000000 举个例子： mt5_positions表中持仓量有Volume和VolumeExt
+Query all open positions for the current user (UID from the `X-UID` header). MT5 often stores floats as integers to avoid precision issues: fields without an Ext suffix use 4 decimal places (divide by 10000); fields with an Ext suffix use 8 decimal places (divide by 100000000). For example, `mt5_positions` stores volume as `Volume` and `VolumeExt`.
 
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | login | string | Yes | MT5合约账户ID/现货账户ID |
-| symbol | string | No | 持仓号 |
+| symbol | string | No | Trading symbol |
 | positionType | string | No | 不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓 |
 
 ```bash
@@ -96,7 +96,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 `GET /openapi/v1/mc-trade/account/pnl` — permission `READ`.
 
-根据当前用户的UID查询一段时间区间内的盈亏统计，如近一周盈亏，UID从请求头X-UID中获取,form&to不传默认查最近七天
+Query PnL for a time range (for example, the past week). UID is taken from the `X-UID` header. If `from` and `to` are omitted, defaults to the last seven days.
 
 ### Query / path parameters
 

@@ -28,7 +28,7 @@ description: "理财账户相关 OpenAPI 接口。"
 
 `POST /openapi/v1/mc-account/finance/account/withdraw` — 权限 `TRADE`。
 
-仅支持活期产品：传入产品代码与提现金额，从理财转出到资金账户再划入现货。定期多笔持仓请使用「定期持仓提现」接口并指定持仓明细 id
+仅支持活期产品：传入产品代码与提现金额，从理财转出到资金账户再划入现货。定期多笔持仓请使用「定期持仓提现」接口并指定持仓明细 ID。
 
 ### 请求体（JSON）
 
@@ -56,7 +56,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 
 `POST /openapi/v1/mc-account/finance/account/withdraw/fixed` — 权限 `TRADE`。
 
-仅支持定期产品：指定持仓明细 id（持有中或已到期均可；与当前持仓接口 positionId 一致），后端按该笔本金+利息全额赎回，工作流与活期提现一致
+仅支持定期产品：指定持仓明细 ID（持有中或已到期均可；与当前持仓接口 `positionId` 一致）。后端按该笔本金与利息全额赎回，工作流与活期提现一致。
 
 ### 请求体（JSON）
 

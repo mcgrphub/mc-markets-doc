@@ -24,13 +24,13 @@ description: "MC OpenAPI 仅支持请求-响应——使用以下轮询模式检
 
 ## 高效轮询模式
 
-目标是**仅获取上次以后的新数据**,避免重下全量。
+目标是**仅拉取自上次轮询以来的新数据**，避免重复下载全量历史。
 
 1. 记录**水位线**:已处理的最大 `createdTime`(或 `transactionId`)。
 2. 每次轮询使用 `startTime = watermark + 1`(或同等过滤)。
-3. 如果 `pages > 1`,继续遗历——见 [分页](/zh/concepts/pagination)。
+3. 如果 `pages > 1`,继续遍历——见 [分页](/zh/concepts/pagination)。
 4. 仅在**持久化处理完本批**后再保存新水位线,避免崩溃时丢失记录。
-5. Sleep,重复。
+5. 等待间隔后重复。
 
 ### Python 示例
 
@@ -99,5 +99,5 @@ while True:
 - **对 `429` / `5xx` 退避。** 复用 [指数退避](/zh/guides/rate-limits) 封装。
 
 <Tip>
-  确实需要推送时,联系 MC 支持确认你的账号层级建议。
+  确实需要推送时，联系 MC 支持，了解你所在账号层级可用的方案。
 </Tip>

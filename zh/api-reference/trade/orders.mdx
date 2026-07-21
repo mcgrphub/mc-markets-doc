@@ -10,7 +10,7 @@ description: "订单相关 OpenAPI 接口。"
 
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-trade/trade/orders/pending/v2 | READ | 查询未成单订单列表V2 |
+| GET | /openapi/v1/mc-trade/trade/orders/pending/v2 | READ | 查询未成交订单列表（挂单）V2 |
 | GET | /openapi/v1/mc-trade/trade/orders/history/v3 | READ | 查询历史订单列表V3 |
 
 <Note>
@@ -19,11 +19,11 @@ description: "订单相关 OpenAPI 接口。"
 
 ---
 
-## 查询未成单订单列表V2
+## 查询未成交订单列表（挂单）V2
 
 `GET /openapi/v1/mc-trade/trade/orders/pending/v2` — 权限 `READ`。
 
-根据当前用户的UID查询未成单订单列表（挂单），UID从请求头X-UID中获取
+根据当前用户的 UID 查询未成交订单列表（挂单），UID 从请求头 `X-UID` 获取。
 
 ### 查询 / 路径参数
 

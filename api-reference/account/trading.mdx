@@ -143,7 +143,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 `POST /openapi/v1/mc-account/transaction/exchange/v2` — permission `TRADE`.
 
-需要先调用[触发2FA验证]接口,触发2FA验证
+Complete 2FA verification first, then pass the temporary tokens in `verify2FaTokens`.
 
 ### Request body (JSON)
 

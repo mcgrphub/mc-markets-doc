@@ -81,7 +81,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 | timestamp | integer |  |
 | oneFromToQuantity | number | 1个[from]币可兑换[to]币的数量 |
 | oneToFromQuantity | number | 1 个[to]币可兑换[from]币的数量 |
-| bookPriceDotMap | object | 汇率转换过程的的报价-包含多个汇率转换步骤,key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
+| bookPriceDotMap | object | 汇率转换过程的报价，包含多个汇率转换步骤，key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
 | baseExchangeRate | number | 基础汇率（未扣手续费/未应用免费额度前），用于测试验证 |
 | baseExchangeRateDisplay | string | 基础汇率展示值 |
 | fromAmount | number | 用户输入的消耗币种数量（from 数量） |
