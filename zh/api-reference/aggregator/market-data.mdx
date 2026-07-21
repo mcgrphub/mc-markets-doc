@@ -44,22 +44,27 @@ description: "查询币种行情排行与 K 线数据。"
 | pricingDegree | integer | 价格精度, 用于把数值转换浮点数 |
 | klineDataList | array | K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳 |
 | klineDisplayList | array | K线展示字段列表, 与 klineDataList 顺序一致 |
-| klineDisplayList[].openStr | string | 开盘价原始 plain string |
-| klineDisplayList[].openDisplay | string | 开盘价展示文本 |
-| klineDisplayList[].openScale | integer | 开盘价展示小数位 |
-| klineDisplayList[].closeStr | string | 收盘价原始 plain string |
-| klineDisplayList[].closeDisplay | string | 收盘价展示文本 |
-| klineDisplayList[].closeScale | integer | 收盘价展示小数位 |
-| klineDisplayList[].highStr | string | 最高价原始 plain string |
-| klineDisplayList[].highDisplay | string | 最高价展示文本 |
-| klineDisplayList[].highScale | integer | 最高价展示小数位 |
-| klineDisplayList[].lowStr | string | 最低价原始 plain string |
-| klineDisplayList[].lowDisplay | string | 最低价展示文本 |
-| klineDisplayList[].lowScale | integer | 最低价展示小数位 |
-| klineDisplayList[].volumeStr | string | 交易量原始 plain string |
-| klineDisplayList[].volumeDisplay | string | 交易量展示文本 |
-| klineDisplayList[].volumeScale | integer | 交易量展示小数位 |
-| klineDisplayList[].timestamp | integer | 秒级时间戳 |
+
+`klineDisplayList[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| openStr | string | 开盘价原始 plain string |
+| openDisplay | string | 开盘价展示文本 |
+| openScale | integer | 开盘价展示小数位 |
+| closeStr | string | 收盘价原始 plain string |
+| closeDisplay | string | 收盘价展示文本 |
+| closeScale | integer | 收盘价展示小数位 |
+| highStr | string | 最高价原始 plain string |
+| highDisplay | string | 最高价展示文本 |
+| highScale | integer | 最高价展示小数位 |
+| lowStr | string | 最低价原始 plain string |
+| lowDisplay | string | 最低价展示文本 |
+| lowScale | integer | 最低价展示小数位 |
+| volumeStr | string | 交易量原始 plain string |
+| volumeDisplay | string | 交易量展示文本 |
+| volumeScale | integer | 交易量展示小数位 |
+| timestamp | integer | 秒级时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/symbol-ranking" \
@@ -99,22 +104,27 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data
 | pricingDegree | integer | 价格精度, 用于把数值转换浮点数 |
 | klineDataList | array | K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳 |
 | klineDisplayList | array | K线展示字段列表, 与 klineDataList 顺序一致 |
-| klineDisplayList[].openStr | string | 开盘价原始 plain string |
-| klineDisplayList[].openDisplay | string | 开盘价展示文本 |
-| klineDisplayList[].openScale | integer | 开盘价展示小数位 |
-| klineDisplayList[].closeStr | string | 收盘价原始 plain string |
-| klineDisplayList[].closeDisplay | string | 收盘价展示文本 |
-| klineDisplayList[].closeScale | integer | 收盘价展示小数位 |
-| klineDisplayList[].highStr | string | 最高价原始 plain string |
-| klineDisplayList[].highDisplay | string | 最高价展示文本 |
-| klineDisplayList[].highScale | integer | 最高价展示小数位 |
-| klineDisplayList[].lowStr | string | 最低价原始 plain string |
-| klineDisplayList[].lowDisplay | string | 最低价展示文本 |
-| klineDisplayList[].lowScale | integer | 最低价展示小数位 |
-| klineDisplayList[].volumeStr | string | 交易量原始 plain string |
-| klineDisplayList[].volumeDisplay | string | 交易量展示文本 |
-| klineDisplayList[].volumeScale | integer | 交易量展示小数位 |
-| klineDisplayList[].timestamp | integer | 秒级时间戳 |
+
+`klineDisplayList[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| openStr | string | 开盘价原始 plain string |
+| openDisplay | string | 开盘价展示文本 |
+| openScale | integer | 开盘价展示小数位 |
+| closeStr | string | 收盘价原始 plain string |
+| closeDisplay | string | 收盘价展示文本 |
+| closeScale | integer | 收盘价展示小数位 |
+| highStr | string | 最高价原始 plain string |
+| highDisplay | string | 最高价展示文本 |
+| highScale | integer | 最高价展示小数位 |
+| lowStr | string | 最低价原始 plain string |
+| lowDisplay | string | 最低价展示文本 |
+| lowScale | integer | 最低价展示小数位 |
+| volumeStr | string | 交易量原始 plain string |
+| volumeDisplay | string | 交易量展示文本 |
+| volumeScale | integer | 交易量展示小数位 |
+| timestamp | integer | 秒级时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/kline" \

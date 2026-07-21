@@ -44,22 +44,27 @@ Paginated symbol ranking by category and sort dimensions.
 | pricingDegree | integer | Price precision, used to convert values to floating point numbers |
 | klineDataList | array | K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp |
 | klineDisplayList | array | K-line display field list, consistent with klineDataList order |
-| klineDisplayList[].openStr | string | Open price raw plain string |
-| klineDisplayList[].openDisplay | string | Open price display text |
-| klineDisplayList[].openScale | integer | Open price display decimal places |
-| klineDisplayList[].closeStr | string | Close price raw plain string |
-| klineDisplayList[].closeDisplay | string | Close price display text |
-| klineDisplayList[].closeScale | integer | Close price display decimal places |
-| klineDisplayList[].highStr | string | High price raw plain string |
-| klineDisplayList[].highDisplay | string | High price display text |
-| klineDisplayList[].highScale | integer | High price display decimal places |
-| klineDisplayList[].lowStr | string | Low price raw plain string |
-| klineDisplayList[].lowDisplay | string | Low price display text |
-| klineDisplayList[].lowScale | integer | Low price display decimal places |
-| klineDisplayList[].volumeStr | string | Trading volume raw plain string |
-| klineDisplayList[].volumeDisplay | string | Trading volume display text |
-| klineDisplayList[].volumeScale | integer | Trading volume display decimal places |
-| klineDisplayList[].timestamp | integer | Second-level timestamp |
+
+`klineDisplayList[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| openStr | string | Open price raw plain string |
+| openDisplay | string | Open price display text |
+| openScale | integer | Open price display decimal places |
+| closeStr | string | Close price raw plain string |
+| closeDisplay | string | Close price display text |
+| closeScale | integer | Close price display decimal places |
+| highStr | string | High price raw plain string |
+| highDisplay | string | High price display text |
+| highScale | integer | High price display decimal places |
+| lowStr | string | Low price raw plain string |
+| lowDisplay | string | Low price display text |
+| lowScale | integer | Low price display decimal places |
+| volumeStr | string | Trading volume raw plain string |
+| volumeDisplay | string | Trading volume display text |
+| volumeScale | integer | Trading volume display decimal places |
+| timestamp | integer | Second-level timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/symbol-ranking" \
@@ -99,22 +104,27 @@ Query candlestick data by symbol, interval, and time range.
 | pricingDegree | integer | Price precision, used to convert values to floating point numbers |
 | klineDataList | array | K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp |
 | klineDisplayList | array | K-line display field list, consistent with klineDataList order |
-| klineDisplayList[].openStr | string | Open price raw plain string |
-| klineDisplayList[].openDisplay | string | Open price display text |
-| klineDisplayList[].openScale | integer | Open price display decimal places |
-| klineDisplayList[].closeStr | string | Close price raw plain string |
-| klineDisplayList[].closeDisplay | string | Close price display text |
-| klineDisplayList[].closeScale | integer | Close price display decimal places |
-| klineDisplayList[].highStr | string | High price raw plain string |
-| klineDisplayList[].highDisplay | string | High price display text |
-| klineDisplayList[].highScale | integer | High price display decimal places |
-| klineDisplayList[].lowStr | string | Low price raw plain string |
-| klineDisplayList[].lowDisplay | string | Low price display text |
-| klineDisplayList[].lowScale | integer | Low price display decimal places |
-| klineDisplayList[].volumeStr | string | Trading volume raw plain string |
-| klineDisplayList[].volumeDisplay | string | Trading volume display text |
-| klineDisplayList[].volumeScale | integer | Trading volume display decimal places |
-| klineDisplayList[].timestamp | integer | Second-level timestamp |
+
+`klineDisplayList[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| openStr | string | Open price raw plain string |
+| openDisplay | string | Open price display text |
+| openScale | integer | Open price display decimal places |
+| closeStr | string | Close price raw plain string |
+| closeDisplay | string | Close price display text |
+| closeScale | integer | Close price display decimal places |
+| highStr | string | High price raw plain string |
+| highDisplay | string | High price display text |
+| highScale | integer | High price display decimal places |
+| lowStr | string | Low price raw plain string |
+| lowDisplay | string | Low price display text |
+| lowScale | integer | Low price display decimal places |
+| volumeStr | string | Trading volume raw plain string |
+| volumeDisplay | string | Trading volume display text |
+| volumeScale | integer | Trading volume display decimal places |
+| timestamp | integer | Second-level timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/kline" \

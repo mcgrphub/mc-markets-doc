@@ -242,152 +242,6 @@ def field_copy(name: str, sch: dict, locale: str, *, page_context: bool = False)
     return ""
 
 
-def walk_fields(
-    spec: dict,
-    sch: dict,
-    *,
-    prefix: str = "",
-    depth: int = 0,
-    max_depth: int = 12,
-    rows: list[tuple[str, str, str]] | None = None,
-    seen: set[str] | None = None,
-    locale: str = "zh",
-) -> list[tuple[str, str, str]]:
-    rows = rows if rows is not None else []
-    seen = seen if seen is not None else set()
-    if prefix in seen or depth > max_depth:
-        return rows
-    if prefix:
-        seen.add(prefix)
-
-    sch = enrich(spec, sch)
-    t = sch.get("type")
-    if isinstance(t, list):
-        t = next((x for x in t if x != "null"), t[0] if t else None)
-    props = sch.get("properties") or {}
-    addl = sch.get("additionalProperties")
-
-    if props:
-        for key, value in props.items():
-            value = enrich(spec, value)
-            path = f"{prefix}.{key}" if prefix else key
-            rows.append((path, norm_type(value), field_copy(key, value, locale)))
-            vt = value.get("type")
-            if isinstance(vt, list):
-                vt = next((x for x in vt if x != "null"), None)
-            if vt == "array":
-                items = enrich(spec, value.get("items") or {})
-                it = items.get("type")
-                if isinstance(it, list):
-                    it = next((x for x in it if x != "null"), None)
-                if (
-                    items.get("properties")
-                    or it in ("object", "array")
-                    or isinstance(items.get("additionalProperties"), dict)
-                ):
-                    walk_fields(
-                        spec,
-                        items,
-                        prefix=path + "[]",
-                        depth=depth + 1,
-                        max_depth=max_depth,
-                        rows=rows,
-                        seen=seen,
-                        locale=locale,
-                    )
-            elif (
-                vt == "object"
-                or value.get("properties")
-                or isinstance(value.get("additionalProperties"), dict)
-            ):
-                walk_fields(
-                    spec,
-                    value,
-                    prefix=path,
-                    depth=depth + 1,
-                    max_depth=max_depth,
-                    rows=rows,
-                    seen=seen,
-                    locale=locale,
-                )
-        return rows
-
-    if t == "array":
-        items = enrich(spec, sch.get("items") or {})
-        if not prefix:
-            rows.append(
-                (
-                    "data",
-                    "array",
-                    (
-                        "`data` 为对象数组，元素字段见 `[]...`"
-                        if locale == "zh"
-                        else "`data` is an array of objects; element fields use `[]...`"
-                    ),
-                )
-            )
-            item_prefix = "[]"
-        else:
-            item_prefix = prefix + "[]"
-        if (
-            items.get("properties")
-            or items.get("type") in ("object", "array")
-            or isinstance(items.get("additionalProperties"), dict)
-            or items.get("items")
-        ):
-            walk_fields(
-                spec,
-                items,
-                prefix=item_prefix,
-                depth=depth + 1,
-                max_depth=max_depth,
-                rows=rows,
-                seen=seen,
-                locale=locale,
-            )
-        else:
-            rows.append((item_prefix, norm_type(items), field_copy("item", items, locale)))
-        return rows
-
-    if isinstance(addl, dict):
-        addl = enrich(spec, addl)
-        path = f"{prefix}.<key>" if prefix else "<key>"
-        rows.append(
-            (
-                path,
-                norm_type(addl),
-                field_copy("value", addl, locale)
-                or ("映射值" if locale == "zh" else "Map value"),
-            )
-        )
-        walk_fields(
-            spec,
-            addl,
-            prefix=path,
-            depth=depth + 1,
-            max_depth=max_depth,
-            rows=rows,
-            seen=seen,
-            locale=locale,
-        )
-        return rows
-
-    if not prefix:
-        rows.append(
-            (
-                "data",
-                norm_type(sch),
-                field_copy("data", sch, locale)
-                or (
-                    "`data` 为该类型标量"
-                    if locale == "zh"
-                    else "`data` is a scalar of this type"
-                ),
-            )
-        )
-    return rows
-
-
 def detect_page_list_key(props: dict) -> str | None:
     keys = set(props)
     if (
@@ -419,6 +273,203 @@ def render_table(headers: tuple[str, str, str], rows: list[tuple[str, str, str]]
     return "\n".join(lines)
 
 
+def join_path(parent: str, child: str) -> str:
+    if not parent:
+        return child
+    if not child:
+        return parent
+    return f"{parent}.{child}"
+
+
+def section_label(path: str, kind: str, locale: str) -> str:
+    """kind: object | array-item | map-value"""
+    if locale == "zh":
+        if kind == "array-item":
+            return f"`{path}` 元素："
+        if kind == "map-value":
+            return f"`{path}` 映射值字段："
+        return f"`{path}` 字段："
+    if kind == "array-item":
+        return f"`{path}` items:"
+    if kind == "map-value":
+        return f"`{path}` map value fields:"
+    return f"`{path}` fields:"
+
+
+def is_expandable_object(sch: dict) -> bool:
+    return bool(
+        sch.get("properties")
+        or (
+            isinstance(sch.get("additionalProperties"), dict)
+            and sch.get("additionalProperties") is not True
+        )
+    )
+
+
+def is_expandable_array_items(items: dict) -> bool:
+    it = items.get("type")
+    if isinstance(it, list):
+        it = next((x for x in it if x != "null"), None)
+    return bool(
+        items.get("properties")
+        or it in ("object", "array")
+        or isinstance(items.get("additionalProperties"), dict)
+        or items.get("items")
+    )
+
+
+def collect_nested_sections(
+    spec: dict,
+    sch: dict,
+    *,
+    path: str,
+    locale: str,
+    headers: tuple[str, str, str],
+    depth: int = 0,
+    max_depth: int = 12,
+    seen: set[str] | None = None,
+) -> list[str]:
+    """Render one schema level as its own table; nest deeper levels as follow-up tables."""
+    seen = seen if seen is not None else set()
+    if path in seen or depth > max_depth:
+        return []
+    if path:
+        seen.add(path)
+
+    sch = enrich(spec, sch)
+    parts: list[str] = []
+    t = sch.get("type")
+    if isinstance(t, list):
+        t = next((x for x in t if x != "null"), t[0] if t else None)
+
+    props = sch.get("properties") or {}
+    addl = sch.get("additionalProperties")
+    nested: list[tuple[str, dict, str]] = []
+
+    if props:
+        rows: list[tuple[str, str, str]] = []
+        for key, value in props.items():
+            value = enrich(spec, value)
+            rows.append((key, norm_type(value), field_copy(key, value, locale)))
+            vt = value.get("type")
+            if isinstance(vt, list):
+                vt = next((x for x in vt if x != "null"), None)
+            child_path = join_path(path, key)
+            if vt == "array":
+                items = enrich(spec, value.get("items") or {})
+                if is_expandable_array_items(items):
+                    nested.append((f"{child_path}[]", items, "array-item"))
+            elif is_expandable_object(value):
+                nested.append((child_path, value, "object"))
+        if path:
+            # Root `data` object table is introduced by the ### heading.
+            kind = "array-item" if path.endswith("[]") else "object"
+            if "<key>" in path:
+                kind = "map-value"
+            parts.append(section_label(path, kind, locale))
+            parts.append("")
+        parts.append(render_table(headers, rows))
+        parts.append("")
+        for child_path, child_sch, _kind in nested:
+            parts.extend(
+                collect_nested_sections(
+                    spec,
+                    child_sch,
+                    path=child_path,
+                    locale=locale,
+                    headers=headers,
+                    depth=depth + 1,
+                    max_depth=max_depth,
+                    seen=seen,
+                )
+            )
+        return parts
+
+    if t == "array":
+        items = enrich(spec, sch.get("items") or {})
+        item_path = f"{path}[]" if path else "data[]"
+        if path in ("", "data"):
+            note = (
+                "`data` 为对象数组。元素字段见下表。"
+                if locale == "zh"
+                else "`data` is an array of objects. Element fields follow."
+            )
+            parts.append(note)
+            parts.append("")
+        if is_expandable_array_items(items):
+            parts.extend(
+                collect_nested_sections(
+                    spec,
+                    items,
+                    path=item_path,
+                    locale=locale,
+                    headers=headers,
+                    depth=depth + 1,
+                    max_depth=max_depth,
+                    seen=seen,
+                )
+            )
+        else:
+            parts.append(section_label(item_path, "array-item", locale))
+            parts.append("")
+            parts.append(
+                render_table(
+                    headers,
+                    [(item_path, norm_type(items), field_copy("item", items, locale))],
+                )
+            )
+            parts.append("")
+        return parts
+
+    if isinstance(addl, dict) and addl is not True:
+        addl = enrich(spec, addl)
+        map_path = join_path(path, "<key>") if path else "<key>"
+        rows = [
+            (
+                "<key>",
+                norm_type(addl),
+                field_copy("value", addl, locale)
+                or ("映射值" if locale == "zh" else "Map value"),
+            )
+        ]
+        if path:
+            parts.append(section_label(path, "object", locale))
+            parts.append("")
+        parts.append(render_table(headers, rows))
+        parts.append("")
+        if is_expandable_object(addl) or addl.get("type") == "array":
+            parts.extend(
+                collect_nested_sections(
+                    spec,
+                    addl,
+                    path=map_path,
+                    locale=locale,
+                    headers=headers,
+                    depth=depth + 1,
+                    max_depth=max_depth,
+                    seen=seen,
+                )
+            )
+        return parts
+
+    # Scalar / opaque `data`
+    rows = [
+        (
+            "data",
+            norm_type(sch),
+            field_copy("data", sch, locale)
+            or (
+                "`data` 为该类型标量"
+                if locale == "zh"
+                else "`data` is a scalar of this type"
+            ),
+        )
+    ]
+    parts.append(render_table(headers, rows))
+    parts.append("")
+    return parts
+
+
 def render_response_block(spec: dict, data_sch: dict, locale: str) -> str:
     data_sch = enrich(spec, data_sch)
     props = data_sch.get("properties") or {}
@@ -427,11 +478,9 @@ def render_response_block(spec: dict, data_sch: dict, locale: str) -> str:
     if locale == "zh":
         headers = ("字段", "类型", "说明")
         title = "### 响应 `data` 字段"
-        item_label = f"`{list_key}[]` 元素：" if list_key else None
     else:
         headers = ("Field", "Type", "Description")
         title = "### Response `data` fields"
-        item_label = f"`{list_key}[]` items:" if list_key else None
 
     parts = [title, ""]
     if list_key:
@@ -443,35 +492,34 @@ def render_response_block(spec: dict, data_sch: dict, locale: str) -> str:
             )
         parts.append(render_table(headers, page_rows))
         parts.append("")
-        parts.append(item_label or "")
-        parts.append("")
         items = enrich(spec, (props[list_key].get("items") or {}))
-        item_rows: list[tuple[str, str, str]] = []
-        walk_fields(spec, items, rows=item_rows, locale=locale)
-        if item_rows:
-            parts.append(render_table(headers, item_rows))
-        else:
-            empty = (
-                "（无元素字段声明）"
-                if locale == "zh"
-                else "(No item fields declared)"
+        parts.extend(
+            collect_nested_sections(
+                spec,
+                items,
+                path=f"{list_key}[]",
+                locale=locale,
+                headers=headers,
             )
-            parts.append(render_table(headers, [("—", "—", empty)]))
-        parts.append("")
-        return "\n".join(parts)
+        )
+        return "\n".join(parts).rstrip() + "\n\n"
 
-    rows: list[tuple[str, str, str]] = []
-    walk_fields(spec, data_sch, rows=rows, locale=locale)
-    if not rows:
+    nested = collect_nested_sections(
+        spec,
+        data_sch,
+        path="data" if (data_sch.get("type") == "array" or not props) else "",
+        locale=locale,
+        headers=headers,
+    )
+    if not nested:
         empty = (
             "（Spec 未声明 `data` 字段结构）"
             if locale == "zh"
             else "(No `data` field schema in Spec)"
         )
-        rows = [("—", "—", empty)]
-    parts.append(render_table(headers, rows))
-    parts.append("")
-    return "\n".join(parts)
+        nested = [render_table(headers, [("—", "—", empty)]), ""]
+    parts.extend(nested)
+    return "\n".join(parts).rstrip() + "\n\n"
 
 
 def find_data_schema(specs: list[dict], method: str, path: str):
@@ -539,8 +587,18 @@ def replace_response_sections(
                     or stripped.startswith("|")
                     or (
                         stripped.startswith("`")
-                        and ("元素" in stripped or "items" in stripped or "[]" in stripped)
+                        and (
+                            "元素" in stripped
+                            or "字段" in stripped
+                            or "items" in stripped
+                            or "fields" in stripped
+                            or "[]" in stripped
+                            or "映射" in stripped
+                            or "map value" in stripped
+                        )
                     )
+                    or stripped.startswith("`data` 为")
+                    or stripped.startswith("`data` is an array")
                     or stripped.startswith("### 响应")
                     or stripped.startswith("### Response")
                 ):
