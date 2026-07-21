@@ -45,9 +45,132 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 Return Status Code |
-| orderId | string | MT5 Order ID (if any) |
-| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -87,9 +210,132 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 Return Status Code |
-| orderId | string | MT5 Order ID (if any) |
-| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -132,9 +378,132 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 Return Status Code |
-| orderId | string | MT5 Order ID (if any) |
-| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -176,9 +545,132 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 Return Status Code |
-| orderId | string | MT5 Order ID (if any) |
-| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -209,107 +701,107 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | Field | Type | Description |
 | --- | --- | --- |
 | data | array | `data` is an array of objects; element fields use `[]...` |
-| [].symbol | string |  |
-| [].mt5 | object |  |
-| [].mt5.Category | string |  |
-| [].mt5.ContractSize | number |  |
-| [].mt5.CurrencyBase | string |  |
-| [].mt5.CurrencyBaseDigits | integer |  |
-| [].mt5.CurrencyMargin | string |  |
-| [].mt5.CurrencyMarginDigits | integer |  |
-| [].mt5.CurrencyProfit | string |  |
-| [].mt5.CurrencyProfitDigits | integer |  |
-| [].mt5.Digits | integer |  |
-| [].mt5.FreezeLevel | integer |  |
-| [].mt5.IESlipLosing | integer |  |
-| [].mt5.IESlipProfit | integer |  |
-| [].mt5.IEVolumeMaxExt | integer |  |
-| [].mt5.International | string |  |
-| [].mt5.MarginFlags | integer |  |
-| [].mt5.MarginHedged | number |  |
-| [].mt5.MarginInitial | number |  |
-| [].mt5.MarginMaintenance | number |  |
-| [].mt5.MarginRateCurrency | number |  |
-| [].mt5.MarginRateLiquidity | number |  |
-| [].mt5.OrderFlags | integer |  |
-| [].mt5.Path | string |  |
-| [].mt5.PriceLimitMax | number |  |
-| [].mt5.PriceLimitMin | number |  |
-| [].mt5.PriceSettle | number |  |
-| [].mt5.SessionTrade | array |  |
-| [].mt5.SessionTrade[].quote | array |  |
-| [].mt5.SessionTrade[].quote[].from | string |  |
-| [].mt5.SessionTrade[].quote[].to | string |  |
-| [].mt5.SessionTrade[].trade | array |  |
-| [].mt5.SessionTrade[].trade[].from | string |  |
-| [].mt5.SessionTrade[].trade[].to | string |  |
-| [].mt5.SessionTrade[].weekDay | string |  |
-| [].mt5.Source | string |  |
-| [].mt5.StopsLevel | integer |  |
-| [].mt5.TickBookDepth | integer |  |
-| [].mt5.TimeExpiration | string |  |
-| [].mt5.TimeStart | string |  |
-| [].mt5.TradeMode | integer |  |
-| [].mt5.Spread | number |  |
-| [].mt5.VolumeLimitExt | integer |  |
-| [].mt5.VolumeMaxExt | integer |  |
-| [].mt5.VolumeMinExt | integer |  |
-| [].mt5.VolumeStepExt | integer |  |
-| [].mt5.leverageGrade | array |  |
-| [].mt5.leverageGrade[].from | number |  |
-| [].mt5.leverageGrade[].initialAdvanceRate | number |  |
-| [].mt5.leverageGrade[].maintenanceAdvanceRate | number |  |
-| [].mt5.leverageGrade[].to | number |  |
-| [].mt5.marginRateInitial | object |  |
-| [].mt5.marginRateInitial.buy | number |  |
-| [].mt5.marginRateInitial.buyLimit | number |  |
-| [].mt5.marginRateInitial.buyStop | number |  |
-| [].mt5.marginRateInitial.buyStopLimit | number |  |
-| [].mt5.marginRateInitial.sell | number |  |
-| [].mt5.marginRateInitial.sellLimit | number |  |
-| [].mt5.marginRateInitial.sellStop | number |  |
-| [].mt5.marginRateInitial.sellStopLimit | number |  |
-| [].mt5.marginRateMaintenance | object |  |
-| [].mt5.marginRateMaintenance.buy | number |  |
-| [].mt5.marginRateMaintenance.buyLimit | number |  |
-| [].mt5.marginRateMaintenance.buyStop | number |  |
-| [].mt5.marginRateMaintenance.buyStopLimit | number |  |
-| [].mt5.marginRateMaintenance.sell | number |  |
-| [].mt5.marginRateMaintenance.sellLimit | number |  |
-| [].mt5.marginRateMaintenance.sellStop | number |  |
-| [].mt5.marginRateMaintenance.sellStopLimit | number |  |
-| [].risk | object |  |
-| [].risk.id | integer |  |
-| [].risk.symbol | string |  |
-| [].risk.version | integer |  |
-| [].risk.longAnnualRate | number |  |
-| [].risk.shortAnnualRate | number |  |
-| [].risk.discountRate | number |  |
-| [].risk.baseRate | number |  |
-| [].risk.specialSymbol | integer |  |
-| [].risk.fundingRateBaseType | string |  |
-| [].risk.fundingRateThreshold | number |  |
-| [].risk.fundingRateStep | number |  |
-| [].risk.fundingRateIncrease | number |  |
-| [].risk.fundingRateBase | number |  |
-| [].risk.fundingRateMin | number |  |
-| [].risk.fundingRateMax | number |  |
-| [].risk.liquidationFeeType | string |  |
-| [].risk.liquidationFeeValue | number |  |
-| [].risk.minLiquidationFee | number |  |
-| [].risk.fundingRateMode | string |  |
-| [].risk.fundingRateExternalMarketSymbol | string |  |
-| [].risk.groupName | string |  |
-| [].risk.platformMaxSlippageType | string |  |
-| [].risk.platformMaxSlippage | number |  |
-| [].risk.tpSlMaxSlippageType | string |  |
-| [].risk.tpSlMaxSlippage | number |  |
-| [].risk.userLongPositionValueLimitUsdc | number |  |
-| [].risk.userShortPositionValueLimitUsdc | number |  |
-| [].risk.platformLongTotalPositionLimitUsdc | number |  |
-| [].risk.platformShortTotalPositionLimitUsdc | number |  |
-| [].risk.free | object |  |
-| [].risk.free.transCostConfig | array |  |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
 | [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
 | [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
 | [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
@@ -320,9 +812,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
 | [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
 | [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
-| [].risk.free.discountRate | number |  |
-| [].risk.premium | object |  |
-| [].risk.premium.transCostConfig | array |  |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
 | [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
 | [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
 | [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
@@ -333,7 +825,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
 | [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
 | [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
-| [].risk.premium.discountRate | number |  |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
@@ -363,7 +855,132 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 
 | Field | Type | Description |
 | --- | --- | --- |
-| estimatedSlippage | number | Estimated Slippage |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
@@ -393,40 +1010,132 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | Field | Type | Description |
 | --- | --- | --- |
-| groupName | string |  |
-| commissionCfg | array |  |
-| commissionCfg[].actionMode | integer |  |
-| commissionCfg[].chargeMode | integer |  |
-| commissionCfg[].description | string |  |
-| commissionCfg[].entryMode | integer |  |
-| commissionCfg[].mode | integer |  |
-| commissionCfg[].name | string |  |
-| commissionCfg[].path | string |  |
-| commissionCfg[].profitMode | integer |  |
-| commissionCfg[].rangeMode | integer |  |
-| commissionCfg[].reasonFlags | integer |  |
-| commissionCfg[].turnoverCurrency | string |  |
-| commissionCfg[].groupTier | array |  |
-| commissionCfg[].groupTier[].currency | string |  |
-| commissionCfg[].groupTier[].maximal | number |  |
-| commissionCfg[].groupTier[].minimal | number |  |
-| commissionCfg[].groupTier[].mode | integer |  |
-| commissionCfg[].groupTier[].rangeFrom | number |  |
-| commissionCfg[].groupTier[].rangeTo | number |  |
-| commissionCfg[].groupTier[].type | integer |  |
-| commissionCfg[].groupTier[].value | number |  |
-| leverageCfg | array |  |
-| leverageCfg[].description | string |  |
-| leverageCfg[].name | string |  |
-| leverageCfg[].path | string |  |
-| leverageCfg[].rangeMode | integer |  |
-| leverageCfg[].rangeValueCurrency | string |  |
-| leverageCfg[].tiers | array |  |
-| leverageCfg[].tiers[].marginRateInitial | number |  |
-| leverageCfg[].tiers[].marginRateMaintenance | number |  |
-| leverageCfg[].tiers[].rangeFrom | number |  |
-| leverageCfg[].tiers[].rangeTo | number |  |
-| marginCall | string |  |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/staticInfo" \
@@ -453,50 +1162,132 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | Field | Type | Description |
 | --- | --- | --- |
-| userAssets | object |  |
-| userAssets.balance | number |  |
-| userAssets.equity | number |  |
-| userAssets.floating | number |  |
-| userAssets.margin | number |  |
-| userAssets.marginFree | number |  |
-| userAssets.marginLevel | number |  |
-| userAssets.positions | array |  |
-| userAssets.positions[].id | integer |  |
-| userAssets.positions[].login | integer |  |
-| userAssets.positions[].action | integer |  |
-| userAssets.positions[].contractSize | number |  |
-| userAssets.positions[].freeMargin | number |  |
-| userAssets.positions[].precision | integer |  |
-| userAssets.positions[].priceDigits | integer |  |
-| userAssets.positions[].currencyDigits | integer |  |
-| userAssets.positions[].priceCurrent | number |  |
-| userAssets.positions[].openPrice | number |  |
-| userAssets.positions[].time | integer |  |
-| userAssets.positions[].slPrice | number |  |
-| userAssets.positions[].tpPrice | number |  |
-| userAssets.positions[].rateProfit | number |  |
-| userAssets.positions[].freeAmount | number |  |
-| userAssets.positions[].symbol | string |  |
-| userAssets.positions[].usdValue | number |  |
-| userAssets.positions[].volume | number |  |
-| userAssets.positions[].volumeExt | number |  |
-| userAssets.positions[].contractSizeStr | string |  |
-| userAssets.positions[].priceCurrentStr | string |  |
-| userAssets.positions[].usdValueStr | string |  |
-| userAssets.positions[].volumeDisplay | string |  |
-| userAssets.positions[].volumeScale | integer |  |
-| userAssets.balanceStr | string |  |
-| userAssets.equityStr | string |  |
-| userAssets.floatingStr | string |  |
-| userAssets.marginStr | string |  |
-| userAssets.marginFreeStr | string |  |
-| userAssets.marginLevelStr | string |  |
-| userAssets.marginDisplay | string |  |
-| userAssets.marginScale | integer |  |
-| userAssets.marginFreeDisplay | string |  |
-| userAssets.marginFreeScale | integer |  |
-| userAssets.marginLevelDisplay | string |  |
-| userAssets.marginLevelScale | integer |  |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \
@@ -526,9 +1317,132 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 Return Status Code |
-| orderId | string | MT5 Order ID (if any) |
-| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Trading Symbol Identifier |
+| [].mt5 | object | MT5 Data Configuration |
+| [].mt5.Category | string | Trading Symbol Category |
+| [].mt5.ContractSize | number | Contract Size |
+| [].mt5.CurrencyBase | string | Base Currency |
+| [].mt5.CurrencyBaseDigits | integer | Base Currency Precision |
+| [].mt5.CurrencyMargin | string | Margin Currency |
+| [].mt5.CurrencyMarginDigits | integer | Margin Currency Precision |
+| [].mt5.CurrencyProfit | string | Profit Currency |
+| [].mt5.CurrencyProfitDigits | integer | Profit Currency Precision |
+| [].mt5.Digits | integer | Price Decimal Places |
+| [].mt5.FreezeLevel | integer | Freeze Level |
+| [].mt5.IESlipLosing | integer | Max decline in loss direction for market execution |
+| [].mt5.IESlipProfit | integer | Max decline in profit direction for market execution |
+| [].mt5.IEVolumeMaxExt | integer | Max trade volume for market execution |
+| [].mt5.International | string | International Name |
+| [].mt5.MarginFlags | integer | Margin Check Mode |
+| [].mt5.MarginHedged | number | Hedged Margin Value |
+| [].mt5.MarginInitial | number | Initial Margin Size |
+| [].mt5.MarginMaintenance | number | Maintenance Margin Size |
+| [].mt5.MarginRateCurrency | number | Margin Currency Exchange Rate |
+| [].mt5.MarginRateLiquidity | number | Liquidity Ratio |
+| [].mt5.OrderFlags | integer | Order Type Identifier |
+| [].mt5.Path | string | Trading Symbol Path |
+| [].mt5.PriceLimitMax | number | Max Price Limit |
+| [].mt5.PriceLimitMin | number | Min Price Limit |
+| [].mt5.PriceSettle | number | Settlement Price |
+| [].mt5.SessionTrade | array | Trading Time |
+| [].mt5.SessionTrade[].quote | array | Quote Time |
+| [].mt5.SessionTrade[].quote[].from | string | Start Time |
+| [].mt5.SessionTrade[].quote[].to | string | End Time |
+| [].mt5.SessionTrade[].trade | array | Trading Time |
+| [].mt5.SessionTrade[].trade[].from | string | Start Time |
+| [].mt5.SessionTrade[].trade[].to | string | End Time |
+| [].mt5.SessionTrade[].weekDay | string | Day of Week |
+| [].mt5.Source | string | Quote Source Symbol |
+| [].mt5.StopsLevel | integer | Stop Loss Order Deviation |
+| [].mt5.TickBookDepth | integer | Market Depth Range |
+| [].mt5.TimeExpiration | string | Trade Expiry Date |
+| [].mt5.TimeStart | string | Trade Start Date |
+| [].mt5.TradeMode | integer | Trading Mode |
+| [].mt5.Spread | number | Spread |
+| [].mt5.VolumeLimitExt | integer | Max Cumulative Volume |
+| [].mt5.VolumeMaxExt | integer | Max Trade Volume |
+| [].mt5.VolumeMinExt | integer | Min Trade Volume |
+| [].mt5.VolumeStepExt | integer | Volume Step |
+| [].mt5.leverageGrade | array | Leverage Tier Configuration |
+| [].mt5.leverageGrade[].from | number | Start Value |
+| [].mt5.leverageGrade[].initialAdvanceRate | number | Initial Margin Ratio |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number | Maintenance Margin Ratio |
+| [].mt5.leverageGrade[].to | number | End Value |
+| [].mt5.marginRateInitial | object | Margin Ratio Details |
+| [].mt5.marginRateInitial.buy | number | Buy Ratio |
+| [].mt5.marginRateInitial.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateInitial.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateInitial.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateInitial.sell | number | Sell Ratio |
+| [].mt5.marginRateInitial.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateInitial.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateInitial.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].mt5.marginRateMaintenance | object | Margin Ratio Details |
+| [].mt5.marginRateMaintenance.buy | number | Buy Ratio |
+| [].mt5.marginRateMaintenance.buyLimit | number | Buy Limit Ratio |
+| [].mt5.marginRateMaintenance.buyStop | number | Buy Stop Ratio |
+| [].mt5.marginRateMaintenance.buyStopLimit | number | Buy Stop Limit Ratio |
+| [].mt5.marginRateMaintenance.sell | number | Sell Ratio |
+| [].mt5.marginRateMaintenance.sellLimit | number | Sell Limit Ratio |
+| [].mt5.marginRateMaintenance.sellStop | number | Sell Stop Ratio |
+| [].mt5.marginRateMaintenance.sellStopLimit | number | Sell Stop Limit Ratio |
+| [].risk | object | Risk Control Configuration Info |
+| [].risk.id | integer | Configuration ID |
+| [].risk.symbol | string | Trading Symbol Identifier |
+| [].risk.version | integer | Configuration Version |
+| [].risk.longAnnualRate | number | Long Annualized Rate |
+| [].risk.shortAnnualRate | number | Short Annualized Rate |
+| [].risk.discountRate | number | Discounted Rate |
+| [].risk.baseRate | number | Base Rate |
+| [].risk.specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| [].risk.fundingRateBaseType | string | Funding Rate Benchmark Type |
+| [].risk.fundingRateThreshold | number | Funding Rate Threshold |
+| [].risk.fundingRateStep | number | Funding Rate Step |
+| [].risk.fundingRateIncrease | number | Funding Rate Increment |
+| [].risk.fundingRateBase | number | Funding Rate Benchmark |
+| [].risk.fundingRateMin | number | Funding Rate Min Value |
+| [].risk.fundingRateMax | number | Funding Rate Max Value |
+| [].risk.liquidationFeeType | string | Liquidation Fee Type |
+| [].risk.liquidationFeeValue | number | Liquidation Fee Value |
+| [].risk.minLiquidationFee | number | Minimum Liquidation Fee |
+| [].risk.fundingRateMode | string | Funding Rate Mode |
+| [].risk.fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
+| [].risk.groupName | string | Group Name |
+| [].risk.platformMaxSlippageType | string | Platform Maximum Slippage Type |
+| [].risk.platformMaxSlippage | number | Platform Maximum Slippage |
+| [].risk.tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
+| [].risk.tpSlMaxSlippage | number | TP/SL Maximum Slippage |
+| [].risk.userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
+| [].risk.userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
+| [].risk.platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
+| [].risk.platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
+| [].risk.free | object | Premium Tier Configuration |
+| [].risk.free.transCostConfig | array | Trading Cost Configuration |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number | Discounted Rate |
+| [].risk.premium | object | Premium Tier Configuration |
+| [].risk.premium.transCostConfig | array | Trading Cost Configuration |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number | Discounted Rate |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

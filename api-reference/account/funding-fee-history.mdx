@@ -41,38 +41,60 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array |  |
-| records[].relatedBizId | string | Associated Business ID |
-| records[].userId | string | User ID |
-| records[].login | string | MT5 Login Account |
-| records[].businessLineId | integer | Business Line ID |
-| records[].businessLineName | string | Business Line Name |
-| records[].dealTime | string | Fee Deduction Time |
-| records[].symbol | string | Settlement Currency |
-| records[].symbolPair | string | Trading Pair |
-| records[].amount | number | Amount summary. Negative values indicate deductions |
-| records[].remark | string | Remarks |
-| records[].createTime | string | Record Creation Time |
-| records[].updateTime | string | Record Update Time |
-| records[].feeRate | number | Rate |
-| records[].volume | number | Position Quantity |
-| records[].positionSide | string | Position Direction |
-| records[].positionId | string | Position ID |
-| records[].batchTime | string | Fee settlement batch time (on the hour) |
-| records[].amountDisplay | string | Funding fee amount display value, rounded up to 8 decimal places |
-| records[].amountScale | integer | Funding fee amount display precision |
-| records[].createTimeTimestamp | integer | Record creation time millisecond timestamp |
-| records[].updateTimeTimestamp | integer | Record update time millisecond timestamp |
-| records[].dealTimeTimestamp | integer | Fee deduction time millisecond timestamp |
-| records[].feeRateDisplay | string | Funding rate display value, ratio converted to percentage and rounded to 4 decimal places |
-| records[].feeRateScale | integer | Funding rate display precision |
-| records[].batchTimeTimestamp | integer | Fee settlement batch time millisecond timestamp |
-| total | integer |  |
-| size | integer |  |
-| current | integer |  |
-| pages | integer |  |
-| hasPrevious | boolean |  |
-| hasNext | boolean |  |
+| records | array | Records on the current page |
+| total | integer | Total number of records |
+| size | integer | Page size |
+| current | integer | Current page number |
+| pages | integer | Total number of pages |
+| hasPrevious | boolean | Whether a previous page exists |
+| hasNext | boolean | Whether a next page exists |
+
+`records[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| id | integer | Transaction Record ID |
+| uid | string | Associated Account Table |
+| transactionId | string | Transaction ID |
+| symbolId | integer | Currency ID |
+| acSymbol | string | Currency Name / From |
+| network | string | Network Protocol |
+| exchangeSymbolId | integer | Target Currency ID |
+| exchangeSymbol | string | Target Currency Name / To |
+| transactionType | string | Trade Type Enum |
+| status | string | Trade Status |
+| amount | number | Transaction Amount |
+| amountStr | string | Transaction Amount String |
+| amountDisplay | string | Transaction amount display value |
+| amountScale | integer | Transaction amount display precision |
+| exchangeAmount | number | Target Amount |
+| exchangeAmountDisplay | string | Target amount display value |
+| fee | number | Trading Fee |
+| feeDisplay | string | Trading fee display value |
+| createTime | string | Trade Start Time |
+| finishTime | string | Trade Completion Time |
+| failureReason | string | Failure Reason |
+| errorCode | string | Failure Error Code |
+| exchangeRate | number | Exchange Rate |
+| convertExchangeRate | number | Exchange rate (to/from) |
+| rateDisplay | string | Exchange rate display value |
+| txHash | string | Blockchain Transaction Hash |
+| feeSymbol | string | Fee Currency |
+| sourceAccountType | string | Source Account Type |
+| targetAccountType | string | Target Account Type |
+| sourceAccountId | string | Source Account ID |
+| targetAccountId | string | Target Account ID |
+| sourceWalletAddress | string | Source Wallet Address |
+| targetWalletAddress | string | Target Wallet Address |
+| extParams | string | Extended Parameters |
+| sourceAccountBalance | number | Source Account Balance After Transfer |
+| targetAccountBalance | number | Target Account Balance After Transfer |
+| fundFlowType | string | Fund Flow Type |
+| transactionMethod | string | Trading Method Enum |
+| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
+| payerUid | string | RECHARGE Has value during user-to-user transfers |
+| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
+| createTimeTimestamp | integer | Trade start time millisecond timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/page/v2" \

@@ -41,38 +41,60 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array |  |
-| records[].relatedBizId | string | 关联业务ID |
-| records[].userId | string | 用户ID |
-| records[].login | string | mt5登录账号 |
-| records[].businessLineId | integer | 业务线ID |
-| records[].businessLineName | string | 业务线名称 |
-| records[].dealTime | string | 扣费时间 |
-| records[].symbol | string | 结算币种 |
-| records[].symbolPair | string | 交易对 |
-| records[].amount | number | 金额汇总，负数表示扣除 |
-| records[].remark | string | 备注 |
-| records[].createTime | string | 记录创建时间 |
-| records[].updateTime | string | 记录更新时间 |
-| records[].feeRate | number | 费率 |
-| records[].volume | number | 持仓数量 |
-| records[].positionSide | string | 持仓方向 |
-| records[].positionId | string | 持仓ID |
-| records[].batchTime | string | 费用结算批次时间(整点时间) |
-| records[].dealTimeTimestamp | integer | 扣费时间毫秒时间戳 |
-| records[].feeRateDisplay | string | 资金费率展示值，ratio转百分比后四舍五入至4位小数 |
-| records[].feeRateScale | integer | 资金费率展示精度 |
-| records[].batchTimeTimestamp | integer | 费用结算批次时间毫秒时间戳 |
-| records[].amountDisplay | string | 资金费金额展示值，向上保留8位小数 |
-| records[].amountScale | integer | 资金费金额展示精度 |
-| records[].createTimeTimestamp | integer | 记录创建时间毫秒时间戳 |
-| records[].updateTimeTimestamp | integer | 记录更新时间毫秒时间戳 |
-| total | integer |  |
-| size | integer |  |
-| current | integer |  |
-| pages | integer |  |
-| hasPrevious | boolean |  |
-| hasNext | boolean |  |
+| records | array | 当前页记录列表 |
+| total | integer | 总记录数 |
+| size | integer | 每页条数 |
+| current | integer | 当前页码 |
+| pages | integer | 总页数 |
+| hasPrevious | boolean | 是否有上一页 |
+| hasNext | boolean | 是否有下一页 |
+
+`records[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| id | integer | 交易记录ID |
+| uid | string | 关联账户表 |
+| transactionId | string | 交易ID |
+| symbolId | integer | 币种ID |
+| acSymbol | string | 币种名/兑出 |
+| network | string | 网络协议 |
+| exchangeSymbolId | integer | 兑换后币种ID |
+| exchangeSymbol | string | 兑换后币种名/兑入 |
+| transactionType | string | 交易类型枚举 |
+| status | string | 交易状态 |
+| amount | number | 交易金额 |
+| amountStr | string | 交易金额字符串 |
+| amountDisplay | string | 交易金额展示值 |
+| amountScale | integer | 交易金额展示精度 |
+| exchangeAmount | number | 兑换后金额 |
+| exchangeAmountDisplay | string | 兑换后金额展示值 |
+| fee | number | 交易手续费 |
+| feeDisplay | string | 交易手续费展示值 |
+| createTime | string | 交易开始时间 |
+| finishTime | string | 交易完成时间 |
+| failureReason | string | 失败原因 |
+| errorCode | string | 失败错误码 |
+| exchangeRate | number | 汇率 |
+| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
+| rateDisplay | string | 汇率展示值 |
+| txHash | string | 区块链交易哈希 |
+| feeSymbol | string | 手续费币种 |
+| sourceAccountType | string | 来源账户类型 |
+| targetAccountType | string | 目标账户类型 |
+| sourceAccountId | string | 来源账户ID |
+| targetAccountId | string | 目标账户ID |
+| sourceWalletAddress | string | 来源钱包地址 |
+| targetWalletAddress | string | 目标钱包地址 |
+| extParams | string | 扩展参数 |
+| sourceAccountBalance | number | 源账户动账后余额 |
+| targetAccountBalance | number | 目标账户动账后余额 |
+| fundFlowType | string | 资金流向类型 |
+| transactionMethod | string | 交易方式枚举 |
+| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
+| payerUid | string | RECHARGE 用户间划转时有值 |
+| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
+| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/page/v2" \

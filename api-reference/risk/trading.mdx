@@ -38,16 +38,36 @@ Query the trading symbol list for the current user.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array |  |
-| records[].symbol | string | Product Name |
-| records[].group | string | Product Group |
-| records[].flags | string | Symbol tags: MORTGAGE: Collateral, TRADE: Trading Symbol, SPOT: Spot |
-| total | integer |  |
-| size | integer |  |
-| current | integer |  |
-| pages | integer |  |
-| hasPrevious | boolean |  |
-| hasNext | boolean |  |
+| records | array | Records on the current page |
+| total | integer | Total number of records |
+| size | integer | Page size |
+| current | integer | Current page number |
+| pages | integer | Total number of pages |
+| hasPrevious | boolean | Whether a previous page exists |
+| hasNext | boolean | Whether a next page exists |
+
+`records[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| symbol | string | Currency |
+| fundingRate | number | Funding Rate |
+| fundingRateStr | string | Funding rate raw decimal string |
+| fundingRateDisplay | string | Funding rate display value |
+| fundingRateScale | integer | Funding rate display decimal places |
+| annualRateDisplay | string | Annualized funding rate display value |
+| settlementPrice | number | Close Price |
+| settlementPriceStr | string | Close price raw decimal string |
+| settlementPriceDisplay | string | Close price display value |
+| settlementPriceScale | integer | Close price display decimal places |
+| longInterestRate | number | Long Interest Rate |
+| longInterestRateStr | string | Long interest rate raw decimal string |
+| shortInterestRate | number | Short Interest Rate |
+| shortInterestRateStr | string | Short interest rate raw decimal string |
+| isSettlementRate | boolean | Whether it is the settlement rate |
+| nextSettlementTime | integer | Next settlement time Unix timestamp |
+| timestamp | integer | Funding rate generation time Unix timestamp |
+| settlementCycle | integer | Settlement cycle (unit: seconds) |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \

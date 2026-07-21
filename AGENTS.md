@@ -47,6 +47,7 @@ When Chinese Specs under `openapi/` are updated (or the maintainer confirms they
    - **Risks** — breaking changes, permission changes, renames, description-only diffs
 3. **Confirm** — Do **not** edit MDX or `docs.json` navigation until the user confirms the summary.
 4. **After confirmation** — Update [`glossary.zh-en.md`](glossary.zh-en.md) if needed → edit `zh/` MDX → sync English via the glossary → then run the Quality checklist.
+5. **Response field tables** — When endpoint response shapes or DTO field copy change, run `python3 scripts/sync_response_fields_from_openapi.py`. Path-level 200 schemas are often fully inlined and drop `title` / nested `$ref`; the script matches `components.schemas` by property keys (e.g. `FundingRateDto`) and reads `description` or `title`. Paginated `data` is split into page meta + `records[]` / `items[]` model tables.
 
 ### Target page split
 
