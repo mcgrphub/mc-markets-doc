@@ -64,7 +64,7 @@ Keep English technical identifiers (`X-Access-Key`, path prefixes, enum names) u
 **Document**
 
 - Public OpenAPI endpoints marked with `@OpenApiPermission`
-- Gateway base URLs already published in this repo (test/production `*.mcconnects.com`)
+- Gateway base URL already published in this repo (production `gateway.mcconnects.com`)
 - Signing, permissions, pagination, error envelope, and integration guides for those APIs
 
 **Do not document**

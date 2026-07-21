@@ -1,7 +1,7 @@
 ---
 title: "MC OpenAPI 常见问题"
 sidebarTitle: "FAQ"
-description: "MC OpenAPI 常见问题解答:签名、权限、环境、分页、PoR 快照与获取帮助。"
+description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、PoR 快照与获取帮助。"
 ---
 
 ## 入门
@@ -11,11 +11,8 @@ description: "MC OpenAPI 常见问题解答:签名、权限、环境、分页、
     登录 MC 账号,打开 **API 管理**。创建新 Key,选择需要的权限(`READ`、`TRADE`、`WITHDRAW`),立即复制 Access Key 与 Secret Key—Secret Key 仅显示一次。完整步骤见 [认证](/zh/authentication)。
   </Accordion>
 
-  <Accordion title="测试与生产网关有什么区别?">
-    - **测试:** `https://test-gateway.mcconnects.com` — 集成沙盒。使用测试余额,不影响真实资金。
-    - **生产:** `https://gateway.mcconnects.com` — 真实流量。
-
-    密钥与环境绑定:测试 Key 不能用于生产,反之亦然。见 [基础 URL](/zh/api-reference/base-url)。
+  <Accordion title="网关地址是什么?">
+    生产网关为 `https://gateway.mcconnects.com`。所有 OpenAPI 请求均通过该地址访问。详见 [基础 URL](/zh/api-reference/base-url)。
   </Accordion>
 
   <Accordion title="每个接口需要什么权限?">

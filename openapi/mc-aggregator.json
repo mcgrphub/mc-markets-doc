@@ -15,10 +15,6 @@
   },
   "servers": [
     {
-      "url": "https://test-gateway.mcconnects.com",
-      "description": "测试环境 API 网关"
-    },
-    {
       "url": "https://gateway.mcconnects.com",
       "description": "生产环境 API 网关"
     }

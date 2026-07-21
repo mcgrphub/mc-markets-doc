@@ -1,7 +1,7 @@
 ---
 title: "MC OpenAPI Frequently Asked Questions"
 sidebarTitle: "FAQ"
-description: "Answers to common MC OpenAPI questions: signing, permissions, environments, pagination, PoR snapshots, and getting help."
+description: "Answers to common MC OpenAPI questions: signing, permissions, gateway, pagination, PoR snapshots, and getting help."
 ---
 
 ## Getting started
@@ -11,11 +11,8 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, envi
     Sign in to your MC account and open **API Management**. Create a new key, choose the permissions you need (`READ`, `TRADE`, `WITHDRAW`), and copy both the Access Key and the Secret Key immediately — the Secret Key is shown only once. Full walkthrough: [Authentication](/authentication#creating-api-keys).
   </Accordion>
 
-  <Accordion title="What is the difference between the test and production gateways?">
-    - **Test:** `https://test-gateway.mcconnects.com` — sandbox for building integrations. Uses test balances and does not affect real funds.
-    - **Production:** `https://gateway.mcconnects.com` — live traffic. Real balances, real money movement.
-
-    Keys are environment-specific: a test key will not work against production and vice versa. See [Base URL](/api-reference/base-url).
+  <Accordion title="What is the gateway URL?">
+    The production gateway is `https://gateway.mcconnects.com`. All OpenAPI requests go through this host. See [Base URL](/api-reference/base-url).
   </Accordion>
 
   <Accordion title="Which permission does an endpoint require?">

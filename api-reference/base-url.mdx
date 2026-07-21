@@ -1,20 +1,19 @@
 ---
 title: "Base URL"
 sidebarTitle: "Base URL"
-description: "Gateway base URLs for MC OpenAPI test and production environments."
+description: "Production gateway base URL for MC OpenAPI."
 ---
 
-The MC OpenAPI is served exclusively over HTTPS through the **MC API Gateway**. Every request must target one of the environment base URLs below, followed by the API path prefix (`/openapi/v1`) and the specific endpoint — for example, `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`.
+The MC OpenAPI is served exclusively over HTTPS through the **MC API Gateway**. Every request must target the base URL below, followed by the API path prefix (`/openapi/v1`) and the specific endpoint — for example, `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`.
 
-## Environments
+## Base URL
 
-| Environment | Base URL |
+| | Base URL |
 | --- | --- |
-| Test | `https://test-gateway.mcconnects.com` |
 | Production | `https://gateway.mcconnects.com` |
 
 <Note>
-  Both environments require the same **AK/SK** credentials and **HMAC-SHA256** signing scheme. Test keys and production keys are issued separately from the MC platform.
+  Authentication uses **AK/SK** credentials and **HMAC-SHA256** signing. Keys are issued from the MC platform.
 </Note>
 
 ## Path prefix
@@ -27,24 +26,14 @@ All resource paths are versioned under `/openapi/v1/…`. Combine the gateway ho
 
 For example:
 
-- `https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`
+- `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`
 - `https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview`
 
-## Switching environments
-
-To move from test to production, change only the gateway host in your configuration — no code changes to signing, headers, or endpoint paths are required.
+## Examples
 
 <CodeGroup>
 
 ```bash cURL
-# Test
-curl -X POST https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
-  -H "X-Access-Key: $MC_ACCESS_KEY" \
-  -H "X-Signature: $MC_SIGNATURE" \
-  -H "X-Timestamp: $MC_TIMESTAMP" \
-  -H "Content-Type: application/json"
-
-# Production
 curl -X POST https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
   -H "X-Access-Key: $MC_ACCESS_KEY" \
   -H "X-Signature: $MC_SIGNATURE" \
@@ -57,7 +46,7 @@ import os
 
 MC_GATEWAY = os.environ.get(
     "MC_GATEWAY",
-    "https://test-gateway.mcconnects.com",
+    "https://gateway.mcconnects.com",
 )
 
 url = f"{MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd"
@@ -65,7 +54,7 @@ url = f"{MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd"
 
 ```javascript Node.js
 const MC_GATEWAY =
-  process.env.MC_GATEWAY ?? "https://test-gateway.mcconnects.com";
+  process.env.MC_GATEWAY ?? "https://gateway.mcconnects.com";
 
 const url = `${MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd`;
 ```
@@ -81,7 +70,7 @@ import (
 func main() {
 	gateway := os.Getenv("MC_GATEWAY")
 	if gateway == "" {
-		gateway = "https://test-gateway.mcconnects.com"
+		gateway = "https://gateway.mcconnects.com"
 	}
 	url := fmt.Sprintf("%s/openapi/v1/mc-account/exchange-rate/query/usd", gateway)
 	fmt.Println(url)
@@ -95,5 +84,5 @@ func main() {
 </Warning>
 
 <Tip>
-  Store the gateway host as an environment variable (for example, `MC_GATEWAY`) in your application config. Promoting an integration from test to production then requires only a single config change.
+  Store the gateway host as an environment variable (for example, `MC_GATEWAY`) in your application config for a single place to manage the host.
 </Tip>

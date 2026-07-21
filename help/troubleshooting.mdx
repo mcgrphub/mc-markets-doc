@@ -87,12 +87,11 @@ Typical categories:
 
 When you file a support request, include the following. It roughly quarters the round-trip time to a resolution:
 
-1. **Environment** — test or production.
-2. **Access Key ID** — the public identifier only, never the Secret Key.
-3. **Timestamp** — the `X-Timestamp` value on the failing request.
-4. **Full path with query string.**
-5. **Response body** (Secret Key redacted; other data intact).
-6. **Canonical string** you signed (last line = the same `X-Timestamp`).
+1. **Access Key ID** — the public identifier only, never the Secret Key.
+2. **Timestamp** — the `X-Timestamp` value on the failing request.
+3. **Full path with query string.**
+4. **Response body** (Secret Key redacted; other data intact).
+5. **Canonical string** you signed (last line = the same `X-Timestamp`).
 
 <Warning>
   Never share your Secret Key when asking for help — not with support, not with colleagues, not in issue trackers. If a Secret Key has been exposed, disable the key immediately and generate a new one.

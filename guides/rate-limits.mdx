@@ -13,7 +13,6 @@ MC OpenAPI enforces per-Access-Key request-rate limits at the gateway to protect
 ## How limits are applied
 
 - Limits are counted **per Access Key**, not per source IP.
-- Both the test and production gateways enforce their own independent limits.
 - Some heavy endpoints (paginated history queries, PoR snapshots) have stricter limits than lightweight metadata endpoints.
 
 ## Detecting throttling

@@ -10,17 +10,12 @@ description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key
 
 All OpenAPI requests must be sent to the **API Gateway** and authenticated with an **Access Key (AK)** and **Secret Key (SK)** pair. The gateway validates your signature, enforces nonce replay protection, checks API Key permissions, and forwards the request to the appropriate backend service.
 
-## Base URLs
+## Base URL
 
-| Environment | Base URL |
-| --- | --- |
-| Test | `https://test-gateway.mcconnects.com` |
-| Production | `https://gateway.mcconnects.com` |
-
-All paths in this documentation are relative to the base URL above. For example, when the documented path is `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT`, the full request URL is:
+The production gateway is `https://gateway.mcconnects.com`. All paths in this documentation are relative to that host. For example, when the documented path is `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT`, the full request URL is:
 
 ```text
-https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
 ```
 
 <Warning>
@@ -235,7 +230,7 @@ import requests
 
 ACCESS_KEY = "YOUR_ACCESS_KEY"
 SECRET_KEY = "YOUR_SECRET_KEY"
-BASE_URL = "https://test-gateway.mcconnects.com"
+BASE_URL = "https://gateway.mcconnects.com"
 
 def sign_request_v2(
     method: str,

@@ -15,12 +15,8 @@
   },
   "servers": [
     {
-      "url": "https://test-gateway.mcconnects.com",
-      "description": "Test Environment API Gateway"
-    },
-    {
       "url": "https://gateway.mcconnects.com",
-      "description": "Production Environment API Gateway"
+      "description": "Production API Gateway"
     }
   ],
   "security": [

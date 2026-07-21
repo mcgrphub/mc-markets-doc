@@ -12,15 +12,10 @@ description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名 v2
 
 ## 基础 URL
 
-| 环境 | 基础地址 |
-| --- | --- |
-| 测试 | `https://test-gateway.mcconnects.com` |
-| 生产 | `https://gateway.mcconnects.com` |
-
-本文档中的路径均相对于上述基础地址。例如，文档路径为 `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` 时，完整请求地址为：
+生产网关地址为 `https://gateway.mcconnects.com`。本文档中的路径均相对于该地址。例如，文档路径为 `/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT` 时，完整请求地址为：
 
 ```text
-https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
+https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT
 ```
 
 <Warning>
@@ -234,7 +229,7 @@ import requests
 
 ACCESS_KEY = "YOUR_ACCESS_KEY"
 SECRET_KEY = "YOUR_SECRET_KEY"
-BASE_URL = "https://test-gateway.mcconnects.com"
+BASE_URL = "https://gateway.mcconnects.com"
 
 def sign_request_v2(
     method: str,

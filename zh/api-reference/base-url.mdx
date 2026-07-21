@@ -1,20 +1,19 @@
 ---
 title: "基础 URL"
 sidebarTitle: "基础 URL"
-description: "MC OpenAPI 测试与生产环境的网关基础 URL。"
+description: "MC OpenAPI 生产环境网关基础 URL。"
 ---
 
-MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使用下方环境 Base URL \+ 路径前缀(`/openapi/v1`)\+ 具体路径,例如 `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`。
+MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使用下方 Base URL \+ 路径前缀(`/openapi/v1`)\+ 具体路径,例如 `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`。
 
-## 环境
+## Base URL
 
-| 环境 | Base URL |
+| | Base URL |
 | --- | --- |
-| 测试 | `https://test-gateway.mcconnects.com` |
 | 生产 | `https://gateway.mcconnects.com` |
 
 <Note>
-  两个环境的鉴权方式相同(AK/SK \+ HMAC-SHA256)。测试与生产的密钥在 MC 平台分别申请。
+  鉴权方式为 AK/SK \+ HMAC-SHA256。密钥在 MC 平台申请。
 </Note>
 
 ## 路径前缀
@@ -27,24 +26,14 @@ MC OpenAPI 仅通过 HTTPS 由 **MC API 网关** 提供。每个请求均需使�
 
 例如:
 
-- `https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`
+- `https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd`
 - `https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview`
 
-## 切换环境
-
-从测试切换到生产只需替换网关主机,无需修改签名、头部或路径。
+## 示例
 
 <CodeGroup>
 
 ```bash cURL
-# 测试
-curl -X POST https://test-gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
-  -H "X-Access-Key: $MC_ACCESS_KEY" \
-  -H "X-Signature: $MC_SIGNATURE" \
-  -H "X-Timestamp: $MC_TIMESTAMP" \
-  -H "Content-Type: application/json"
-
-# 生产
 curl -X POST https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd \
   -H "X-Access-Key: $MC_ACCESS_KEY" \
   -H "X-Signature: $MC_SIGNATURE" \
@@ -55,12 +44,12 @@ curl -X POST https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 ```python Python
 import os
 
-MC_GATEWAY = os.environ.get("MC_GATEWAY", "https://test-gateway.mcconnects.com")
+MC_GATEWAY = os.environ.get("MC_GATEWAY", "https://gateway.mcconnects.com")
 url = f"{MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd"
 ```
 
 ```javascript Node.js
-const MC_GATEWAY = process.env.MC_GATEWAY ?? "https://test-gateway.mcconnects.com";
+const MC_GATEWAY = process.env.MC_GATEWAY ?? "https://gateway.mcconnects.com";
 const url = `${MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd`;
 ```
 
@@ -71,5 +60,5 @@ const url = `${MC_GATEWAY}/openapi/v1/mc-account/exchange-rate/query/usd`;
 </Warning>
 
 <Tip>
-  将网关主机存为环境变量(如 `MC_GATEWAY`),上线时仅需一处配置改动。
+  将网关主机存为环境变量(如 `MC_GATEWAY`),便于在应用配置中统一管理。
 </Tip>
