@@ -117,60 +117,45 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
-
-`records[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
+| businessLineId | integer | Business Line ID |
+| uid | string | User ID |
+| positionId | integer | Position Order ID |
+| orderId | integer | Order Number |
+| dealId | integer | Deal Order Number |
+| dealTime | string | Deal Time |
+| dealTimeTimestamp | integer | Deal time millisecond timestamp |
+| type | string | Trade Type |
+| symbolPair | string | Trading Pair |
+| baseSymbolId | integer | Base Currency ID |
+| quoteSymbolId | integer | Quote Currency ID |
+| entry | string | Direction |
+| price | number | Order Price |
+| pricePosition | number | Average Deal Price |
+| lot | number | Order Quantity |
+| volumeClosed | number | Deal Quantity |
+| storage | number | Storage Fee |
+| commission | number | Fee |
+| commissionDisplay | string | Fee display value, rounded up with sign, fixed to 6 decimal places |
+| commissionScale | integer | Fee display precision |
+| profit | number | Trading P/L Amount |
+| profitDisplay | string | P/L display value, rounded and fixed to 6 decimal places |
+| profitScale | integer | P/L display precision |
+| contractSize | integer | Contract Size |
+| stopLoss | number | Stop Loss Price |
+| takeProfit | number | Take Profit Price |
+| onChainStatus | string | On-chain Status |
 | txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| retryCount | integer | Retry Count |
+| gasUsed | integer | Actual Gas Consumed |
+| gasPrice | integer | Gas Price |
+| blockNumber | integer | Block Number |
+| blockConfirmation | integer | Block Confirmations |
+| submitTime | string | Submit Time |
+| submitTimeTimestamp | integer | Submit time millisecond timestamp |
+| confirmTime | string | Confirmation Time |
+| confirmTimeTimestamp | integer | Confirmation time millisecond timestamp |
+| remark | string | Remarks Information |
+| accountType | string | Account Type |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/{dealId}" \

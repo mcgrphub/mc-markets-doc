@@ -36,60 +36,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
-
-`records[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| data | number | `data` is a scalar of this type |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}" \
@@ -110,62 +57,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 ### Response `data` fields
 
-| Field | Type | Description |
-| --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
+`data` is an array of objects. Element fields follow.
 
-`records[]` items:
+`data[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
+| symbolType | string | Base currency type |
+| baseCurrency | string | Base currency code (ISO 4217 standard) |
+| targetCurrency | string | Target currency code (ISO 4217 standard) |
 | exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
@@ -195,60 +96,47 @@ For USDT to BTC, set `from` to USDT and `to` to BTC.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
+| exchangeRate | number | Exchange Rate |
+| timestamp | integer | Timestamp |
+| oneFromToQuantity | number | Quantity of [to] currency exchangeable for 1 [from] currency |
+| oneToFromQuantity | number | Quantity of [from] currency exchangeable for 1 [to] currency |
+| bookPriceDotMap | object | Quotes from the exchange rate conversion process - includes multiple conversion steps, key=currency pair (Warning: only available in non-production environments, used for testing exchange rate accuracy) |
+| baseExchangeRate | number | Base exchange rate (before fee deduction / free quota application), used for testing verification |
+| baseExchangeRateDisplay | string | Base exchange rate display value |
+| fromAmount | number | User-input source currency amount (from amount) |
+| fromAmountDisplay | string | User-input source currency amount display value |
+| fromAmountScale | integer | User-input source currency amount display precision |
+| freeQuotaFromAmount | number | Today's remaining free quota (from amount, used for calculating fee-free tier) |
+| freeQuotaFromAmountDisplay | string | Today's remaining free quota (from amount) display value |
+| feeAmount | number | Actual fee charged (from amount) |
+| feeAmountDisplay | string | Actual fee charged (from amount) display value |
+| feeAmountScale | integer | Actual fee charged (from amount) display precision |
+| netFromAmount | number | Net amount actually used in exchange (from amount) = fromAmount - feeAmount |
+| netFromAmountDisplay | string | Net amount actually used in exchange (from amount) display value |
+| toAmount | number | Expected received amount (to amount) |
+| toAmountDisplay | string | Expected received amount (to amount) display value |
+| toAmountScale | integer | Expected received amount (to amount) display precision |
+| convertFeePercent | number | Flash exchange fee percentage (deducted from the source amount) |
+| dailyFreeConvertFeeQuotaUsd | number | Daily free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
+| dailyRemainingFreeConvertFeeQuotaUsd | number | Today's remaining free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
+| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | Today's remaining free flash exchange fee quota (USDC equivalent) display value |
+| expireTimestamp | integer | Quote expiry timestamp, in milliseconds |
+| quoteSessionId | string | Quote Session ID |
 
-`records[]` items:
+`bookPriceDotMap` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| <key> | object | Quotes from the exchange rate conversion process - includes multiple conversion steps, key=currency pair (Warning: only available in non-production environments, used for testing exchange rate accuracy) |
+
+`bookPriceDotMap.<key>` map value fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| buyPrice | number | Bid Price |
+| sellPrice | number | Ask Price |
+| midPrice | number | Mid Price |
+| timestamp | integer | Timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}" \

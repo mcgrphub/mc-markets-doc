@@ -41,30 +41,23 @@ description: "查询币种行情排行与 K 线数据。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| pricingDegree | integer | 价格精度, 用于把数值转换浮点数 |
-| klineDataList | array | K线数据列表, 依次代表：开盘价,收盘价,最高价,最低价,交易量,秒级时间戳 |
-| klineDisplayList | array | K线展示字段列表, 与 klineDataList 顺序一致 |
+| total | integer | 当前分类下品种总数 |
+| page | integer | 当前页码 |
+| pageSize | integer | 每页条数 |
+| snapshotVersion | integer | 排行快照版本号 |
+| items | array | 当前页排行条目 |
 
-`klineDisplayList[]` 元素：
+`items[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| openStr | string | 开盘价原始 plain string |
-| openDisplay | string | 开盘价展示文本 |
-| openScale | integer | 开盘价展示小数位 |
-| closeStr | string | 收盘价原始 plain string |
-| closeDisplay | string | 收盘价展示文本 |
-| closeScale | integer | 收盘价展示小数位 |
-| highStr | string | 最高价原始 plain string |
-| highDisplay | string | 最高价展示文本 |
-| highScale | integer | 最高价展示小数位 |
-| lowStr | string | 最低价原始 plain string |
-| lowDisplay | string | 最低价展示文本 |
-| lowScale | integer | 最低价展示小数位 |
-| volumeStr | string | 交易量原始 plain string |
-| volumeDisplay | string | 交易量展示文本 |
-| volumeScale | integer | 交易量展示小数位 |
-| timestamp | integer | 秒级时间戳 |
+| rank | integer | 全局名次 |
+| symbol | string | 品种代码 |
+| bid | string | 买价 |
+| change24hAbs | string | 24h 涨跌额 |
+| change24hPct | string | 24h 涨跌幅（小数形式，如 -0.0146 表示 -1.46%） |
+| isHot | boolean | 是否热门 |
+| pricingDegree | integer | 价格小数位 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/symbol-ranking" \

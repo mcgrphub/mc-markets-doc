@@ -43,207 +43,11 @@ description: "交易相关 OpenAPI 接口。"
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
-
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -281,207 +85,11 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
-
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -522,207 +130,11 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
-
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -762,207 +174,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
-
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -1218,207 +434,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
-
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| estimatedSlippage | number | 预估滑点 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
@@ -1446,207 +464,62 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| groupName | string | 用户所属分组名字 |
+| commissionCfg | array | 手续费配置 |
+| leverageCfg | array | 杠杆配置 |
+| marginCall | string | Margin Call |
 
-`data[]` 元素：
+`commissionCfg[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
+| actionMode | integer | 取决于交易类型的手续费计算模式 |
+| chargeMode | integer | 手续费收取时间 |
+| description | string | 手续费配置描述 |
+| entryMode | integer | 取决于交易方向的手续费计算模式 |
+| mode | integer | 手续费类型 |
+| name | string | 手续费配置名称 |
+| path | string | 从属于手续费的交易品种或交易品种组的路径 |
+| profitMode | integer | 根据交易利润设置费计算模式 |
+| rangeMode | integer | 手续费范围的类型 — 依据交易量或流通 |
+| reasonFlags | integer | 根据交易执行的原因手续费计算模式 |
+| turnoverCurrency | string | 计算钱款流通的货币 |
+| groupTier | array | 不同范围的手续费配置 |
 
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
+`commissionCfg[].groupTier[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
+| currency | string | 手续费计算货币 |
+| maximal | number | 收取手续费的最大金额 |
+| minimal | number | 收取手续费的最小金额 |
+| mode | integer | 手续费收取方法 |
+| rangeFrom | number | 将从其收取手续费的最小交易量（流通） |
+| rangeTo | number | 将从其收取手续费的最大交易量（流通） |
+| type | integer | 手续费收取类型 |
+| value | number | 手续费金额 |
 
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
+`leverageCfg[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
+| description | string | 杠杆配置描述 |
+| name | string | 杠杆配置名字 |
+| path | string | 从属于杠杆配置的交易品种或交易品种组的路径 |
+| rangeMode | integer | 杠杆档位匹配方式 |
+| rangeValueCurrency | string | 名义价值的计价货币 |
+| tiers | array | 不同范围的杠杆配置 |
 
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
+`leverageCfg[].tiers[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| marginRateInitial | number | 初始保证金比例 |
+| marginRateMaintenance | number | 维持保证金比例 |
+| rangeFrom | number | 符合该杠杆配置的最小交易量 |
+| rangeTo | number | 符合该杠杆配置的最大交易量 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/staticInfo" \
@@ -1671,207 +544,62 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| userAssets | object |  |
 
-`data[]` 元素：
+`userAssets` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
+| balance | number |  |
+| equity | number |  |
+| floating | number |  |
+| margin | number |  |
+| marginFree | number |  |
+| marginLevel | number |  |
+| positions | array |  |
+| balanceStr | string |  |
+| equityStr | string |  |
+| floatingStr | string |  |
+| marginStr | string |  |
+| marginFreeStr | string |  |
+| marginLevelStr | string |  |
+| marginDisplay | string |  |
+| marginScale | integer |  |
+| marginFreeDisplay | string |  |
+| marginFreeScale | integer |  |
+| marginLevelDisplay | string |  |
+| marginLevelScale | integer |  |
 
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
+`userAssets.positions[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| id | integer |  |
+| login | integer |  |
+| action | integer |  |
+| contractSize | number |  |
+| freeMargin | number |  |
+| precision | integer |  |
+| priceDigits | integer |  |
+| currencyDigits | integer |  |
+| priceCurrent | number |  |
+| openPrice | number |  |
+| time | integer |  |
+| slPrice | number |  |
+| tpPrice | number |  |
+| rateProfit | number |  |
+| freeAmount | number |  |
+| symbol | string |  |
+| usdValue | number |  |
+| volume | number |  |
+| volumeExt | number |  |
+| contractSizeStr | string |  |
+| priceCurrentStr | string |  |
+| usdValueStr | string |  |
+| volumeDisplay | string |  |
+| volumeScale | integer |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \
@@ -1899,207 +627,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 ### 响应 `data` 字段
 
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
-| risk | object | 风控配置信息 |
-
-`data[].mt5` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| Category | string | 交易品种分类 |
-| ContractSize | number | 合约大小 |
-| CurrencyBase | string | 基础货币 |
-| CurrencyBaseDigits | integer | 基础货币精度 |
-| CurrencyMargin | string | 预付款货币 |
-| CurrencyMarginDigits | integer | 预付款货币精度 |
-| CurrencyProfit | string | 利润货币 |
-| CurrencyProfitDigits | integer | 利润货币精度 |
-| Digits | integer | 价格小数位数 |
-| FreezeLevel | integer | 冻结级别 |
-| IESlipLosing | integer | 现价执行亏损方向最大下降 |
-| IESlipProfit | integer | 现价执行盈利方向最大下降 |
-| IEVolumeMaxExt | integer | 现价执行最大交易量 |
-| International | string | 国际名称 |
-| MarginFlags | integer | 预付款检查模式 |
-| MarginHedged | number | 锁仓预付款值 |
-| MarginInitial | number | 初始预付款大小 |
-| MarginMaintenance | number | 维持预付款大小 |
-| MarginRateCurrency | number | 预付款货币汇率 |
-| MarginRateLiquidity | number | 流动性比率 |
-| OrderFlags | integer | 订单类型标识 |
-| Path | string | 交易品种路径 |
-| PriceLimitMax | number | 最大价格限制 |
-| PriceLimitMin | number | 最小价格限制 |
-| PriceSettle | number | 结算价格 |
-| SessionTrade | array | 交易时间 |
-| Source | string | 报价源交易品种 |
-| StopsLevel | integer | 止损订单幅度 |
-| TickBookDepth | integer | 市场深度范围 |
-| TimeExpiration | string | 交易到期日期 |
-| TimeStart | string | 交易开始日期 |
-| TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
-| VolumeLimitExt | integer | 最大累计交易量 |
-| VolumeMaxExt | integer | 最大交易量 |
-| VolumeMinExt | integer | 最小交易量 |
-| VolumeStepExt | integer | 交易量步长 |
-| leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
-
-`data[].mt5.SessionTrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| quote | array | 报价时间 |
-| trade | array | 交易时间 |
-| weekDay | string | 星期 |
-
-`data[].mt5.SessionTrade[].quote[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.SessionTrade[].trade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | string | 开始时间 |
-| to | string | 结束时间 |
-
-`data[].mt5.leverageGrade[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | number | 起始值 |
-| initialAdvanceRate | number | 初始预付款比率 |
-| maintenanceAdvanceRate | number | 维持预付款比率 |
-| to | number | 结束值 |
-
-`data[].mt5.marginRateInitial` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].mt5.marginRateMaintenance` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| buy | number | 买入比率 |
-| buyLimit | number | 买入限价单比率 |
-| buyStop | number | 买入止损单比率 |
-| buyStopLimit | number | 买入止损限价单比率 |
-| sell | number | 卖出比率 |
-| sellLimit | number | 卖出限价单比率 |
-| sellStop | number | 卖出止损单比率 |
-| sellStopLimit | number | 卖出止损限价单比率 |
-
-`data[].risk` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| symbol | string | 交易品种标识 |
-| version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
-| specialSymbol | integer | 特殊现货标识：0=否，1=是 |
-| fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
-| liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
-| fundingRateMode | string | 资金费率模式 |
-| fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
-| groupName | string | 分组名称 |
-| platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
-| tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| code | string | MT5返回状态码 |
+| orderId | string | MT5订单ID(如果有) |
+| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

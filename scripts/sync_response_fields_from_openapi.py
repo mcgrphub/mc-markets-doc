@@ -160,11 +160,34 @@ def doc_score(spec: dict, sch: dict, depth: int = 0) -> int:
     return score
 
 
+def schema_fingerprint(spec: dict, sch: dict) -> tuple:
+    """Structural fingerprint so RetResult* envelopes are not cross-matched."""
+    sch = resolve(spec, sch)
+    keys = prop_keys(sch)
+    if "data" in keys:
+        data = resolve(spec, (sch.get("properties") or {}).get("data") or {})
+        t = data.get("type")
+        if isinstance(t, list):
+            t = next((x for x in t if x != "null"), t[0] if t else None)
+        if t == "array":
+            items = resolve(spec, data.get("items") or {})
+            return ("envelope", frozenset(keys), "array", prop_keys(items), norm_type(items))
+        return ("envelope", frozenset(keys), "object", prop_keys(data), norm_type(data))
+    return ("object", frozenset(keys), None, frozenset(), norm_type(sch))
+
+
 def find_matching_component(spec: dict, inline: dict) -> dict | None:
-    """Return a components schema with the same property keys and richer docs."""
+    """Return a components schema with the same shape and richer docs.
+
+    Important: many RetResult* wrappers share identical top-level keys
+    (status/message/code/data/...). Matching on those keys alone wrongly
+    replaces every endpoint with the richest wrapper (e.g. staticConfig).
+    Require a full structural fingerprint, including `data` shape.
+    """
     keys = prop_keys(inline)
     if len(keys) < 2:
         return None
+    inline_fp = schema_fingerprint(spec, inline)
     inline_score = doc_score(spec, inline)
     best_name = None
     best_score = inline_score
@@ -175,8 +198,9 @@ def find_matching_component(spec: dict, inline: dict) -> dict | None:
         resolved = resolve(spec, candidate)
         if prop_keys(resolved) != keys:
             continue
+        if schema_fingerprint(spec, candidate) != inline_fp:
+            continue
         score = doc_score(spec, candidate)
-        # Prefer component schemas that keep $ref children.
         if score > best_score:
             best_score = score
             best_name = name
@@ -538,11 +562,13 @@ def find_data_schema(specs: list[dict], method: str, path: str):
             continue
         resp = (op.get("responses") or {}).get("200") or {}
         for content in (resp.get("content") or {}).values():
-            sch = enrich(spec, content.get("schema") or {})
+            # Do NOT enrich the RetResult envelope first — many wrappers share
+            # the same top-level keys and would cross-match. Enrich only `data`.
+            sch = resolve(spec, content.get("schema") or {})
             props = sch.get("properties") or {}
             if "data" in props:
                 return spec, enrich(spec, props["data"])
-            return spec, sch
+            return spec, enrich(spec, sch)
     return None, None
 
 
@@ -646,15 +672,37 @@ def main() -> None:
 
     # Prove FundingRateDto titles flow through enrich().
     zh_specs = load_specs("zh")
-    risk = next(s for s in zh_specs if "FundingRateDto" in ((s.get("components") or {}).get("schemas") or {}))
-    _, data = find_data_schema(
-        zh_specs, "GET", "/openapi/v1/mc-risk/funding-rate"
+    risk = next(
+        s
+        for s in zh_specs
+        if "FundingRateDto" in ((s.get("components") or {}).get("schemas") or {})
     )
+    _, data = find_data_schema(zh_specs, "GET", "/openapi/v1/mc-risk/funding-rate")
     assert data is not None
     items = enrich(risk, (data.get("properties") or {})["records"].get("items") or {})
     symbol = (items.get("properties") or {})["symbol"]
     assert symbol.get("title") == "币种", symbol
-    print("OK: funding-rate records resolved via FundingRateDto title=", symbol.get("title"))
+    print(
+        "OK: funding-rate records resolved via FundingRateDto title=",
+        symbol.get("title"),
+    )
+
+    # Prove RetResult wrappers are not cross-matched to staticConfig.
+    _, modify_data = find_data_schema(
+        zh_specs, "PUT", "/openapi/v1/mc-trade/trade/positions/modify"
+    )
+    assert modify_data is not None
+    modify_props = set((modify_data.get("properties") or {}).keys())
+    assert modify_props == {"code", "orderId", "params"}, modify_props
+    modify_block = render_response_block(
+        next(s for s in zh_specs if "paths" in s and "/openapi/v1/mc-trade/trade/positions/modify" in s["paths"]),
+        modify_data,
+        "zh",
+    )
+    assert "SessionTrade" not in modify_block
+    assert "| code | string |" in modify_block
+    print("OK: positions/modify data not cross-matched to staticConfig")
+
     for path, count in stats:
         if count:
             print(f"{path}: {count}")

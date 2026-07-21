@@ -30,60 +30,28 @@ Query positions.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
+| uid | string | User ID |
+| symbolInfo | object | Position information, key is the trading symbol, value is position details |
 
-`records[]` items:
+`symbolInfo` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| <key> | object | Position information, key is the trading symbol, value is position details |
+
+`symbolInfo.<key>` map value fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| contractSize | number | Contract Size |
+| freeMargin | number | Available |
+| precision | number | Precision |
+| priceCurrent | number | Current Price |
+| symbol | string | Trading Symbol |
+| usdValue | number | USD Value |
+| volumeExt | number | Extended Position Volume |
+| volume | number | Actual Position Quantity |
+| openPrice | number | Open Price |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot/positions/v2" \
@@ -111,60 +79,33 @@ Query spot account positions.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
+| spotId | string | Spot Account ID |
+| symbolInfo | object | Position information, key is the trading symbol, value is position details |
 
-`records[]` items:
+`symbolInfo` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| <key> | object | Position information, key is the trading symbol, value is position details |
+
+`symbolInfo.<key>` map value fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| contractSize | number | Contract Size |
+| freeMargin | number | Available |
+| precision | number | Precision |
+| priceCurrent | number | Current Price |
+| symbol | string | Trading Symbol |
+| usdValue | number | USD Value |
+| rateProfit | number | P/L Exchange Rate |
+| volume | number | Actual Position Quantity |
+| volumeExt | number | Actual Position Quantity |
+| openPrice | number | Current Price |
+| freeAmount | number | Available (excluding portion locked by pending orders). This field is non-zero only for USDC |
+| volumeDisplay | string | Total balance display value |
+| volumeScale | integer | Total balance display precision |
+| volumeExtDec | number |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \
@@ -191,60 +132,22 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 | Field | Type | Description |
 | --- | --- | --- |
-| records | array | Records on the current page |
-| total | integer | Total number of records |
-| size | integer | Page size |
-| current | integer | Current page number |
-| pages | integer | Total number of pages |
-| hasPrevious | boolean | Whether a previous page exists |
-| hasNext | boolean | Whether a next page exists |
+| treeBatchId | integer | Merkle Tree Build Batch |
+| userId | string | User ID |
+| userHash | string | PoRv2 User Hash (user_hash) |
+| assetInfo | string | Asset Information |
+| leafHash | string | Merkle leaf hash value |
+| pathLayers | string | Recursive layer path, each layer has a group + its position within it |
+| platformAssetProof | array | Platform Proof of Assets |
 
-`records[]` items:
+`platformAssetProof[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| chain | string | Chain Name |
+| address | string | Wallet Address |
+| assetInfo | string | Asset Information |
+| signature | string | Signature |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/por" \

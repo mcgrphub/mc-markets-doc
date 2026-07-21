@@ -40,207 +40,72 @@ Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT
 
 ### Response `data` fields
 
-`data` is an array of objects. Element fields follow.
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array | Records on the current page |
+| total | integer | Total number of records |
+| size | integer | Page size |
+| current | integer | Current page number |
+| pages | integer | Total number of pages |
+| hasPrevious | boolean | Whether a previous page exists |
+| hasNext | boolean | Whether a next page exists |
 
-`data[]` items:
+`records[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbol | string | Trading Symbol Identifier |
-| mt5 | object | MT5 Data Configuration |
-| risk | object | Risk Control Configuration Info |
-
-`data[].mt5` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| Category | string | Trading Symbol Category |
-| ContractSize | number | Contract Size |
-| CurrencyBase | string | Base Currency |
-| CurrencyBaseDigits | integer | Base Currency Precision |
-| CurrencyMargin | string | Margin Currency |
-| CurrencyMarginDigits | integer | Margin Currency Precision |
-| CurrencyProfit | string | Profit Currency |
-| CurrencyProfitDigits | integer | Profit Currency Precision |
-| Digits | integer | Price Decimal Places |
-| FreezeLevel | integer | Freeze Level |
-| IESlipLosing | integer | Max decline in loss direction for market execution |
-| IESlipProfit | integer | Max decline in profit direction for market execution |
-| IEVolumeMaxExt | integer | Max trade volume for market execution |
-| International | string | International Name |
-| MarginFlags | integer | Margin Check Mode |
-| MarginHedged | number | Hedged Margin Value |
-| MarginInitial | number | Initial Margin Size |
-| MarginMaintenance | number | Maintenance Margin Size |
-| MarginRateCurrency | number | Margin Currency Exchange Rate |
-| MarginRateLiquidity | number | Liquidity Ratio |
-| OrderFlags | integer | Order Type Identifier |
-| Path | string | Trading Symbol Path |
-| PriceLimitMax | number | Max Price Limit |
-| PriceLimitMin | number | Min Price Limit |
-| PriceSettle | number | Settlement Price |
-| SessionTrade | array | Trading Time |
-| Source | string | Quote Source Symbol |
-| StopsLevel | integer | Stop Loss Order Deviation |
-| TickBookDepth | integer | Market Depth Range |
-| TimeExpiration | string | Trade Expiry Date |
-| TimeStart | string | Trade Start Date |
-| TradeMode | integer | Trading Mode |
-| Spread | number | Spread |
-| VolumeLimitExt | integer | Max Cumulative Volume |
-| VolumeMaxExt | integer | Max Trade Volume |
-| VolumeMinExt | integer | Min Trade Volume |
-| VolumeStepExt | integer | Volume Step |
-| leverageGrade | array | Leverage Tier Configuration |
-| marginRateInitial | object | Margin Ratio Details |
-| marginRateMaintenance | object | Margin Ratio Details |
-
-`data[].mt5.SessionTrade[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| quote | array | Quote Time |
-| trade | array | Trading Time |
-| weekDay | string | Day of Week |
-
-`data[].mt5.SessionTrade[].quote[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | string | Start Time |
-| to | string | End Time |
-
-`data[].mt5.SessionTrade[].trade[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | string | Start Time |
-| to | string | End Time |
-
-`data[].mt5.leverageGrade[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | number | Start Value |
-| initialAdvanceRate | number | Initial Margin Ratio |
-| maintenanceAdvanceRate | number | Maintenance Margin Ratio |
-| to | number | End Value |
-
-`data[].mt5.marginRateInitial` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| buy | number | Buy Ratio |
-| buyLimit | number | Buy Limit Ratio |
-| buyStop | number | Buy Stop Ratio |
-| buyStopLimit | number | Buy Stop Limit Ratio |
-| sell | number | Sell Ratio |
-| sellLimit | number | Sell Limit Ratio |
-| sellStop | number | Sell Stop Ratio |
-| sellStopLimit | number | Sell Stop Limit Ratio |
-
-`data[].mt5.marginRateMaintenance` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| buy | number | Buy Ratio |
-| buyLimit | number | Buy Limit Ratio |
-| buyStop | number | Buy Stop Ratio |
-| buyStopLimit | number | Buy Stop Limit Ratio |
-| sell | number | Sell Ratio |
-| sellLimit | number | Sell Limit Ratio |
-| sellStop | number | Sell Stop Ratio |
-| sellStopLimit | number | Sell Stop Limit Ratio |
-
-`data[].risk` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| id | integer | Configuration ID |
-| symbol | string | Trading Symbol Identifier |
-| version | integer | Configuration Version |
-| longAnnualRate | number | Long Annualized Rate |
-| shortAnnualRate | number | Short Annualized Rate |
-| discountRate | number | Discounted Rate |
-| baseRate | number | Base Rate |
-| specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
-| fundingRateBaseType | string | Funding Rate Benchmark Type |
-| fundingRateThreshold | number | Funding Rate Threshold |
-| fundingRateStep | number | Funding Rate Step |
-| fundingRateIncrease | number | Funding Rate Increment |
-| fundingRateBase | number | Funding Rate Benchmark |
-| fundingRateMin | number | Funding Rate Min Value |
-| fundingRateMax | number | Funding Rate Max Value |
-| liquidationFeeType | string | Liquidation Fee Type |
-| liquidationFeeValue | number | Liquidation Fee Value |
-| minLiquidationFee | number | Minimum Liquidation Fee |
-| fundingRateMode | string | Funding Rate Mode |
-| fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
-| groupName | string | Group Name |
-| platformMaxSlippageType | string | Platform Maximum Slippage Type |
-| platformMaxSlippage | number | Platform Maximum Slippage |
-| tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
-| tpSlMaxSlippage | number | TP/SL Maximum Slippage |
-| userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
-| userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
-| platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
-| platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
-| free | object | Premium Tier Configuration |
-| premium | object | Premium Tier Configuration |
-
-`data[].risk.free` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| transCostConfig | array | Trading Cost Configuration |
-| discountRate | number | Discounted Rate |
-
-`data[].risk.free.transCostConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| startTime | string | Trading Cost Config - Start Time |
-| endTime | string | Trading Cost Config - End Time |
-| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
-| transTotalTime | integer | Deal cumulative time |
-| slippageConfig | array | Slippage Tier Configuration |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | integer | Tier Range (From) |
-| to | integer | Tier Range (To) |
-| value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
-| valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
-| slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
-
-`data[].risk.premium` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| transCostConfig | array | Trading Cost Configuration |
-| discountRate | number | Discounted Rate |
-
-`data[].risk.premium.transCostConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| startTime | string | Trading Cost Config - Start Time |
-| endTime | string | Trading Cost Config - End Time |
-| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
-| transTotalTime | integer | Deal cumulative time |
-| slippageConfig | array | Slippage Tier Configuration |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | integer | Tier Range (From) |
-| to | integer | Tier Range (To) |
-| value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
-| valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
-| slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| order | integer | Order number, primary key |
+| login | integer | Login account, MT5 account login number |
+| dealer | integer | Dealer ID, the MT5 dealer code |
+| symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
+| digits | integer | Price precision, the number of decimal places for the trading symbol |
+| digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
+| contractSize | number | Contract size, the standard size per lot |
+| state | integer | Order Status |
+| reason | integer | Reason, the reason code for the order change |
+| timeSetup | integer | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
+| timeExpiration | integer | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
+| timeDone | integer | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
+| timeSetupMsc | integer | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
+| timeDoneMsc | integer | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
+| modifyFlags | integer | Modification flags, the flag bits for order modification |
+| type | integer | Order type, e.g., buy, sell, etc. |
+| typeFill | integer | Deal type, the fill type of the order |
+| typeTime | integer | Time validity type, the validity type of the order |
+| priceOrder | number | Order price, the execution price of the order |
+| priceOrderStr | string | Order price raw string |
+| priceOrderDisplay | string | Order price display value |
+| priceOrderScale | integer | Order price display decimal places |
+| priceTrigger | number | Trigger price, the trigger price of the order |
+| priceTriggerDisplay | string | Trigger price display value |
+| priceTriggerScale | integer | Trigger price display decimal places |
+| priceCurrent | number | Current price, the current market price of the order |
+| priceCurrentDisplay | string | Current price display value |
+| priceCurrentScale | integer | Current price display decimal places |
+| priceSlDisplay | string | Stop loss price display value |
+| priceSlScale | integer | Stop loss price display decimal places |
+| priceTpDisplay | string | Take profit price display value |
+| priceTpScale | integer | Take profit price display decimal places |
+| volumeInitialExt | number | Initial extended volume, the initial extended volume of the order (for large orders) |
+| quantity | number | User quantity, equals initial volumeInitialExt divided by 10^8 |
+| volumeInitialDisplay | string | Initial volume display value |
+| volumeInitialScale | integer | Initial volume display decimal places |
+| volumeCurrentExt | number | Current extended volume, the current extended volume of the order |
+| volumeCurrentDisplay | string | Current volume display value |
+| volumeCurrentScale | integer | Current volume display decimal places |
+| rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
+| activationMode | integer | Activation mode, the activation mode of the pending order |
+| activationTime | integer | Activation time, the activation timestamp of the pending order |
+| activationPrice | number | Activation price, the activation price of the pending order |
+| activationFlags | integer | Activation flag, the flag bit for pending order activation |
+| volumeInitial | number | Initial volume, the initial trading volume of the order |
+| volumeCurrent | number | Current volume, the current trading volume of the order |
+| externalID | string | External ID, the ID associated with the external system |
+| priceSL | number | Stop loss price, the set stop loss level |
+| priceTP | number | Take profit price, the set take profit level |
+| expertID | integer | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
+| positionID | integer | Position ID, the associated position ID |
+| positionByID | integer | Opposite position ID, the associated opposite position ID |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/v3" \
@@ -277,201 +142,11 @@ Query recent deals by symbol; result count is controlled by `limit`.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbol | string | Trading Symbol Identifier |
-| mt5 | object | MT5 Data Configuration |
-| risk | object | Risk Control Configuration Info |
-
-`data[].mt5` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| Category | string | Trading Symbol Category |
-| ContractSize | number | Contract Size |
-| CurrencyBase | string | Base Currency |
-| CurrencyBaseDigits | integer | Base Currency Precision |
-| CurrencyMargin | string | Margin Currency |
-| CurrencyMarginDigits | integer | Margin Currency Precision |
-| CurrencyProfit | string | Profit Currency |
-| CurrencyProfitDigits | integer | Profit Currency Precision |
-| Digits | integer | Price Decimal Places |
-| FreezeLevel | integer | Freeze Level |
-| IESlipLosing | integer | Max decline in loss direction for market execution |
-| IESlipProfit | integer | Max decline in profit direction for market execution |
-| IEVolumeMaxExt | integer | Max trade volume for market execution |
-| International | string | International Name |
-| MarginFlags | integer | Margin Check Mode |
-| MarginHedged | number | Hedged Margin Value |
-| MarginInitial | number | Initial Margin Size |
-| MarginMaintenance | number | Maintenance Margin Size |
-| MarginRateCurrency | number | Margin Currency Exchange Rate |
-| MarginRateLiquidity | number | Liquidity Ratio |
-| OrderFlags | integer | Order Type Identifier |
-| Path | string | Trading Symbol Path |
-| PriceLimitMax | number | Max Price Limit |
-| PriceLimitMin | number | Min Price Limit |
-| PriceSettle | number | Settlement Price |
-| SessionTrade | array | Trading Time |
-| Source | string | Quote Source Symbol |
-| StopsLevel | integer | Stop Loss Order Deviation |
-| TickBookDepth | integer | Market Depth Range |
-| TimeExpiration | string | Trade Expiry Date |
-| TimeStart | string | Trade Start Date |
-| TradeMode | integer | Trading Mode |
-| Spread | number | Spread |
-| VolumeLimitExt | integer | Max Cumulative Volume |
-| VolumeMaxExt | integer | Max Trade Volume |
-| VolumeMinExt | integer | Min Trade Volume |
-| VolumeStepExt | integer | Volume Step |
-| leverageGrade | array | Leverage Tier Configuration |
-| marginRateInitial | object | Margin Ratio Details |
-| marginRateMaintenance | object | Margin Ratio Details |
-
-`data[].mt5.SessionTrade[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| quote | array | Quote Time |
-| trade | array | Trading Time |
-| weekDay | string | Day of Week |
-
-`data[].mt5.SessionTrade[].quote[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | string | Start Time |
-| to | string | End Time |
-
-`data[].mt5.SessionTrade[].trade[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | string | Start Time |
-| to | string | End Time |
-
-`data[].mt5.leverageGrade[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | number | Start Value |
-| initialAdvanceRate | number | Initial Margin Ratio |
-| maintenanceAdvanceRate | number | Maintenance Margin Ratio |
-| to | number | End Value |
-
-`data[].mt5.marginRateInitial` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| buy | number | Buy Ratio |
-| buyLimit | number | Buy Limit Ratio |
-| buyStop | number | Buy Stop Ratio |
-| buyStopLimit | number | Buy Stop Limit Ratio |
-| sell | number | Sell Ratio |
-| sellLimit | number | Sell Limit Ratio |
-| sellStop | number | Sell Stop Ratio |
-| sellStopLimit | number | Sell Stop Limit Ratio |
-
-`data[].mt5.marginRateMaintenance` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| buy | number | Buy Ratio |
-| buyLimit | number | Buy Limit Ratio |
-| buyStop | number | Buy Stop Ratio |
-| buyStopLimit | number | Buy Stop Limit Ratio |
-| sell | number | Sell Ratio |
-| sellLimit | number | Sell Limit Ratio |
-| sellStop | number | Sell Stop Ratio |
-| sellStopLimit | number | Sell Stop Limit Ratio |
-
-`data[].risk` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| id | integer | Configuration ID |
-| symbol | string | Trading Symbol Identifier |
-| version | integer | Configuration Version |
-| longAnnualRate | number | Long Annualized Rate |
-| shortAnnualRate | number | Short Annualized Rate |
-| discountRate | number | Discounted Rate |
-| baseRate | number | Base Rate |
-| specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
-| fundingRateBaseType | string | Funding Rate Benchmark Type |
-| fundingRateThreshold | number | Funding Rate Threshold |
-| fundingRateStep | number | Funding Rate Step |
-| fundingRateIncrease | number | Funding Rate Increment |
-| fundingRateBase | number | Funding Rate Benchmark |
-| fundingRateMin | number | Funding Rate Min Value |
-| fundingRateMax | number | Funding Rate Max Value |
-| liquidationFeeType | string | Liquidation Fee Type |
-| liquidationFeeValue | number | Liquidation Fee Value |
-| minLiquidationFee | number | Minimum Liquidation Fee |
-| fundingRateMode | string | Funding Rate Mode |
-| fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
-| groupName | string | Group Name |
-| platformMaxSlippageType | string | Platform Maximum Slippage Type |
-| platformMaxSlippage | number | Platform Maximum Slippage |
-| tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
-| tpSlMaxSlippage | number | TP/SL Maximum Slippage |
-| userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
-| userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
-| platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
-| platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
-| free | object | Premium Tier Configuration |
-| premium | object | Premium Tier Configuration |
-
-`data[].risk.free` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| transCostConfig | array | Trading Cost Configuration |
-| discountRate | number | Discounted Rate |
-
-`data[].risk.free.transCostConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| startTime | string | Trading Cost Config - Start Time |
-| endTime | string | Trading Cost Config - End Time |
-| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
-| transTotalTime | integer | Deal cumulative time |
-| slippageConfig | array | Slippage Tier Configuration |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | integer | Tier Range (From) |
-| to | integer | Tier Range (To) |
-| value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
-| valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
-| slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
-
-`data[].risk.premium` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| transCostConfig | array | Trading Cost Configuration |
-| discountRate | number | Discounted Rate |
-
-`data[].risk.premium.transCostConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| startTime | string | Trading Cost Config - Start Time |
-| endTime | string | Trading Cost Config - End Time |
-| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
-| transTotalTime | integer | Deal cumulative time |
-| slippageConfig | array | Slippage Tier Configuration |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | integer | Tier Range (From) |
-| to | integer | Tier Range (To) |
-| value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
-| valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
-| slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| action | integer | 0-Buy, 1-Sell |
+| price | number | Deal Price |
+| volumeExt | integer | Extended Volume |
+| timeMsc | integer | Deal Time (ms) |
+| orderId | integer | Order Number |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \

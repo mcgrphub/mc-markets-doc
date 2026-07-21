@@ -41,30 +41,23 @@ Paginated symbol ranking by category and sort dimensions.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| pricingDegree | integer | Price precision, used to convert values to floating point numbers |
-| klineDataList | array | K-line data list, in order: open price, close price, high price, low price, volume, second-level timestamp |
-| klineDisplayList | array | K-line display field list, consistent with klineDataList order |
+| total | integer | Total number of symbols in current category |
+| page | integer | Current page number |
+| pageSize | integer | Number of records per page |
+| snapshotVersion | integer | Ranking snapshot version number |
+| items | array | Ranking entries on current page |
 
-`klineDisplayList[]` items:
+`items[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| openStr | string | Open price raw plain string |
-| openDisplay | string | Open price display text |
-| openScale | integer | Open price display decimal places |
-| closeStr | string | Close price raw plain string |
-| closeDisplay | string | Close price display text |
-| closeScale | integer | Close price display decimal places |
-| highStr | string | High price raw plain string |
-| highDisplay | string | High price display text |
-| highScale | integer | High price display decimal places |
-| lowStr | string | Low price raw plain string |
-| lowDisplay | string | Low price display text |
-| lowScale | integer | Low price display decimal places |
-| volumeStr | string | Trading volume raw plain string |
-| volumeDisplay | string | Trading volume display text |
-| volumeScale | integer | Trading volume display decimal places |
-| timestamp | integer | Second-level timestamp |
+| rank | integer | Global rank |
+| symbol | string | Symbol Code |
+| bid | string | Bid Price |
+| change24hAbs | string | 24h change amount |
+| change24hPct | string | 24h change percentage (decimal form, e.g., -0.0146 means -1.46%) |
+| isHot | boolean | Whether hot |
+| pricingDegree | integer | Price Decimal Places |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/symbol-ranking" \

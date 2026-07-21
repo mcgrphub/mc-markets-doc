@@ -36,60 +36,7 @@ description: "汇率相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| data | number | `data` 为该类型标量 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}" \
@@ -110,62 +57,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 ### 响应 `data` 字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
+`data` 为对象数组。元素字段见下表。
 
-`records[]` 元素：
+`data[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
+| symbolType | string | 基础货币的类型 |
+| baseCurrency | string | 基础货币代码（ISO 4217标准） |
+| targetCurrency | string | 目标货币代码（ISO 4217标准） |
 | exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
@@ -195,60 +96,47 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
+| exchangeRate | number | 汇率 |
+| timestamp | integer | 时间戳 |
+| oneFromToQuantity | number | 1个[from]币可兑换[to]币的数量 |
+| oneToFromQuantity | number | 1 个[to]币可兑换[from]币的数量 |
+| bookPriceDotMap | object | 汇率转换过程的的报价-包含多个汇率转换步骤,key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
+| baseExchangeRate | number | 基础汇率（未扣手续费/未应用免费额度前），用于测试验证 |
+| baseExchangeRateDisplay | string | 基础汇率展示值 |
+| fromAmount | number | 用户输入的消耗币种数量（from 数量） |
+| fromAmountDisplay | string | 用户输入的消耗币种数量展示值 |
+| fromAmountScale | integer | 用户输入的消耗币种数量展示精度 |
+| freeQuotaFromAmount | number | 当日剩余免费额度（from 数量，用于计算免手续费区间） |
+| freeQuotaFromAmountDisplay | string | 当日剩余免费额度（from 数量）展示值 |
+| feeAmount | number | 实收手续费（from 数量） |
+| feeAmountDisplay | string | 实收手续费（from 数量）展示值 |
+| feeAmountScale | integer | 实收手续费（from 数量）展示精度 |
+| netFromAmount | number | 实际参与兑换的净额（from 数量）= fromAmount - feeAmount |
+| netFromAmountDisplay | string | 实际参与兑换的净额（from 数量）展示值 |
+| toAmount | number | 预计获得数量（to 数量） |
+| toAmountDisplay | string | 预计获得数量（to 数量）展示值 |
+| toAmountScale | integer | 预计获得数量（to 数量）展示精度 |
+| convertFeePercent | number | 闪兑手续费百分比(对兑出的数量进行扣减) |
+| dailyFreeConvertFeeQuotaUsd | number | 每日免费闪兑手续费额度（USDC等值，按用户累计，UTC+8日切） |
+| dailyRemainingFreeConvertFeeQuotaUsd | number | 今日剩余免费闪兑手续费额度（USDC等值，按用户累计，UTC+8日切） |
+| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | 今日剩余免费闪兑手续费额度（USDC等值）展示值 |
+| expireTimestamp | integer | 报价过期时间戳, 毫秒级 |
+| quoteSessionId | string | 报价会话ID |
 
-`records[]` 元素：
+`bookPriceDotMap` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| <key> | object | 汇率转换过程的的报价-包含多个汇率转换步骤,key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
+
+`bookPriceDotMap.<key>` 映射值字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| buyPrice | number | 买价 |
+| sellPrice | number | 卖价 |
+| midPrice | number | 中间价 |
+| timestamp | integer | 时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}" \

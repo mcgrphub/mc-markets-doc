@@ -46,60 +46,7 @@ description: "金库账户相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| data | string | `data` 为该类型标量 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/withdraw" \
@@ -133,60 +80,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| data | string | `data` 为该类型标量 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/deposit" \
@@ -215,62 +109,15 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 
 ### 响应 `data` 字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
+`data` 为对象数组。元素字段见下表。
 
-`records[]` 元素：
+`data[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| data | string | 日期 |
+| value | number | 收益率 |
+| valueDisplay | string | 收益率展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-yield-rate-data" \
@@ -290,60 +137,12 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| maxWithdrawAmount | number | 最大可提款金额（可提金额） |
+| withdrawablePrincipal | number | 可提本金 |
+| withdrawableEarnings | number | 可提收益 |
+| withdrawableEarningsDisplay | string | 可提收益展示值 |
+| maxWithdrawAmountDisplay | string | 最大可提款金额展示值 |
+| withdrawablePrincipalDisplay | string | 可提本金展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-info" \
@@ -368,62 +167,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-i
 
 ### 响应 `data` 字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
+`data` 为对象数组。元素字段见下表。
 
-`records[]` 元素：
+`data[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| data | string | 日期 |
+| value | number | 收益率 |
+| valueDisplay | string | 收益率展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" \
@@ -443,60 +195,23 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" 
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| treasuryIntroduction | string | 金库介绍 |
+| treasuryYield | number | 统计数据-金库收益 |
+| currentAnnualYieldRate | number | 统计数据-当前年化收益率 |
+| currentDailyYieldRate | number | 统计数据-当前每日回报率 |
+| treasuryBalance | number | 我的表现-金库余额 |
+| withdrawableEarnings | number | 我的表现-可提收益 |
+| yesterdayEarnings | number | 我的表现-昨日收益 |
+| lockedDeposit | number | 我的表现-锁定存款 |
+| withdrawableAmount | number | 我的表现-可提金额 |
+| currentAnnualYieldRateDisplay | string | 统计数据-当前年化收益率展示值 |
+| currentDailyYieldRateDisplay | string | 统计数据-当前每日回报率展示值 |
+| withdrawableEarningsDisplay | string | 我的表现-可提收益展示值 |
+| yesterdayEarningsDisplay | string | 我的表现-昨日收益展示值 |
+| withdrawableAmountDisplay | string | 我的表现-可提金额展示值 |
+| treasuryYieldDisplay | string | 统计数据-金库收益展示值 |
+| treasuryBalanceDisplay | string | 我的表现-金库余额展示值 |
+| lockedDepositDisplay | string | 我的表现-锁定存款展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-info" \
@@ -516,60 +231,18 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-i
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| maxDepositAmount | number | 最大可存款金额 |
+| availableMargin | number | 合约账户可用保证金 |
+| maxDepositLimitPercentage | number | 最大存款限额百分比 |
+| userPoints | integer | 用户当前积分 |
+| depositedAmount | number | 已存入金额 |
+| remainingDepositAmount | number | 剩余可存金额 |
+| hasPosition | boolean | 是否有持仓 |
+| maxDepositLimitPercentageDisplay | string | 最大存款限额百分比展示值 |
+| remainingDepositAmountDisplay | string | 剩余可存金额展示值 |
+| maxDepositAmountDisplay | string | 最大可存款金额展示值 |
+| availableMarginDisplay | string | 合约账户可用保证金展示值 |
+| depositedAmountDisplay | string | 已存入金额展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-info" \
@@ -589,60 +262,20 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| totalLockedAmount | number | 总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值 |
+| annualYieldRate | number | 年化收益率 |
+| myTotalDeposit | number | 我的总存款 |
+| totalHistoricalEarnings | number | 历史总收益 |
+| totalLockedAmountDisplay | string |  |
+| portfolioVaultBalanceDisplay | string |  |
+| portfolioVaultBalanceScale | integer |  |
+| totalHistoricalEarningsDisplay | string |  |
+| totalHistoricalEarningsScale | integer |  |
+| totalLockedAmountScale | integer |  |
+| annualYieldRateDisplay | string |  |
+| annualYieldRateScale | integer |  |
+| myTotalDepositDisplay | string |  |
+| myTotalDepositScale | integer |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats" \
@@ -664,60 +297,19 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| id | integer | 配置ID |
+| businessLineId | integer | 业务线ID |
+| annualYieldRate | number | 调整收益率（年化），单位：百分比 |
+| lockPeriodDays | integer | 锁仓期，单位：天 |
+| singleUserDepositLimit | number | 单用户存款上限，单位：USDC |
+| tvlBaseAmount | number | TVL金额基准值，单位：USDC |
+| integralTierConfig | string | 积分档位配置，格式：积分最小值:存款限额比例,...，例如：50:25,300:50,1500:75,10000:100 |
+| createBy | string | 创建人 |
+| createTime | string | 创建时间 |
+| updateBy | string | 更新人 |
+| updateTime | string | 更新时间 |
+| createTimeTimestamp | integer | 创建时间毫秒时间戳 |
+| updateTimeTimestamp | integer | 更新时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
@@ -742,62 +334,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
 
 ### 响应 `data` 字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
+`data` 为对象数组。元素字段见下表。
 
-`records[]` 元素：
+`data[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| data | string | 日期 |
+| value | number | 收益率 |
+| valueDisplay | string | 收益率展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" \
@@ -815,62 +360,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 
 ### 响应 `data` 字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
+`data` 为对象数组。元素字段见下表。
 
-`records[]` 元素：
+`data[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| symbol | string | 币种名称 |
+| principalAvailable | number | 可用本金 |
+| interestAvailable | number | 可用收益 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \
