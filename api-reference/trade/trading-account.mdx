@@ -10,11 +10,11 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-trade/account/positions | READ | 资金动账列表 |
-| GET | /openapi/v1/mc-trade/account/positions/current/v2 | READ | 当前持仓查询V2 |
-| GET | /openapi/v1/mc-trade/account/pnl | READ | 一段时间总盈亏统计 |
-| GET | /openapi/v1/mc-trade/account/contract-volume-by-symbol | 公开访问 | 按交易品种 symbol 查询合约多空总持仓手数 |
-| GET | /openapi/v1/mc-trade/account/contract-notional-by-symbol | 公开访问 | 按交易品种 symbol 查询合约多空总持仓名义价值 |
+| GET | /openapi/v1/mc-trade/account/positions | READ | Fund movement list |
+| GET | /openapi/v1/mc-trade/account/positions/current/v2 | READ | Query current positions V2 |
+| GET | /openapi/v1/mc-trade/account/pnl | READ | PnL statistics for a time range |
+| GET | /openapi/v1/mc-trade/account/contract-volume-by-symbol | Public | Query total long/short contract volume by trading symbol |
+| GET | /openapi/v1/mc-trade/account/contract-notional-by-symbol | Public | Query total long/short contract notional by trading symbol |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -22,11 +22,11 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 ---
 
-## 资金动账列表
+## Fund movement list
 
 `GET /openapi/v1/mc-trade/account/positions` — permission `READ`.
 
-根据当前用户的UID查询交易账户的资金动账列表，即抵押品的增减历史，UID从请求头X-UID中获取
+Query the trading account fund movement list (collateral increase/decrease history) for the current user. UID is taken from the `X-UID` request header.
 
 ### Query / path parameters
 
@@ -36,7 +36,7 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 | current | integer | No |  |
 | orderBy | string | No |  |
 | sortOrder | string | No |  |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
+| login | string | Yes | MT5 contract account ID / spot account ID |
 | from | integer | Yes |  |
 | to | integer | Yes |  |
 | symbol | string | No |  |
@@ -67,7 +67,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 ---
 
-## 当前持仓查询V2
+## Query current positions V2
 
 `GET /openapi/v1/mc-trade/account/positions/current/v2` — permission `READ`.
 
@@ -77,9 +77,9 @@ Query all open positions for the current user (UID from the `X-UID` header). MT5
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
+| login | string | Yes | MT5 contract account ID / spot account ID |
 | symbol | string | No | Trading symbol |
-| positionType | string | No | 不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓 |
+| positionType | string | No | Omit or pass ALL for all, COLLATERAL for collateral only, SYMBOL for trading positions only |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions/current/v2" \
@@ -92,7 +92,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 ---
 
-## 一段时间总盈亏统计
+## PnL statistics for a time range
 
 `GET /openapi/v1/mc-trade/account/pnl` — permission `READ`.
 
@@ -110,10 +110,10 @@ Query PnL for a time range (for example, the past week). UID is taken from the `
 
 | Field | Type | Description |
 | --- | --- | --- |
-| uid | integer | 账户登录号 |
-| totalProfit | number | 区间总盈利 |
-| totalLoss | number | 区间总亏损（为负数） |
-| netPnl | number | 区间净盈亏 |
+| uid | integer | Account login ID |
+| totalProfit | number | Total profit in range |
+| totalLoss | number | Total loss in range (negative value) |
+| netPnl | number | Net PnL in range |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
@@ -126,11 +126,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
 
 ---
 
-## 按交易品种 symbol 查询合约多空总持仓手数
+## Query total long/short contract volume by trading symbol
 
-`GET /openapi/v1/mc-trade/account/contract-volume-by-symbol` — permission `公开访问`.
+`GET /openapi/v1/mc-trade/account/contract-volume-by-symbol` — permission `Public`.
 
-symbol 对应 mt5_positions.Symbol；仅统计 Path 以 CFD 开头的品种；手数 = VolumeExt/1e8。
+`symbol` maps to `mt5_positions.Symbol`; only symbols whose Path starts with CFD are counted; volume = VolumeExt/1e8.
 
 ### Query / path parameters
 
@@ -157,11 +157,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
 
 ---
 
-## 按交易品种 symbol 查询合约多空总持仓名义价值
+## Query total long/short contract notional by trading symbol
 
-`GET /openapi/v1/mc-trade/account/contract-notional-by-symbol` — permission `公开访问`.
+`GET /openapi/v1/mc-trade/account/contract-notional-by-symbol` — permission `Public`.
 
-symbol 对应 mt5_positions.Symbol；仅统计 Path 以 CFD 开头的品种；名义 = VolumeExt/1e8 * PriceCurrent * RateProfit * ContractSize（不按 Symbol 区分）。
+`symbol` maps to `mt5_positions.Symbol`; only symbols whose Path starts with CFD are counted; notional = VolumeExt/1e8 * PriceCurrent * RateProfit * ContractSize (not differentiated by Symbol).
 
 ### Query / path parameters
 

@@ -10,7 +10,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-account/funding-fee-record/page/v2 | READ | 资金费历史记录分页查询接口V2 |
+| GET | /openapi/v1/mc-account/funding-fee-record/page/v2 | READ | Paginated funding fee history V2 |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -18,11 +18,11 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 ---
 
-## 资金费历史记录分页查询接口V2
+## Paginated funding fee history V2
 
 `GET /openapi/v1/mc-account/funding-fee-record/page/v2` — permission `READ`.
 
-feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amount
+`feeType` is fixed to INTEREST_FEE/FUNDING_FEE; amounts are aggregated by `positionId` + `dealTime`.
 
 ### Query / path parameters
 
@@ -30,12 +30,12 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
-| userId | string | No | 用户ID |
-| login | string | No | mt5登录账号 |
-| dealTimeStart | string | No | 开始扣费时间 |
-| dealTimeEnd | string | No | 结束扣费时间 |
+| orderBy | string | No | Multi-field sort; comma-separated |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| userId | string | No | User ID |
+| login | string | No | MT5 login ID |
+| dealTimeStart | string | No | Fee deduction start time |
+| dealTimeEnd | string | No | Fee deduction end time |
 
 ### Response `data` fields (summary)
 

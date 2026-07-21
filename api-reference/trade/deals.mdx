@@ -10,8 +10,8 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-trade/trade/deals/history/v3 | READ | 查询历史成交列表V3 |
-| GET | /openapi/v1/mc-trade/trade/deals/history/recent | 公开访问 | 获取品种最近成交列表 |
+| GET | /openapi/v1/mc-trade/trade/deals/history/v3 | READ | Query historical deals V3 |
+| GET | /openapi/v1/mc-trade/trade/deals/history/recent | Public | Query recent deals by symbol |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -19,11 +19,11 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 ---
 
-## 查询历史成交列表V3
+## Query historical deals V3
 
 `GET /openapi/v1/mc-trade/trade/deals/history/v3` — permission `READ`.
 
-根据 uid 和账户数据类型(SPOT/CONTRACT/SPOT_CONTRACT)查询历史成交列表
+Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT).
 
 ### Query / path parameters
 
@@ -33,10 +33,10 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 | current | integer | No |  |
 | orderBy | string | No |  |
 | sortOrder | string | No |  |
-| type | string | Yes | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并 |
-| from | integer | Yes | 开始时间戳（Unix时间戳，秒） |
-| to | integer | Yes | 结束时间戳（Unix时间戳，秒） |
-| symbol | string | No | 交易品种名 |
+| type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined |
+| from | integer | Yes | Start timestamp (Unix timestamp, seconds) |
+| to | integer | Yes | End timestamp (Unix timestamp, seconds) |
+| symbol | string | No | Trading symbol name |
 
 ### Response `data` fields (summary)
 
@@ -64,11 +64,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 
 ---
 
-## 获取品种最近成交列表
+## Query recent deals by symbol
 
-`GET /openapi/v1/mc-trade/trade/deals/history/recent` — permission `公开访问`.
+`GET /openapi/v1/mc-trade/trade/deals/history/recent` — permission `Public`.
 
-根据 symbol 查询最近成交，返回条数由 limit 控制
+Query recent deals by symbol; result count is controlled by `limit`.
 
 ### Query / path parameters
 

@@ -10,9 +10,9 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-account/symbol/list | READ | 查询币种网络列表 |
-| GET | /openapi/v1/mc-account/symbol/exchange/list | READ | 查询可兑换币种列表 |
-| GET | /openapi/v1/mc-account/symbol/detail/&#123;id&#125; | READ | 查询币种详情 |
+| GET | /openapi/v1/mc-account/symbol/list | READ | Query symbol network list |
+| GET | /openapi/v1/mc-account/symbol/exchange/list | READ | Query exchangeable symbol list |
+| GET | /openapi/v1/mc-account/symbol/detail/&#123;id&#125; | READ | Query symbol details |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -20,7 +20,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 ---
 
-## 查询币种网络列表
+## Query symbol network list
 
 `GET /openapi/v1/mc-account/symbol/list` — permission `READ`.
 
@@ -34,7 +34,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 
 ---
 
-## 查询可兑换币种列表
+## Query exchangeable symbol list
 
 `GET /openapi/v1/mc-account/symbol/exchange/list` — permission `READ`.
 
@@ -48,7 +48,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 
 ---
 
-## 查询币种详情
+## Query symbol details
 
 `GET /openapi/v1/mc-account/symbol/detail/{id}` — permission `READ`.
 
@@ -56,19 +56,19 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| id | string | Yes | 币种ID |
+| id | string | Yes | Symbol ID |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbolId | integer | 币种ID |
-| assetType | string | 币种类型 |
-| symbol | string | 币种名称 |
-| network | string | 币种网络协议 |
-| minTradeUnit | number | 最小动账单位 |
-| pricePrecision | integer | 价格精度 |
-| exchangeRate | number | 汇率 |
+| symbolId | integer | Symbol ID |
+| assetType | string | Symbol type |
+| symbol | string | Symbol name |
+| network | string | Symbol network protocol |
+| minTradeUnit | number | Minimum movement unit |
+| pricePrecision | integer | Price precision |
+| exchangeRate | number | Exchange rate |
 | minRechargeAmount | number |  |
 | minWithdrawAmount | number |  |
 | assetNet | string |  |

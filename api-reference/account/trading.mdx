@@ -10,10 +10,10 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | 根据transactionId查询交易记录详情 |
-| POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | 分页查询交易记录 |
-| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | 兑换v2, 支持询价 |
-| POST | /openapi/v1/mc-account/transaction/account/record/page | READ | 分页查询资金流水记录 |
+| POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | Get transaction record details by transactionId |
+| POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | Paginate transaction records |
+| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | Exchange v2 (quote-supported) |
+| POST | /openapi/v1/mc-account/transaction/account/record/page | READ | Paginate fund account ledger records |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -21,7 +21,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 ---
 
-## 根据transactionId查询交易记录详情
+## Get transaction record details by transactionId
 
 `POST /openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}` — permission `READ`.
 
@@ -36,14 +36,14 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | Field | Type | Description |
 | --- | --- | --- |
 | id | integer |  |
-| uid | string | 关联账户表 |
+| uid | string | Associated account |
 | transactionId | string |  |
 | symbolId | integer |  |
 | acSymbol | string |  |
 | network | string |  |
 | exchangeSymbolId | integer |  |
 | exchangeSymbol | string |  |
-| transactionType | string | 交易类型枚举 |
+| transactionType | string | Transaction type enum |
 | status | string |  |
 | amount | number |  |
 | amountStr | string |  |
@@ -72,9 +72,9 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | sourceAccountBalance | number |  |
 | targetAccountBalance | number |  |
 | fundFlowType | string |  |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
+| transactionMethod | string | Transaction method enum |
+| recipientUid | string | Set for WITHDRAWAL peer-to-peer transfers |
+| payerUid | string | Set for RECHARGE peer-to-peer transfers |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}" \
@@ -88,7 +88,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 ---
 
-## 分页查询交易记录
+## Paginate transaction records
 
 `POST /openapi/v1/mc-account/transaction/transaction/record/page` — permission `READ`.
 
@@ -98,20 +98,20 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
-| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| trackingId | string | Yes | Unique request tracking ID |
 | symbolId | integer | No |  |
 | exchangeSymbolId | integer | No |  |
-| transactionType | string | No | 交易类型枚举 |
-| transactionTypes | array | No | 仅 transactionType==null 时生效 |
+| transactionType | string | No | Transaction type enum |
+| transactionTypes | array | No | Applies only when transactionType==null |
 | status | string | No |  |
-| statuses | array | No | 仅 status==null 时生效 |
+| statuses | array | No | Applies only when status==null |
 | createTimeStart | string | No | yyyy-MM-dd HH:mm:ss.SSS |
-| createTimeStartTimestamp | integer | No | 毫秒级 Unix timestamp |
+| createTimeStartTimestamp | integer | No | Unix timestamp (ms) |
 | createTimeEnd | string | No | yyyy-MM-dd HH:mm:ss.SSS |
-| createTimeEndTimestamp | integer | No | 毫秒级 Unix timestamp |
-| transactionMethod | string | No | 交易方式枚举 |
+| createTimeEndTimestamp | integer | No | Unix timestamp (ms) |
+| transactionMethod | string | No | Transaction method enum |
 
 ### Response `data` fields (summary)
 
@@ -139,7 +139,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 ---
 
-## 兑换v2, 支持询价
+## Exchange v2 (quote-supported)
 
 `POST /openapi/v1/mc-account/transaction/exchange/v2` — permission `TRADE`.
 
@@ -149,12 +149,12 @@ Complete 2FA verification first, then pass the temporary tokens in `verify2FaTok
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
-| symbol | string | Yes | 如 BTC/USDT |
-| exchangeSymbol | string | Yes | 如 BTC/USDT |
-| amount | number | Yes | 兑换金额/兑换币种的数量 |
-| verify2FaTokens | array | No | 通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证 |
-| quoteSessionId | string | Yes | asw1w123a |
+| trackingId | string | Yes | Unique request tracking ID |
+| symbol | string | Yes | e.g. BTC/USDT |
+| exchangeSymbol | string | Yes | e.g. BTC/USDT |
+| amount | number | Yes | Exchange amount / quantity of the exchange symbol |
+| verify2FaTokens | array | No | Temporary verification tokens from the 2FA verification API; supports multiple 2FA types |
+| quoteSessionId | string | Yes | Quote session ID from the rate quote |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/exchange/v2" \
@@ -170,7 +170,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 ---
 
-## 分页查询资金流水记录
+## Paginate fund account ledger records
 
 `POST /openapi/v1/mc-account/transaction/account/record/page` — permission `READ`.
 
@@ -180,20 +180,20 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
-| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| trackingId | string | Yes | Unique request tracking ID |
 | symbolId | integer | No |  |
 | exchangeSymbolId | integer | No |  |
-| transactionType | string | No | 交易类型枚举 |
-| transactionTypes | array | No | 仅 transactionType==null 时生效 |
+| transactionType | string | No | Transaction type enum |
+| transactionTypes | array | No | Applies only when transactionType==null |
 | status | string | No |  |
-| statuses | array | No | 仅 status==null 时生效 |
+| statuses | array | No | Applies only when status==null |
 | createTimeStart | string | No | yyyy-MM-dd HH:mm:ss.SSS |
-| createTimeStartTimestamp | integer | No | 毫秒级 Unix timestamp |
+| createTimeStartTimestamp | integer | No | Unix timestamp (ms) |
 | createTimeEnd | string | No | yyyy-MM-dd HH:mm:ss.SSS |
-| createTimeEndTimestamp | integer | No | 毫秒级 Unix timestamp |
-| transactionMethod | string | No | 交易方式枚举 |
+| createTimeEndTimestamp | integer | No | Unix timestamp (ms) |
+| transactionMethod | string | No | Transaction method enum |
 
 ### Response `data` fields (summary)
 

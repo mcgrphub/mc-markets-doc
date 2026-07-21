@@ -10,9 +10,9 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-account/exchange-rate/query/&#123;symbolType&#125;/&#123;baseCurrency&#125;/&#123;targetCurrency&#125; | READ | 汇率查询 |
-| GET | /openapi/v1/mc-account/exchange-rate/query/usd | READ | 美元汇率查询 |
-| GET | /openapi/v1/mc-account/exchange-rate/convert-rate/&#123;from&#125;/&#123;to&#125; | READ | 闪兑汇率查询 |
+| GET | /openapi/v1/mc-account/exchange-rate/query/&#123;symbolType&#125;/&#123;baseCurrency&#125;/&#123;targetCurrency&#125; | READ | Query exchange rate |
+| GET | /openapi/v1/mc-account/exchange-rate/query/usd | READ | Query USD exchange rate |
+| GET | /openapi/v1/mc-account/exchange-rate/convert-rate/&#123;from&#125;/&#123;to&#125; | READ | Query flash conversion exchange rate |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -20,7 +20,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 ---
 
-## 汇率查询
+## Query exchange rate
 
 `GET /openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` — permission `READ`.
 
@@ -28,9 +28,9 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| symbolType | string | Yes | 资产类型 |
-| baseCurrency | string | Yes | 基础货币代码（ISO 4217标准） |
-| targetCurrency | string | Yes | 目标货币代码（ISO 4217标准） |
+| symbolType | string | Yes | Asset type |
+| baseCurrency | string | Yes | Base currency code (ISO 4217) |
+| targetCurrency | string | Yes | Target currency code (ISO 4217) |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}" \
@@ -45,7 +45,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 ---
 
-## 美元汇率查询
+## Query USD exchange rate
 
 `GET /openapi/v1/mc-account/exchange-rate/query/usd` — permission `READ`.
 
@@ -59,50 +59,50 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 ---
 
-## 闪兑汇率查询
+## Query flash conversion exchange rate
 
 `GET /openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}` — permission `READ`.
 
-若 USDT 兑 BTC , 则 from 为 USDT, to 为 BTC
+For USDT to BTC, set `from` to USDT and `to` to BTC.
 
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| from | string | Yes | 兑出币种/兑换前币种 |
-| to | string | Yes | 兑入币种/兑换后币种 |
-| fromAmount | number | No | 用户输入的消耗币种数量（from 数量），用于试算手续费与预计到账 |
+| from | string | Yes | Source symbol / symbol to convert from |
+| to | string | Yes | Target symbol / symbol to convert to |
+| fromAmount | number | No | User-entered amount of the source symbol (`from`); used to estimate fees and expected receipt |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| exchangeRate | number | 汇率 |
+| exchangeRate | number | Exchange rate |
 | timestamp | integer |  |
-| oneFromToQuantity | number | 1个[from]币可兑换[to]币的数量 |
-| oneToFromQuantity | number | 1 个[to]币可兑换[from]币的数量 |
+| oneFromToQuantity | number | Amount of `[to]` per 1 `[from]` |
+| oneToFromQuantity | number | Amount of `[from]` per 1 `[to]` |
 | bookPriceDotMap | object | Quotes from each step of the exchange-rate conversion; key = currency pair (warning: populated only in non-production, for rate accuracy testing) |
-| baseExchangeRate | number | 基础汇率（未扣手续费/未应用免费额度前），用于测试验证 |
-| baseExchangeRateDisplay | string | 基础汇率展示值 |
-| fromAmount | number | 用户输入的消耗币种数量（from 数量） |
-| fromAmountDisplay | string | 用户输入的消耗币种数量展示值 |
-| fromAmountScale | integer | 用户输入的消耗币种数量展示精度 |
-| freeQuotaFromAmount | number | 当日剩余免费额度（from 数量，用于计算免手续费区间） |
-| freeQuotaFromAmountDisplay | string | 当日剩余免费额度（from 数量）展示值 |
-| feeAmount | number | 实收手续费（from 数量） |
-| feeAmountDisplay | string | 实收手续费（from 数量）展示值 |
-| feeAmountScale | integer | 实收手续费（from 数量）展示精度 |
-| netFromAmount | number | 实际参与兑换的净额（from 数量）= fromAmount - feeAmount |
-| netFromAmountDisplay | string | 实际参与兑换的净额（from 数量）展示值 |
-| toAmount | number | 预计获得数量（to 数量） |
-| toAmountDisplay | string | 预计获得数量（to 数量）展示值 |
-| toAmountScale | integer | 预计获得数量（to 数量）展示精度 |
-| convertFeePercent | number | 闪兑手续费百分比(对兑出的数量进行扣减) |
-| dailyFreeConvertFeeQuotaUsd | number | 每日免费闪兑手续费额度（USDC等值，按用户累计，UTC+8日切） |
-| dailyRemainingFreeConvertFeeQuotaUsd | number | 今日剩余免费闪兑手续费额度（USDC等值，按用户累计，UTC+8日切） |
-| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | 今日剩余免费闪兑手续费额度（USDC等值）展示值 |
-| expireTimestamp | integer | 报价过期时间戳, 毫秒级 |
-| quoteSessionId | string | 报价会话ID |
+| baseExchangeRate | number | Base exchange rate (before fees / free quota); for testing |
+| baseExchangeRateDisplay | string | Base exchange rate display value |
+| fromAmount | number | User-entered source amount (`from`) |
+| fromAmountDisplay | string | User-entered source amount display value |
+| fromAmountScale | integer | User-entered source amount display precision |
+| freeQuotaFromAmount | number | Remaining daily free quota (`from` amount; used for fee-free range) |
+| freeQuotaFromAmountDisplay | string | Remaining daily free quota (`from` amount) display value |
+| feeAmount | number | Actual fee charged (`from` amount) |
+| feeAmountDisplay | string | Actual fee display value (`from` amount) |
+| feeAmountScale | integer | Actual fee display precision (`from` amount) |
+| netFromAmount | number | Net amount participating in conversion (`from`) = fromAmount - feeAmount |
+| netFromAmountDisplay | string | Net conversion amount display value (`from`) |
+| toAmount | number | Expected received amount (`to`) |
+| toAmountDisplay | string | Expected received amount display value (`to`) |
+| toAmountScale | integer | Expected received amount display precision (`to`) |
+| convertFeePercent | number | Flash conversion fee percentage (deducted from source amount) |
+| dailyFreeConvertFeeQuotaUsd | number | Daily free flash conversion fee quota (USDC equivalent; per-user cumulative; UTC+8 day boundary) |
+| dailyRemainingFreeConvertFeeQuotaUsd | number | Remaining free flash conversion fee quota today (USDC equivalent; per-user cumulative; UTC+8 day boundary) |
+| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | Remaining free quota display value (USDC equivalent) |
+| expireTimestamp | integer | Quote expiration timestamp (ms) |
+| quoteSessionId | string | Quote session ID |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}" \

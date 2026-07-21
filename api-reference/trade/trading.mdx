@@ -10,15 +10,15 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| PUT | /openapi/v1/mc-trade/trade/positions/modify | TRADE | 修改持仓 |
-| PUT | /openapi/v1/mc-trade/trade/orders/modify | TRADE | 订单操作：改单 |
-| POST | /openapi/v1/mc-trade/trade/orders/create | TRADE | 订单操作：下单 |
-| POST | /openapi/v1/mc-trade/trade/orders/close | TRADE | 订单操作：平仓 |
-| GET | /openapi/v1/mc-trade/trade/symbol/staticConfig | 公开访问 | 交易标的信息 |
-| GET | /openapi/v1/mc-trade/trade/slippage/estimate | READ | 获取预估滑点 |
-| GET | /openapi/v1/mc-trade/trade/mt5-group/staticInfo | READ | mt5分组相关静态信息 |
-| GET | /openapi/v1/mc-trade/trade/account/assets | READ | 获取用户资产 |
-| DELETE | /openapi/v1/mc-trade/trade/orders/cancel | TRADE | 订单操作：撤单 |
+| PUT | /openapi/v1/mc-trade/trade/positions/modify | TRADE | Modify position |
+| PUT | /openapi/v1/mc-trade/trade/orders/modify | TRADE | Order action: modify order |
+| POST | /openapi/v1/mc-trade/trade/orders/create | TRADE | Order action: place order |
+| POST | /openapi/v1/mc-trade/trade/orders/close | TRADE | Order action: close position |
+| GET | /openapi/v1/mc-trade/trade/symbol/staticConfig | Public | Trading symbol info |
+| GET | /openapi/v1/mc-trade/trade/slippage/estimate | READ | Get estimated slippage |
+| GET | /openapi/v1/mc-trade/trade/mt5-group/staticInfo | READ | MT5 group static info |
+| GET | /openapi/v1/mc-trade/trade/account/assets | READ | Get user assets |
+| DELETE | /openapi/v1/mc-trade/trade/orders/cancel | TRADE | Order action: cancel order |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -26,7 +26,7 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 ---
 
-## 修改持仓
+## Modify position
 
 `PUT /openapi/v1/mc-trade/trade/positions/modify` — permission `TRADE`.
 
@@ -34,20 +34,20 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
-| order | integer | Yes | 订单ID |
-| symbol | string | Yes | 交易对，例如 BTCUSDT, 仅下单有效 |
-| type | integer | Yes | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
-| priceSL | number | No | 新的止损价格 |
-| priceTP | number | No | 新的止盈价格 |
+| login | string | Yes | MT5 contract account ID / spot account ID |
+| order | integer | Yes | Order ID |
+| symbol | string | Yes | Trading pair, e.g. BTCUSDT; valid only when placing orders |
+| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| priceSL | number | No | New stop-loss price |
+| priceTP | number | No | New take-profit price |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | MT5 response status code |
+| orderId | string | MT5 order ID (if present) |
+| params | object | MT5 response parameters (passed through to the client or used for business logic) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -63,7 +63,7 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 ---
 
-## 订单操作：改单
+## Order action: modify order
 
 `PUT /openapi/v1/mc-trade/trade/orders/modify` — permission `TRADE`.
 
@@ -71,25 +71,25 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
-| symbol | string | Yes | 交易对，例如 BTCUSDT, 仅下单有效 |
-| price | number | Yes | 下单价格 |
-| type | integer | Yes | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
-| typeTime | integer | Yes | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
-| expiration | integer | Yes | 过期时间戳（typeTime=2时必填） |
-| priceTrigger | number | Yes | 止损限价单触发价格 |
-| priceSL | number | Yes | 止损 |
-| priceTP | number | Yes | 止盈, |
-| order | integer | Yes | 订单ID |
-| volumeExt | integer | Yes | 交易量，10e8放大后的值, 如下单1手则传入1*100000000, 需与下单时传入的volumeExt一致 |
+| login | string | Yes | MT5 contract account ID / spot account ID |
+| symbol | string | Yes | Trading pair, e.g. BTCUSDT; valid only when placing orders |
+| price | number | Yes | Order price |
+| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| typeTime | integer | Yes | Time-in-force type; defaults to 0 if omitted. Values: "0-good till cancelled", "1-day order", "2-specified time", "3-specified date; expires at 00:00 on that date or the nearest trading time" |
+| expiration | integer | Yes | Expiration timestamp (required when typeTime=2) |
+| priceTrigger | number | Yes | Stop-limit order trigger price |
+| priceSL | number | Yes | Stop-loss |
+| priceTP | number | Yes | Take-profit |
+| order | integer | Yes | Order ID |
+| volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000; must match the volumeExt passed when the order was placed |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | MT5 response status code |
+| orderId | string | MT5 order ID (if present) |
+| params | object | MT5 response parameters (passed through to the client or used for business logic) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -105,7 +105,7 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 ---
 
-## 订单操作：下单
+## Order action: place order
 
 `POST /openapi/v1/mc-trade/trade/orders/create` — permission `TRADE`.
 
@@ -113,28 +113,28 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
-| symbol | string | Yes | 交易对，例如 BTCUSDT |
-| volumeExt | integer | Yes | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
-| price | number | No | 下单价格，不传默认0, 0为市价，其他为限价 |
-| type | integer | Yes | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
-| position | integer | No | 持仓ID, 默认0 |
-| typeFill | integer | Yes | 成交类型 "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。", "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。", "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
-| typeTime | integer | No | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
-| expiration | integer | No | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
-| priceTrigger | number | No | 止损限价单触发价格, 不传默认0 |
-| priceSL | number | No | 止损 |
-| priceTP | number | No | 止盈, |
-| userSlippageLimit | number | No | 用户填入的市价单最大滑点限制(仅市价单有效) |
-| frontMarketPrice | number | No | 前端市价参考价格(可选)，不能小于0 |
+| login | string | Yes | MT5 contract account ID / spot account ID |
+| symbol | string | Yes | Trading pair, e.g. BTCUSDT |
+| volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000 |
+| price | number | No | Order price; defaults to 0 if omitted; 0 = market, any other value = limit |
+| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| position | integer | No | Position ID; defaults to 0 |
+| typeFill | integer | Yes | Fill type: "0-Fill or Kill: the order must be fully filled or cancelled; partial fills are not kept.", "1-Immediate or Cancel: the order may be partially filled; the unfilled remainder is cancelled.", "2-Return remainder to queue: for pending orders (e.g. limit, stop); only for exchange-executed market orders; unfilled volume re-enters the queue.", "3-BOC (Book or Cancel): placed on the book only; if it would execute immediately, it is cancelled." |
+| typeTime | integer | No | Time-in-force type; defaults to 0 if omitted. Values: "0-good till cancelled", "1-day order", "2-specified time", "3-specified date; expires at 00:00 on that date or the nearest trading time" |
+| expiration | integer | No | Expiration timestamp (required when typeTime=2); defaults to 0 if omitted (no auto-expiry) |
+| priceTrigger | number | No | Stop-limit order trigger price; defaults to 0 if omitted |
+| priceSL | number | No | Stop-loss |
+| priceTP | number | No | Take-profit |
+| userSlippageLimit | number | No | Maximum slippage limit for market orders entered by the user (market orders only) |
+| frontMarketPrice | number | No | Client-side market reference price (optional); must be ≥ 0 |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | MT5 response status code |
+| orderId | string | MT5 order ID (if present) |
+| params | object | MT5 response parameters (passed through to the client or used for business logic) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -150,7 +150,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 ---
 
-## 订单操作：平仓
+## Order action: close position
 
 `POST /openapi/v1/mc-trade/trade/orders/close` — permission `TRADE`.
 
@@ -158,27 +158,27 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
-| symbol | string | Yes | 交易对，例如 BTCUSDT |
-| volumeExt | integer | Yes | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
-| price | number | No | 下单价格，不传默认0, 0为市价，其他为限价 |
-| type | integer | Yes | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
-| position | integer | No | 持仓ID, 默认0 |
-| typeFill | integer | Yes | 成交类型 "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。", "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。", "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
-| typeTime | integer | No | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
-| expiration | integer | No | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
-| priceTrigger | number | No | 止损限价单触发价格, 不传默认0 |
-| priceSL | number | No | 止损 |
-| priceTP | number | No | 止盈, |
-| frontMarketPrice | number | No | 前端市价参考价格(可选)，不能小于0 |
+| login | string | Yes | MT5 contract account ID / spot account ID |
+| symbol | string | Yes | Trading pair, e.g. BTCUSDT |
+| volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000 |
+| price | number | No | Order price; defaults to 0 if omitted; 0 = market, any other value = limit |
+| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| position | integer | No | Position ID; defaults to 0 |
+| typeFill | integer | Yes | Fill type: "0-Fill or Kill: the order must be fully filled or cancelled; partial fills are not kept.", "1-Immediate or Cancel: the order may be partially filled; the unfilled remainder is cancelled.", "2-Return remainder to queue: for pending orders (e.g. limit, stop); only for exchange-executed market orders; unfilled volume re-enters the queue.", "3-BOC (Book or Cancel): placed on the book only; if it would execute immediately, it is cancelled." |
+| typeTime | integer | No | Time-in-force type; defaults to 0 if omitted. Values: "0-good till cancelled", "1-day order", "2-specified time", "3-specified date; expires at 00:00 on that date or the nearest trading time" |
+| expiration | integer | No | Expiration timestamp (required when typeTime=2); defaults to 0 if omitted (no auto-expiry) |
+| priceTrigger | number | No | Stop-limit order trigger price; defaults to 0 if omitted |
+| priceSL | number | No | Stop-loss |
+| priceTP | number | No | Take-profit |
+| frontMarketPrice | number | No | Client-side market reference price (optional); must be ≥ 0 |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | MT5 response status code |
+| orderId | string | MT5 order ID (if present) |
+| params | object | MT5 response parameters (passed through to the client or used for business logic) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -194,9 +194,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 ---
 
-## 交易标的信息
+## Trading symbol info
 
-`GET /openapi/v1/mc-trade/trade/symbol/staticConfig` — permission `公开访问`.
+`GET /openapi/v1/mc-trade/trade/symbol/staticConfig` — permission `Public`.
 
 ### Query / path parameters
 
@@ -215,7 +215,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 
 ---
 
-## 获取预估滑点
+## Get estimated slippage
 
 `GET /openapi/v1/mc-trade/trade/slippage/estimate` — permission `READ`.
 
@@ -223,16 +223,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
-| type | integer | Yes | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单", "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单", "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
-| volumeExt | integer | Yes | 下单数量（*100000000扩展精度）， 如用户下单量是0.01， 则传入0.01*100000000 |
-| symbol | string | Yes | 交易对/品种 |
+| login | string | Yes | MT5 contract account ID / spot account ID |
+| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order", "7-OP_SELL_STOP_LIMIT: stop-limit sell pending order", "8-OP_CLOSE_BY: close-by order; applies only in hedging mode" |
+| volumeExt | integer | Yes | Order quantity (extended precision ×100000000); e.g. for 0.01 lots pass 0.01*100000000 |
+| symbol | string | Yes | Trading pair / symbol |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| estimatedSlippage | number | 预估滑点 |
+| estimatedSlippage | number | Estimated slippage |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
@@ -248,7 +248,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 ---
 
-## mt5分组相关静态信息
+## MT5 group static info
 
 `GET /openapi/v1/mc-trade/trade/mt5-group/staticInfo` — permission `READ`.
 
@@ -278,7 +278,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 ---
 
-## 获取用户资产
+## Get user assets
 
 `GET /openapi/v1/mc-trade/trade/account/assets` — permission `READ`.
 
@@ -305,7 +305,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 ---
 
-## 订单操作：撤单
+## Order action: cancel order
 
 `DELETE /openapi/v1/mc-trade/trade/orders/cancel` — permission `TRADE`.
 
@@ -313,18 +313,18 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5合约账户ID/现货账户ID |
-| order | integer | Yes | 订单ID |
-| type | integer | Yes | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
-| symbol | string | Yes | 交易对，例如 BTCUSDT |
+| login | string | Yes | MT5 contract account ID / spot account ID |
+| order | integer | Yes | Order ID |
+| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| symbol | string | Yes | Trading pair, e.g. BTCUSDT |
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | MT5 response status code |
+| orderId | string | MT5 order ID (if present) |
+| params | object | MT5 response parameters (passed through to the client or used for business logic) |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

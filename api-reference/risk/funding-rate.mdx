@@ -10,7 +10,7 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-risk/funding-rate | READ | 分页查询交易币种资金费率历史数据 |
+| GET | /openapi/v1/mc-risk/funding-rate | READ | Paginated funding rate history by trading symbol |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -18,7 +18,7 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 
 ---
 
-## 分页查询交易币种资金费率历史数据
+## Paginated funding rate history by trading symbol
 
 `GET /openapi/v1/mc-risk/funding-rate` — permission `READ`.
 
@@ -28,10 +28,10 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
-| symbol | string | Yes | 交易币种 |
-| isSettlementRate | boolean | No | 是否是结算价 |
+| orderBy | string | No | Multi-field sort; comma-separated |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| symbol | string | Yes | Trading symbol |
+| isSettlementRate | boolean | No | Whether this is the settlement rate |
 
 ### Response `data` fields (summary)
 

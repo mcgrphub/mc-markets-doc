@@ -10,8 +10,8 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-account/deal-order | READ | 分页查询成交订单 |
-| GET | /openapi/v1/mc-account/deal-order/&#123;dealId&#125; | READ | 成交单详情查询 |
+| GET | /openapi/v1/mc-account/deal-order | READ | Paginate deal orders |
+| GET | /openapi/v1/mc-account/deal-order/&#123;dealId&#125; | READ | Get deal order details |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -19,7 +19,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 ---
 
-## 分页查询成交订单
+## Paginate deal orders
 
 `GET /openapi/v1/mc-account/deal-order` — permission `READ`.
 
@@ -29,8 +29,8 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 
 ### Response `data` fields (summary)
 
@@ -56,7 +56,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 
 ---
 
-## 成交单详情查询
+## Get deal order details
 
 `GET /openapi/v1/mc-account/deal-order/{dealId}` — permission `READ`.
 
@@ -70,45 +70,45 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 
 | Field | Type | Description |
 | --- | --- | --- |
-| businessLineId | integer | 业务线ID |
-| uid | string | 用户ID |
-| positionId | integer | 持仓单ID |
-| orderId | integer | 订单号 |
-| dealId | integer | 成交单号 |
-| dealTime | string | 成交时间 |
-| dealTimeTimestamp | integer | 成交时间毫秒时间戳 |
-| type | string | 交易类型 |
-| symbolPair | string | 交易对 |
-| baseSymbolId | integer | 基础币种ID |
-| quoteSymbolId | integer | 计价币种ID |
-| entry | string | 方向 |
-| price | number | 委托价格 |
-| pricePosition | number | 成交均价 |
-| lot | number | 委托数量 |
-| volumeClosed | number | 成交数量 |
-| storage | number | 库存费 |
-| commission | number | 手续费 |
-| commissionDisplay | string | 手续费展示值，带符号向上取整后固定6位小数 |
-| commissionScale | integer | 手续费展示精度 |
-| profit | number | 交易盈亏额 |
-| profitDisplay | string | 盈亏展示值，四舍五入后固定6位小数 |
-| profitScale | integer | 盈亏展示精度 |
-| contractSize | integer | 合约大小 |
-| stopLoss | number | 止损价 |
-| takeProfit | number | 止盈价 |
-| onChainStatus | string | 上链状态 |
-| txHash | string | 区块链交易哈希 |
-| retryCount | integer | 重试次数 |
-| gasUsed | integer | 实际消耗的Gas |
-| gasPrice | integer | Gas价格 |
-| blockNumber | integer | 区块号 |
-| blockConfirmation | integer | 区块确认数 |
-| submitTime | string | 提交时间 |
-| submitTimeTimestamp | integer | 提交时间毫秒时间戳 |
-| confirmTime | string | 确认时间 |
-| confirmTimeTimestamp | integer | 确认时间毫秒时间戳 |
-| remark | string | 备注信息 |
-| accountType | string | 账户类型 |
+| businessLineId | integer | Business line ID |
+| uid | string | User ID |
+| positionId | integer | Position ID |
+| orderId | integer | Order ID |
+| dealId | integer | Deal ID |
+| dealTime | string | Deal time |
+| dealTimeTimestamp | integer | Deal time (epoch ms) |
+| type | string | Trade type |
+| symbolPair | string | Symbol pair |
+| baseSymbolId | integer | Base symbol ID |
+| quoteSymbolId | integer | Quote symbol ID |
+| entry | string | Direction |
+| price | number | Order price |
+| pricePosition | number | Average fill price |
+| lot | number | Order quantity |
+| volumeClosed | number | Filled quantity |
+| storage | number | Swap fee |
+| commission | number | Commission |
+| commissionDisplay | string | Commission display value; rounded up with sign, fixed 6 decimal places |
+| commissionScale | integer | Commission display precision |
+| profit | number | Trade P&L |
+| profitDisplay | string | P&L display value; rounded, fixed 6 decimal places |
+| profitScale | integer | P&L display precision |
+| contractSize | integer | Contract size |
+| stopLoss | number | Stop-loss price |
+| takeProfit | number | Take-profit price |
+| onChainStatus | string | On-chain status |
+| txHash | string | Blockchain transaction hash |
+| retryCount | integer | Retry count |
+| gasUsed | integer | Gas consumed |
+| gasPrice | integer | Gas price |
+| blockNumber | integer | Block number |
+| blockConfirmation | integer | Block confirmations |
+| submitTime | string | Submit time |
+| submitTimeTimestamp | integer | Submit time (epoch ms) |
+| confirmTime | string | Confirm time |
+| confirmTimeTimestamp | integer | Confirm time (epoch ms) |
+| remark | string | Remarks |
+| accountType | string | Account type |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/{dealId}" \

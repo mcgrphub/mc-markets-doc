@@ -10,7 +10,7 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-risk/trade/symbol/list | READ | 交易品种列表 |
+| GET | /openapi/v1/mc-risk/trade/symbol/list | READ | Trading symbol list |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -18,11 +18,11 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 
 ---
 
-## 交易品种列表
+## Trading symbol list
 
 `GET /openapi/v1/mc-risk/trade/symbol/list` — permission `READ`.
 
-根据当前用户的UID查询交易品种列表
+Query the trading symbol list for the current user.
 
 ### Query / path parameters
 
@@ -30,8 +30,8 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderBy | string | No | Multi-field sort; comma-separated |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 | group | string | No |  |
 
 ### Response `data` fields (summary)

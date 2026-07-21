@@ -10,13 +10,13 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| POST | /openapi/v1/mc-account/finance/account/withdraw | TRADE | 理财账户提现（活期） |
-| POST | /openapi/v1/mc-account/finance/account/withdraw/fixed | TRADE | 理财定期持仓提现 |
-| POST | /openapi/v1/mc-account/finance/account/deposit | TRADE | 理财账户存款 |
-| GET | /openapi/v1/mc-account/finance/products/catalog | READ | 理财产品目录 |
-| GET | /openapi/v1/mc-account/finance/account/positions/holding | READ | 理财当前持仓 |
-| GET | /openapi/v1/mc-account/finance/account/positions/history | READ | 用户赎回明细 |
-| GET | /openapi/v1/mc-account/finance/account/overview | READ | 理财概览 |
+| POST | /openapi/v1/mc-account/finance/account/withdraw | TRADE | Withdraw from Finance account (flexible) |
+| POST | /openapi/v1/mc-account/finance/account/withdraw/fixed | TRADE | Withdraw fixed-term Finance position |
+| POST | /openapi/v1/mc-account/finance/account/deposit | TRADE | Deposit to Finance account |
+| GET | /openapi/v1/mc-account/finance/products/catalog | READ | Finance product catalog |
+| GET | /openapi/v1/mc-account/finance/account/positions/holding | READ | Current Finance account positions |
+| GET | /openapi/v1/mc-account/finance/account/positions/history | READ | User redemption history |
+| GET | /openapi/v1/mc-account/finance/account/overview | READ | Finance account overview |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -24,19 +24,19 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 ---
 
-## 理财账户提现（活期）
+## Withdraw from Finance account (flexible)
 
 `POST /openapi/v1/mc-account/finance/account/withdraw` — permission `TRADE`.
 
-仅支持活期产品：传入产品代码与提现金额，从理财转出到资金账户再划入现货。定期多笔持仓请使用「定期持仓提现」接口并指定持仓明细 id
+Flexible products only: pass the product code and withdrawal amount. Funds move from the Finance account to the fund account, then into spot. For multiple fixed-term positions, use the fixed-term position withdrawal endpoint and specify the position detail ID.
 
 ### Request body (JSON)
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
-| productCode | string | Yes | 活期理财产品代码 |
-| amount | number | Yes | 提现金额 |
+| trackingId | string | Yes | Unique request tracking ID |
+| productCode | string | Yes | Flexible finance product code |
+| amount | number | Yes | Withdrawal amount |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw" \
@@ -52,18 +52,18 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 
 ---
 
-## 理财定期持仓提现
+## Withdraw fixed-term Finance position
 
 `POST /openapi/v1/mc-account/finance/account/withdraw/fixed` — permission `TRADE`.
 
-仅支持定期产品：指定持仓明细 id（持有中或已到期均可；与当前持仓接口 positionId 一致），后端按该笔本金+利息全额赎回，工作流与活期提现一致
+Fixed-term products only: specify the position detail ID (active or matured; matches `positionId` from the current positions endpoint). The backend redeems the full principal plus interest for that position. Workflow matches flexible withdrawal.
 
 ### Request body (JSON)
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
-| positionId | integer | Yes | 定期持仓主键 id（持有中或已到期均可赎回；与当前持仓接口返回的 positionId 一致） |
+| trackingId | string | Yes | Unique request tracking ID |
+| positionId | integer | Yes | Fixed-term position primary key ID (redeemable whether active or matured; matches `positionId` returned by the current positions endpoint) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw/fixed" \
@@ -79,19 +79,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 
 ---
 
-## 理财账户存款
+## Deposit to Finance account
 
 `POST /openapi/v1/mc-account/finance/account/deposit` — permission `TRADE`.
 
-理财账户存款，从现货账户划出到资金账户，然后存入理财产品
+Deposit to the Finance account: transfer from the trading account to the fund account, then into the finance product.
 
 ### Request body (JSON)
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | 用于跟踪请求的唯一标识 |
-| productCode | string | Yes | 理财产品代码，如 USDT_CURRENT |
-| amount | number | Yes | 存款金额 |
+| trackingId | string | Yes | Unique request tracking ID |
+| productCode | string | Yes | Finance product code, e.g. USDT_CURRENT |
+| amount | number | Yes | Deposit amount |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/deposit" \
@@ -107,17 +107,17 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 
 ---
 
-## 理财产品目录
+## Finance product catalog
 
 `GET /openapi/v1/mc-account/finance/products/catalog` — permission `READ`.
 
-按类型（活期/定期）查询已启用产品配置全量列表（不分页），按基础年化+超额奖励年化降序；查询参数仅 type 必填
+Returns the full list of enabled product configurations by type (flexible / fixed-term), unpaginated, sorted descending by base APR plus bonus APR. Query parameter `type` is required.
 
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| type | string | Yes | 产品类型：活期 / 定期 |
+| type | string | Yes | Product type: flexible / fixed-term |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/products/catalog" \
@@ -130,11 +130,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/produc
 
 ---
 
-## 理财当前持仓
+## Current Finance account positions
 
 `GET /openapi/v1/mc-account/finance/account/positions/holding` — permission `READ`.
 
-根据上下文 uid 分页查询持有中/已到期持仓；活期同产品多笔汇总为一行。返回列表按 product_code 升序、再 currency 升序。positionAmount 为持仓本金合计（不含未结利息，利息见 currentRewardAmount）；cumulativeRewardAmount 为该产品该币种下历史结息原币种合计，不折 USDC。未登录或缺少业务线时返回空页
+Paginated query of active and matured positions for the context user ID. Multiple flexible positions for the same product are aggregated into one row. Results are sorted by `product_code` ascending, then `currency` ascending. `positionAmount` is total position principal (excludes unsettled interest; see `currentRewardAmount` for interest). `cumulativeRewardAmount` is the historical settled interest total in the original currency for that product and currency, not converted to USDC. Returns an empty page when not logged in or when the business line is missing.
 
 ### Query / path parameters
 
@@ -142,8 +142,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/produc
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderBy | string | No | Multi-field sort supported; comma-separated |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 
 ### Response `data` fields (summary)
 
@@ -169,11 +169,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 
 ---
 
-## 用户赎回明细
+## User redemption history
 
 `GET /openapi/v1/mc-account/finance/account/positions/history` — permission `READ`.
 
-与后台赎回明细一致：主表 ac_transaction_history（EARN_WITHDRAWAL），按 create_time 分页；productCode、类型、持仓关联等来自 ac_finance_transaction（tx_id = transaction_id，WITHDRAW）；赎回金额与时间为动账主单 amount、create_time
+Aligns with admin redemption history: main table `ac_transaction_history` (`EARN_WITHDRAWAL`), paginated by `create_time`. `productCode`, type, position linkage, etc. come from `ac_finance_transaction` (`tx_id` = `transaction_id`, `WITHDRAW`). Redemption amount and time come from the main ledger entry `amount` and `create_time`.
 
 ### Query / path parameters
 
@@ -181,8 +181,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | --- | --- | --- | --- |
 | size | integer | No |  |
 | current | integer | No |  |
-| orderBy | string | No | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | No | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderBy | string | No | Multi-field sort supported; comma-separated |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 
 ### Response `data` fields (summary)
 
@@ -208,23 +208,23 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 
 ---
 
-## 理财概览
+## Finance account overview
 
 `GET /openapi/v1/mc-account/finance/account/overview` — permission `READ`.
 
-按产品维度返回 products，顺序为 product_code 升序、再 currency 升序；用户侧 userDepositedAmount/userInterestAmount/availableBalance 来自该产品在 ac_user_finance_position 的持仓汇总（该产品币种）。totalDepositValue 为各产品持仓本金×预言机价折 USDC 之和。totalInterestValue、yesterdayInterestValue 仍为结息流水按币种折 USDC。userSpotAvailableBalance 为现货币种维度，同币种产品值相同。未登录时用户侧为0
+Returns `products` by product dimension, ordered by `product_code` ascending, then `currency` ascending. User-side `userDepositedAmount`, `userInterestAmount`, and `availableBalance` come from position aggregates in `ac_user_finance_position` for that product (in the product currency). `totalDepositValue` is the sum of each product's position principal × oracle price, converted to USDC. `totalInterestValue` and `yesterdayInterestValue` are interest settlement records converted to USDC by currency. `userSpotAvailableBalance` is per trading-account currency; products sharing the same currency have the same value. User-side values are 0 when not logged in.
 
 ### Response `data` fields (summary)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| totalDepositValue | number | 用户存入总额（各币种本金 × 对应预言机价，折 USDC；未登录为0） |
-| totalInterestValue | number | 用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestVal |
-| yesterdayInterestValue | number | 昨日利息（自然日昨日 Asia/Shanghai 已入账结息流水，按同套预言机折 USDC；未登录为0） |
-| products | array | 按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBal |
-| totalDepositValueDisplay | string | 用户存入总额展示值 |
-| totalInterestValueDisplay | string | 用户历史结息总额展示值 |
-| yesterdayInterestValueDisplay | string | 昨日利息展示值 |
+| totalDepositValue | number | Total user deposits (principal per currency × corresponding oracle price, converted to USDC; 0 when not logged in) |
+| totalInterestValue | number | Total historical settled interest (successful `INTEREST` records in `ac_finance_transaction`, summed by currency, then × same overview oracle prices, converted to USDC; calculation basis matches `totalDepositValue` and `yesterdayInterestValue`) |
+| yesterdayInterestValue | number | Yesterday's interest (settled interest records credited on the previous calendar day in Asia/Shanghai, converted to USDC using the same oracle prices; 0 when not logged in) |
+| products | array | By product dimension: each row maps to `ac_finance_product` + config; user amounts from position aggregates under that product, platform fields from product summary table; includes `subscribedAmount`, `fundPoolAmount`, `availableSubscriptionBal` |
+| totalDepositValueDisplay | string | Total user deposits display value |
+| totalInterestValueDisplay | string | Total historical settled interest display value |
+| yesterdayInterestValueDisplay | string | Yesterday's interest display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview" \
