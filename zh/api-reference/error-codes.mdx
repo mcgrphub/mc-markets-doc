@@ -1,11 +1,13 @@
 ---
 title: "错误码"
 sidebarTitle: "错误码"
-description: "MC OpenAPI 业务错误码（`code` / `codeKey`）目录。"
+description: "MC OpenAPI 公开接口可能返回的业务错误码（`code` / `codeKey`）。"
 ---
 
-多数 OpenAPI 响应使用统一 JSON 信封，同时返回数字 `code` 与字符串 `codeKey`。
-业务分支请使用 `code` / `codeKey`；`msg` 仅作可读说明，不要依赖其精确文案。
+多数业务响应使用统一 JSON 信封，同时返回数字 `code` 与字符串 `codeKey`。
+业务分支请使用 `code` / `codeKey`；`message` / `msg` 仅作可读说明，不要依赖其精确文案。
+
+本页仅收录 **MC OpenAPI 公开接口** 业务调用链中可能返回的错误码。网关 AK/SK 鉴权失败不走此信封，见文末。
 
 ```json
 {
@@ -19,7 +21,7 @@ description: "MC OpenAPI 业务错误码（`code` / `codeKey`）目录。"
 
 ## 编码规则
 
-错误码为 **7 位**（部分 schema 中以数字返回）：
+错误码为 **7 位**：
 
 | 段 | 位数 | 含义 |
 | --- | --- | --- |
@@ -33,520 +35,209 @@ description: "MC OpenAPI 业务错误码（`code` / `codeKey`）目录。"
 
 ## 通用平台错误（1000xxx）
 
-### Platform
-
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
 | `DEFAULT` | `1000000` | Internal server error | `500` |
-| `SIGN_ERROR` | `1000001` | Sign verification failed | `401` |
 | `NOT_EXIST` | `1000002` | Resource does not exist | `404` |
 | `ALREADY_EXIST` | `1000003` | Resource already exists | `409` |
 | `REPEAT_OPERATION` | `1000004` | Repeat operation | `409` |
 | `PARAM_ERROR` | `1000005` | Invalid request parameter | `400` |
-| `PERMISSION_DENIED` | `1000006` | Permission denied | `403` |
-| `OPERATION_FAILED` | `1000007` | operation failed | `400` |
-| `DATA_FORMAT_ERROR` | `1000008` | data format error | `400` |
-| `NETWORK_ERROR` | `1000009` | network error | `400` |
-| `TIMEOUT_ERROR` | `1000010` | timeout error | `400` |
-| `CONFIG_ERROR` | `1000011` | configuration error | `400` |
-| `STATUS_ERROR` | `1000012` | status error | `400` |
-| `VERSION_INCOMPATIBLE` | `1000013` | version incompatible | `400` |
-| `SERVICE_UNAVAILABLE` | `1000014` | service unavailable | `400` |
-| `DATA_INTEGRITY_ERROR` | `1000015` | data integrity error | `400` |
-| `CONCURRENT_CONFLICT` | `1000016` | concurrent conflict | `400` |
-| `RESOURCE_LOCKED` | `1000017` | resource locked | `400` |
-| `QUOTA_EXCEEDED` | `1000018` | quota exceeded | `400` |
-| `DEPENDENCY_ERROR` | `1000019` | dependency service error | `400` |
-| `BUSINESS_RULE_CONFLICT` | `1000020` | business rule conflict | `400` |
 
-## 通用业务错误（1100xxx）
-
-### 1100001 用户角色相关
+## 业务线（1101xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `ROLE_PERMISSION_INVALID` | `1100001` | Role permission invalid | `500` |
-| `ROLE_ALREADY_EXIST` | `1100002` | Role already exists | `500` |
-| `ROLE_NOT_EXIST` | `1100003` | Role does not exist | `500` |
-| `ROLE_ADMIN_CANNOT_MODIFY` | `1100004` | Cannot modify admin role | `500` |
-| `ROLE_ADMIN_CANNOT_DELETE` | `1100005` | Cannot delete admin role | `500` |
+| `BUSINESS_LINE_NOT_EXIST` | `1101002` | Business line not exist | `400` |
 
-### 1101001 业务线相关
+## 划转（2002xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `BUSINESS_LINE_NAME_EXIST` | `1101001` | Business line name exist | `500` |
-| `BUSINESS_LINE_NOT_EXIST` | `1101002` | Business line not exist | `500` |
-| `BUSINESS_LINE_NOT_PERMITTED` | `1101003` | Business line not permitted | `500` |
+| `TRANSFER_FAILED` | `2002001` | Transfer failed | `400` |
+| `TRANSFER_AMOUNT_INVALID` | `2002002` | Invalid transfer amount | `400` |
+| `TRANSFER_LIMIT_EXCEEDED` | `2002005` | Transfer limit exceeded | `400` |
 
-## 账户服务（2000xxx）
-
-### 2002xxx 划转相关
+## 汇率 / 闪兑（2003xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `TRANSFER_FAILED` | `2002001` | Transfer failed | `500` |
-| `TRANSFER_AMOUNT_INVALID` | `2002002` | Invalid transfer amount | `500` |
-| `TRANSFER_ACCOUNT_NOT_EXIST` | `2002003` | Transfer account does not exist | `500` |
-| `TRANSFER_ACCOUNT_FROZEN` | `2002004` | Transfer account is frozen | `500` |
-| `TRANSFER_LIMIT_EXCEEDED` | `2002005` | Transfer limit exceeded | `500` |
+| `EXCHANGE_RATE_NOT_FOUND` | `2003001` | Exchange rate not found | `400` |
+| `EXCHANGE_RATE_INVALID` | `2003002` | Invalid exchange rate | `400` |
+| `EXCHANGE_RATE_QUOTE_INVALID` | `2003004` | Exchange rate quote invalid | `400` |
+| `EXCHANGE_SYMBOL_ERROR` | `2003005` | The same currency is not operate | `400` |
 
-### 2003xxx 闪兑兑相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `EXCHANGE_RATE_NOT_FOUND` | `2003001` | Exchange rate not found | `500` |
-| `EXCHANGE_RATE_INVALID` | `2003002` | Invalid exchange rate | `500` |
-| `EXCHANGE_RATE_SERVICE_ERROR` | `2003003` | Exchange rate service error | `500` |
-| `EXCHANGE_RATE_QUOTE_INVALID` | `2003004` | Exchange rate quote invalid | `500` |
-| `EXCHANGE_SYMBOL_ERROR` | `2003005` | The same currency is not operate | `500` |
-
-### 2004xxx 账户相关
+## 账户（2004xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `ACCOUNT_NOT_EXIST` | `2004001` | Account does not exist | `500` |
-| `ACCOUNT_FROZEN` | `2004002` | Account is frozen | `500` |
-| `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | Account balance insufficient | `500` |
-| `ACCOUNT_OPERATION_FAILED` | `2004004` | Account operation failed | `500` |
-| `ACCOUNT_PARAM_INVALID` | `2004005` | Account parameter invalid | `500` |
-| `ACCOUNT_PASSWORD_INVALID` | `2004006` | Account password invalid | `500` |
-| `ACCOUNT_TOKEN_GENERATE_FAILED` | `2004007` | Account token generate failed | `500` |
+| `ACCOUNT_NOT_EXIST` | `2004001` | Account does not exist | `400` |
+| `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | Account balance insufficient | `400` |
+| `ACCOUNT_PASSWORD_INVALID` | `2004006` | Account password invalid | `400` |
+| `ACCOUNT_TOKEN_GENERATE_FAILED` | `2004007` | Account token generate failed | `400` |
 
-### 2005xxx 2fa认证相关
+## 二次验证（2005xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `TWO_FA_NOT_BOUND` | `2005001` | 2FA not bound | `500` |
-| `TWO_FA_ALREADY_BOUND` | `2005002` | 2FA already bound | `500` |
-| `TWO_FA_VERIFY_FAILED` | `2005003` | 2FA verification failed | `500` |
-| `TWO_FA_CODE_INVALID` | `2005004` | Invalid 2FA code | `500` |
-| `TWO_FA_SESSION_EXPIRED` | `2005005` | 2FA session expired | `500` |
-| `TWO_FA_TYPE_NOT_SUPPORTED` | `2005006` | 2FA type not supported | `500` |
-| `TWO_FA_ATTEMPT_TIMES_ABNORMAL` | `2005007` | 2FA Too many attempts | `500` |
-| `TWO_FA_RESET_WITHIN_24H` | `2005008` | Modification or reset not allowed within 24 hours | `500` |
-| `TWO_FA_ADDRESS_LOCK_PERIOD` | `2005009` | Address lock period, cannot add temporarily | `500` |
-| `TWO_FA_FUND_PASSWORD_INVALID` | `2005010` | Fund password invalid | `500` |
-| `TWO_FA_TICKET_INVALID` | `2005011` | Invalid 2FA ticket or token | `500` |
-| `TWO_FA_TICKET_USER_MISMATCH` | `2005012` | 2FA ticket user mismatch | `500` |
-| `TWO_FA_TICKET_SCENE_MISMATCH` | `2005013` | 2FA ticket scene mismatch | `500` |
-| `TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED` | `2005014` | Challenge does not support verification method | `500` |
-| `TWO_FA_SEND_TOO_FREQUENT` | `2005015` | 2FA code sent too frequently | `500` |
-| `TWO_FA_SEND_DAILY_LIMIT_EXCEEDED` | `2005016` | 2FA code daily send limit exceeded | `500` |
-| `TWO_FA_CODE_SEND_FAILED` | `2005017` | Failed to send 2FA verification code | `500` |
-| `TWO_FA_FUND_PASSWORD_NOT_SET` | `2005018` | Fund password not set | `500` |
-| `TWO_FA_FUND_PASSWORD_WRONG` | `2005019` | Fund password incorrect | `500` |
-| `TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH` | `2005020` | Fund password confirmation mismatch | `500` |
-| `TWO_FA_FUND_PASSWORD_ALREADY_SET` | `2005021` | Fund password already set | `500` |
+| `TWO_FA_VERIFY_FAILED` | `2005003` | 2FA verification failed | `400` |
+| `TWO_FA_TYPE_NOT_SUPPORTED` | `2005006` | 2FA type not supported | `400` |
 
-### 2006xxx 保险箱相关
+## 保险箱（2006xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `SAFE_BOX_NOT_EXIST` | `2006001` | Safe box does not exist | `500` |
-| `SAFE_BOX_LOCK_FAILED` | `2006002` | Failed to lock safe box | `500` |
-| `SAFE_BOX_BALANCE_INSUFFICIENT` | `2006003` | Safe box balance insufficient | `500` |
-| `SAFE_BOX_DAILY_LIMIT_EXCEEDED` | `2006004` | Daily transfer limit exceeded | `500` |
-| `SAFE_BOX_FREEZE_FAILED` | `2006005` | Failed to freeze safe box assets | `500` |
-| `SAFE_BOX_UNFREEZE_FAILED` | `2006006` | Failed to unfreeze safe box assets | `500` |
-| `SAFE_BOX_TRANSFER_IN_FAILED` | `2006007` | Failed to transfer into safe box | `500` |
-| `SAFE_BOX_TRANSFER_OUT_FAILED` | `2006008` | Failed to transfer out from safe box | `500` |
-| `SAFE_BOX_PASSWORD_INVALID` | `2006009` | Safe box password invalid | `500` |
-| `SAFE_BOX_OPERATION_FAILED` | `2006010` | Safe box operation failed | `500` |
+| `SAFE_BOX_PASSWORD_INVALID` | `2006009` | Safe box password invalid | `400` |
 
-### 2007xxx 提现相关
+## 出金（2007xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `WITHDRAWAL_AMOUNT_INVALID` | `2007001` | Invalid withdrawal amount | `500` |
-| `WITHDRAWAL_ADDRESS_INVALID` | `2007002` | Invalid withdrawal address | `500` |
-| `WITHDRAWAL_WHITELIST_REQUIRED` | `2007003` | Address not in whitelist | `500` |
-| `WITHDRAWAL_LIMIT_EXCEEDED` | `2007004` | Withdrawal limit exceeded | `500` |
-| `WITHDRAWAL_SERVICE_ERROR` | `2007005` | Withdrawal service error | `500` |
-| `WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR` | `2007006` | Withdrawal min amount limit | `500` |
-| `WITHDRAWAL_RECHARGE_IN_24H_LIMIT` | `2007007` | Withdrawal recharge in 24h limit | `500` |
-| `WITHDRAWAL_PENDING_RECORD_EXISTS` | `2007008` | Pending Record Exists | `500` |
-| `WITHDRAWAL_GET_ESTIMATE_FEE_FAILED` | `2007009` | Get estimate fee failed | `500` |
-| `WITHDRAWAL_TIMES_LIMIT_EXCEEDED` | `2007010` | Withdrawal times limit exceeded | `500` |
+| `WITHDRAWAL_AMOUNT_INVALID` | `2007001` | Invalid withdrawal amount | `400` |
+| `WITHDRAWAL_WHITELIST_REQUIRED` | `2007003` | Address not in whitelist | `400` |
+| `WITHDRAWAL_LIMIT_EXCEEDED` | `2007004` | Withdrawal limit exceeded | `400` |
+| `WITHDRAWAL_SERVICE_ERROR` | `2007005` | Withdrawal service error | `400` |
+| `WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR` | `2007006` | Withdrawal min amount limit | `400` |
+| `WITHDRAWAL_RECHARGE_IN_24H_LIMIT` | `2007007` | Withdrawal recharge in 24h limit | `400` |
+| `WITHDRAWAL_GET_ESTIMATE_FEE_FAILED` | `2007009` | Get estimate fee failed | `400` |
+| `WITHDRAWAL_TIMES_LIMIT_EXCEEDED` | `2007010` | Withdrawal times limit exceeded | `400` |
 
-### 2008xxx 币种相关
+## 币种（2008xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `CURRENCY_NOT_EXIST` | `2008001` | Currency does not exist | `500` |
-| `CURRENCY_NOT_ENABLED` | `2008002` | Currency not enabled | `500` |
-| `CURRENCY_NETWORK_NOT_EXIST` | `2008003` | Currency network does not exist | `500` |
-| `CURRENCY_BALANCE_INSUFFICIENT` | `2008004` | Currency balance insufficient | `500` |
-| `CURRENCY_ADDRESS_LIMIT_EXCEEDED` | `2008005` | Address limit exceeded | `500` |
-| `CURRENCY_ADDRESS_EXIST` | `2008006` | Address already exists | `500` |
-| `CURRENCY_ADDRESS_LABEL_EXIST` | `2008007` | AddressLabel already exists | `500` |
+| `CURRENCY_NOT_EXIST` | `2008001` | Currency does not exist | `400` |
+| `CURRENCY_NETWORK_NOT_EXIST` | `2008003` | Currency network does not exist | `400` |
 
-### 2009xxx 黑名单相关
+## KYC（2010xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `BLACKLIST_UID_REQUIRED` | `2009001` | User UID cannot be empty | `500` |
-| `BLACKLIST_WALLET_REQUIRED` | `2009002` | Wallet address cannot be empty | `500` |
-| `BLACKLIST_ALREADY_EXIST` | `2009003` | Record already exists | `500` |
-| `BLACKLIST_NOT_EXIST` | `2009004` | Record does not exist | `500` |
+| `KYC_LEVEL_QUERY_FAILED` | `2010001` | Failed to get KYC level | `400` |
+| `KYC_USER_NOT_VERIFIED` | `2010004` | user not verified | `400` |
+| `KYC_BUSINESS_LINE_CONTEXT_MISSING` | `2010044` | Business line context missing | `400` |
 
-### 2010xxx kyc相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `KYC_LEVEL_QUERY_FAILED` | `2010001` | Failed to get KYC level | `500` |
-| `KYC_CFG_ALREADY_EXIST` | `2010002` | Record already exists | `500` |
-| `KYC_LEVEL_INVALID` | `2010003` | kyc level invalid | `500` |
-| `KYC_USER_NOT_VERIFIED` | `2010004` | user not verified | `500` |
-| `KYC_WITHDRAW_LEVEL_INSUFFICIENT` | `2010005` | KYC level insufficient for withdrawal | `500` |
-| `KYC_RWA_DEAL_QUERY_FAILED` | `2010006` | Failed to verify RWA deal for withdrawal | `500` |
-| `KYC_L0_NOT_PASSED` | `2010007` | L0 verification not passed | `500` |
-| `KYC_CERT_NO_DUPLICATE` | `2010008` | Certificate number already in use | `500` |
-| `KYC_CERT_VALID_UNTIL_FORMAT_ERROR` | `2010009` | Invalid certificate valid-until date format | `500` |
-| `KYC_CERT_VALID_UNTIL_EXPIRED` | `2010010` | Certificate valid-until must be after today | `500` |
-| `KYC_CERT_VALID_FROM_FORMAT_ERROR` | `2010011` | Invalid certificate valid-from date format | `500` |
-| `KYC_CERT_VALID_DATE_RANGE_ERROR` | `2010012` | Certificate valid-until must be after valid-from | `500` |
-| `KYC_CERT_PERMANENT_FLAG_INVALID` | `2010013` | Invalid cert permanent flag, only 0 or 1 | `500` |
-| `KYC_FLOW_NOT_CONFIGURED` | `2010014` | KYC flow not configured for business line | `500` |
-| `KYC_FLOW_STEP_NOT_CONFIGURED` | `2010015` | KYC flow has no steps configured | `500` |
-| `KYC_FLOW_FIRST_STEP_LEVEL_MISSING` | `2010016` | First step kyc_level not configured | `500` |
-| `KYC_APPLY_ALREADY_EXISTS` | `2010017` | Active KYC application already exists | `500` |
-| `KYC_APPLY_NOT_EXIST` | `2010018` | KYC application not found | `500` |
-| `KYC_APPLY_DETAIL_NOT_EXIST` | `2010019` | KYC application detail not found | `500` |
-| `KYC_APPLY_FLOW_NOT_EXIST` | `2010020` | KYC application flow not found | `500` |
-| `KYC_SUB_FLOW_NOT_EXIST` | `2010021` | KYC sub flow not found | `500` |
-| `KYC_APPLY_STATUS_CANCELED` | `2010022` | KYC application canceled | `500` |
-| `KYC_APPLY_STATUS_PASSED` | `2010023` | KYC application already passed | `500` |
-| `KYC_APPLY_STATUS_SUBMITTED` | `2010024` | KYC data already submitted | `500` |
-| `KYC_STEP_PREREQUISITE_NOT_MET` | `2010025` | Prerequisite KYC step not completed | `500` |
-| `KYC_AUDIT_LEVEL_NOT_L0` | `2010026` | Only L0 application can be modified in audit | `500` |
-| `KYC_AUDIT_STATUS_NOT_PENDING` | `2010027` | Only pending application can be modified in audit | `500` |
-| `KYC_USER_INFO_NOT_EXIST` | `2010028` | KYC user info not found | `500` |
-| `KYC_NO_FIELD_TO_UPDATE` | `2010029` | No field to update | `500` |
-| `KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH` | `2010030` | KYC application not in current business line | `500` |
-| `KYC_AUDIT_NO_SUBMIT_DATA` | `2010031` | No submitted data for audit | `500` |
-| `KYC_AUDIT_ALREADY_REJECTED` | `2010032` | KYC flow already rejected | `500` |
-| `KYC_AUDIT_NOT_PENDING_FOR_APPROVE` | `2010033` | Only pending status can be approved | `500` |
-| `KYC_AUDIT_FLOW_NOT_FOUND` | `2010034` | No auditable flow found | `500` |
-| `KYC_FLOW_CONFIG_NOT_EXIST` | `2010035` | KYC flow configuration not found | `500` |
-| `KYC_STEP_CODE_NOT_FOUND` | `2010036` | Step code not found in flow configuration | `500` |
-| `KYC_STEP_LEVEL_NOT_CONFIGURED` | `2010037` | Flow step kyc_level not configured | `500` |
-| `KYC_PROOF_REQUIRED` | `2010038` | At least one proof document required | `500` |
-| `KYC_IMAGE_OBJECT_KEY_INVALID` | `2010039` | Invalid KYC image object key | `500` |
-| `KYC_IMAGE_ACCESS_DENIED` | `2010040` | KYC image access denied | `500` |
-| `KYC_PRESIGN_TYPE_INVALID` | `2010041` | Invalid KYC presign type | `500` |
-| `KYC_QUOTA_INVALID` | `2010042` | Invalid KYC quota: monthly limit must be >= daily limit | `500` |
-| `KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED` | `2010043` | All business line operation not supported | `500` |
-| `KYC_BUSINESS_LINE_CONTEXT_MISSING` | `2010044` | Business line context missing | `500` |
-| `KYC_SYNC_FUND_ACCOUNT_FAILED` | `2010045` | Failed to sync KYC to fund account | `500` |
-| `KYC_STATE_MACHINE_INIT_FAILED` | `2010046` | KYC state machine initialization failed | `500` |
-| `KYC_REJECT_NEED_APPLY_NO` | `2010047` | ApplyNo required when user has KYC ticket | `500` |
-| `KYC_CFG_NOT_EXIST` | `2010048` | KYC quota config not found | `500` |
-| `KYC_APPLY_NO_OR_UID_REQUIRED` | `2010049` | ApplyNo or uid required when ticket not found | `500` |
-| `KYC_SUB_FLOW_NO_REQUIRED` | `2010050` | Sub flow number required | `500` |
-| `KYC_UID_REQUIRED` | `2010051` | uid required | `500` |
-| `KYC_BUSINESS_LINE_ID_REQUIRED` | `2010052` | businessLineId required | `500` |
-| `KYC_REQUEST_BODY_REQUIRED` | `2010053` | Request body required | `500` |
-| `KYC_USER_OR_BUSINESS_LINE_MISSING` | `2010054` | User or business line info missing | `500` |
-| `KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED` | `2010055` | ApplyNo and sub flow number required | `500` |
-| `KYC_OSS_NOT_ENABLED` | `2010056` | OSS KYC image upload not enabled | `500` |
-| `KYC_OSS_CLIENT_NOT_INITIALIZED` | `2010057` | OSS client not initialized | `500` |
-| `KYC_OSS_CONFIG_MISSING` | `2010058` | OSS bucket or endpoint not configured | `500` |
-| `KYC_USER_NOT_LOGGED_IN` | `2010059` | User not logged in | `500` |
-| `KYC_FACE_MIME_INVALID` | `2010060` | FACE type only supports video format | `500` |
-| `KYC_IMAGE_MIME_INVALID` | `2010061` | Image type only supports image format | `500` |
-| `KYC_REQUIRED_FIELD_MISSING` | `2010062` | Required KYC field missing | `500` |
-| `KYC_WITHDRAW_LARGE_NEED_L2_MANUAL` | `2010063` | Large withdrawal requires L2 manual face verification | `500` |
-| `KYC_AUDIT_COMMENT_REQUIRED` | `2010064` | Audit comment required | `500` |
-| `KYC_AUDIT_REJECT_LEVEL_EXCEEDED` | `2010065` | Cannot reject step above user current kyc_level | `500` |
-
-### 2011xxx 资产相关
+## 资产（2011xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `ASSET_ACCOUNT_NOT_EXIST` | `2011001` | User asset account does not exist | `500` |
-| `ASSET_LOCK_FAILED` | `2011002` | Failed to acquire asset lock, please try again later | `500` |
-| `ASSET_NOT_EXIST` | `2011003` | Asset does not exist | `500` |
-| `ASSET_ADD_FAILED` | `2011004` | Failed to add asset, please try again | `500` |
-| `ASSET_UNFREEZE_FAILED` | `2011005` | Failed to unfreeze asset, please try again | `500` |
-| `ASSET_CREATE_LOCK_FAILED` | `2011006` | Failed to acquire asset creation lock, please try again later | `500` |
-| `ASSET_CREATE_FAILED` | `2011007` | Failed to create asset | `500` |
-| `ASSET_BALANCE_INSUFFICIENT` | `2011008` | Insufficient balance | `500` |
-| `ASSET_FROZEN_AMOUNT_INSUFFICIENT` | `2011009` | Insufficient frozen amount | `500` |
-| `ASSET_FREEZE_FAILED` | `2011010` | Failed to freeze asset, please try again | `500` |
-| `ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED` | `2011011` | Fund pool max amount exceeded | `500` |
-| `ASSET_FUND_POOL_MIN_AMOUNT_ERROR` | `2011012` | Fund pool min amount error | `500` |
-| `ASSET_FUND_POOL_MAX_AMOUNT_ERROR` | `2011013` | Fund pool max amount error | `500` |
-| `ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR` | `2011014` | Withdrawal min amount limit | `500` |
+| `ASSET_ACCOUNT_NOT_EXIST` | `2011001` | User asset account does not exist | `400` |
+| `ASSET_LOCK_FAILED` | `2011002` | Failed to acquire asset lock, please try again later | `400` |
+| `ASSET_NOT_EXIST` | `2011003` | Asset does not exist | `400` |
+| `ASSET_ADD_FAILED` | `2011004` | Failed to add asset, please try again | `400` |
+| `ASSET_UNFREEZE_FAILED` | `2011005` | Failed to unfreeze asset, please try again | `400` |
+| `ASSET_CREATE_LOCK_FAILED` | `2011006` | Failed to acquire asset creation lock, please try again later | `400` |
+| `ASSET_CREATE_FAILED` | `2011007` | Failed to create asset | `400` |
+| `ASSET_BALANCE_INSUFFICIENT` | `2011008` | Insufficient balance | `400` |
+| `ASSET_FROZEN_AMOUNT_INSUFFICIENT` | `2011009` | Insufficient frozen amount | `400` |
+| `ASSET_FREEZE_FAILED` | `2011010` | Failed to freeze asset, please try again | `400` |
+| `ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED` | `2011011` | Fund pool max amount exceeded | `400` |
+| `ASSET_FUND_POOL_MIN_AMOUNT_ERROR` | `2011012` | Fund pool min amount error | `400` |
+| `ASSET_FUND_POOL_MAX_AMOUNT_ERROR` | `2011013` | Fund pool max amount error | `400` |
+| `ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR` | `2011014` | Withdrawal min amount limit | `400` |
 
-### 2012xxx 资金账户相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `FUND_ACCOUNT_NOT_EXIST` | `2012001` | Fund account does not exist | `500` |
-| `FUND_ACCOUNT_ALREADY_EXIST` | `2012002` | Fund account already exists | `500` |
-| `FUND_ACCOUNT_CREATE_FAILED` | `2012003` | Failed to create fund account | `500` |
-| `FUND_ACCOUNT_UPDATE_FAILED` | `2012004` | Failed to update fund account | `500` |
-| `FUND_ACCOUNT_DELETE_FAILED` | `2012005` | Failed to delete fund account | `500` |
-| `FUND_ACCOUNT_PARAM_INVALID` | `2012006` | Invalid account parameters | `500` |
-| `FUND_ACCOUNT_LOCK_FAILED` | `2012007` | Failed to acquire account lock, please try again later | `500` |
-| `FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED` | `2012008` | Failed to update safe box password | `500` |
-| `FUND_ACCOUNT_CONTACT_REQUIRED` | `2012010` | Either mobile number or email must be provided | `500` |
-| `FUND_ACCOUNT_MOBILE_ALREADY_USED` | `2012011` | Mobile number already in use | `500` |
-| `FUND_ACCOUNT_EMAIL_ALREADY_USED` | `2012012` | Email already in use | `500` |
-
-### 2013xxx 交易记录相关
+## 资金账户（2012xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `TRANSACTION_RECORD_NOT_EXIST` | `2013001` | Transaction record does not exist | `500` |
-| `TRANSACTION_FORBIDDEN` | `2013002` | Transaction forbidden | `500` |
-| `TRANSACTION_IN_PROGRESS` | `2013003` | Transaction in progress, please do not repeat | `500` |
-| `TRANSACTION_AMOUNT_TOO_LOW` | `2013004` | The amount cannot be lower than the minimum | `500` |
-| `TRANSACTION_REQUEST_FREQUENTLY` | `2013005` | Transaction Request Frequently | `500` |
-| `TRANSACTION_BALANCE_INSUFFICIENT` | `2013006` | Transaction Balance Insufficient | `500` |
+| `FUND_ACCOUNT_NOT_EXIST` | `2012001` | Fund account does not exist | `400` |
+| `FUND_ACCOUNT_PARAM_INVALID` | `2012006` | Invalid account parameters | `400` |
+| `FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED` | `2012008` | Failed to update safe box password | `400` |
 
-### 2014xxx webhook相关
+## 交易流水（2013xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `WEBHOOK_SIGNATURE_INVALID` | `2014001` | Invalid webhook signature | `500` |
-| `WEBHOOK_EVENT_TYPE_INVALID` | `2014002` | Invalid webhook event type | `500` |
-| `WEBHOOK_PAYLOAD_INVALID` | `2014003` | Invalid webhook payload | `500` |
-| `WEBHOOK_DEPOSIT_DETAIL_INVALID` | `2014004` | Invalid deposit details | `500` |
-| `WEBHOOK_DEPOSIT_STATUS_INVALID` | `2014005` | Invalid deposit status | `500` |
+| `TRANSACTION_RECORD_NOT_EXIST` | `2013001` | Transaction record does not exist | `400` |
+| `TRANSACTION_IN_PROGRESS` | `2013003` | Transaction in progress, please do not repeat | `400` |
+| `TRANSACTION_AMOUNT_TOO_LOW` | `2013004` | The amount cannot be lower than the minimum | `400` |
+| `TRANSACTION_REQUEST_FREQUENTLY` | `2013005` | Transaction Request Frequently | `400` |
+| `TRANSACTION_BALANCE_INSUFFICIENT` | `2013006` | Transaction Balance Insufficient | `400` |
 
-### 2015xxx 提现审核相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `WITHDRAWAL_AUDIT_NOT_EXIST` | `2015001` | Withdrawal audit record does not exist | `500` |
-| `WITHDRAWAL_AUDIT_ALREADY_PROCESSED` | `2015002` | Withdrawal audit record already processed | `500` |
-| `WITHDRAWAL_AUDIT_CREATE_FAILED` | `2015003` | Failed to create withdrawal audit record | `500` |
-| `WITHDRAWAL_AUDIT_UPDATE_FAILED` | `2015004` | Failed to update withdrawal audit record | `500` |
-| `WITHDRAWAL_AUDIT_DELETE_FAILED` | `2015005` | Failed to delete withdrawal audit record | `500` |
-| `WITHDRAWAL_AUDIT_PARAM_INVALID` | `2015006` | Invalid withdrawal audit parameters | `500` |
-| `WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID` | `2015007` | Invalid withdrawal audit risk level | `500` |
-| `WITHDRAWAL_AUDIT_STATUS_INVALID` | `2015008` | Invalid withdrawal audit status | `500` |
-| `WITHDRAWAL_AUDIT_REJECT_ERROR` | `2015009` | Withdrawal audit reject error | `500` |
-| `WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR` | `2015010` | Pending Record Exists | `500` |
-| `WITHDRAW_LOCK_PERIOD_ERROR` | `2015011` | Withdrawal lock period error | `500` |
-
-### 2016xxx 支付相关
+## 锁仓出金（2015xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `PAYMENT_OPERATION_FAILED` | `2016001` | Payment operation failed | `500` |
+| `WITHDRAW_LOCK_PERIOD_ERROR` | `2015011` | Withdrawal lock period error | `400` |
 
-### 2017xxx MT交互相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `MT_GROUP_NOT_FOUND` | `2017001` | Group Not Found | `500` |
-| `MT_MEM` | `2017002` | Mem | `500` |
-| `MT_DEALER_SEND` | `2017003` | Dealer Send | `500` |
-| `MT_SYMBOL_NOT_SUPPORT_DEPOSIT` | `2017004` | Symbol Not Support Deposit | `500` |
-| `MT_POSITION_GET_BY_LOGIN` | `2017005` | Position Get By Login | `500` |
-| `MT_POSITION_VOLUME_NOT_ENOUGH` | `2017006` | Position Volume Not Enough | `500` |
-| `MT_DEDUCT_COLLATERAL_FAILED` | `2017007` | Deduct Collateral Failed | `500` |
-| `MT_DEALER_RESULT_FAILED` | `2017008` | Dealer Result Failed | `500` |
-| `MT_INPUT_SERIALIZE_FAILED` | `2017009` | Input Serialize Failed | `500` |
-| `MT_AMOUNT_DECIMAL` | `2017010` | Amount Decimal | `500` |
-| `MT_MTRISK_NOT_FOUND` | `2017011` | MTRisk Not Found | `500` |
-
-### 2018xxx 储备金证明相关
+## 交易账户联动（2017xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `PROOF_FUND_ALREADY_EXIST` | `2018001` | Fund proof already exists | `500` |
-| `PROOF_FUND_NOT_EXIST` | `2018002` | Fund proof not exists | `500` |
-| `PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS` | `2018003` | Platform assets failed to cover user assets | `500` |
+| `MT_GROUP_NOT_FOUND` | `2017001` | Group Not Found | `400` |
+| `MT_MEM` | `2017002` | Mem | `400` |
+| `MT_DEALER_SEND` | `2017003` | Dealer Send | `400` |
+| `MT_SYMBOL_NOT_SUPPORT_DEPOSIT` | `2017004` | Symbol Not Support Deposit | `400` |
+| `MT_POSITION_GET_BY_LOGIN` | `2017005` | Position Get By Login | `400` |
+| `MT_POSITION_VOLUME_NOT_ENOUGH` | `2017006` | Position Volume Not Enough | `400` |
+| `MT_DEDUCT_COLLATERAL_FAILED` | `2017007` | Deduct Collateral Failed | `400` |
+| `MT_DEALER_RESULT_FAILED` | `2017008` | Dealer Result Failed | `400` |
+| `MT_INPUT_SERIALIZE_FAILED` | `2017009` | Input Serialize Failed | `400` |
+| `MT_AMOUNT_DECIMAL` | `2017010` | Amount Decimal | `400` |
 
-### 2019xxx 用户钱包配置相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `USER_WALLET_CONFIG_ALREADY_EXIST` | `2019001` | User wallet config already exists | `500` |
-| `USER_WALLET_CONFIG_DELETE_FAILED` | `2019002` | User wallet config delete failed | `500` |
-
-### 2020xxx 中台相关
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `BACK_OFFICE_CONFIG_INVALID_SYMBOL` | `2020001` | Invalid symbol | `500` |
-| `BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST` | `2020002` | Chain config already exists | `500` |
-
-### 2021xxx 金库账户相关
+## 储备金证明（2018xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `MLP_CONFIG_NOT_FOUND` | `2021001` | 金库账户配置未找到 | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_DUPLICATE` | `2021002` | 金库账户积分档位配置重复 | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_EMPTY` | `2021003` | 金库账户积分档位配置为空 | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_INVALID` | `2021004` | 金库账户积分档位配置无效 | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR` | `2021005` | 金库账户积分档位配置格式错误 | `500` |
+| `PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS` | `2018003` | Platform assets failed to cover user assets | `400` |
 
-### 2022xxx 工单相关
+## 金库账户（2021xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `TICKET_NOT_EXIST` | `2022001` | Ticket not exist | `500` |
-| `TICKET_PENDING_EXISTS` | `2022002` | Ticket pending exists | `500` |
-| `TICKET_CLOSED_CANNOT_SEND` | `2022003` | Ticket closed cannot send | `500` |
-| `TICKET_EVALUATE_FAILED` | `2022004` | Ticket evaluate failed | `500` |
-| `TICKET_STATUS_INVALID` | `2022005` | Ticket status invalid | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_DUPLICATE` | `2021002` | MLP integral tier config duplicate | `400` |
+| `MLP_INTEGRAL_TIER_CONFIG_EMPTY` | `2021003` | MLP integral tier config empty | `400` |
+| `MLP_INTEGRAL_TIER_CONFIG_INVALID` | `2021004` | MLP integral tier config invalid | `400` |
+| `MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR` | `2021005` | MLP integral tier config format error | `400` |
 
-## 交易服务（2100xxx）
-
-### 2100xxx 下单相关
+## 交易订单（2100xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `ORDER_OPERATION_FAILED` | `2100001` | order operation failed | `500` |
-| `ORDER_SELL_NOT_SUPPORTED` | `2100002` | order_sell_not_supported | `500` |
-| `TP_SL_NOT_SUPPORTED` | `2100003` | tp and sl not supported | `500` |
-| `SYMBOL_NOT_EXIST` | `2100004` | symbol not exist | `500` |
-| `ORDER_VALUE_VOLUME_LIMIT_ERROR` | `2100005` | order condition limit error | `500` |
-| `SYMBOL_NOT_SUPPORTED_ERROR` | `2100006` | symbol not supported | `500` |
-| `SLIPPAGE_PARAM_ERROR` | `2100007` | slippage param error | `500` |
-| `SLIPPAGE_ESTIMATE_ERROR` | `2100008` | slippage estimate error | `500` |
-| `COMMON_ERROR` | `2100009` | common error | `500` |
-| `COMMON_PARAMS_ERROR` | `2100010` | common params error | `500` |
-| `COMMON_MEM_ERROR` | `2100011` | common mtrisk internal error | `500` |
-| `ORDER_REQUEST_REJECT` | `2100012` | order rejected by mtrisk | `500` |
-| `ORDER_REQUEST_CANCEL` | `2100013` | order cancelled by mtrisk | `500` |
-| `ORDER_REQUEST_PLACED` | `2100014` | order placed into matching queue | `500` |
-| `ORDER_REQUEST_DONE` | `2100015` | order placed into matching queue - not used | `500` |
-| `ORDER_REQUEST_ERROR` | `2100016` | order request common error | `500` |
-| `ORDER_REQUEST_TIMEOUT` | `2100017` | order request timeout | `500` |
-| `ORDER_REQUEST_INVALID` | `2100018` | order request invalid | `500` |
-| `ORDER_REQUEST_INVALID_VOLUME` | `2100019` | order request invalid volume | `500` |
-| `ORDER_REQUEST_INVALID_PRICE` | `2100020` | order request invalid price | `500` |
-| `ORDER_REQUEST_INVALID_STOPS` | `2100021` | order request invalid stops | `500` |
-| `ORDER_REQUEST_TRADE_DISABLED` | `2100022` | order request trade disabled | `500` |
-| `ORDER_REQUEST_MARKET_CLOSED` | `2100023` | order request market closed | `500` |
-| `ORDER_REQUEST_NO_MONEY` | `2100024` | order request no money | `500` |
-| `ORDER_REQUEST_TOO_MANY` | `2100025` | order request too many requests | `500` |
-| `ORDER_REQUEST_INVALID_ORDER` | `2100026` | order request invalid orders | `500` |
-| `COMMON_OK` | `2100027` | common ok | `500` |
-| `ORDER_REQUEST_PRICE_OFF` | `2100028` | order request price off | `500` |
+| `ORDER_OPERATION_FAILED` | `2100001` | order operation failed | `400` |
+| `ORDER_SELL_NOT_SUPPORTED` | `2100002` | order_sell_not_supported | `400` |
+| `TP_SL_NOT_SUPPORTED` | `2100003` | tp and sl not supported | `400` |
+| `SYMBOL_NOT_EXIST` | `2100004` | symbol not exist | `400` |
+| `ORDER_VALUE_VOLUME_LIMIT_ERROR` | `2100005` | order condition limit error | `400` |
+| `SYMBOL_NOT_SUPPORTED_ERROR` | `2100006` | symbol not supported | `400` |
+| `SLIPPAGE_PARAM_ERROR` | `2100007` | slippage param error | `400` |
+| `SLIPPAGE_ESTIMATE_ERROR` | `2100008` | slippage estimate error | `400` |
+| `COMMON_ERROR` | `2100009` | common error | `400` |
+| `COMMON_PARAMS_ERROR` | `2100010` | common params error | `400` |
+| `COMMON_MEM_ERROR` | `2100011` | common mtrisk internal error | `400` |
+| `ORDER_REQUEST_REJECT` | `2100012` | order rejected by mtrisk | `400` |
+| `ORDER_REQUEST_CANCEL` | `2100013` | order cancelled by mtrisk | `400` |
+| `ORDER_REQUEST_ERROR` | `2100016` | order request common error | `400` |
+| `ORDER_REQUEST_TIMEOUT` | `2100017` | order request timeout | `400` |
+| `ORDER_REQUEST_INVALID` | `2100018` | order request invalid | `400` |
+| `ORDER_REQUEST_INVALID_VOLUME` | `2100019` | order request invalid volume | `400` |
+| `ORDER_REQUEST_INVALID_PRICE` | `2100020` | order request invalid price | `400` |
+| `ORDER_REQUEST_INVALID_STOPS` | `2100021` | order request invalid stops | `400` |
+| `ORDER_REQUEST_TRADE_DISABLED` | `2100022` | order request trade disabled | `400` |
+| `ORDER_REQUEST_MARKET_CLOSED` | `2100023` | order request market closed | `400` |
+| `ORDER_REQUEST_NO_MONEY` | `2100024` | order request no money | `400` |
+| `ORDER_REQUEST_TOO_MANY` | `2100025` | order request too many requests | `400` |
+| `ORDER_REQUEST_INVALID_ORDER` | `2100026` | order request invalid orders | `400` |
+| `ORDER_REQUEST_PRICE_OFF` | `2100028` | order request price off | `400` |
 
-### 2101xxx 持仓相关
+## 持仓（2101xxx）
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `POSITION_OBTAIN_ERROR` | `2101001` | position_obtain_error | `500` |
-| `POSITION_VALUE_LIMIT_EXCEEDED` | `2101002` | position value limit exceeded | `500` |
-| `POSITION_MARGIN_INSUFFICIENT` | `2101003` | position margin insufficient | `500` |
-| `PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED` | `2101004` | platform position value limit exceeded | `500` |
+| `POSITION_OBTAIN_ERROR` | `2101001` | position_obtain_error | `400` |
+| `POSITION_VALUE_LIMIT_EXCEEDED` | `2101002` | position value limit exceeded | `400` |
+| `POSITION_MARGIN_INSUFFICIENT` | `2101003` | position margin insufficient | `400` |
+| `PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED` | `2101004` | platform position value limit exceeded | `400` |
 
-## 通知服务（2200xxx）
+## 网关鉴权错误（无 `codeKey`）
 
-### General
+AK/SK 鉴权由 API 网关处理。失败时通常返回 HTTP **401**（请求体超限为 **413**），响应为：
 
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `TEMPLATE_RICH_TEXT_ILLEGAL_TAG` | `2200001` | template rich text has illegal tags | `500` |
-| `FATIGUE_LIMIT` | `2200002` | fatigue limit | `500` |
-| `TEMPLATE_DISABLED` | `2200003` | template disabled | `500` |
-| `CHANNEL_NOT_SUPPORT` | `2200004` | channel not support | `500` |
-| `TEMPLATE_PARAM_MISMATCH` | `2200005` | template param mismatch | `500` |
-| `TEMPLATE_CONTENT_NOT_FOUND` | `2200006` | template content not found | `500` |
-| `TEMPLATE_CONTENT_INCONSISTENT` | `2200007` | template content inconsistent | `500` |
+```json
+{
+  "status": 401,
+  "code": 401,
+  "message": "签名无效"
+}
+```
 
-## 认证服务（2300xxx）
-
-### 用户管理模块异常 2301xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `USER_NOT_FOUND` | `2301001` | user not found | `500` |
-| `USERNAME_EXISTS` | `2301002` | username already exists | `500` |
-| `EMAIL_EXISTS` | `2301003` | email already exists | `500` |
-| `PASSWORD_ERROR` | `2301004` | password error | `500` |
-| `USER_DATA_VALIDATION_FAILED` | `2301005` | user data validation failed | `500` |
-| `USER_BATCH_OPERATION_FAILED` | `2301006` | user batch operation failed | `500` |
-| `OLD_PASSWORD_SAME` | `2301007` | old password same | `500` |
-| `NEW_PASSWORD_NOT_MATCH` | `2301008` | new password not match | `500` |
-| `ACCOUNT_TIER_OPERATION_FAILED` | `2301009` | account tier operation failed | `500` |
-
-### 业务线管理模块异常 2302xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `BUSINESS_LINE_NOT_FOUND` | `2302001` | business line not found | `500` |
-| `BUSINESS_LINE_NAME_EXISTS` | `2302002` | business line name already exists | `500` |
-| `BUSINESS_LINE_SAVE_FAILED` | `2302003` | business line save failed | `500` |
-| `BUSINESS_LINE_UPDATE_FAILED` | `2302004` | business line update failed | `500` |
-| `BUSINESS_LINE_DELETE_FAILED` | `2302005` | business line delete failed | `500` |
-| `BUSINESS_LINE_EMAIL_EXISTS` | `2302006` | business line email already exists | `500` |
-| `BUSINESS_LINE_STATUS_ERROR` | `2302007` | business line status error | `500` |
-| `BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED` | `2302008` | business line exist binding user delete failed | `500` |
-| `BUSINESS_TYPE_EXCEPTION` | `2302009` | business type exception | `500` |
-| `BUSINESS_TYPE_INVALID` | `2302010` | business type invalid | `500` |
-
-### 角色管理模块异常 2303xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `ROLE_NOT_FOUND` | `2303001` | role not found | `500` |
-| `ROLE_CODE_EXISTS` | `2303002` | role code already exists | `500` |
-| `ROLE_ADMIN_OPERATION_DENIED` | `2303003` | cannot operate admin role | `500` |
-| `ROLE_STATUS_ERROR` | `2303004` | role status error | `500` |
-| `ROLE_BATCH_OPERATION_FAILED` | `2303005` | role batch operation failed | `500` |
-
-### 权限管理模块异常 2304xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `PERMISSION_NOT_FOUND` | `2304001` | permission not found | `500` |
-| `PERMISSION_CODE_EXISTS` | `2304002` | permission code already exists | `500` |
-| `PERMISSION_IN_USE` | `2304003` | permission in use | `500` |
-| `PERMISSION_HAS_CHILDREN` | `2304004` | permission has children | `500` |
-| `PERMISSION_CIRCULAR_REFERENCE` | `2304005` | permission circular reference | `500` |
-
-## 行情聚合（2400xxx）
-
-### 行情源模块异常 2401xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `SYMBOL_STATUS_CLOSED` | `2401001` | mc symbol status closed | `500` |
-| `SYMBOL_SOURCE_DISABLED` | `2401002` | 行情源被禁用，请先删除被禁用的行情源 | `500` |
-| `SYMBOL_SOURCE_SYMBOL_DISABLED` | `2401003` | 行情源品种被禁用，请先删除被禁用的行情源品种 | `500` |
-| `SYMBOL_SOURCE_NAME_EXISTS` | `2401004` | 存在相同名称的行情源，请检查修改后重试 | `500` |
-
-### 交易品种模块异常 2402xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `TRADE_SYMBOL_NAME_EXISTS` | `2402001` | 存在相同名称的平台交易品种，请检查修改后重试 | `500` |
-| `TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS` | `2402002` | 此类型对应的子类型下，已存在相同名称的交易品种，请检查修改后重试 | `500` |
-| `TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY` | `2402003` | symbolIds is not empty | `500` |
-| `TRADE_SYMBOL_CONTRACT_UNIT_NULL` | `2402004` | contractUnit is null or 0 | `500` |
-| `TRADE_SYMBOL_BOOK_NULL` | `2402005` | book is null | `500` |
-| `TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR` | `2402006` | master source num error | `500` |
-| `TRADE_SYMBOL_CURRENCY_NOT_EXIST` | `2402007` | 币种不存在 | `500` |
-| `TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS` | `2402008` | 此类型对应的子类型下，已存在相同名称的上游品种名称, 请检查修改后重试 | `500` |
-
-### 告警通知模块异常 2403xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `ALARM_NOTIFICATION_TYPE_INVALID` | `2403001` | 告警通知类型无效 | `500` |
-
-### 规则映射模块异常 2404xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `RULE_MAPPING_NOT_CONFIGURED` | `2404001` | 平台品种映射未配置相关的映射交易品种 | `500` |
-| `RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE` | `2404002` | 中间价价差超过阈值，禁止切换 | `500` |
-
-### k线数据模块异常 2405xxx
-
-| `codeKey` | `code` | 说明 | HTTP |
-| --- | --- | --- | --- |
-| `KLINE_DATA_SOURCE_GET_FAILED` | `2405001` | 从数据源获取k线失败 | `500` |
-| `KLINE_DATA_SOURCE_REQUEST_TOO_LARGE` | `2405002` | 请求数据量过大 | `500` |
-| `KLINE_DATA_SOURCE_SYNC_MT5_FAILED` | `2405003` | 同步K线到MT5出错 | `500` |
-
+此类响应**没有**业务信封中的 `codeKey`。常见 `message` 见 [认证](/zh/authentication) 中的「错误响应」。

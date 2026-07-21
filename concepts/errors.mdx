@@ -60,20 +60,18 @@ Failed calls keep the same envelope shape, with `success: false` and a non-succe
 
 ## Common business codes
 
-Full catalog (all `codeKey` values): [Error codes](/api-reference/error-codes).
+Full catalog: [Error codes](/api-reference/error-codes) (public OpenAPI-reachable codes only).
 
 | `codeKey` | `code` | Meaning | Suggested action |
 | --- | --- | --- | --- |
-| `SIGN_ERROR` | `1000001` | Signature verification failed | Recompute signature; verify Secret Key and canonical string. |
 | `PARAM_ERROR` | `1000005` | Invalid request parameter | Fix parameters per `msg`. |
-| `PERMISSION_DENIED` | `1000006` | Permission denied | Add the required scope to the key. |
 | `NOT_EXIST` | `1000002` | Resource does not exist | Verify IDs in the request. |
 | `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | Insufficient balance | Top up or reduce the amount. |
 | `ORDER_OPERATION_FAILED` | `2100001` | Order operation failed | Inspect `msg`; retry only if transient. |
 | `DEFAULT` | `1000000` | Internal server error | Retry with backoff; contact support if it persists. |
 
 <Note>
-  Prefer `codeKey` (stable string) for switch/case logic. See the full [Error codes](/api-reference/error-codes) page for the complete catalog.
+  AK/SK authentication failures (for example `签名无效`) come from the gateway and have **no** `codeKey` — see [Authentication](/authentication). Prefer `codeKey` for switch/case logic.
 </Note>
 
 ## Handling errors
@@ -95,8 +93,8 @@ def call(method, path, body=""):
         return payload.get("data")
 
     code_key = payload.get("codeKey") or str(payload.get("code"))
-    if code_key in {"SIGN_ERROR", "1000001"}:
-        raise AuthError(code_key, payload.get("msg"))
+    if response.status_code == 401:
+        raise AuthError(code_key, payload.get("msg") or payload.get("message"))
 
     raise BusinessError(code_key, payload.get("msg"))
 
@@ -128,8 +126,8 @@ async function call(method, path, body = "") {
   if (payload.success === true) return payload.data;
 
   const codeKey = payload.codeKey || String(payload.code);
-  if (codeKey === "SIGN_ERROR" || codeKey === "1000001") {
-    throw new AuthError(codeKey, payload.msg);
+  if (res.status === 401) {
+    throw new AuthError(codeKey, payload.msg || payload.message);
   }
   throw new BusinessError(codeKey, payload.msg);
 }
