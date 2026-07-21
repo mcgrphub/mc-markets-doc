@@ -1,7 +1,7 @@
 ---
 title: "错误码"
 sidebarTitle: "错误码"
-description: "MC OpenAPI 业务错误码（`code` / `codeKey`），整理自 ExceptionTypeEnum。"
+description: "MC OpenAPI 业务错误码（`code` / `codeKey`）目录。"
 ---
 
 多数 OpenAPI 响应使用统一 JSON 信封，同时返回数字 `code` 与字符串 `codeKey`。
@@ -26,8 +26,6 @@ description: "MC OpenAPI 业务错误码（`code` / `codeKey`），整理自 Exc
 | `SS` | 2 | 场景 / 平台模块 |
 | `BB` | 2 | 业务域 |
 | `EEE` | 3 | 具体错误 |
-
-权威定义见 `mc-common-core` 中的 `ExceptionTypeEnum`。
 
 <Note>
   各接口文档不再内联完整 `codeKey` 枚举，请以本页为目录。
@@ -378,15 +376,15 @@ description: "MC OpenAPI 业务错误码（`code` / `codeKey`），整理自 Exc
 | `BACK_OFFICE_CONFIG_INVALID_SYMBOL` | `2020001` | Invalid symbol | `500` |
 | `BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST` | `2020002` | Chain config already exists | `500` |
 
-### 2021xxx MLP相关
+### 2021xxx 金库账户相关
 
 | `codeKey` | `code` | 说明 | HTTP |
 | --- | --- | --- | --- |
-| `MLP_CONFIG_NOT_FOUND` | `2021001` | MLP config not found | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_DUPLICATE` | `2021002` | MLP integral tier config duplicate | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_EMPTY` | `2021003` | MLP integral tier config empty | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_INVALID` | `2021004` | MLP integral tier config invalid | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR` | `2021005` | MLP integral tier config format error | `500` |
+| `MLP_CONFIG_NOT_FOUND` | `2021001` | 金库账户配置未找到 | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_DUPLICATE` | `2021002` | 金库账户积分档位配置重复 | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_EMPTY` | `2021003` | 金库账户积分档位配置为空 | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_INVALID` | `2021004` | 金库账户积分档位配置无效 | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR` | `2021005` | 金库账户积分档位配置格式错误 | `500` |
 
 ### 2022xxx 工单相关
 

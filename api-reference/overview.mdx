@@ -1,10 +1,10 @@
 ---
 title: "API Reference"
 sidebarTitle: "Overview"
-description: "MC OpenAPI public endpoints grouped by gateway service; facts come from Chinese Specs under openapi/, pages are hand-written MDX."
+description: "MC OpenAPI public endpoints grouped by gateway service: Account, Trade, Risk, and Aggregator."
 ---
 
-This reference covers public MC OpenAPI endpoints (the `@OpenApiPermission`-filtered subset in the Chinese Specs). Sidebar groups **Account**, **Trade**, **Risk**, and **Aggregator** are hand-written MDX pages, one page per external tag.
+This reference covers public MC OpenAPI endpoints. The sidebar groups **Account**, **Trade**, **Risk**, and **Aggregator**.
 
 All endpoints share the same gateway host, authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope. Request paths already include the service segment used for signing (for example `/openapi/v1/mc-account/...`).
 
@@ -22,17 +22,17 @@ All endpoints share the same gateway host, authentication scheme (AK/SK with HMA
   </Card>
 
   <Card title="Error codes" icon="triangle-exclamation" href="/api-reference/error-codes">
-    Full `code` / `codeKey` catalog from `ExceptionTypeEnum`.
+    Full `code` / `codeKey` catalog.
   </Card>
 </CardGroup>
 
 ## Endpoint groups
 
-| Group | Spec | Gateway path prefix |
-| --- | --- | --- |
-| Account | `openapi/mc-account.json` | `/openapi/v1/mc-account/` |
-| Trade | `openapi/mc-trade.json` | `/openapi/v1/mc-trade/` |
-| Risk | `openapi/mc-risk.json` | `/openapi/v1/mc-risk/` |
-| Aggregator | `openapi/mc-aggregator.json` | `/openapi/v1/mc-aggregator/` |
+| Group | Gateway path prefix |
+| --- | --- |
+| Account | `/openapi/v1/mc-account/` |
+| Trade | `/openapi/v1/mc-trade/` |
+| Risk | `/openapi/v1/mc-risk/` |
+| Aggregator | `/openapi/v1/mc-aggregator/` |
 
 Use the sidebar to open each group. The interactive playground is disabled because requests require custom AK/SK signing — follow [Authentication](/authentication) and [First request](/guides/first-request).

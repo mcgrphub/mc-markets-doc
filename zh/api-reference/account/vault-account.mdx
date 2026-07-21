@@ -4,23 +4,23 @@ sidebarTitle: "金库账户"
 description: "金库账户相关 OpenAPI 接口。"
 ---
 
-本组对应 Spec tag `MLP账户`（对外名称 **金库账户**）。路径前缀为 `/openapi/v1/mc-account/`。
+本组接口路径前缀为 `/openapi/v1/mc-account/`。
 
 ## 接口列表
 
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
-| POST | /openapi/v1/mc-account/mlp/account/withdraw | TRADE | MLP账户提现 |
-| POST | /openapi/v1/mc-account/mlp/account/deposit | TRADE | MLP账户存款 |
-| GET | /openapi/v1/mc-account/mlp/yesterday-yield-rate-data | READ | 获取MLP昨日回报率数据 |
-| GET | /openapi/v1/mc-account/mlp/withdraw-info | READ | 获取MLP提款信息 |
-| GET | /openapi/v1/mc-account/mlp/tvl-data | READ | 获取MLP金库TVL数据 |
-| GET | /openapi/v1/mc-account/mlp/treasury-info | READ | 获取MLP金库相关信息 |
-| GET | /openapi/v1/mc-account/mlp/deposit-info | READ | 获取MLP存款信息 |
-| GET | /openapi/v1/mc-account/mlp/core/stats | READ | 获取MLP统计信息 |
-| GET | /openapi/v1/mc-account/mlp/config | READ | 查询MLP参数 |
-| GET | /openapi/v1/mc-account/mlp/apr-data | READ | 获取MLP APR数据 |
-| GET | /openapi/v1/mc-account/mlp/account/assets | READ | 查询MLP账户资产详情 |
+| POST | /openapi/v1/mc-account/mlp/account/withdraw | TRADE | 金库账户提现 |
+| POST | /openapi/v1/mc-account/mlp/account/deposit | TRADE | 金库账户存款 |
+| GET | /openapi/v1/mc-account/mlp/yesterday-yield-rate-data | READ | 获取金库账户昨日回报率数据 |
+| GET | /openapi/v1/mc-account/mlp/withdraw-info | READ | 获取金库账户提款信息 |
+| GET | /openapi/v1/mc-account/mlp/tvl-data | READ | 获取金库账户 TVL 数据 |
+| GET | /openapi/v1/mc-account/mlp/treasury-info | READ | 获取金库账户相关信息 |
+| GET | /openapi/v1/mc-account/mlp/deposit-info | READ | 获取金库账户存款信息 |
+| GET | /openapi/v1/mc-account/mlp/core/stats | READ | 获取金库账户统计信息 |
+| GET | /openapi/v1/mc-account/mlp/config | READ | 查询金库账户参数 |
+| GET | /openapi/v1/mc-account/mlp/apr-data | READ | 获取金库账户 APR 数据 |
+| GET | /openapi/v1/mc-account/mlp/account/assets | READ | 查询金库账户资产详情 |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -28,11 +28,11 @@ description: "金库账户相关 OpenAPI 接口。"
 
 ---
 
-## MLP账户提现
+## 金库账户提现
 
 `POST /openapi/v1/mc-account/mlp/account/withdraw` — 权限 `TRADE`。
 
-MLP账户提现，从MLP账户转出到资金账户，然后划入交易账户。优先扣减本金，再扣减收益
+金库账户提现，从金库账户转出到资金账户，然后划入交易账户。优先扣减本金，再扣减收益
 
 ### 请求体（JSON）
 
@@ -56,11 +56,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 
 ---
 
-## MLP账户存款
+## 金库账户存款
 
 `POST /openapi/v1/mc-account/mlp/account/deposit` — 权限 `TRADE`。
 
-MLP账户存款，从交易账户转出到资金账户，然后存入MLP账户
+金库账户存款，从交易账户转出到资金账户，然后存入金库账户
 
 ### 请求体（JSON）
 
@@ -84,7 +84,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 
 ---
 
-## 获取MLP昨日回报率数据
+## 获取金库账户昨日回报率数据
 
 `GET /openapi/v1/mc-account/mlp/yesterday-yield-rate-data` — 权限 `READ`。
 
@@ -105,7 +105,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-
 
 ---
 
-## 获取MLP提款信息
+## 获取金库账户提款信息
 
 `GET /openapi/v1/mc-account/mlp/withdraw-info` — 权限 `READ`。
 
@@ -130,7 +130,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-i
 
 ---
 
-## 获取MLP金库TVL数据
+## 获取金库账户 TVL 数据
 
 `GET /openapi/v1/mc-account/mlp/tvl-data` — 权限 `READ`。
 
@@ -151,7 +151,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" 
 
 ---
 
-## 获取MLP金库相关信息
+## 获取金库账户相关信息
 
 `GET /openapi/v1/mc-account/mlp/treasury-info` — 权限 `READ`。
 
@@ -187,7 +187,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-i
 
 ---
 
-## 获取MLP存款信息
+## 获取金库账户存款信息
 
 `GET /openapi/v1/mc-account/mlp/deposit-info` — 权限 `READ`。
 
@@ -218,7 +218,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 ---
 
-## 获取MLP统计信息
+## 获取金库账户统计信息
 
 `GET /openapi/v1/mc-account/mlp/core/stats` — 权限 `READ`。
 
@@ -226,7 +226,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| totalLockedAmount | number | 总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值 |
+| totalLockedAmount | number | 总锁仓量 = 存入金库账户的总金额 + TVL 金额基准值 |
 | annualYieldRate | number | 年化收益率 |
 | myTotalDeposit | number | 我的总存款 |
 | totalHistoricalEarnings | number | 历史总收益 |
@@ -251,11 +251,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats
 
 ---
 
-## 查询MLP参数
+## 查询金库账户参数
 
 `GET /openapi/v1/mc-account/mlp/config` — 权限 `READ`。
 
-查询当前请求上下文业务线下的 MLP 收益率等参数，逻辑与后台 MlpConfigController#getConfig 一致，响应为 OpenAPI 专用模型。
+查询当前业务线下的金库账户收益率等参数。
 
 ### 响应 `data` 字段（摘要）
 
@@ -285,7 +285,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
 
 ---
 
-## 获取MLP APR数据
+## 获取金库账户 APR 数据
 
 `GET /openapi/v1/mc-account/mlp/apr-data` — 权限 `READ`。
 
@@ -306,7 +306,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 
 ---
 
-## 查询MLP账户资产详情
+## 查询金库账户资产详情
 
 `GET /openapi/v1/mc-account/mlp/account/assets` — 权限 `READ`。
 

@@ -28,11 +28,11 @@ Failed calls keep the same envelope shape, with `success: false` and a non-succe
 ```
 
 <ResponseField name="code" type="integer | string">
-  Business status code. Success responses typically use `0` / `200` depending on the envelope path. Failures use a **7-digit** code from `ExceptionTypeEnum`.
+  Business status code. Success responses typically use `0` / `200` depending on the envelope path. Failures use a **7-digit** error code.
 </ResponseField>
 
 <ResponseField name="codeKey" type="string">
-  Stable error key (enum name), for example `PARAM_ERROR` or `SIGN_ERROR`. Prefer branching on `codeKey` or `code`, not on `msg`.
+  Stable error key, for example `PARAM_ERROR` or `SIGN_ERROR`. Prefer branching on `codeKey` or `code`, not on `msg`.
 </ResponseField>
 
 <ResponseField name="msg" type="string">
@@ -73,7 +73,7 @@ Full catalog (all `codeKey` values): [Error codes](/api-reference/error-codes).
 | `DEFAULT` | `1000000` | Internal server error | Retry with backoff; contact support if it persists. |
 
 <Note>
-  Prefer `codeKey` (stable string) for switch/case logic. See the full [Error codes](/api-reference/error-codes) page for every value from `ExceptionTypeEnum`.
+  Prefer `codeKey` (stable string) for switch/case logic. See the full [Error codes](/api-reference/error-codes) page for the complete catalog.
 </Note>
 
 ## Handling errors

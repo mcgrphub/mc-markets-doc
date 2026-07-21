@@ -1,7 +1,7 @@
 ---
 title: "Error codes"
 sidebarTitle: "Error codes"
-description: "MC OpenAPI business error codes (`code` / `codeKey`) from ExceptionTypeEnum."
+description: "MC OpenAPI business error codes (`code` / `codeKey`) catalog."
 ---
 
 Most OpenAPI responses use a JSON envelope with both a numeric `code` and a string `codeKey`.
@@ -26,8 +26,6 @@ Error codes are **7-digit** values (returned as numbers in some schemas):
 | `SS` | 2 | Scene / platform module |
 | `BB` | 2 | Business domain |
 | `EEE` | 3 | Specific error |
-
-Source of truth: `ExceptionTypeEnum` in `mc-common-core`.
 
 <Note>
   Endpoint pages no longer inline the full `codeKey` enum. Use this page as the catalog.
@@ -378,15 +376,15 @@ Source of truth: `ExceptionTypeEnum` in `mc-common-core`.
 | `BACK_OFFICE_CONFIG_INVALID_SYMBOL` | `2020001` | Invalid symbol | `500` |
 | `BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST` | `2020002` | Chain config already exists | `500` |
 
-### 2021xxx MLP相关
+### 2021xxx Vault account
 
 | `codeKey` | `code` | Message | HTTP |
 | --- | --- | --- | --- |
-| `MLP_CONFIG_NOT_FOUND` | `2021001` | MLP config not found | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_DUPLICATE` | `2021002` | MLP integral tier config duplicate | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_EMPTY` | `2021003` | MLP integral tier config empty | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_INVALID` | `2021004` | MLP integral tier config invalid | `500` |
-| `MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR` | `2021005` | MLP integral tier config format error | `500` |
+| `MLP_CONFIG_NOT_FOUND` | `2021001` | Vault account config not found | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_DUPLICATE` | `2021002` | Vault account integral tier config duplicate | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_EMPTY` | `2021003` | Vault account integral tier config empty | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_INVALID` | `2021004` | Vault account integral tier config invalid | `500` |
+| `MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR` | `2021005` | Vault account integral tier config format error | `500` |
 
 ### 2022xxx 工单相关
 
