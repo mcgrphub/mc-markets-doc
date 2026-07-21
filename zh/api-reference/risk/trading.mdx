@@ -34,11 +34,14 @@ description: "交易品种列表等 Risk 交易相关接口。"
 | orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
 | group | string | 否 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].symbol | string | 产品名称 |
+| records[].group | string | 产品分组 |
+| records[].flags | string | 品种标签, MORTGAGE:抵押品，TRADE:交易品种,SPOT:现货 |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

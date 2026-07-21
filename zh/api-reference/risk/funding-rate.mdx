@@ -33,11 +33,29 @@ description: "资金费率相关 OpenAPI 接口。"
 | symbol | string | 是 | 交易币种 |
 | isSettlementRate | boolean | 否 | 是否是结算价 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].symbol | string |  |
+| records[].fundingRate | number |  |
+| records[].fundingRateStr | string |  |
+| records[].fundingRateDisplay | string |  |
+| records[].fundingRateScale | integer |  |
+| records[].annualRateDisplay | string |  |
+| records[].settlementPrice | number |  |
+| records[].settlementPriceStr | string |  |
+| records[].settlementPriceDisplay | string |  |
+| records[].settlementPriceScale | integer |  |
+| records[].longInterestRate | number |  |
+| records[].longInterestRateStr | string |  |
+| records[].shortInterestRate | number |  |
+| records[].shortInterestRateStr | string |  |
+| records[].isSettlementRate | boolean |  |
+| records[].nextSettlementTime | integer |  |
+| records[].timestamp | integer |  |
+| records[].settlementCycle | integer |  |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

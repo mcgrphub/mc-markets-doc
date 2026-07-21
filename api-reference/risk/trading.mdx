@@ -34,11 +34,14 @@ Query the trading symbol list for the current user.
 | orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 | group | string | No |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].symbol | string | Product Name |
+| records[].group | string | Product Group |
+| records[].flags | string | Symbol tags: MORTGAGE: Collateral, TRADE: Trading Symbol, SPOT: Spot |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

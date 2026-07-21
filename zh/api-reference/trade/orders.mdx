@@ -32,6 +32,63 @@ description: "订单相关 OpenAPI 接口。"
 | symbol | string | 否 |  |
 | login | string | 是 |  |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].order | integer | 订单号，主键 |
+| [].login | integer | 登录账号，MT5账户登录号 |
+| [].dealer | integer | 交易商ID，MT5交易商编号 |
+| [].symbol | string | 交易品种，如EURUSD、GBPUSD等 |
+| [].digits | integer | 价格精度，交易品种的价格小数位数 |
+| [].digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
+| [].contractSize | number | 合约大小，每手合约的标准大小 |
+| [].state | integer | 订单状态 |
+| [].reason | integer | 原因，订单变更的原因代码 |
+| [].timeSetup | integer | 下单时间，订单创建的时间戳，毫秒级，长度13位 |
+| [].timeExpiration | integer | 到期时间，订单的到期时间戳，毫秒级，长度13位 |
+| [].timeDone | integer | 完成时间，订单完成的时间戳，毫秒级，长度13位 |
+| [].timeSetupMsc | integer | 下单时间（毫秒），订单创建的时间戳（毫秒），毫秒级，长度13位 |
+| [].timeDoneMsc | integer | 完成时间（毫秒），订单完成的时间戳（毫秒），毫秒级，长度13位 |
+| [].modifyFlags | integer | 修改标志，订单修改的标志位 |
+| [].type | integer | 订单类型，如买入、卖出等 |
+| [].typeFill | integer | 成交类型，订单的填充方式 |
+| [].typeTime | integer | 有效时间类型，订单的有效期类型 |
+| [].priceOrder | number | 订单价格，订单的执行价格 |
+| [].priceOrderDisplay | string | 订单价格展示值 |
+| [].priceOrderScale | integer | 订单价格展示小数位 |
+| [].priceTrigger | number | 触发价格，订单的触发价格 |
+| [].priceTriggerDisplay | string | 触发价格展示值 |
+| [].priceTriggerScale | integer | 触发价格展示小数位 |
+| [].priceCurrent | number | 当前价格，订单的当前市场价格 |
+| [].priceCurrentDisplay | string | 当前价格展示值 |
+| [].priceCurrentScale | integer | 当前价格展示小数位 |
+| [].priceSlDisplay | string | 止损价格展示值 |
+| [].priceSlScale | integer | 止损价格展示小数位 |
+| [].priceTpDisplay | string | 止盈价格展示值 |
+| [].priceTpScale | integer | 止盈价格展示小数位 |
+| [].volumeInitialExt | number | 初始扩展手数，订单的初始扩展手数（用于大额订单） |
+| [].volumeCurrentExt | number | 当前扩展手数，订单的当前扩展手数 |
+| [].quantity | number | 用户数量，等于当前剩余 volumeCurrentExt 除以 10^8 |
+| [].rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
+| [].activationMode | integer | 激活模式，挂单的激活模式（如挂单激活方式） |
+| [].activationTime | integer | 激活时间，挂单的激活时间戳 |
+| [].activationPrice | number | 激活价格，挂单的激活价格 |
+| [].activationFlags | integer | 激活标志，挂单激活的标志位 |
+| [].volumeInitial | number | 初始手数，订单的初始交易手数 |
+| [].volumeInitialDisplay | string | 初始手数展示值 |
+| [].volumeInitialScale | integer | 初始手数展示小数位 |
+| [].volumeCurrent | number | 当前手数，订单的当前交易手数 |
+| [].volumeCurrentDisplay | string | 当前手数展示值 |
+| [].volumeCurrentScale | integer | 当前手数展示小数位 |
+| [].externalID | string | 外部ID，外部系统关联的ID |
+| [].priceSL | number | 止损价格，设置的止损价位 |
+| [].priceTP | number | 止盈价格，设置的止盈价位 |
+| [].expertID | integer | 专家顾问ID，如果订单由EA（Expert Advisor）创建，则记录EA的ID |
+| [].positionID | integer | 持仓ID，关联的持仓ID |
+| [].positionByID | integer | 反向持仓ID，关联的反向持仓ID |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/pending/v2" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -62,11 +119,63 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/pen
 | to | integer | 是 | 结束时间戳（Unix时间戳，秒） |
 | symbol | string | 否 | 交易品种名 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].order | integer | 订单号，主键 |
+| records[].login | integer | 登录账号，MT5账户登录号 |
+| records[].dealer | integer | 交易商ID，MT5交易商编号 |
+| records[].symbol | string | 交易品种，如EURUSD、GBPUSD等 |
+| records[].digits | integer | 价格精度，交易品种的价格小数位数 |
+| records[].digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
+| records[].contractSize | number | 合约大小，每手合约的标准大小 |
+| records[].state | integer | 订单状态 |
+| records[].reason | integer | 原因，订单变更的原因代码 |
+| records[].timeSetup | integer | 下单时间，订单创建的时间戳，毫秒级，长度13位 |
+| records[].timeExpiration | integer | 到期时间，订单的到期时间戳，毫秒级，长度13位 |
+| records[].timeDone | integer | 完成时间，订单完成的时间戳，毫秒级，长度13位 |
+| records[].timeSetupMsc | integer | 下单时间（毫秒），订单创建的时间戳（毫秒），毫秒级，长度13位 |
+| records[].timeDoneMsc | integer | 完成时间（毫秒），订单完成的时间戳（毫秒），毫秒级，长度13位 |
+| records[].modifyFlags | integer | 修改标志，订单修改的标志位 |
+| records[].type | integer | 订单类型，如买入、卖出等 |
+| records[].typeFill | integer | 成交类型，订单的填充方式 |
+| records[].typeTime | integer | 有效时间类型，订单的有效期类型 |
+| records[].priceOrder | number | 订单价格，订单的执行价格 |
+| records[].priceOrderStr | string | 订单价格原始字符串 |
+| records[].priceOrderDisplay | string | 订单价格展示值 |
+| records[].priceOrderScale | integer | 订单价格展示小数位 |
+| records[].priceTrigger | number | 触发价格，订单的触发价格 |
+| records[].priceTriggerDisplay | string | 触发价格展示值 |
+| records[].priceTriggerScale | integer | 触发价格展示小数位 |
+| records[].priceCurrent | number | 当前价格，订单的当前市场价格 |
+| records[].priceCurrentDisplay | string | 当前价格展示值 |
+| records[].priceCurrentScale | integer | 当前价格展示小数位 |
+| records[].priceSlDisplay | string | 止损价格展示值 |
+| records[].priceSlScale | integer | 止损价格展示小数位 |
+| records[].priceTpDisplay | string | 止盈价格展示值 |
+| records[].priceTpScale | integer | 止盈价格展示小数位 |
+| records[].volumeInitialExt | number | 初始扩展手数，订单的初始扩展手数（用于大额订单） |
+| records[].quantity | number | 用户数量，等于初始 volumeInitialExt 除以 10^8 |
+| records[].volumeInitialDisplay | string | 初始手数展示值 |
+| records[].volumeInitialScale | integer | 初始手数展示小数位 |
+| records[].volumeCurrentExt | number | 当前扩展手数，订单的当前扩展手数 |
+| records[].volumeCurrentDisplay | string | 当前手数展示值 |
+| records[].volumeCurrentScale | integer | 当前手数展示小数位 |
+| records[].rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
+| records[].activationMode | integer | 激活模式，挂单的激活模式（如挂单激活方式） |
+| records[].activationTime | integer | 激活时间，挂单的激活时间戳 |
+| records[].activationPrice | number | 激活价格，挂单的激活价格 |
+| records[].activationFlags | integer | 激活标志，挂单激活的标志位 |
+| records[].volumeInitial | number | 初始手数，订单的初始交易手数 |
+| records[].volumeCurrent | number | 当前手数，订单的当前交易手数 |
+| records[].externalID | string | 外部ID，外部系统关联的ID |
+| records[].priceSL | number | 止损价格，设置的止损价位 |
+| records[].priceTP | number | 止盈价格，设置的止盈价位 |
+| records[].expertID | integer | 专家顾问ID，如果订单由EA（Expert Advisor）创建，则记录EA的ID |
+| records[].positionID | integer | 持仓ID，关联的持仓ID |
+| records[].positionByID | integer | 反向持仓ID，关联的反向持仓ID |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

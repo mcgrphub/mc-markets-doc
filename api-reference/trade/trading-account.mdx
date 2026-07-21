@@ -41,11 +41,18 @@ Query the trading account fund movement list (collateral increase/decrease histo
 | to | integer | Yes |  |
 | symbol | string | No |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].symbol | string | Product Name |
+| records[].volume | integer | Transfer amount. Positive means increase, negative means deduction |
+| records[].value | number | Converted USDC value (at the time of transfer) |
+| records[].position | integer | Associated position ID, if any |
+| records[].reason | integer | Transfer Reason - Enum |
+| records[].price | number | USDC price (at the time of transfer) |
+| records[].timestamp | integer | Timestamp |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -81,6 +88,59 @@ Query all open positions for the current user (UID from the `X-UID` header). MT5
 | symbol | string | No | Trading symbol |
 | positionType | string | No | Omit or pass ALL for all, COLLATERAL for collateral only, SYMBOL for trading positions only |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].position | integer | Position number, the unique position identifier in the MT5 system |
+| [].login | integer | Login account, MT5 account login number |
+| [].dealer | integer | Dealer ID, the MT5 dealer code |
+| [].symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
+| [].action | integer | Operation type: 0-Buy, 1-Sell |
+| [].digits | integer | Price precision, the number of decimal places for the trading symbol |
+| [].digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
+| [].profitCurrencyDigits | integer | P/L currency display precision. Priority: position DigitsCurrency > mt5_symbols.CurrencyProfitDigits > fallback 2 |
+| [].reason | integer | Reason, the reason code for the position change |
+| [].contractSize | number | Contract size, the standard size per lot |
+| [].timeCreate | integer | Creation time, the timestamp when the position was created, in milliseconds, 13 digits |
+| [].timeUpdate | integer | Update time, the timestamp when the position was last updated, in milliseconds, 13 digits |
+| [].timeCreateMsc | integer | Creation time (ms), the timestamp when the position was created (milliseconds), 13 digits |
+| [].timeUpdateMsc | integer | Update time (ms), the timestamp when the position was last updated (milliseconds), 13 digits |
+| [].priceOpen | number | Open price, the opening price of the position |
+| [].priceOpenDisplay | string | Open price display value |
+| [].priceOpenScale | integer | Open price display decimal places |
+| [].priceCurrent | number | Current price, the current market price of the position |
+| [].priceCurrentDisplay | string | Current price display value |
+| [].priceCurrentScale | integer | Current price display decimal places |
+| [].priceSlDisplay | string | Stop loss price display value |
+| [].priceSlScale | integer | Stop loss price display decimal places |
+| [].priceTpDisplay | string | Take profit price display value |
+| [].priceTpScale | integer | Take profit price display decimal places |
+| [].volumeExt | integer | Extended volume, the extended volume of the position (for large orders). Divide by 100000000 to convert to a floating point number |
+| [].volumeDisplay | string | Position volume display value |
+| [].volumeScale | integer | Position volume display decimal places |
+| [].positionValueDisplay | string | Position value display value |
+| [].positionValueScale | integer | Position value display decimal places |
+| [].profit | number | Profit/Loss, the floating profit/loss amount of the current position |
+| [].profitDisplay | string | Profit/Loss display value |
+| [].profitScale | integer | Profit/Loss display decimal places |
+| [].storage | number | Storage fee, the overnight interest/storage fee of the position |
+| [].rateProfit | number | Profit/Loss exchange rate, the exchange rate used when calculating P/L |
+| [].rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
+| [].activationMode | integer | Activation mode, the activation mode of the pending order |
+| [].activationTime | integer | Activation time, the activation timestamp of the pending order |
+| [].activationPrice | number | Activation price, the activation price of the pending order |
+| [].activationFlags | integer | Activation flag, the flag bit for pending order activation |
+| [].volume | integer | Volume, the trading volume of the position in lots. Divide by 10000 to convert to a floating point number |
+| [].fundingRate | number | Funding Fee |
+| [].interest | number | Interest |
+| [].externalID | string | External ID, the ID associated with the external system |
+| [].priceSL | number | Stop loss price, the set stop loss level |
+| [].priceTP | number | Take profit price, the set take profit level |
+| [].expertID | integer | Expert Advisor ID. If the position was created by an EA (Expert Advisor), records the EA ID |
+| [].expertPositionID | integer | Expert Advisor position ID, the position ID associated with EA-created positions |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions/current/v2" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -106,14 +166,14 @@ Query PnL for a time range (for example, the past week). UID is taken from the `
 | to | integer | No |  |
 | login | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| uid | integer | Account login ID |
-| totalProfit | number | Total profit in range |
-| totalLoss | number | Total loss in range (negative value) |
-| netPnl | number | Net PnL in range |
+| uid | integer | Account Login Number |
+| totalProfit | number | Total Period Profit |
+| totalLoss | number | Total Period Loss (negative value) |
+| netPnl | number | Net Period P/L |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
@@ -138,7 +198,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
 | --- | --- | --- | --- |
 | symbol | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -169,7 +229,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
 | --- | --- | --- | --- |
 | symbol | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |

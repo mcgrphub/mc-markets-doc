@@ -32,6 +32,12 @@ description: "汇率相关 OpenAPI 接口。"
 | baseCurrency | string | 是 | 基础货币代码（ISO 4217标准） |
 | targetCurrency | string | 是 | 目标货币代码（ISO 4217标准） |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | number | `data` 为该类型标量 |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -48,6 +54,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 ## 美元汇率查询
 
 `GET /openapi/v1/mc-account/exchange-rate/query/usd` — 权限 `READ`。
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].symbolType | string | 基础货币的类型 |
+| [].baseCurrency | string | 基础货币代码（ISO 4217标准） |
+| [].targetCurrency | string | 目标货币代码（ISO 4217标准） |
+| [].exchangeRate | number | 汇率 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
@@ -73,7 +89,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 | to | string | 是 | 兑入币种/兑换后币种 |
 | fromAmount | number | 否 | 用户输入的消耗币种数量（from 数量），用于试算手续费与预计到账 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -81,7 +97,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 | timestamp | integer |  |
 | oneFromToQuantity | number | 1个[from]币可兑换[to]币的数量 |
 | oneToFromQuantity | number | 1 个[to]币可兑换[from]币的数量 |
-| bookPriceDotMap | object | 汇率转换过程的报价，包含多个汇率转换步骤，key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
+| bookPriceDotMap | object | 汇率转换过程的的报价-包含多个汇率转换步骤,key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |
 | baseExchangeRate | number | 基础汇率（未扣手续费/未应用免费额度前），用于测试验证 |
 | baseExchangeRateDisplay | string | 基础汇率展示值 |
 | fromAmount | number | 用户输入的消耗币种数量（from 数量） |

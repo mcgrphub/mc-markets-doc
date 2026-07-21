@@ -41,13 +41,13 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 | priceSL | number | No | New stop-loss price |
 | priceTP | number | No | New take-profit price |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 response status code |
-| orderId | string | MT5 order ID (if present) |
-| params | object | MT5 response parameters (passed through to the client or used for business logic) |
+| code | string | MT5 Return Status Code |
+| orderId | string | MT5 Order ID (if any) |
+| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -83,13 +83,13 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 | order | integer | Yes | Order ID |
 | volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000; must match the volumeExt passed when the order was placed |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 response status code |
-| orderId | string | MT5 order ID (if present) |
-| params | object | MT5 response parameters (passed through to the client or used for business logic) |
+| code | string | MT5 Return Status Code |
+| orderId | string | MT5 Order ID (if any) |
+| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -128,13 +128,13 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 | userSlippageLimit | number | No | Maximum slippage limit for market orders entered by the user (market orders only) |
 | frontMarketPrice | number | No | Client-side market reference price (optional); must be ≥ 0 |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 response status code |
-| orderId | string | MT5 order ID (if present) |
-| params | object | MT5 response parameters (passed through to the client or used for business logic) |
+| code | string | MT5 Return Status Code |
+| orderId | string | MT5 Order ID (if any) |
+| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -172,13 +172,13 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | priceTP | number | No | Take-profit |
 | frontMarketPrice | number | No | Client-side market reference price (optional); must be ≥ 0 |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 response status code |
-| orderId | string | MT5 order ID (if present) |
-| params | object | MT5 response parameters (passed through to the client or used for business logic) |
+| code | string | MT5 Return Status Code |
+| orderId | string | MT5 Order ID (if any) |
+| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -204,6 +204,137 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | --- | --- | --- | --- |
 | symbols | array | Yes |  |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string |  |
+| [].mt5 | object |  |
+| [].mt5.Category | string |  |
+| [].mt5.ContractSize | number |  |
+| [].mt5.CurrencyBase | string |  |
+| [].mt5.CurrencyBaseDigits | integer |  |
+| [].mt5.CurrencyMargin | string |  |
+| [].mt5.CurrencyMarginDigits | integer |  |
+| [].mt5.CurrencyProfit | string |  |
+| [].mt5.CurrencyProfitDigits | integer |  |
+| [].mt5.Digits | integer |  |
+| [].mt5.FreezeLevel | integer |  |
+| [].mt5.IESlipLosing | integer |  |
+| [].mt5.IESlipProfit | integer |  |
+| [].mt5.IEVolumeMaxExt | integer |  |
+| [].mt5.International | string |  |
+| [].mt5.MarginFlags | integer |  |
+| [].mt5.MarginHedged | number |  |
+| [].mt5.MarginInitial | number |  |
+| [].mt5.MarginMaintenance | number |  |
+| [].mt5.MarginRateCurrency | number |  |
+| [].mt5.MarginRateLiquidity | number |  |
+| [].mt5.OrderFlags | integer |  |
+| [].mt5.Path | string |  |
+| [].mt5.PriceLimitMax | number |  |
+| [].mt5.PriceLimitMin | number |  |
+| [].mt5.PriceSettle | number |  |
+| [].mt5.SessionTrade | array |  |
+| [].mt5.SessionTrade[].quote | array |  |
+| [].mt5.SessionTrade[].quote[].from | string |  |
+| [].mt5.SessionTrade[].quote[].to | string |  |
+| [].mt5.SessionTrade[].trade | array |  |
+| [].mt5.SessionTrade[].trade[].from | string |  |
+| [].mt5.SessionTrade[].trade[].to | string |  |
+| [].mt5.SessionTrade[].weekDay | string |  |
+| [].mt5.Source | string |  |
+| [].mt5.StopsLevel | integer |  |
+| [].mt5.TickBookDepth | integer |  |
+| [].mt5.TimeExpiration | string |  |
+| [].mt5.TimeStart | string |  |
+| [].mt5.TradeMode | integer |  |
+| [].mt5.Spread | number |  |
+| [].mt5.VolumeLimitExt | integer |  |
+| [].mt5.VolumeMaxExt | integer |  |
+| [].mt5.VolumeMinExt | integer |  |
+| [].mt5.VolumeStepExt | integer |  |
+| [].mt5.leverageGrade | array |  |
+| [].mt5.leverageGrade[].from | number |  |
+| [].mt5.leverageGrade[].initialAdvanceRate | number |  |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number |  |
+| [].mt5.leverageGrade[].to | number |  |
+| [].mt5.marginRateInitial | object |  |
+| [].mt5.marginRateInitial.buy | number |  |
+| [].mt5.marginRateInitial.buyLimit | number |  |
+| [].mt5.marginRateInitial.buyStop | number |  |
+| [].mt5.marginRateInitial.buyStopLimit | number |  |
+| [].mt5.marginRateInitial.sell | number |  |
+| [].mt5.marginRateInitial.sellLimit | number |  |
+| [].mt5.marginRateInitial.sellStop | number |  |
+| [].mt5.marginRateInitial.sellStopLimit | number |  |
+| [].mt5.marginRateMaintenance | object |  |
+| [].mt5.marginRateMaintenance.buy | number |  |
+| [].mt5.marginRateMaintenance.buyLimit | number |  |
+| [].mt5.marginRateMaintenance.buyStop | number |  |
+| [].mt5.marginRateMaintenance.buyStopLimit | number |  |
+| [].mt5.marginRateMaintenance.sell | number |  |
+| [].mt5.marginRateMaintenance.sellLimit | number |  |
+| [].mt5.marginRateMaintenance.sellStop | number |  |
+| [].mt5.marginRateMaintenance.sellStopLimit | number |  |
+| [].risk | object |  |
+| [].risk.id | integer |  |
+| [].risk.symbol | string |  |
+| [].risk.version | integer |  |
+| [].risk.longAnnualRate | number |  |
+| [].risk.shortAnnualRate | number |  |
+| [].risk.discountRate | number |  |
+| [].risk.baseRate | number |  |
+| [].risk.specialSymbol | integer |  |
+| [].risk.fundingRateBaseType | string |  |
+| [].risk.fundingRateThreshold | number |  |
+| [].risk.fundingRateStep | number |  |
+| [].risk.fundingRateIncrease | number |  |
+| [].risk.fundingRateBase | number |  |
+| [].risk.fundingRateMin | number |  |
+| [].risk.fundingRateMax | number |  |
+| [].risk.liquidationFeeType | string |  |
+| [].risk.liquidationFeeValue | number |  |
+| [].risk.minLiquidationFee | number |  |
+| [].risk.fundingRateMode | string |  |
+| [].risk.fundingRateExternalMarketSymbol | string |  |
+| [].risk.groupName | string |  |
+| [].risk.platformMaxSlippageType | string |  |
+| [].risk.platformMaxSlippage | number |  |
+| [].risk.tpSlMaxSlippageType | string |  |
+| [].risk.tpSlMaxSlippage | number |  |
+| [].risk.userLongPositionValueLimitUsdc | number |  |
+| [].risk.userShortPositionValueLimitUsdc | number |  |
+| [].risk.platformLongTotalPositionLimitUsdc | number |  |
+| [].risk.platformShortTotalPositionLimitUsdc | number |  |
+| [].risk.free | object |  |
+| [].risk.free.transCostConfig | array |  |
+| [].risk.free.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.free.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.free.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.free.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.free.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.free.discountRate | number |  |
+| [].risk.premium | object |  |
+| [].risk.premium.transCostConfig | array |  |
+| [].risk.premium.transCostConfig[].startTime | string | Trading Cost Config - Start Time |
+| [].risk.premium.transCostConfig[].endTime | string | Trading Cost Config - End Time |
+| [].risk.premium.transCostConfig[].transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | Deal cumulative time |
+| [].risk.premium.transCostConfig[].slippageConfig | array | Slippage Tier Configuration |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | Tier Range (From) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | Tier Range (To) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| [].risk.premium.discountRate | number |  |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -228,11 +359,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 | volumeExt | integer | Yes | Order quantity (extended precision ×100000000); e.g. for 0.01 lots pass 0.01*100000000 |
 | symbol | string | Yes | Trading pair / symbol |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| estimatedSlippage | number | Estimated slippage |
+| estimatedSlippage | number | Estimated Slippage |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
@@ -258,13 +389,43 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 | --- | --- | --- | --- |
 | uid | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | groupName | string |  |
 | commissionCfg | array |  |
+| commissionCfg[].actionMode | integer |  |
+| commissionCfg[].chargeMode | integer |  |
+| commissionCfg[].description | string |  |
+| commissionCfg[].entryMode | integer |  |
+| commissionCfg[].mode | integer |  |
+| commissionCfg[].name | string |  |
+| commissionCfg[].path | string |  |
+| commissionCfg[].profitMode | integer |  |
+| commissionCfg[].rangeMode | integer |  |
+| commissionCfg[].reasonFlags | integer |  |
+| commissionCfg[].turnoverCurrency | string |  |
+| commissionCfg[].groupTier | array |  |
+| commissionCfg[].groupTier[].currency | string |  |
+| commissionCfg[].groupTier[].maximal | number |  |
+| commissionCfg[].groupTier[].minimal | number |  |
+| commissionCfg[].groupTier[].mode | integer |  |
+| commissionCfg[].groupTier[].rangeFrom | number |  |
+| commissionCfg[].groupTier[].rangeTo | number |  |
+| commissionCfg[].groupTier[].type | integer |  |
+| commissionCfg[].groupTier[].value | number |  |
 | leverageCfg | array |  |
+| leverageCfg[].description | string |  |
+| leverageCfg[].name | string |  |
+| leverageCfg[].path | string |  |
+| leverageCfg[].rangeMode | integer |  |
+| leverageCfg[].rangeValueCurrency | string |  |
+| leverageCfg[].tiers | array |  |
+| leverageCfg[].tiers[].marginRateInitial | number |  |
+| leverageCfg[].tiers[].marginRateMaintenance | number |  |
+| leverageCfg[].tiers[].rangeFrom | number |  |
+| leverageCfg[].tiers[].rangeTo | number |  |
 | marginCall | string |  |
 
 ```bash
@@ -288,11 +449,54 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 | --- | --- | --- | --- |
 | login | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | userAssets | object |  |
+| userAssets.balance | number |  |
+| userAssets.equity | number |  |
+| userAssets.floating | number |  |
+| userAssets.margin | number |  |
+| userAssets.marginFree | number |  |
+| userAssets.marginLevel | number |  |
+| userAssets.positions | array |  |
+| userAssets.positions[].id | integer |  |
+| userAssets.positions[].login | integer |  |
+| userAssets.positions[].action | integer |  |
+| userAssets.positions[].contractSize | number |  |
+| userAssets.positions[].freeMargin | number |  |
+| userAssets.positions[].precision | integer |  |
+| userAssets.positions[].priceDigits | integer |  |
+| userAssets.positions[].currencyDigits | integer |  |
+| userAssets.positions[].priceCurrent | number |  |
+| userAssets.positions[].openPrice | number |  |
+| userAssets.positions[].time | integer |  |
+| userAssets.positions[].slPrice | number |  |
+| userAssets.positions[].tpPrice | number |  |
+| userAssets.positions[].rateProfit | number |  |
+| userAssets.positions[].freeAmount | number |  |
+| userAssets.positions[].symbol | string |  |
+| userAssets.positions[].usdValue | number |  |
+| userAssets.positions[].volume | number |  |
+| userAssets.positions[].volumeExt | number |  |
+| userAssets.positions[].contractSizeStr | string |  |
+| userAssets.positions[].priceCurrentStr | string |  |
+| userAssets.positions[].usdValueStr | string |  |
+| userAssets.positions[].volumeDisplay | string |  |
+| userAssets.positions[].volumeScale | integer |  |
+| userAssets.balanceStr | string |  |
+| userAssets.equityStr | string |  |
+| userAssets.floatingStr | string |  |
+| userAssets.marginStr | string |  |
+| userAssets.marginFreeStr | string |  |
+| userAssets.marginLevelStr | string |  |
+| userAssets.marginDisplay | string |  |
+| userAssets.marginScale | integer |  |
+| userAssets.marginFreeDisplay | string |  |
+| userAssets.marginFreeScale | integer |  |
+| userAssets.marginLevelDisplay | string |  |
+| userAssets.marginLevelScale | integer |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \
@@ -318,13 +522,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 | type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
 | symbol | string | Yes | Trading pair, e.g. BTCUSDT |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code | string | MT5 response status code |
-| orderId | string | MT5 order ID (if present) |
-| params | object | MT5 response parameters (passed through to the client or used for business logic) |
+| code | string | MT5 Return Status Code |
+| orderId | string | MT5 Order ID (if any) |
+| params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

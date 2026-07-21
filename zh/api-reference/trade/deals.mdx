@@ -38,11 +38,59 @@ description: "成交相关 OpenAPI 接口。"
 | to | integer | 是 | 结束时间戳（Unix时间戳，秒） |
 | symbol | string | 否 | 交易品种名 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].deal | integer | 成交号，主键 |
+| records[].login | integer | 登录账号，MT5账户登录号 |
+| records[].dealer | integer | 交易商ID，MT5交易商编号 |
+| records[].order | integer | 订单号，关联的订单号 |
+| records[].action | integer | 0-买入, 1-卖出 |
+| records[].entry | integer | 0-开仓，1-平仓 |
+| records[].reason | integer | 原因，成交变更的原因代码 |
+| records[].digits | integer | 价格精度，交易品种的价格小数位数 |
+| records[].digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
+| records[].contractSize | number | 合约大小，每手合约的标准大小 |
+| records[].time | integer | 成交时间，成交发生的时间戳，毫秒级，长度13位 |
+| records[].timeMsc | integer | 成交时间（毫秒），成交发生的时间戳（毫秒），毫秒级，长度13位 |
+| records[].symbol | string | 交易品种，如EURUSD、GBPUSD等 |
+| records[].price | number | 成交价格，成交的执行价格 |
+| records[].volumeExt | integer | 扩展手数，成交的扩展手数（用于大额订单）,转浮点数需要除100000000 |
+| records[].quantity | number | 用户数量，volumeExt 除以 10^8 |
+| records[].profit | number | 盈亏，成交产生的盈亏金额 |
+| records[].storage | number | 库存费，持仓产生的库存费用 |
+| records[].commission | number | 佣金，成交产生的佣金费用 |
+| records[].commissionDisplay | string | 佣金展示值，按带符号 CEILING 固定保留 6 位小数 |
+| records[].commissionScale | integer | 佣金展示小数位 |
+| records[].profitDisplay | string | 盈亏展示值，按 HALF_UP 固定保留 8 位小数 |
+| records[].profitScale | integer | 盈亏展示小数位 |
+| records[].fee | number | 手续费，成交产生的手续费用 |
+| records[].rateProfit | number | 盈亏汇率，计算盈亏时使用的汇率 |
+| records[].rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
+| records[].profitRaw | number | 原始盈亏，成交的原始盈亏金额（未考虑汇率） |
+| records[].pricePosition | number | 持仓价格，持仓的平均价格 |
+| records[].volumeClosedExt | integer | 已平仓扩展手数，已平仓的扩展手数 |
+| records[].tickValue | number | 点值，每个点的价值 |
+| records[].tickSize | number | 点大小，每个点的大小 |
+| records[].flags | integer | 标志位，成交的标志位 |
+| records[].value | number | 价值，成交的价值 |
+| records[].gateway | string | 网关，成交的网关名称 |
+| records[].priceGateway | number | 网关价格，网关的成交价格 |
+| records[].modifyFlags | integer | 修改标志，成交修改的标志位 |
+| records[].marketBid | number | 市场买价，市场当前的买价 |
+| records[].marketAsk | number | 市场卖价，市场当前的卖价 |
+| records[].marketLast | number | 市场最后价，市场最后的成交价 |
+| records[].volume | integer | 手数，成交的交易手数,转浮点数需要除10000 |
+| records[].volumeClosed | integer | 已平仓手数，已平仓的交易手数 |
+| records[].externalID | string | 外部ID，外部系统关联的ID |
+| records[].expertID | integer | 专家顾问ID，如果成交由EA（Expert Advisor）创建，则记录EA的ID |
+| records[].positionID | integer | 持仓ID，关联的持仓ID |
+| records[].priceSL | number | 止损价格，设置的止损价位 |
+| records[].priceTP | number | 止盈价格，设置的止盈价位 |
+| records[].on_chain_status | string | 链上状态（关联 ac_deal_order） |
+| records[].tx_hash | string | 链上交易哈希（关联 ac_deal_order） |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -76,6 +124,17 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 | --- | --- | --- | --- |
 | symbol | string | 是 |  |
 | limit | integer | 是 |  |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].action | integer | 0-买入, 1-卖出 |
+| [].price | number | 成交价格 |
+| [].volumeExt | integer | 扩展手数 |
+| [].timeMsc | integer | 成交时间（毫秒） |
+| [].orderId | integer | 订单号 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \

@@ -26,12 +26,12 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 Query positions.
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | uid | string | User ID |
-| symbolInfo | object | Position info; key is trading symbol, value is position details |
+| symbolInfo | object | Position information, key is the trading symbol, value is position details |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot/positions/v2" \
@@ -55,12 +55,12 @@ Query spot account positions.
 | --- | --- | --- | --- |
 | spotId | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| spotId | string | Spot account ID |
-| symbolInfo | object | Position info; key is trading symbol, value is position details |
+| spotId | string | Spot Account ID |
+| symbolInfo | object | Position information, key is the trading symbol, value is position details |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \
@@ -83,17 +83,21 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 | --- | --- | --- | --- |
 | batchId | integer | No |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| treeBatchId | integer | Merkle Tree build batch |
+| treeBatchId | integer | Merkle Tree Build Batch |
 | userId | string | User ID |
-| userHash | string | PoRv2 user hash (user_hash) |
-| assetInfo | string | Asset info |
+| userHash | string | PoRv2 User Hash (user_hash) |
+| assetInfo | string | Asset Information |
 | leafHash | string | Merkle leaf hash value |
-| pathLayers | string | Recursive layer path; each layer is one group plus your position within it |
-| platformAssetProof | array | Platform asset proof |
+| pathLayers | string | Recursive layer path, each layer has a group + its position within it |
+| platformAssetProof | array | Platform Proof of Assets |
+| platformAssetProof[].chain | string | Chain Name |
+| platformAssetProof[].address | string | Wallet Address |
+| platformAssetProof[].assetInfo | string | Asset Information |
+| platformAssetProof[].signature | string | Signature |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/por" \

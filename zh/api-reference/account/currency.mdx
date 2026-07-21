@@ -24,6 +24,25 @@ description: "币种相关 OpenAPI 接口。"
 
 `GET /openapi/v1/mc-account/symbol/list` — 权限 `READ`。
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].symbolId | integer | 币种ID |
+| [].assetType | string | 币种类型 |
+| [].symbol | string | 币种名称 |
+| [].network | string | 币种网络协议 |
+| [].minTradeUnit | number | 最小动账单位 |
+| [].pricePrecision | integer | 价格精度 |
+| [].exchangeRate | number | 汇率 |
+| [].minRechargeAmount | number |  |
+| [].minWithdrawAmount | number |  |
+| [].assetNet | string |  |
+| [].iconData | string |  |
+| [].depositStatus | integer |  |
+| [].withdrawalStatus | integer |  |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -37,6 +56,21 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 ## 查询可兑换币种列表
 
 `GET /openapi/v1/mc-account/symbol/exchange/list` — 权限 `READ`。
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].symbolId | integer | 币种ID |
+| [].symbolType | string | 币种类型 |
+| [].symbol | string | 币种名称 |
+| [].minTradeUnit | number | 最小动账单位 |
+| [].pricePrecision | integer | 价格精度 |
+| [].exchangeRate | number | 汇率 |
+| [].minExchangeAmount | number |  |
+| [].exchangeOutStatus | integer |  |
+| [].exchangeInStatus | integer |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchange/list" \
@@ -58,7 +92,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 | --- | --- | --- | --- |
 | id | string | 是 | 币种ID |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |

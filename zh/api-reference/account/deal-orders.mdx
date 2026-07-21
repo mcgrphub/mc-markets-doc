@@ -32,11 +32,21 @@ description: "成交订单相关 OpenAPI 接口。"
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
 | orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].remark | string | 备注信息 |
+| records[].dealAmount | number | 成交价值(USDC) |
+| records[].dealAmountDisplay | string | 成交价值展示值 |
+| records[].dealAmountScale | integer | 成交价值展示小数位 |
+| records[].commission | number | 费用 |
+| records[].commissionDisplay | string | 费用展示值 |
+| records[].commissionScale | integer | 费用展示小数位 |
+| records[].profit | number | 已实现盈亏 |
+| records[].profitDisplay | string | 已实现盈亏展示值 |
+| records[].profitScale | integer | 已实现盈亏展示小数位 |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -66,7 +76,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 | --- | --- | --- | --- |
 | dealId | integer | 是 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |

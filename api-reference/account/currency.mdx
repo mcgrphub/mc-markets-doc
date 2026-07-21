@@ -24,6 +24,25 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 `GET /openapi/v1/mc-account/symbol/list` — permission `READ`.
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbolId | integer | Currency ID |
+| [].assetType | string | Currency Type |
+| [].symbol | string | Currency Name |
+| [].network | string | Currency Network Protocol |
+| [].minTradeUnit | number | Minimum Transfer Unit |
+| [].pricePrecision | integer | Price Precision |
+| [].exchangeRate | number | Exchange Rate |
+| [].minRechargeAmount | number |  |
+| [].minWithdrawAmount | number |  |
+| [].assetNet | string |  |
+| [].iconData | string |  |
+| [].depositStatus | integer |  |
+| [].withdrawalStatus | integer |  |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -37,6 +56,21 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 ## Query exchangeable symbol list
 
 `GET /openapi/v1/mc-account/symbol/exchange/list` — permission `READ`.
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbolId | integer | Currency ID |
+| [].symbolType | string | Currency Type |
+| [].symbol | string | Currency Name |
+| [].minTradeUnit | number | Minimum Transfer Unit |
+| [].pricePrecision | integer | Price Precision |
+| [].exchangeRate | number | Exchange Rate |
+| [].minExchangeAmount | number |  |
+| [].exchangeOutStatus | integer |  |
+| [].exchangeInStatus | integer |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchange/list" \
@@ -58,17 +92,17 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 | --- | --- | --- | --- |
 | id | string | Yes | Symbol ID |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbolId | integer | Symbol ID |
-| assetType | string | Symbol type |
-| symbol | string | Symbol name |
-| network | string | Symbol network protocol |
-| minTradeUnit | number | Minimum movement unit |
-| pricePrecision | integer | Price precision |
-| exchangeRate | number | Exchange rate |
+| symbolId | integer | Currency ID |
+| assetType | string | Currency Type |
+| symbol | string | Currency Name |
+| network | string | Currency Network Protocol |
+| minTradeUnit | number | Minimum Transfer Unit |
+| pricePrecision | integer | Price Precision |
+| exchangeRate | number | Exchange Rate |
 | minRechargeAmount | number |  |
 | minWithdrawAmount | number |  |
 | assetNet | string |  |

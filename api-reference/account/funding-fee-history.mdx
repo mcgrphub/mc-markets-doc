@@ -37,11 +37,36 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | dealTimeStart | string | No | Fee deduction start time |
 | dealTimeEnd | string | No | Fee deduction end time |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].relatedBizId | string | Associated Business ID |
+| records[].userId | string | User ID |
+| records[].login | string | MT5 Login Account |
+| records[].businessLineId | integer | Business Line ID |
+| records[].businessLineName | string | Business Line Name |
+| records[].dealTime | string | Fee Deduction Time |
+| records[].symbol | string | Settlement Currency |
+| records[].symbolPair | string | Trading Pair |
+| records[].amount | number | Amount summary. Negative values indicate deductions |
+| records[].remark | string | Remarks |
+| records[].createTime | string | Record Creation Time |
+| records[].updateTime | string | Record Update Time |
+| records[].feeRate | number | Rate |
+| records[].volume | number | Position Quantity |
+| records[].positionSide | string | Position Direction |
+| records[].positionId | string | Position ID |
+| records[].batchTime | string | Fee settlement batch time (on the hour) |
+| records[].amountDisplay | string | Funding fee amount display value, rounded up to 8 decimal places |
+| records[].amountScale | integer | Funding fee amount display precision |
+| records[].createTimeTimestamp | integer | Record creation time millisecond timestamp |
+| records[].updateTimeTimestamp | integer | Record update time millisecond timestamp |
+| records[].dealTimeTimestamp | integer | Fee deduction time millisecond timestamp |
+| records[].feeRateDisplay | string | Funding rate display value, ratio converted to percentage and rounded to 4 decimal places |
+| records[].feeRateScale | integer | Funding rate display precision |
+| records[].batchTimeTimestamp | integer | Fee settlement batch time millisecond timestamp |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

@@ -33,11 +33,29 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 | symbol | string | Yes | Trading symbol |
 | isSettlementRate | boolean | No | Whether this is the settlement rate |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].symbol | string |  |
+| records[].fundingRate | number |  |
+| records[].fundingRateStr | string |  |
+| records[].fundingRateDisplay | string |  |
+| records[].fundingRateScale | integer |  |
+| records[].annualRateDisplay | string |  |
+| records[].settlementPrice | number |  |
+| records[].settlementPriceStr | string |  |
+| records[].settlementPriceDisplay | string |  |
+| records[].settlementPriceScale | integer |  |
+| records[].longInterestRate | number |  |
+| records[].longInterestRateStr | string |  |
+| records[].shortInterestRate | number |  |
+| records[].shortInterestRateStr | string |  |
+| records[].isSettlementRate | boolean |  |
+| records[].nextSettlementTime | integer |  |
+| records[].timestamp | integer |  |
+| records[].settlementCycle | integer |  |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

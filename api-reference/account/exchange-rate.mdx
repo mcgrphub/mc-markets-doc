@@ -32,6 +32,12 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | baseCurrency | string | Yes | Base currency code (ISO 4217) |
 | targetCurrency | string | Yes | Target currency code (ISO 4217) |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | number | `data` is a scalar of this type |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -48,6 +54,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 ## Query USD exchange rate
 
 `GET /openapi/v1/mc-account/exchange-rate/query/usd` — permission `READ`.
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbolType | string | Base currency type |
+| [].baseCurrency | string | Base currency code (ISO 4217 standard) |
+| [].targetCurrency | string | Target currency code (ISO 4217 standard) |
+| [].exchangeRate | number | Exchange Rate |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
@@ -73,36 +89,36 @@ For USDT to BTC, set `from` to USDT and `to` to BTC.
 | to | string | Yes | Target symbol / symbol to convert to |
 | fromAmount | number | No | User-entered amount of the source symbol (`from`); used to estimate fees and expected receipt |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| exchangeRate | number | Exchange rate |
+| exchangeRate | number | Exchange Rate |
 | timestamp | integer |  |
-| oneFromToQuantity | number | Amount of `[to]` per 1 `[from]` |
-| oneToFromQuantity | number | Amount of `[from]` per 1 `[to]` |
-| bookPriceDotMap | object | Quotes from each step of the exchange-rate conversion; key = currency pair (warning: populated only in non-production, for rate accuracy testing) |
-| baseExchangeRate | number | Base exchange rate (before fees / free quota); for testing |
+| oneFromToQuantity | number | Quantity of [to] currency exchangeable for 1 [from] currency |
+| oneToFromQuantity | number | Quantity of [from] currency exchangeable for 1 [to] currency |
+| bookPriceDotMap | object | Quotes from the exchange rate conversion process - includes multiple conversion steps, key=currency pair (Warning: only available in non-production environments, used for testing exchange rate accuracy) |
+| baseExchangeRate | number | Base exchange rate (before fee deduction / free quota application), used for testing verification |
 | baseExchangeRateDisplay | string | Base exchange rate display value |
-| fromAmount | number | User-entered source amount (`from`) |
-| fromAmountDisplay | string | User-entered source amount display value |
-| fromAmountScale | integer | User-entered source amount display precision |
-| freeQuotaFromAmount | number | Remaining daily free quota (`from` amount; used for fee-free range) |
-| freeQuotaFromAmountDisplay | string | Remaining daily free quota (`from` amount) display value |
-| feeAmount | number | Actual fee charged (`from` amount) |
-| feeAmountDisplay | string | Actual fee display value (`from` amount) |
-| feeAmountScale | integer | Actual fee display precision (`from` amount) |
-| netFromAmount | number | Net amount participating in conversion (`from`) = fromAmount - feeAmount |
-| netFromAmountDisplay | string | Net conversion amount display value (`from`) |
-| toAmount | number | Expected received amount (`to`) |
-| toAmountDisplay | string | Expected received amount display value (`to`) |
-| toAmountScale | integer | Expected received amount display precision (`to`) |
-| convertFeePercent | number | Flash conversion fee percentage (deducted from source amount) |
-| dailyFreeConvertFeeQuotaUsd | number | Daily free flash conversion fee quota (USDC equivalent; per-user cumulative; UTC+8 day boundary) |
-| dailyRemainingFreeConvertFeeQuotaUsd | number | Remaining free flash conversion fee quota today (USDC equivalent; per-user cumulative; UTC+8 day boundary) |
-| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | Remaining free quota display value (USDC equivalent) |
-| expireTimestamp | integer | Quote expiration timestamp (ms) |
-| quoteSessionId | string | Quote session ID |
+| fromAmount | number | User-input source currency amount (from amount) |
+| fromAmountDisplay | string | User-input source currency amount display value |
+| fromAmountScale | integer | User-input source currency amount display precision |
+| freeQuotaFromAmount | number | Today's remaining free quota (from amount, used for calculating fee-free tier) |
+| freeQuotaFromAmountDisplay | string | Today's remaining free quota (from amount) display value |
+| feeAmount | number | Actual fee charged (from amount) |
+| feeAmountDisplay | string | Actual fee charged (from amount) display value |
+| feeAmountScale | integer | Actual fee charged (from amount) display precision |
+| netFromAmount | number | Net amount actually used in exchange (from amount) = fromAmount - feeAmount |
+| netFromAmountDisplay | string | Net amount actually used in exchange (from amount) display value |
+| toAmount | number | Expected received amount (to amount) |
+| toAmountDisplay | string | Expected received amount (to amount) display value |
+| toAmountScale | integer | Expected received amount (to amount) display precision |
+| convertFeePercent | number | Flash exchange fee percentage (deducted from the source amount) |
+| dailyFreeConvertFeeQuotaUsd | number | Daily free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
+| dailyRemainingFreeConvertFeeQuotaUsd | number | Today's remaining free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
+| dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | Today's remaining free flash exchange fee quota (USDC equivalent) display value |
+| expireTimestamp | integer | Quote expiry timestamp, in milliseconds |
+| quoteSessionId | string | Quote Session ID |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}" \

@@ -31,19 +31,19 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | id | string | Yes |  |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | id | integer |  |
-| uid | string | Associated account |
+| uid | string | Associated Account Table |
 | transactionId | string |  |
 | symbolId | integer |  |
 | acSymbol | string |  |
 | network | string |  |
 | exchangeSymbolId | integer |  |
 | exchangeSymbol | string |  |
-| transactionType | string | Transaction type enum |
+| transactionType | string | Trade Type Enum |
 | status | string |  |
 | amount | number |  |
 | amountStr | string |  |
@@ -72,9 +72,11 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | sourceAccountBalance | number |  |
 | targetAccountBalance | number |  |
 | fundFlowType | string |  |
-| transactionMethod | string | Transaction method enum |
-| recipientUid | string | Set for WITHDRAWAL peer-to-peer transfers |
-| payerUid | string | Set for RECHARGE peer-to-peer transfers |
+| transactionMethod | string | Trading Method Enum |
+| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
+| payerUid | string | RECHARGE Has value during user-to-user transfers |
+| finishTimeTimestamp | integer |  |
+| createTimeTimestamp | integer |  |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}" \
@@ -113,11 +115,53 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | createTimeEndTimestamp | integer | No | Unix timestamp (ms) |
 | transactionMethod | string | No | Transaction method enum |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].id | integer |  |
+| records[].uid | string | Associated Account Table |
+| records[].transactionId | string |  |
+| records[].symbolId | integer |  |
+| records[].acSymbol | string |  |
+| records[].network | string |  |
+| records[].exchangeSymbolId | integer |  |
+| records[].exchangeSymbol | string |  |
+| records[].transactionType | string | Trade Type Enum |
+| records[].status | string |  |
+| records[].amount | number |  |
+| records[].amountStr | string |  |
+| records[].amountDisplay | string |  |
+| records[].amountScale | integer |  |
+| records[].exchangeAmount | number |  |
+| records[].exchangeAmountDisplay | string |  |
+| records[].fee | number |  |
+| records[].feeDisplay | string |  |
+| records[].createTime | string |  |
+| records[].finishTime | string |  |
+| records[].failureReason | string |  |
+| records[].errorCode | string |  |
+| records[].exchangeRate | number |  |
+| records[].convertExchangeRate | number |  |
+| records[].rateDisplay | string |  |
+| records[].txHash | string |  |
+| records[].feeSymbol | string |  |
+| records[].sourceAccountType | string |  |
+| records[].targetAccountType | string |  |
+| records[].sourceAccountId | string |  |
+| records[].targetAccountId | string |  |
+| records[].sourceWalletAddress | string |  |
+| records[].targetWalletAddress | string |  |
+| records[].extParams | string |  |
+| records[].sourceAccountBalance | number |  |
+| records[].targetAccountBalance | number |  |
+| records[].fundFlowType | string |  |
+| records[].transactionMethod | string | Trading Method Enum |
+| records[].recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
+| records[].payerUid | string | RECHARGE Has value during user-to-user transfers |
+| records[].finishTimeTimestamp | integer |  |
+| records[].createTimeTimestamp | integer |  |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -155,6 +199,12 @@ Complete 2FA verification first, then pass the temporary tokens in `verify2FaTok
 | amount | number | Yes | Exchange amount / quantity of the exchange symbol |
 | verify2FaTokens | array | No | Temporary verification tokens from the 2FA verification API; supports multiple 2FA types |
 | quoteSessionId | string | Yes | Quote session ID from the rate quote |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | string | `data` is a scalar of this type |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/exchange/v2" \
@@ -195,11 +245,53 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | createTimeEndTimestamp | integer | No | Unix timestamp (ms) |
 | transactionMethod | string | No | Transaction method enum |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].id | integer |  |
+| records[].uid | string | Associated Account Table |
+| records[].transactionId | string |  |
+| records[].symbolId | integer |  |
+| records[].acSymbol | string |  |
+| records[].network | string |  |
+| records[].exchangeSymbolId | integer |  |
+| records[].exchangeSymbol | string |  |
+| records[].transactionType | string | Trade Type Enum |
+| records[].status | string |  |
+| records[].amount | number |  |
+| records[].amountStr | string |  |
+| records[].amountDisplay | string |  |
+| records[].amountScale | integer |  |
+| records[].exchangeAmount | number |  |
+| records[].exchangeAmountDisplay | string |  |
+| records[].fee | number |  |
+| records[].feeDisplay | string |  |
+| records[].createTime | string |  |
+| records[].finishTime | string |  |
+| records[].failureReason | string |  |
+| records[].errorCode | string |  |
+| records[].exchangeRate | number |  |
+| records[].convertExchangeRate | number |  |
+| records[].rateDisplay | string |  |
+| records[].txHash | string |  |
+| records[].feeSymbol | string |  |
+| records[].sourceAccountType | string |  |
+| records[].targetAccountType | string |  |
+| records[].sourceAccountId | string |  |
+| records[].targetAccountId | string |  |
+| records[].sourceWalletAddress | string |  |
+| records[].targetWalletAddress | string |  |
+| records[].extParams | string |  |
+| records[].sourceAccountBalance | number |  |
+| records[].targetAccountBalance | number |  |
+| records[].fundFlowType | string |  |
+| records[].transactionMethod | string | Trading Method Enum |
+| records[].recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
+| records[].payerUid | string | RECHARGE Has value during user-to-user transfers |
+| records[].finishTimeTimestamp | integer |  |
+| records[].createTimeTimestamp | integer |  |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

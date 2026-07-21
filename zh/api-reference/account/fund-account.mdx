@@ -26,7 +26,7 @@ description: "资金账户相关 OpenAPI 接口。"
 
 获取持仓信息
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 | --- | --- | --- | --- |
 | spotId | string | 是 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -83,7 +83,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 | --- | --- | --- | --- |
 | batchId | integer | 否 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -94,6 +94,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 | leafHash | string | Merkle leaf 的 hash 值 |
 | pathLayers | string | 递归层路径，每层一个 group + 自己在其中的位置 |
 | platformAssetProof | array | 平台资产证明 |
+| platformAssetProof[].chain | string | 链名 |
+| platformAssetProof[].address | string | 钱包地址 |
+| platformAssetProof[].assetInfo | string | 资产信息 |
+| platformAssetProof[].signature | string | 签名 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/por" \

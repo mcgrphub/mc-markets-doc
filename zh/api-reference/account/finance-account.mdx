@@ -38,6 +38,12 @@ description: "理财账户相关 OpenAPI 接口。"
 | productCode | string | 是 | 活期理财产品代码 |
 | amount | number | 是 | 提现金额 |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | string | `data` 为该类型标量 |
+
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -64,6 +70,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | --- | --- | --- | --- |
 | trackingId | string | 是 | 用于跟踪请求的唯一标识 |
 | positionId | integer | 是 | 定期持仓主键 id（持有中或已到期均可赎回；与当前持仓接口返回的 positionId 一致） |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | string | `data` 为该类型标量 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw/fixed" \
@@ -93,6 +105,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | productCode | string | 是 | 理财产品代码，如 USDT_CURRENT |
 | amount | number | 是 | 存款金额 |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | string | `data` 为该类型标量 |
+
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/deposit" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -118,6 +136,32 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | type | string | 是 | 产品类型：活期 / 定期 |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].productCode | string | 产品代码 |
+| [].productName | string | 产品名称 |
+| [].type | string | 类型：活期/定期 |
+| [].currency | string | 币种 |
+| [].annualRate | number | 基础年化收益率% |
+| [].rewardAnnualRate | number | 超额奖励年化收益率%（配置档） |
+| [].maxAnnualRate | number | 最高年化%=基础+奖励 |
+| [].periodDays | integer | 定期天数，活期为0 |
+| [].minDepositAmount | number | 最低起存金额 |
+| [].minRedeemAmount | number | 最小赎回金额 |
+| [].digit | integer | 币种精度（小数位） |
+| [].subscribedAmount | number | 已申购金额：池内净留存申购本金（与资金池上限校验口径一致：累计存入-累计赎回+累计赎息） |
+| [].fundPoolAmount | number | 池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制） |
+| [].availableSubscriptionBalance | number | 可申购余额：池上限剩余可存入额度；池未设上限时为 null |
+| [].subscriptionStartTime | string | 申购开始时间；与结束时间均为 null 表示不限制 |
+| [].subscriptionEndTime | string | 申购结束时间；与开始时间均为 null 表示不限制 |
+| [].maxDepositAmount | number | 最大申购额：单户最高存入额（ac_finance_product_config.max_deposit_amount；null 或 ≤0 表示不限制） |
+| [].dailyMaxRedeemAmount | number | 每日提取上限 |
+| [].subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
+| [].subscriptionStartTimeTimestamp | integer | 申购开始时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/products/catalog" \
@@ -145,11 +189,34 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/produc
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
 | orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].positionId | integer | 持仓明细ID；活期同一产品多笔汇总时为 null |
+| records[].productName | string | 产品名称 |
+| records[].productCode | string | 产品代码 |
+| records[].currency | string | 资产币种 |
+| records[].digit | integer | 币种精度（小数位） |
+| records[].lockPeriodDays | integer | 锁仓天数（定期）；活期为 0 |
+| records[].type | string | 类型：活期 / 定期 |
+| records[].positionAmount | number | 持有中订单的本金：活期同产品多笔为 principal_balance 合计；不含未结利息与冻结（利息见 currentRewardAmount） |
+| records[].baseAnnualRate | number | 基础年利率%（定期/活期单笔取持仓快照，活期汇总取产品配置） |
+| records[].rewardMinHoldingDays | integer | 奖励需连续持有满（天）后才享超额档；无分层规则时可为 null |
+| records[].excessRewardAnnualRate | number | 超额奖励年化收益率%（产品配置） |
+| records[].eligibleRewardAmount | number | 订单持有金额不低于：享受超额奖励档所需的持仓本金门槛（产品配置 reward_min_position；无超额分层时可为 null） |
+| records[].currentRewardAmount | number | 当前持有利息: ac_user_finance_position 中该用户、该产品、该币种下持有中利息合计；单位为该产品资产币种（与 currency 一致），不折 USDC |
+| records[].cumulativeRewardAmount | number | 历史利息总额：ac_finance_transaction 中该用户、该产品、该币种下成功 INTEREST 流水的 amount 合计；单位为该产品资产币种（与 currency 一致），不折 USDC |
+| records[].status | string | 持仓状态：持有中 / 已到期（活期汇总时若任一为持有中则为持有中） |
+| records[].subscribeTime | string | 定期：该笔持仓明细的申购时间（ac_user_finance_position.create_time，申购成功落库时刻）；活期同产品汇总行为 null |
+| records[].excessRewardAnnualRateDisplay | string | 超额奖励年化收益率展示值 |
+| records[].eligibleRewardAmountDisplay | string | 奖励持仓本金门槛展示值 |
+| records[].currentRewardAmountDisplay | string | 当前持有利息展示值 |
+| records[].cumulativeRewardAmountDisplay | string | 历史利息总额展示值 |
+| records[].baseAnnualRateDisplay | string | 基础年利率展示值 |
+| records[].subscribeTimeTimestamp | integer | 申购时间毫秒时间戳 |
+| records[].positionAmountDisplay | string | 持有中订单本金展示值 |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -184,11 +251,22 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
 | orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].productName | string | 产品名称 |
+| records[].productCode | string | 产品代码 |
+| records[].currency | string | 资产币种 |
+| records[].digit | integer | 币种精度（小数位） |
+| records[].lockPeriodDays | integer | 锁仓天数（定期）；活期为 0 |
+| records[].type | string | 类型：活期/定期 |
+| records[].redeemAmount | number | 本笔赎回金额：动账主单 ac_transaction_history.amount 绝对值（与后台赎回明细一致） |
+| records[].endTime | string | 本笔赎回时间：动账主单 ac_transaction_history.create_time（与后台赎回明细 redeemTime 一致） |
+| records[].expireTime | string | 关联持仓到期日：ac_user_finance_position.end_time；无关联持仓时为 null |
+| records[].endTimeTimestamp | integer | 本笔赎回时间毫秒时间戳 |
+| records[].expireTimeTimestamp | integer | 关联持仓到期日毫秒时间戳 |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -214,14 +292,61 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 
 按产品维度返回 products，顺序为 product_code 升序、再 currency 升序；用户侧 userDepositedAmount/userInterestAmount/availableBalance 来自该产品在 ac_user_finance_position 的持仓汇总（该产品币种）。totalDepositValue 为各产品持仓本金×预言机价折 USDC 之和。totalInterestValue、yesterdayInterestValue 仍为结息流水按币种折 USDC。userSpotAvailableBalance 为现货币种维度，同币种产品值相同。未登录时用户侧为0
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | totalDepositValue | number | 用户存入总额（各币种本金 × 对应预言机价，折 USDC；未登录为0） |
-| totalInterestValue | number | 用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestVal |
+| totalInterestValue | number | 用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestValue 一致：小数位=FinanceConstants.DECIMAL_SCALE、ROUND_DOWN；未登录为0） |
 | yesterdayInterestValue | number | 昨日利息（自然日昨日 Asia/Shanghai 已入账结息流水，按同套预言机折 USDC；未登录为0） |
-| products | array | 按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBal |
+| products | array | 按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBalance（与理财产品目录口径一致） |
+| products[].productCode | string | 产品代码 |
+| products[].type | string | 产品类型：活期 / 定期 |
+| products[].currency | string | 币种 |
+| products[].lockPeriodDays | integer | 锁仓天数（定期）；活期为 0 |
+| products[].maxDepositAmount | number | 单用户申购上限（单户最高存入额；null 或 ≤0 表示不限制） |
+| products[].dailyMaxRedeemAmount | number | 每日赎回上限（null 或 ≤0 表示不限制） |
+| products[].pauseRedeem | boolean | 是否暂停赎回（true 表示已暂停，不可发起赎回） |
+| products[].annualRate | number | 基础年化收益率%（不含积分奖励） |
+| products[].rewardAnnualRate | number | 奖励年利率：超额奖励档年化%（配置 excess_reward_annual_rate） |
+| products[].totalAnnualRate | number | 总年化%=基础+奖励（展示用） |
+| products[].minDepositAmount | number | 最小存入金额 |
+| products[].minRedeemAmount | number | 最小提取金额 |
+| products[].subscriptionStartTime | string | 申购开始时间；与结束时间均为 null 表示不限制 |
+| products[].subscriptionEndTime | string | 申购结束时间；与开始时间均为 null 表示不限制 |
+| products[].rewardMinHoldingDays | integer | 订单持有满天数：享受超额奖励档需连续持仓满（天）（reward_min_holding_days） |
+| products[].rewardMinPosition | number | 订单持有金额不低于：与持仓天数同时满足才分层计息（reward_min_position） |
+| products[].oraclePrice | number | 预言机价格（计价币） |
+| products[].userDepositedAmount | number | 当前用户在该产品下的持仓本金合计（ac_user_finance_position.principal_balance，持有中+已到期；未登录为0） |
+| products[].userInterestAmount | number | 当前用户在该产品下的未结利息合计（ac_user_finance_position.interest_balance；未登录为0） |
+| products[].availableBalance | number | 当前用户在该产品下的持仓账面合计：本金+利息+冻结（ac_user_finance_position；未登录为0） |
+| products[].userSpotAvailableBalance | number | 当前用户该币种现货可用余额（与产品无关，同币种多产品返回相同值；未登录为0） |
+| products[].totalDeposited | number | 平台该产品累计存入量（ac_finance_product.total_deposited） |
+| products[].totalPrincipal | number | 平台该产品当前留存本金（ac_finance_product 口径：total_deposited - total_withdrawn + total_interest_withdrawn） |
+| products[].subscribedAmount | number | 已申购金额：池内净留存申购本金（与资金池上限校验口径一致：累计存入-累计赎回+累计赎息） |
+| products[].fundPoolAmount | number | 池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制） |
+| products[].availableSubscriptionBalance | number | 可申购余额：池上限剩余可存入额度；池未设上限时为 null |
+| products[].digit | integer | 币种小数位 |
+| products[].dailyMaxRedeemAmountDisplay | string | 每日赎回上限展示值 |
+| products[].rewardMinPositionDisplay | string | 订单持有金额门槛展示值 |
+| products[].userDepositedAmountDisplay | string | 用户持仓本金合计展示值 |
+| products[].userInterestAmountDisplay | string | 用户未结利息合计展示值 |
+| products[].userSpotAvailableBalanceDisplay | string | 用户现货可用余额展示值 |
+| products[].availableSubscriptionBalanceDisplay | string | 可申购余额展示值 |
+| products[].annualRateDisplay | string | 基础年化收益率展示值 |
+| products[].rewardAnnualRateDisplay | string | 奖励年利率展示值 |
+| products[].totalAnnualRateDisplay | string | 总年化展示值 |
+| products[].minDepositAmountDisplay | string | 最小存入金额展示值 |
+| products[].minRedeemAmountDisplay | string | 最小提取金额展示值 |
+| products[].oraclePriceDisplay | string | 预言机价格展示值 |
+| products[].availableBalanceDisplay | string | 用户持仓账面合计展示值 |
+| products[].totalDepositedDisplay | string | 平台累计存入量展示值 |
+| products[].totalPrincipalDisplay | string | 平台当前留存本金展示值 |
+| products[].subscribedAmountDisplay | string | 已申购金额展示值 |
+| products[].fundPoolAmountDisplay | string | 池上限展示值 |
+| products[].maxDepositAmountDisplay | string | 单用户申购上限展示值 |
+| products[].subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
+| products[].subscriptionStartTimeTimestamp | integer | 申购开始时间毫秒时间戳 |
 | totalDepositValueDisplay | string | 用户存入总额展示值 |
 | totalInterestValueDisplay | string | 用户历史结息总额展示值 |
 | yesterdayInterestValueDisplay | string | 昨日利息展示值 |

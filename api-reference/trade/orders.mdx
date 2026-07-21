@@ -32,6 +32,63 @@ Query pending (unfilled) orders for the current user. UID is taken from the `X-U
 | symbol | string | No |  |
 | login | string | Yes |  |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].order | integer | Order number, primary key |
+| [].login | integer | Login account, MT5 account login number |
+| [].dealer | integer | Dealer ID, the MT5 dealer code |
+| [].symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
+| [].digits | integer | Price precision, the number of decimal places for the trading symbol |
+| [].digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
+| [].contractSize | number | Contract size, the standard size per lot |
+| [].state | integer | Order Status |
+| [].reason | integer | Reason, the reason code for the order change |
+| [].timeSetup | integer | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
+| [].timeExpiration | integer | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
+| [].timeDone | integer | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
+| [].timeSetupMsc | integer | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
+| [].timeDoneMsc | integer | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
+| [].modifyFlags | integer | Modification flags, the flag bits for order modification |
+| [].type | integer | Order type, e.g., buy, sell, etc. |
+| [].typeFill | integer | Deal type, the fill type of the order |
+| [].typeTime | integer | Time validity type, the validity type of the order |
+| [].priceOrder | number | Order price, the execution price of the order |
+| [].priceOrderDisplay | string | Order price display value |
+| [].priceOrderScale | integer | Order price display decimal places |
+| [].priceTrigger | number | Trigger price, the trigger price of the order |
+| [].priceTriggerDisplay | string | Trigger price display value |
+| [].priceTriggerScale | integer | Trigger price display decimal places |
+| [].priceCurrent | number | Current price, the current market price of the order |
+| [].priceCurrentDisplay | string | Current price display value |
+| [].priceCurrentScale | integer | Current price display decimal places |
+| [].priceSlDisplay | string | Stop loss price display value |
+| [].priceSlScale | integer | Stop loss price display decimal places |
+| [].priceTpDisplay | string | Take profit price display value |
+| [].priceTpScale | integer | Take profit price display decimal places |
+| [].volumeInitialExt | number | Initial extended volume, the initial extended volume of the order (for large orders) |
+| [].volumeCurrentExt | number | Current extended volume, the current extended volume of the order |
+| [].quantity | number | User quantity, equals current remaining volumeCurrentExt divided by 10^8 |
+| [].rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
+| [].activationMode | integer | Activation mode, the activation mode of the pending order |
+| [].activationTime | integer | Activation time, the activation timestamp of the pending order |
+| [].activationPrice | number | Activation price, the activation price of the pending order |
+| [].activationFlags | integer | Activation flag, the flag bit for pending order activation |
+| [].volumeInitial | number | Initial volume, the initial trading volume of the order |
+| [].volumeInitialDisplay | string | Initial volume display value |
+| [].volumeInitialScale | integer | Initial volume display decimal places |
+| [].volumeCurrent | number | Current volume, the current trading volume of the order |
+| [].volumeCurrentDisplay | string | Current volume display value |
+| [].volumeCurrentScale | integer | Current volume display decimal places |
+| [].externalID | string | External ID, the ID associated with the external system |
+| [].priceSL | number | Stop loss price, the set stop loss level |
+| [].priceTP | number | Take profit price, the set take profit level |
+| [].expertID | integer | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
+| [].positionID | integer | Position ID, the associated position ID |
+| [].positionByID | integer | Opposite position ID, the associated opposite position ID |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/pending/v2" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -62,11 +119,63 @@ Query historical orders by UID and account data type (SPOT/CONTRACT/SPOT_CONTRAC
 | to | integer | Yes | End timestamp (Unix timestamp, seconds) |
 | symbol | string | No | Trading symbol name |
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array |  |
+| records[].order | integer | Order number, primary key |
+| records[].login | integer | Login account, MT5 account login number |
+| records[].dealer | integer | Dealer ID, the MT5 dealer code |
+| records[].symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
+| records[].digits | integer | Price precision, the number of decimal places for the trading symbol |
+| records[].digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
+| records[].contractSize | number | Contract size, the standard size per lot |
+| records[].state | integer | Order Status |
+| records[].reason | integer | Reason, the reason code for the order change |
+| records[].timeSetup | integer | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
+| records[].timeExpiration | integer | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
+| records[].timeDone | integer | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
+| records[].timeSetupMsc | integer | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
+| records[].timeDoneMsc | integer | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
+| records[].modifyFlags | integer | Modification flags, the flag bits for order modification |
+| records[].type | integer | Order type, e.g., buy, sell, etc. |
+| records[].typeFill | integer | Deal type, the fill type of the order |
+| records[].typeTime | integer | Time validity type, the validity type of the order |
+| records[].priceOrder | number | Order price, the execution price of the order |
+| records[].priceOrderStr | string | Order price raw string |
+| records[].priceOrderDisplay | string | Order price display value |
+| records[].priceOrderScale | integer | Order price display decimal places |
+| records[].priceTrigger | number | Trigger price, the trigger price of the order |
+| records[].priceTriggerDisplay | string | Trigger price display value |
+| records[].priceTriggerScale | integer | Trigger price display decimal places |
+| records[].priceCurrent | number | Current price, the current market price of the order |
+| records[].priceCurrentDisplay | string | Current price display value |
+| records[].priceCurrentScale | integer | Current price display decimal places |
+| records[].priceSlDisplay | string | Stop loss price display value |
+| records[].priceSlScale | integer | Stop loss price display decimal places |
+| records[].priceTpDisplay | string | Take profit price display value |
+| records[].priceTpScale | integer | Take profit price display decimal places |
+| records[].volumeInitialExt | number | Initial extended volume, the initial extended volume of the order (for large orders) |
+| records[].quantity | number | User quantity, equals initial volumeInitialExt divided by 10^8 |
+| records[].volumeInitialDisplay | string | Initial volume display value |
+| records[].volumeInitialScale | integer | Initial volume display decimal places |
+| records[].volumeCurrentExt | number | Current extended volume, the current extended volume of the order |
+| records[].volumeCurrentDisplay | string | Current volume display value |
+| records[].volumeCurrentScale | integer | Current volume display decimal places |
+| records[].rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
+| records[].activationMode | integer | Activation mode, the activation mode of the pending order |
+| records[].activationTime | integer | Activation time, the activation timestamp of the pending order |
+| records[].activationPrice | number | Activation price, the activation price of the pending order |
+| records[].activationFlags | integer | Activation flag, the flag bit for pending order activation |
+| records[].volumeInitial | number | Initial volume, the initial trading volume of the order |
+| records[].volumeCurrent | number | Current volume, the current trading volume of the order |
+| records[].externalID | string | External ID, the ID associated with the external system |
+| records[].priceSL | number | Stop loss price, the set stop loss level |
+| records[].priceTP | number | Take profit price, the set take profit level |
+| records[].expertID | integer | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
+| records[].positionID | integer | Position ID, the associated position ID |
+| records[].positionByID | integer | Opposite position ID, the associated opposite position ID |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

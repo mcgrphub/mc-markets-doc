@@ -37,11 +37,36 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 | dealTimeStart | string | 否 | 开始扣费时间 |
 | dealTimeEnd | string | 否 | 结束扣费时间 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].relatedBizId | string | 关联业务ID |
+| records[].userId | string | 用户ID |
+| records[].login | string | mt5登录账号 |
+| records[].businessLineId | integer | 业务线ID |
+| records[].businessLineName | string | 业务线名称 |
+| records[].dealTime | string | 扣费时间 |
+| records[].symbol | string | 结算币种 |
+| records[].symbolPair | string | 交易对 |
+| records[].amount | number | 金额汇总，负数表示扣除 |
+| records[].remark | string | 备注 |
+| records[].createTime | string | 记录创建时间 |
+| records[].updateTime | string | 记录更新时间 |
+| records[].feeRate | number | 费率 |
+| records[].volume | number | 持仓数量 |
+| records[].positionSide | string | 持仓方向 |
+| records[].positionId | string | 持仓ID |
+| records[].batchTime | string | 费用结算批次时间(整点时间) |
+| records[].dealTimeTimestamp | integer | 扣费时间毫秒时间戳 |
+| records[].feeRateDisplay | string | 资金费率展示值，ratio转百分比后四舍五入至4位小数 |
+| records[].feeRateScale | integer | 资金费率展示精度 |
+| records[].batchTimeTimestamp | integer | 费用结算批次时间毫秒时间戳 |
+| records[].amountDisplay | string | 资金费金额展示值，向上保留8位小数 |
+| records[].amountScale | integer | 资金费金额展示精度 |
+| records[].createTimeTimestamp | integer | 记录创建时间毫秒时间戳 |
+| records[].updateTimeTimestamp | integer | 记录更新时间毫秒时间戳 |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

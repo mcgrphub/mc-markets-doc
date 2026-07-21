@@ -31,7 +31,7 @@ description: "交易相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | id | string | 是 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -75,6 +75,8 @@ description: "交易相关 OpenAPI 接口。"
 | transactionMethod | string | 交易方式枚举 |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
+| finishTimeTimestamp | integer |  |
+| createTimeTimestamp | integer |  |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}" \
@@ -113,11 +115,53 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | createTimeEndTimestamp | integer | 否 | 毫秒级 Unix timestamp |
 | transactionMethod | string | 否 | 交易方式枚举 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].id | integer |  |
+| records[].uid | string | 关联账户表 |
+| records[].transactionId | string |  |
+| records[].symbolId | integer |  |
+| records[].acSymbol | string |  |
+| records[].network | string |  |
+| records[].exchangeSymbolId | integer |  |
+| records[].exchangeSymbol | string |  |
+| records[].transactionType | string | 交易类型枚举 |
+| records[].status | string |  |
+| records[].amount | number |  |
+| records[].amountStr | string |  |
+| records[].amountDisplay | string |  |
+| records[].amountScale | integer |  |
+| records[].exchangeAmount | number |  |
+| records[].exchangeAmountDisplay | string |  |
+| records[].fee | number |  |
+| records[].feeDisplay | string |  |
+| records[].createTime | string |  |
+| records[].finishTime | string |  |
+| records[].failureReason | string |  |
+| records[].errorCode | string |  |
+| records[].exchangeRate | number |  |
+| records[].convertExchangeRate | number |  |
+| records[].rateDisplay | string |  |
+| records[].txHash | string |  |
+| records[].feeSymbol | string |  |
+| records[].sourceAccountType | string |  |
+| records[].targetAccountType | string |  |
+| records[].sourceAccountId | string |  |
+| records[].targetAccountId | string |  |
+| records[].sourceWalletAddress | string |  |
+| records[].targetWalletAddress | string |  |
+| records[].extParams | string |  |
+| records[].sourceAccountBalance | number |  |
+| records[].targetAccountBalance | number |  |
+| records[].fundFlowType | string |  |
+| records[].transactionMethod | string | 交易方式枚举 |
+| records[].recipientUid | string | WITHDRAWAL 用户间划转时有值 |
+| records[].payerUid | string | RECHARGE 用户间划转时有值 |
+| records[].finishTimeTimestamp | integer |  |
+| records[].createTimeTimestamp | integer |  |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |
@@ -155,6 +199,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | amount | number | 是 | 兑换金额/兑换币种的数量 |
 | verify2FaTokens | array | 否 | 通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证 |
 | quoteSessionId | string | 是 | asw1w123a |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | string | `data` 为该类型标量 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/exchange/v2" \
@@ -195,11 +245,53 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | createTimeEndTimestamp | integer | 否 | 毫秒级 Unix timestamp |
 | transactionMethod | string | 否 | 交易方式枚举 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array |  |
+| records[].id | integer |  |
+| records[].uid | string | 关联账户表 |
+| records[].transactionId | string |  |
+| records[].symbolId | integer |  |
+| records[].acSymbol | string |  |
+| records[].network | string |  |
+| records[].exchangeSymbolId | integer |  |
+| records[].exchangeSymbol | string |  |
+| records[].transactionType | string | 交易类型枚举 |
+| records[].status | string |  |
+| records[].amount | number |  |
+| records[].amountStr | string |  |
+| records[].amountDisplay | string |  |
+| records[].amountScale | integer |  |
+| records[].exchangeAmount | number |  |
+| records[].exchangeAmountDisplay | string |  |
+| records[].fee | number |  |
+| records[].feeDisplay | string |  |
+| records[].createTime | string |  |
+| records[].finishTime | string |  |
+| records[].failureReason | string |  |
+| records[].errorCode | string |  |
+| records[].exchangeRate | number |  |
+| records[].convertExchangeRate | number |  |
+| records[].rateDisplay | string |  |
+| records[].txHash | string |  |
+| records[].feeSymbol | string |  |
+| records[].sourceAccountType | string |  |
+| records[].targetAccountType | string |  |
+| records[].sourceAccountId | string |  |
+| records[].targetAccountId | string |  |
+| records[].sourceWalletAddress | string |  |
+| records[].targetWalletAddress | string |  |
+| records[].extParams | string |  |
+| records[].sourceAccountBalance | number |  |
+| records[].targetAccountBalance | number |  |
+| records[].fundFlowType | string |  |
+| records[].transactionMethod | string | 交易方式枚举 |
+| records[].recipientUid | string | WITHDRAWAL 用户间划转时有值 |
+| records[].payerUid | string | RECHARGE 用户间划转时有值 |
+| records[].finishTimeTimestamp | integer |  |
+| records[].createTimeTimestamp | integer |  |
 | total | integer |  |
 | size | integer |  |
 | current | integer |  |

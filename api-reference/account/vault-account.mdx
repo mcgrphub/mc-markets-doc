@@ -42,6 +42,12 @@ Withdraw from the Vault account to the fund account, then transfer into the trad
 | symbolId | string | Yes | Symbol ID |
 | amount | number | Yes | Withdrawal amount |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | string | `data` is a scalar of this type |
+
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/withdraw" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -70,6 +76,12 @@ Deposit to the Vault account: transfer from the trading account to the fund acco
 | symbolId | string | Yes | Symbol ID |
 | amount | number | Yes | Deposit amount |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | string | `data` is a scalar of this type |
+
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/deposit" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -95,6 +107,15 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 | from | string | No |  |
 | to | string | No |  |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].data | string | Date |
+| [].value | number | Yield Rate |
+| [].valueDisplay | string | Yield rate display value |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-yield-rate-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -109,15 +130,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-
 
 `GET /openapi/v1/mc-account/mlp/withdraw-info` — permission `READ`.
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| maxWithdrawAmount | number | Maximum withdrawable amount |
-| withdrawablePrincipal | number | Withdrawable principal |
-| withdrawableEarnings | number | Withdrawable earnings |
-| withdrawableEarningsDisplay | string | Withdrawable earnings display value |
-| maxWithdrawAmountDisplay | string | Maximum withdrawable amount display value |
+| maxWithdrawAmount | number | Maximum withdrawable amount (available amount) |
+| withdrawablePrincipal | number | Withdrawable Principal |
+| withdrawableEarnings | number | Withdrawable Yield |
+| withdrawableEarningsDisplay | string | Withdrawable yield display value |
+| maxWithdrawAmountDisplay | string | Maximum withdrawal amount display value |
 | withdrawablePrincipalDisplay | string | Withdrawable principal display value |
 
 ```bash
@@ -141,6 +162,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-i
 | from | string | No |  |
 | to | string | No |  |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].data | string | Date |
+| [].value | number | Yield Rate |
+| [].valueDisplay | string | Yield rate display value |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -155,27 +185,27 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" 
 
 `GET /openapi/v1/mc-account/mlp/treasury-info` — permission `READ`.
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| treasuryIntroduction | string | Vault introduction |
-| treasuryYield | number | Stats — vault yield |
-| currentAnnualYieldRate | number | Stats — current annual yield rate |
-| currentDailyYieldRate | number | Stats — current daily yield rate |
-| treasuryBalance | number | My performance — vault balance |
-| withdrawableEarnings | number | My performance — withdrawable earnings |
-| yesterdayEarnings | number | My performance — yesterday's earnings |
-| lockedDeposit | number | My performance — locked deposit |
-| withdrawableAmount | number | My performance — withdrawable amount |
-| currentAnnualYieldRateDisplay | string | Stats — current annual yield rate display value |
-| currentDailyYieldRateDisplay | string | Stats — current daily yield rate display value |
-| withdrawableEarningsDisplay | string | My performance — withdrawable earnings display value |
-| yesterdayEarningsDisplay | string | My performance — yesterday's earnings display value |
-| withdrawableAmountDisplay | string | My performance — withdrawable amount display value |
-| treasuryYieldDisplay | string | Stats — vault yield display value |
-| treasuryBalanceDisplay | string | My performance — vault balance display value |
-| lockedDepositDisplay | string | My performance — locked deposit display value |
+| treasuryIntroduction | string | Vault Introduction |
+| treasuryYield | number | Statistics - Vault Yield |
+| currentAnnualYieldRate | number | Statistics - Current APY |
+| currentDailyYieldRate | number | Statistics - Current Daily Return Rate |
+| treasuryBalance | number | My Performance - Vault Balance |
+| withdrawableEarnings | number | My Performance - Withdrawable Yield |
+| yesterdayEarnings | number | My Performance - Yesterday's Yield |
+| lockedDeposit | number | My Performance - Locked Deposit |
+| withdrawableAmount | number | My Performance - Withdrawable Amount |
+| currentAnnualYieldRateDisplay | string | Statistics - current APY display value |
+| currentDailyYieldRateDisplay | string | Statistics - current daily return rate display value |
+| withdrawableEarningsDisplay | string | My Performance - withdrawable yield display value |
+| yesterdayEarningsDisplay | string | My Performance - yesterday's yield display value |
+| withdrawableAmountDisplay | string | My Performance - withdrawable amount display value |
+| treasuryYieldDisplay | string | Statistics - vault yield display value |
+| treasuryBalanceDisplay | string | My Performance - vault balance display value |
+| lockedDepositDisplay | string | My Performance - locked deposit display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-info" \
@@ -191,21 +221,21 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-i
 
 `GET /openapi/v1/mc-account/mlp/deposit-info` — permission `READ`.
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| maxDepositAmount | number | Maximum deposit amount |
-| availableMargin | number | Available margin in the futures account |
+| maxDepositAmount | number | Maximum Deposit Amount |
+| availableMargin | number | Contract Account Available Margin |
 | maxDepositLimitPercentage | number | Maximum deposit limit percentage |
-| userPoints | integer | Current user points |
-| depositedAmount | number | Amount already deposited |
-| remainingDepositAmount | number | Remaining depositable amount |
-| hasPosition | boolean | Whether the user has an open position |
+| userPoints | integer | User Current Points |
+| depositedAmount | number | Deposited Amount |
+| remainingDepositAmount | number | Remaining Depositable Amount |
+| hasPosition | boolean | Whether holding positions exist |
 | maxDepositLimitPercentageDisplay | string | Maximum deposit limit percentage display value |
 | remainingDepositAmountDisplay | string | Remaining depositable amount display value |
 | maxDepositAmountDisplay | string | Maximum deposit amount display value |
-| availableMarginDisplay | string | Available margin display value |
+| availableMarginDisplay | string | Contract account available margin display value |
 | depositedAmountDisplay | string | Deposited amount display value |
 
 ```bash
@@ -222,14 +252,14 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 `GET /openapi/v1/mc-account/mlp/core/stats` — permission `READ`.
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| totalLockedAmount | number | Total locked amount = total deposited into Vault account + TVL base amount |
-| annualYieldRate | number | Annual yield rate |
-| myTotalDeposit | number | My total deposit |
-| totalHistoricalEarnings | number | Total historical earnings |
+| totalLockedAmount | number | Total Value Locked = Total amount deposited in MLP vault + TVL amount base value |
+| annualYieldRate | number | APY |
+| myTotalDeposit | number | My Total Deposit |
+| totalHistoricalEarnings | number | Historical Total Yield |
 | totalLockedAmountDisplay | string |  |
 | portfolioVaultBalanceDisplay | string |  |
 | portfolioVaultBalanceScale | integer |  |
@@ -257,23 +287,23 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats
 
 Query Vault account yield rate and related parameters for the current business line.
 
-### Response `data` fields (summary)
+### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Config ID |
-| businessLineId | integer | Business line ID |
-| annualYieldRate | number | Adjusted annual yield rate (percent) |
-| lockPeriodDays | integer | Lock period in days |
-| singleUserDepositLimit | number | Per-user deposit limit (USDC) |
-| tvlBaseAmount | number | TVL base amount (USDC) |
-| integralTierConfig | string | Points tier config, format `minPoints:depositLimitPercent,...`, for example `50:25,300:50,1500:75,10000:100` |
-| createBy | string | Created by |
-| createTime | string | Create time |
-| updateBy | string | Updated by |
-| updateTime | string | Update time |
-| createTimeTimestamp | integer | Create time (epoch ms) |
-| updateTimeTimestamp | integer | Update time (epoch ms) |
+| id | integer | Configuration ID |
+| businessLineId | integer | Business Line ID |
+| annualYieldRate | number | Adjusted yield rate (annualized), unit: percentage |
+| lockPeriodDays | integer | Lock-up period, unit: days |
+| singleUserDepositLimit | number | Per-user deposit cap, unit: USDC |
+| tvlBaseAmount | number | TVL amount base value, unit: USDC |
+| integralTierConfig | string | Points tier configuration, format: minPoints:depositLimitRatio,... e.g., 50:25,300:50,1500:75,10000:100 |
+| createBy | string | Created By |
+| createTime | string | Creation Time |
+| updateBy | string | Updated By |
+| updateTime | string | Update Time |
+| createTimeTimestamp | integer | Creation time millisecond timestamp |
+| updateTimeTimestamp | integer | Update time millisecond timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
@@ -296,6 +326,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
 | from | string | No |  |
 | to | string | No |  |
 
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].data | string | Date |
+| [].value | number | Yield Rate |
+| [].valueDisplay | string | Yield rate display value |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -309,6 +348,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 ## Vault account asset details
 
 `GET /openapi/v1/mc-account/mlp/account/assets` — permission `READ`.
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | array | `data` is an array of objects; element fields use `[]...` |
+| [].symbol | string | Currency Name |
+| [].principalAvailable | number | Available Principal |
+| [].interestAvailable | number | Available Yield |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \

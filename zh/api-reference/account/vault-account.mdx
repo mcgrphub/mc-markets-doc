@@ -42,6 +42,12 @@ description: "金库账户相关 OpenAPI 接口。"
 | symbolId | string | 是 | 关联ac_symbol表 |
 | amount | number | 是 | 提现金额 |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | string | `data` 为该类型标量 |
+
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/withdraw" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -70,6 +76,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 | symbolId | string | 是 | 关联ac_symbol表 |
 | amount | number | 是 | 存款金额 |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | string | `data` 为该类型标量 |
+
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/deposit" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -95,6 +107,15 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 | from | string | 否 |  |
 | to | string | 否 |  |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].data | string | 日期 |
+| [].value | number | 收益率 |
+| [].valueDisplay | string | 收益率展示值 |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-yield-rate-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -109,7 +130,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-
 
 `GET /openapi/v1/mc-account/mlp/withdraw-info` — 权限 `READ`。
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -141,6 +162,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-i
 | from | string | 否 |  |
 | to | string | 否 |  |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].data | string | 日期 |
+| [].value | number | 收益率 |
+| [].valueDisplay | string | 收益率展示值 |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -155,7 +185,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" 
 
 `GET /openapi/v1/mc-account/mlp/treasury-info` — 权限 `READ`。
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -191,7 +221,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-i
 
 `GET /openapi/v1/mc-account/mlp/deposit-info` — 权限 `READ`。
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -222,11 +252,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 `GET /openapi/v1/mc-account/mlp/core/stats` — 权限 `READ`。
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| totalLockedAmount | number | 总锁仓量 = 存入金库账户的总金额 + TVL 金额基准值 |
+| totalLockedAmount | number | 总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值 |
 | annualYieldRate | number | 年化收益率 |
 | myTotalDeposit | number | 我的总存款 |
 | totalHistoricalEarnings | number | 历史总收益 |
@@ -257,7 +287,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats
 
 查询当前业务线下的金库账户收益率等参数。
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -296,6 +326,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
 | from | string | 否 |  |
 | to | string | 否 |  |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].data | string | 日期 |
+| [].value | number | 收益率 |
+| [].valueDisplay | string | 收益率展示值 |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -309,6 +348,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 ## 查询金库账户资产详情
 
 `GET /openapi/v1/mc-account/mlp/account/assets` — 权限 `READ`。
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].symbol | string | 币种名称 |
+| [].principalAvailable | number | 可用本金 |
+| [].interestAvailable | number | 可用收益 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \

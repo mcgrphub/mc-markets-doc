@@ -41,7 +41,7 @@ description: "交易相关 OpenAPI 接口。"
 | priceSL | number | 否 | 新的止损价格 |
 | priceTP | number | 否 | 新的止盈价格 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -83,7 +83,7 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 | order | integer | 是 | 订单ID |
 | volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000, 需与下单时传入的volumeExt一致 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -128,7 +128,7 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 | userSlippageLimit | number | 否 | 用户填入的市价单最大滑点限制(仅市价单有效) |
 | frontMarketPrice | number | 否 | 前端市价参考价格(可选)，不能小于0 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -172,7 +172,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | priceTP | number | 否 | 止盈, |
 | frontMarketPrice | number | 否 | 前端市价参考价格(可选)，不能小于0 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -204,6 +204,137 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | --- | --- | --- | --- |
 | symbols | array | 是 |  |
 
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | array | `data` 为对象数组，元素字段见 `[]...` |
+| [].symbol | string |  |
+| [].mt5 | object |  |
+| [].mt5.Category | string |  |
+| [].mt5.ContractSize | number |  |
+| [].mt5.CurrencyBase | string |  |
+| [].mt5.CurrencyBaseDigits | integer |  |
+| [].mt5.CurrencyMargin | string |  |
+| [].mt5.CurrencyMarginDigits | integer |  |
+| [].mt5.CurrencyProfit | string |  |
+| [].mt5.CurrencyProfitDigits | integer |  |
+| [].mt5.Digits | integer |  |
+| [].mt5.FreezeLevel | integer |  |
+| [].mt5.IESlipLosing | integer |  |
+| [].mt5.IESlipProfit | integer |  |
+| [].mt5.IEVolumeMaxExt | integer |  |
+| [].mt5.International | string |  |
+| [].mt5.MarginFlags | integer |  |
+| [].mt5.MarginHedged | number |  |
+| [].mt5.MarginInitial | number |  |
+| [].mt5.MarginMaintenance | number |  |
+| [].mt5.MarginRateCurrency | number |  |
+| [].mt5.MarginRateLiquidity | number |  |
+| [].mt5.OrderFlags | integer |  |
+| [].mt5.Path | string |  |
+| [].mt5.PriceLimitMax | number |  |
+| [].mt5.PriceLimitMin | number |  |
+| [].mt5.PriceSettle | number |  |
+| [].mt5.SessionTrade | array |  |
+| [].mt5.SessionTrade[].quote | array |  |
+| [].mt5.SessionTrade[].quote[].from | string |  |
+| [].mt5.SessionTrade[].quote[].to | string |  |
+| [].mt5.SessionTrade[].trade | array |  |
+| [].mt5.SessionTrade[].trade[].from | string |  |
+| [].mt5.SessionTrade[].trade[].to | string |  |
+| [].mt5.SessionTrade[].weekDay | string |  |
+| [].mt5.Source | string |  |
+| [].mt5.StopsLevel | integer |  |
+| [].mt5.TickBookDepth | integer |  |
+| [].mt5.TimeExpiration | string |  |
+| [].mt5.TimeStart | string |  |
+| [].mt5.TradeMode | integer |  |
+| [].mt5.Spread | number |  |
+| [].mt5.VolumeLimitExt | integer |  |
+| [].mt5.VolumeMaxExt | integer |  |
+| [].mt5.VolumeMinExt | integer |  |
+| [].mt5.VolumeStepExt | integer |  |
+| [].mt5.leverageGrade | array |  |
+| [].mt5.leverageGrade[].from | number |  |
+| [].mt5.leverageGrade[].initialAdvanceRate | number |  |
+| [].mt5.leverageGrade[].maintenanceAdvanceRate | number |  |
+| [].mt5.leverageGrade[].to | number |  |
+| [].mt5.marginRateInitial | object |  |
+| [].mt5.marginRateInitial.buy | number |  |
+| [].mt5.marginRateInitial.buyLimit | number |  |
+| [].mt5.marginRateInitial.buyStop | number |  |
+| [].mt5.marginRateInitial.buyStopLimit | number |  |
+| [].mt5.marginRateInitial.sell | number |  |
+| [].mt5.marginRateInitial.sellLimit | number |  |
+| [].mt5.marginRateInitial.sellStop | number |  |
+| [].mt5.marginRateInitial.sellStopLimit | number |  |
+| [].mt5.marginRateMaintenance | object |  |
+| [].mt5.marginRateMaintenance.buy | number |  |
+| [].mt5.marginRateMaintenance.buyLimit | number |  |
+| [].mt5.marginRateMaintenance.buyStop | number |  |
+| [].mt5.marginRateMaintenance.buyStopLimit | number |  |
+| [].mt5.marginRateMaintenance.sell | number |  |
+| [].mt5.marginRateMaintenance.sellLimit | number |  |
+| [].mt5.marginRateMaintenance.sellStop | number |  |
+| [].mt5.marginRateMaintenance.sellStopLimit | number |  |
+| [].risk | object |  |
+| [].risk.id | integer |  |
+| [].risk.symbol | string |  |
+| [].risk.version | integer |  |
+| [].risk.longAnnualRate | number |  |
+| [].risk.shortAnnualRate | number |  |
+| [].risk.discountRate | number |  |
+| [].risk.baseRate | number |  |
+| [].risk.specialSymbol | integer |  |
+| [].risk.fundingRateBaseType | string |  |
+| [].risk.fundingRateThreshold | number |  |
+| [].risk.fundingRateStep | number |  |
+| [].risk.fundingRateIncrease | number |  |
+| [].risk.fundingRateBase | number |  |
+| [].risk.fundingRateMin | number |  |
+| [].risk.fundingRateMax | number |  |
+| [].risk.liquidationFeeType | string |  |
+| [].risk.liquidationFeeValue | number |  |
+| [].risk.minLiquidationFee | number |  |
+| [].risk.fundingRateMode | string |  |
+| [].risk.fundingRateExternalMarketSymbol | string |  |
+| [].risk.groupName | string |  |
+| [].risk.platformMaxSlippageType | string |  |
+| [].risk.platformMaxSlippage | number |  |
+| [].risk.tpSlMaxSlippageType | string |  |
+| [].risk.tpSlMaxSlippage | number |  |
+| [].risk.userLongPositionValueLimitUsdc | number |  |
+| [].risk.userShortPositionValueLimitUsdc | number |  |
+| [].risk.platformLongTotalPositionLimitUsdc | number |  |
+| [].risk.platformShortTotalPositionLimitUsdc | number |  |
+| [].risk.free | object |  |
+| [].risk.free.transCostConfig | array |  |
+| [].risk.free.transCostConfig[].startTime | string | 交易成本配置-开始时间 |
+| [].risk.free.transCostConfig[].endTime | string | 交易成本配置-结束时间 |
+| [].risk.free.transCostConfig[].transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
+| [].risk.free.transCostConfig[].transTotalTime | integer | 成交累计时间 |
+| [].risk.free.transCostConfig[].slippageConfig | array | 滑点档位配置 |
+| [].risk.free.transCostConfig[].slippageConfig[].from | integer | 档位范围 (从) |
+| [].risk.free.transCostConfig[].slippageConfig[].to | integer | 档位范围 (到) |
+| [].risk.free.transCostConfig[].slippageConfig[].value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
+| [].risk.free.transCostConfig[].slippageConfig[].valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
+| [].risk.free.transCostConfig[].slippageConfig[].slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| [].risk.free.discountRate | number |  |
+| [].risk.premium | object |  |
+| [].risk.premium.transCostConfig | array |  |
+| [].risk.premium.transCostConfig[].startTime | string | 交易成本配置-开始时间 |
+| [].risk.premium.transCostConfig[].endTime | string | 交易成本配置-结束时间 |
+| [].risk.premium.transCostConfig[].transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
+| [].risk.premium.transCostConfig[].transTotalTime | integer | 成交累计时间 |
+| [].risk.premium.transCostConfig[].slippageConfig | array | 滑点档位配置 |
+| [].risk.premium.transCostConfig[].slippageConfig[].from | integer | 档位范围 (从) |
+| [].risk.premium.transCostConfig[].slippageConfig[].to | integer | 档位范围 (到) |
+| [].risk.premium.transCostConfig[].slippageConfig[].value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
+| [].risk.premium.transCostConfig[].slippageConfig[].valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
+| [].risk.premium.transCostConfig[].slippageConfig[].slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| [].risk.premium.discountRate | number |  |
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -228,7 +359,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 | volumeExt | integer | 是 | 下单数量（*100000000扩展精度）， 如用户下单量是0.01， 则传入0.01*100000000 |
 | symbol | string | 是 | 交易对/品种 |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -258,13 +389,43 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 | --- | --- | --- | --- |
 | uid | string | 是 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | groupName | string |  |
 | commissionCfg | array |  |
+| commissionCfg[].actionMode | integer |  |
+| commissionCfg[].chargeMode | integer |  |
+| commissionCfg[].description | string |  |
+| commissionCfg[].entryMode | integer |  |
+| commissionCfg[].mode | integer |  |
+| commissionCfg[].name | string |  |
+| commissionCfg[].path | string |  |
+| commissionCfg[].profitMode | integer |  |
+| commissionCfg[].rangeMode | integer |  |
+| commissionCfg[].reasonFlags | integer |  |
+| commissionCfg[].turnoverCurrency | string |  |
+| commissionCfg[].groupTier | array |  |
+| commissionCfg[].groupTier[].currency | string |  |
+| commissionCfg[].groupTier[].maximal | number |  |
+| commissionCfg[].groupTier[].minimal | number |  |
+| commissionCfg[].groupTier[].mode | integer |  |
+| commissionCfg[].groupTier[].rangeFrom | number |  |
+| commissionCfg[].groupTier[].rangeTo | number |  |
+| commissionCfg[].groupTier[].type | integer |  |
+| commissionCfg[].groupTier[].value | number |  |
 | leverageCfg | array |  |
+| leverageCfg[].description | string |  |
+| leverageCfg[].name | string |  |
+| leverageCfg[].path | string |  |
+| leverageCfg[].rangeMode | integer |  |
+| leverageCfg[].rangeValueCurrency | string |  |
+| leverageCfg[].tiers | array |  |
+| leverageCfg[].tiers[].marginRateInitial | number |  |
+| leverageCfg[].tiers[].marginRateMaintenance | number |  |
+| leverageCfg[].tiers[].rangeFrom | number |  |
+| leverageCfg[].tiers[].rangeTo | number |  |
 | marginCall | string |  |
 
 ```bash
@@ -288,11 +449,54 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 | --- | --- | --- | --- |
 | login | string | 是 |  |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | userAssets | object |  |
+| userAssets.balance | number |  |
+| userAssets.equity | number |  |
+| userAssets.floating | number |  |
+| userAssets.margin | number |  |
+| userAssets.marginFree | number |  |
+| userAssets.marginLevel | number |  |
+| userAssets.positions | array |  |
+| userAssets.positions[].id | integer |  |
+| userAssets.positions[].login | integer |  |
+| userAssets.positions[].action | integer |  |
+| userAssets.positions[].contractSize | number |  |
+| userAssets.positions[].freeMargin | number |  |
+| userAssets.positions[].precision | integer |  |
+| userAssets.positions[].priceDigits | integer |  |
+| userAssets.positions[].currencyDigits | integer |  |
+| userAssets.positions[].priceCurrent | number |  |
+| userAssets.positions[].openPrice | number |  |
+| userAssets.positions[].time | integer |  |
+| userAssets.positions[].slPrice | number |  |
+| userAssets.positions[].tpPrice | number |  |
+| userAssets.positions[].rateProfit | number |  |
+| userAssets.positions[].freeAmount | number |  |
+| userAssets.positions[].symbol | string |  |
+| userAssets.positions[].usdValue | number |  |
+| userAssets.positions[].volume | number |  |
+| userAssets.positions[].volumeExt | number |  |
+| userAssets.positions[].contractSizeStr | string |  |
+| userAssets.positions[].priceCurrentStr | string |  |
+| userAssets.positions[].usdValueStr | string |  |
+| userAssets.positions[].volumeDisplay | string |  |
+| userAssets.positions[].volumeScale | integer |  |
+| userAssets.balanceStr | string |  |
+| userAssets.equityStr | string |  |
+| userAssets.floatingStr | string |  |
+| userAssets.marginStr | string |  |
+| userAssets.marginFreeStr | string |  |
+| userAssets.marginLevelStr | string |  |
+| userAssets.marginDisplay | string |  |
+| userAssets.marginScale | integer |  |
+| userAssets.marginFreeDisplay | string |  |
+| userAssets.marginFreeScale | integer |  |
+| userAssets.marginLevelDisplay | string |  |
+| userAssets.marginLevelScale | integer |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \
@@ -318,7 +522,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 | type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
 
-### 响应 `data` 字段（摘要）
+### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
