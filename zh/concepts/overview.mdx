@@ -30,16 +30,15 @@ MC OpenAPI 是面向 MC 多账户系统(MC-account)的 JSON-over-HTTPS API。本
 
 ## 接口分组
 
-API 参考按网关服务分组：
+API 参考按业务域分组（文件路径仍按网关服务目录存放）：
 
 | 分组 | 用途 | 常见权限 |
 | --- | --- | --- |
-| Account（`/openapi/v1/mc-account/`） | 交易记录、理财、金库账户、币种、资金账户、汇率等 | `READ`、`TRADE`、`WITHDRAW` |
-| Trade（`/openapi/v1/mc-trade/`） | 订单、持仓、成交、交易账户 | `READ`、`TRADE` |
-| Risk（`/openapi/v1/mc-risk/`） | 资金费率、交易品种 | `READ` |
-| Aggregator（`/openapi/v1/mc-aggregator/`） | K 线与行情排行 | `READ` |
+| 行情 | 行情数据、币种、汇率 | `READ` |
+| 交易 | 下单与持仓、交易账户、订单、成交、账户交易、成交订单、资金费历史、交易品种、资金费率 | `READ`、`TRADE` |
+| 理财 | 理财账户、金库账户、资金账户 | `READ`、`TRADE`、`WITHDRAW` |
 
-详见 [API 参考概览](/zh/api-reference/overview)。
+请求路径仍可能包含 `/openapi/v1/mc-account/`、`/openapi/v1/mc-trade/`、`/openapi/v1/mc-risk/`、`/openapi/v1/mc-aggregator/` 等服务段，签名时须使用完整路径。详见 [API 参考概览](/zh/api-reference/overview)。
 
 ## 请求生命周期
 

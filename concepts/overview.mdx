@@ -30,16 +30,15 @@ The production base URL is `https://gateway.mcconnects.com`. All endpoints share
 
 ## Endpoint groups
 
-API Reference is grouped by gateway service:
+API Reference is grouped by product domain (MDX files still live under gateway-service directories):
 
 | Group | Purpose | Required scope (typical) |
 | --- | --- | --- |
-| Account (`/openapi/v1/mc-account/`) | Trading records, finance, vault account, currency, fund account, exchange rate | `READ`, `TRADE`, `WITHDRAW` |
-| Trade (`/openapi/v1/mc-trade/`) | Orders, positions, deals, trade account | `READ`, `TRADE` |
-| Risk (`/openapi/v1/mc-risk/`) | Funding rate, trade symbols | `READ` |
-| Aggregator (`/openapi/v1/mc-aggregator/`) | K-line and symbol ranking | `READ` |
+| Market data | Market data, currency, exchange rate | `READ` |
+| Trading | Orders and positions, trading account, orders, deals, account trading, deal orders, funding fee history, trading symbols, funding rate | `READ`, `TRADE` |
+| Finance | Finance account, vault account, fund account | `READ`, `TRADE`, `WITHDRAW` |
 
-See the [API Reference overview](/api-reference/overview).
+Request paths may still include service segments such as `/openapi/v1/mc-account/`, `/openapi/v1/mc-trade/`, `/openapi/v1/mc-risk/`, and `/openapi/v1/mc-aggregator/`. Use the full path when signing. See the [API Reference overview](/api-reference/overview).
 
 ## Request lifecycle
 

@@ -76,38 +76,33 @@
                 ]
               },
               {
-                "group": "Account",
+                "group": "Market data",
                 "pages": [
-                  "api-reference/account/vault-account",
-                  "api-reference/account/finance-account",
-                  "api-reference/account/trading",
+                  "api-reference/aggregator/market-data",
                   "api-reference/account/currency",
-                  "api-reference/account/fund-account",
-                  "api-reference/account/exchange-rate",
-                  "api-reference/account/deal-orders",
-                  "api-reference/account/funding-fee-history"
+                  "api-reference/account/exchange-rate"
                 ]
               },
               {
-                "group": "Trade",
+                "group": "Trading",
                 "pages": [
                   "api-reference/trade/trading",
                   "api-reference/trade/trading-account",
                   "api-reference/trade/orders",
-                  "api-reference/trade/deals"
-                ]
-              },
-              {
-                "group": "Risk",
-                "pages": [
+                  "api-reference/trade/deals",
+                  "api-reference/account/trading",
+                  "api-reference/account/deal-orders",
+                  "api-reference/account/funding-fee-history",
                   "api-reference/risk/trading",
                   "api-reference/risk/funding-rate"
                 ]
               },
               {
-                "group": "Aggregator",
+                "group": "Finance",
                 "pages": [
-                  "api-reference/aggregator/market-data"
+                  "api-reference/account/finance-account",
+                  "api-reference/account/vault-account",
+                  "api-reference/account/fund-account"
                 ]
               }
             ]
@@ -169,38 +164,33 @@
                 ]
               },
               {
-                "group": "Account",
+                "group": "行情",
                 "pages": [
-                  "zh/api-reference/account/vault-account",
-                  "zh/api-reference/account/finance-account",
-                  "zh/api-reference/account/trading",
+                  "zh/api-reference/aggregator/market-data",
                   "zh/api-reference/account/currency",
-                  "zh/api-reference/account/fund-account",
-                  "zh/api-reference/account/exchange-rate",
-                  "zh/api-reference/account/deal-orders",
-                  "zh/api-reference/account/funding-fee-history"
+                  "zh/api-reference/account/exchange-rate"
                 ]
               },
               {
-                "group": "Trade",
+                "group": "交易",
                 "pages": [
                   "zh/api-reference/trade/trading",
                   "zh/api-reference/trade/trading-account",
                   "zh/api-reference/trade/orders",
-                  "zh/api-reference/trade/deals"
-                ]
-              },
-              {
-                "group": "Risk",
-                "pages": [
+                  "zh/api-reference/trade/deals",
+                  "zh/api-reference/account/trading",
+                  "zh/api-reference/account/deal-orders",
+                  "zh/api-reference/account/funding-fee-history",
                   "zh/api-reference/risk/trading",
                   "zh/api-reference/risk/funding-rate"
                 ]
               },
               {
-                "group": "Aggregator",
+                "group": "理财",
                 "pages": [
-                  "zh/api-reference/aggregator/market-data"
+                  "zh/api-reference/account/finance-account",
+                  "zh/api-reference/account/vault-account",
+                  "zh/api-reference/account/fund-account"
                 ]
               }
             ]

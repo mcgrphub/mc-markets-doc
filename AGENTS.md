@@ -50,9 +50,9 @@ When Chinese Specs under `openapi/` are updated (or the maintainer confirms they
 
 ### Target page split
 
-- Top-level groups: one per Spec service (Account, Trade, Risk, Aggregator).
+- **Sidebar (reader-facing):** top-level groups are **行情 / Market data**, **交易 / Trading**, **理财 / Finance** — not Spec service names (Account / Trade / Risk / Aggregator).
 - Second-level pages: one page per **external** tag (after glossary internal→external mapping).
-- Suggested file paths: `zh/api-reference/{service}/{slug}.mdx` ↔ English mirror without `zh/`.
+- **File paths:** still `zh/api-reference/{service}/{slug}.mdx` ↔ English mirror without `zh/` (service = account / trade / risk / aggregator). Register pages under the correct sidebar group in `docs.json`; do not move files unless the user asks.
 
 ### Phase 1 limits
 

@@ -1,12 +1,12 @@
 ---
 title: "API Reference"
 sidebarTitle: "Overview"
-description: "MC OpenAPI public endpoints grouped by gateway service: Account, Trade, Risk, and Aggregator."
+description: "MC OpenAPI public endpoints grouped by Market data, Trading, and Finance."
 ---
 
-This reference covers public MC OpenAPI endpoints. The sidebar groups **Account**, **Trade**, **Risk**, and **Aggregator**.
+This reference covers public MC OpenAPI endpoints. The sidebar groups **Market data**, **Trading**, and **Finance**.
 
-All endpoints share the same gateway host, authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope. Request paths already include the service segment used for signing (for example `/openapi/v1/mc-account/...`).
+All endpoints share the same gateway host, authentication scheme (AK/SK with HMAC-SHA256), and JSON response envelope. Request paths still include the service segment used for signing (for example `/openapi/v1/mc-account/...`).
 
 <CardGroup cols={2}>
   <Card title="Authentication" icon="lock" href="/authentication">
@@ -28,11 +28,10 @@ All endpoints share the same gateway host, authentication scheme (AK/SK with HMA
 
 ## Endpoint groups
 
-| Group | Gateway path prefix |
+| Group | Includes |
 | --- | --- |
-| Account | `/openapi/v1/mc-account/` |
-| Trade | `/openapi/v1/mc-trade/` |
-| Risk | `/openapi/v1/mc-risk/` |
-| Aggregator | `/openapi/v1/mc-aggregator/` |
+| Market data | Market data, Currency, Exchange rate |
+| Trading | Orders and positions, Trading account, Orders, Deals, Account trading records, Deal orders, Funding fee history, Trading symbols, Funding rate |
+| Finance | Finance account, Vault account, Fund account |
 
 Use the sidebar to open each group. The interactive playground is disabled because requests require custom AK/SK signing — follow [Authentication](/authentication) and [First request](/guides/first-request).

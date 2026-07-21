@@ -22,6 +22,9 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | 币种 | Symbol / Currency | Prefer consistency with endpoint pages; Spec tag en uses Currency |
 | `READ` / `TRADE` / `WITHDRAW` | `READ` / `TRADE` / `WITHDRAW` | Keep as-is |
 | 遍历 | iterate / iterate through | Not 遗历; use when translating pagination “iterate” |
+| 行情 | Market data | Sidebar API Reference group (not Spec service name) |
+| 交易 | Trading | Sidebar API Reference group; also used as page/tag label |
+| 理财 | Finance | Sidebar API Reference group (covers Finance / Vault / Fund accounts) |
 
 ## Table 2 — Spec internal → external
 

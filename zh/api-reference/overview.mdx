@@ -1,12 +1,12 @@
 ---
 title: "API 参考"
 sidebarTitle: "概览"
-description: "MC OpenAPI 公开接口按网关服务分组：Account、Trade、Risk、Aggregator。"
+description: "MC OpenAPI 公开接口按行情、交易、理财分组。"
 ---
 
-本参考涵盖 MC OpenAPI 的公开接口。侧边栏按 **Account**、**Trade**、**Risk**、**Aggregator** 分组。
+本参考涵盖 MC OpenAPI 的公开接口。侧边栏按 **行情**、**交易**、**理财** 分组。
 
-所有接口共享相同的网关主机、鉴权方式（AK/SK + HMAC-SHA256）以及 JSON 响应信封。路径已包含签名所需的服务段（例如 `/openapi/v1/mc-account/...`）。
+所有接口共享相同的网关主机、鉴权方式（AK/SK + HMAC-SHA256）以及 JSON 响应信封。请求路径仍包含服务段（例如 `/openapi/v1/mc-account/...`），签名时须使用完整路径。
 
 <CardGroup cols={2}>
   <Card title="认证" icon="lock" href="/zh/authentication">
@@ -28,11 +28,10 @@ description: "MC OpenAPI 公开接口按网关服务分组：Account、Trade、R
 
 ## 接口分组
 
-| 分组 | 网关路径前缀 |
+| 分组 | 包含 |
 | --- | --- |
-| Account | `/openapi/v1/mc-account/` |
-| Trade | `/openapi/v1/mc-trade/` |
-| Risk | `/openapi/v1/mc-risk/` |
-| Aggregator | `/openapi/v1/mc-aggregator/` |
+| 行情 | 行情数据、币种、汇率 |
+| 交易 | 下单与持仓、交易账户、订单、成交、账户交易记录、成交订单、资金费历史、交易品种、资金费率 |
+| 理财 | 理财账户、金库账户、资金账户 |
 
 在侧边栏打开具体分组。交互式 Playground 已关闭（请求需自定义 AK/SK 签名），请按 [认证](/zh/authentication) 与 [第一次请求](/zh/guides/first-request) 调用。
