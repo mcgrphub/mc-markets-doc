@@ -2952,7 +2952,7 @@
                   },
                   "symbolId": {
                     "type": "string",
-                    "description": "关联ac_symbol表"
+                    "description": "币种ID"
                   },
                   "amount": {
                     "type": "number",
@@ -3411,7 +3411,7 @@
                   },
                   "symbolId": {
                     "type": "string",
-                    "description": "关联ac_symbol表"
+                    "description": "币种ID"
                   },
                   "amount": {
                     "type": "number",
@@ -18992,7 +18992,7 @@
           "symbolId": {
             "title": "币种ID",
             "type": "string",
-            "description": "关联ac_symbol表"
+            "description": "币种ID"
           },
           "amount": {
             "title": "提现金额",
@@ -19020,7 +19020,7 @@
           "symbolId": {
             "title": "币种ID",
             "type": "string",
-            "description": "关联ac_symbol表"
+            "description": "币种ID"
           },
           "amount": {
             "title": "存款金额",

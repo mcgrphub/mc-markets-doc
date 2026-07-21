@@ -39,7 +39,7 @@ description: "金库账户相关 OpenAPI 接口。"
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | trackingId | string | 是 | 用于跟踪请求的唯一标识 |
-| symbolId | string | 是 | 关联ac_symbol表 |
+| symbolId | string | 是 | 币种ID |
 | amount | number | 是 | 提现金额 |
 
 ### 响应 `data` 字段
@@ -57,7 +57,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
   -H "Content-Type: application/json" \
   -d '{
   "example": "see fields above"
-}' 
+}'
 ```
 
 ---
@@ -73,7 +73,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | trackingId | string | 是 | 用于跟踪请求的唯一标识 |
-| symbolId | string | 是 | 关联ac_symbol表 |
+| symbolId | string | 是 | 币种ID |
 | amount | number | 是 | 存款金额 |
 
 ### 响应 `data` 字段
@@ -91,7 +91,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
   -H "Content-Type: application/json" \
   -d '{
   "example": "see fields above"
-}' 
+}'
 ```
 
 ---
