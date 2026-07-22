@@ -50,11 +50,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "每页显示条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "当前页码",
                   "format": "int64",
                   "example": 1
                 },
@@ -74,9 +76,10 @@
                 },
                 "group": {
                   "type": "string",
-                  "description": "产品分组，可选"
+                  "description": "产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种"
                 }
               },
+              "description": "交易品种分页查询请求",
               "example": null
             }
           }
@@ -104,6 +107,7 @@
                       "properties": {
                         "records": {
                           "type": "array",
+                          "description": "当前页记录列表",
                           "items": {
                             "type": "object",
                             "properties": {
@@ -128,30 +132,37 @@
                                 ]
                               }
                             },
+                            "description": "当前页记录列表",
                             "example": null
                           }
                         },
                         "total": {
                           "type": "integer",
+                          "description": "总记录数",
                           "format": "int64"
                         },
                         "size": {
                           "type": "integer",
+                          "description": "每页条数",
                           "format": "int64"
                         },
                         "current": {
                           "type": "integer",
+                          "description": "当前页码",
                           "format": "int64"
                         },
                         "pages": {
                           "type": "integer",
+                          "description": "总页数",
                           "format": "int64"
                         },
                         "hasPrevious": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "description": "是否有上一页"
                         },
                         "hasNext": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "description": "是否有下一页"
                         }
                       },
                       "example": null
@@ -189,11 +200,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "每页显示条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "当前页码",
                   "format": "int64",
                   "example": 1
                 },
@@ -252,111 +265,137 @@
                       "properties": {
                         "records": {
                           "type": "array",
+                          "description": "当前页记录列表",
                           "items": {
                             "type": "object",
                             "properties": {
                               "symbol": {
                                 "type": "string",
+                                "description": "交易品种",
                                 "example": "BTCUSDT"
                               },
                               "fundingRate": {
                                 "type": "number",
+                                "description": "资金费率",
                                 "example": 0.0001
                               },
                               "fundingRateStr": {
                                 "type": "string",
+                                "description": "资金费率原始字符串",
                                 "example": "1.0E-4"
                               },
                               "fundingRateDisplay": {
                                 "type": "string",
+                                "description": "资金费率展示值（百分比文本）",
                                 "example": "0.0125%"
                               },
                               "fundingRateScale": {
                                 "type": "integer",
+                                "description": "资金费率展示小数位数",
                                 "format": "int32",
                                 "example": 4
                               },
                               "annualRateDisplay": {
                                 "type": "string",
+                                "description": "年化资金费率展示值",
                                 "example": "13.69%"
                               },
                               "settlementPrice": {
                                 "type": "number",
+                                "description": "结算价格",
                                 "example": 0.0001
                               },
                               "settlementPriceStr": {
                                 "type": "string",
+                                "description": "结算价格原始字符串",
                                 "example": "3964.2"
                               },
                               "settlementPriceDisplay": {
                                 "type": "string",
+                                "description": "结算价格展示值",
                                 "example": "3964.2"
                               },
                               "settlementPriceScale": {
                                 "type": "integer",
+                                "description": "结算价格展示小数位数",
                                 "format": "int32",
                                 "example": 2
                               },
                               "longInterestRate": {
                                 "type": "number",
+                                "description": "多头利息费率",
                                 "example": 0.0001
                               },
                               "longInterestRateStr": {
                                 "type": "string",
+                                "description": "多头利息费率原始字符串",
                                 "example": "1.0E-4"
                               },
                               "shortInterestRate": {
                                 "type": "number",
+                                "description": "空头利息费率",
                                 "example": 0.0001
                               },
                               "shortInterestRateStr": {
                                 "type": "string",
+                                "description": "空头利息费率原始字符串",
                                 "example": "1.0E-4"
                               },
                               "isSettlementRate": {
                                 "type": "boolean",
+                                "description": "是否为结算费率记录",
                                 "example": true
                               },
                               "nextSettlementTime": {
                                 "type": "integer",
+                                "description": "下次结算时间（Unix 毫秒时间戳）",
                                 "format": "int64",
                                 "example": 1697331200000
                               },
                               "timestamp": {
                                 "type": "integer",
+                                "description": "资金费率生成时间（Unix 毫秒时间戳）",
                                 "format": "int64",
                                 "example": 1697331200000
                               },
                               "settlementCycle": {
                                 "type": "integer",
+                                "description": "结算周期（秒）",
                                 "format": "int64",
                                 "example": 3600
                               }
                             },
+                            "description": "当前页记录列表",
                             "example": null
                           }
                         },
                         "total": {
                           "type": "integer",
+                          "description": "总记录数",
                           "format": "int64"
                         },
                         "size": {
                           "type": "integer",
+                          "description": "每页条数",
                           "format": "int64"
                         },
                         "current": {
                           "type": "integer",
+                          "description": "当前页码",
                           "format": "int64"
                         },
                         "pages": {
                           "type": "integer",
+                          "description": "总页数",
                           "format": "int64"
                         },
                         "hasPrevious": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "description": "是否有上一页"
                         },
                         "hasNext": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "description": "是否有下一页"
                         }
                       },
                       "example": null
@@ -382,12 +421,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "每页显示条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64",
             "example": 1
           },
@@ -410,40 +451,55 @@
           "group": {
             "title": "产品分组",
             "type": "string",
-            "description": "产品分组，可选"
+            "description": "产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种"
           }
-        }
+        },
+        "description": "交易品种分页查询请求"
       },
       "BasePageRspSymbolDto": {
         "type": "object",
         "properties": {
           "records": {
+            "title": "当前页记录列表",
             "type": "array",
+            "description": "当前页记录列表",
             "items": {
               "$ref": "#/components/schemas/SymbolDto"
             }
           },
           "total": {
+            "title": "总记录数",
             "type": "integer",
+            "description": "总记录数",
             "format": "int64"
           },
           "size": {
+            "title": "每页条数",
             "type": "integer",
+            "description": "每页条数",
             "format": "int64"
           },
           "current": {
+            "title": "当前页码",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64"
           },
           "pages": {
+            "title": "总页数",
             "type": "integer",
+            "description": "总页数",
             "format": "int64"
           },
           "hasPrevious": {
-            "type": "boolean"
+            "title": "是否有上一页",
+            "type": "boolean",
+            "description": "是否有上一页"
           },
           "hasNext": {
-            "type": "boolean"
+            "title": "是否有下一页",
+            "type": "boolean",
+            "description": "是否有下一页"
           }
         }
       },
@@ -469,6 +525,7 @@
         }
       },
       "SymbolDto": {
+        "title": "当前页记录列表",
         "type": "object",
         "properties": {
           "symbol": {
@@ -491,7 +548,8 @@
               "SPOT"
             ]
           }
-        }
+        },
+        "description": "当前页记录列表"
       },
       "FundingRatePageReq": {
         "required": [
@@ -502,12 +560,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "每页显示条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64",
             "example": 1
           },
@@ -546,134 +606,168 @@
         "type": "object",
         "properties": {
           "records": {
+            "title": "当前页记录列表",
             "type": "array",
+            "description": "当前页记录列表",
             "items": {
               "$ref": "#/components/schemas/FundingRateDto"
             }
           },
           "total": {
+            "title": "总记录数",
             "type": "integer",
+            "description": "总记录数",
             "format": "int64"
           },
           "size": {
+            "title": "每页条数",
             "type": "integer",
+            "description": "每页条数",
             "format": "int64"
           },
           "current": {
+            "title": "当前页码",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64"
           },
           "pages": {
+            "title": "总页数",
             "type": "integer",
+            "description": "总页数",
             "format": "int64"
           },
           "hasPrevious": {
-            "type": "boolean"
+            "title": "是否有上一页",
+            "type": "boolean",
+            "description": "是否有上一页"
           },
           "hasNext": {
-            "type": "boolean"
+            "title": "是否有下一页",
+            "type": "boolean",
+            "description": "是否有下一页"
           }
         }
       },
       "FundingRateDto": {
+        "title": "当前页记录列表",
         "type": "object",
         "properties": {
           "symbol": {
             "title": "币种",
             "type": "string",
+            "description": "交易品种",
             "example": "BTCUSDT"
           },
           "fundingRate": {
             "title": "资金费率",
             "type": "number",
+            "description": "资金费率",
             "example": 0.0001
           },
           "fundingRateStr": {
             "title": "资金费率原始decimal字符串",
             "type": "string",
+            "description": "资金费率原始字符串",
             "example": "1.0E-4"
           },
           "fundingRateDisplay": {
             "title": "资金费率展示值",
             "type": "string",
+            "description": "资金费率展示值（百分比文本）",
             "example": "0.0125%"
           },
           "fundingRateScale": {
             "title": "资金费率展示小数位",
             "type": "integer",
+            "description": "资金费率展示小数位数",
             "format": "int32",
             "example": 4
           },
           "annualRateDisplay": {
             "title": "年化资金费率展示值",
             "type": "string",
+            "description": "年化资金费率展示值",
             "example": "13.69%"
           },
           "settlementPrice": {
             "title": "平仓价格",
             "type": "number",
+            "description": "结算价格",
             "example": 0.0001
           },
           "settlementPriceStr": {
             "title": "平仓价格原始decimal字符串",
             "type": "string",
+            "description": "结算价格原始字符串",
             "example": "3964.2"
           },
           "settlementPriceDisplay": {
             "title": "平仓价格展示值",
             "type": "string",
+            "description": "结算价格展示值",
             "example": "3964.2"
           },
           "settlementPriceScale": {
             "title": "平仓价格展示小数位",
             "type": "integer",
+            "description": "结算价格展示小数位数",
             "format": "int32",
             "example": 2
           },
           "longInterestRate": {
             "title": "多头利息费率",
             "type": "number",
+            "description": "多头利息费率",
             "example": 0.0001
           },
           "longInterestRateStr": {
             "title": "多头利息费率原始decimal字符串",
             "type": "string",
+            "description": "多头利息费率原始字符串",
             "example": "1.0E-4"
           },
           "shortInterestRate": {
             "title": "空头利息费率",
             "type": "number",
+            "description": "空头利息费率",
             "example": 0.0001
           },
           "shortInterestRateStr": {
             "title": "空头利息费率原始decimal字符串",
             "type": "string",
+            "description": "空头利息费率原始字符串",
             "example": "1.0E-4"
           },
           "isSettlementRate": {
             "title": "是否是结算费率",
             "type": "boolean",
+            "description": "是否为结算费率记录",
             "example": true
           },
           "nextSettlementTime": {
             "title": "下次结算时间 unix时间戳",
             "type": "integer",
+            "description": "下次结算时间（Unix 毫秒时间戳）",
             "format": "int64",
             "example": 1697331200000
           },
           "timestamp": {
             "title": "资金费率生成时间 unix时间戳",
             "type": "integer",
+            "description": "资金费率生成时间（Unix 毫秒时间戳）",
             "format": "int64",
             "example": 1697331200000
           },
           "settlementCycle": {
             "title": "结算周期（单位：秒）",
             "type": "integer",
+            "description": "结算周期（秒）",
             "format": "int64",
             "example": 3600
           }
-        }
+        },
+        "description": "当前页记录列表"
       },
       "RetResultBasePageRspFundingRateDto": {
         "type": "object",

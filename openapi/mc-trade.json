@@ -2568,209 +2568,263 @@
                         "type": "object",
                         "properties": {
                           "symbol": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "交易品种标识"
                           },
                           "mt5": {
                             "type": "object",
                             "properties": {
                               "Category": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易品种分类"
                               },
                               "ContractSize": {
                                 "type": "number",
+                                "description": "合约大小",
                                 "format": "double"
                               },
                               "CurrencyBase": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "基础货币"
                               },
                               "CurrencyBaseDigits": {
                                 "type": "integer",
+                                "description": "基础货币精度",
                                 "format": "int32"
                               },
                               "CurrencyMargin": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "预付款货币"
                               },
                               "CurrencyMarginDigits": {
                                 "type": "integer",
+                                "description": "预付款货币精度",
                                 "format": "int32"
                               },
                               "CurrencyProfit": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "利润货币"
                               },
                               "CurrencyProfitDigits": {
                                 "type": "integer",
+                                "description": "利润货币精度",
                                 "format": "int32"
                               },
                               "Digits": {
                                 "type": "integer",
+                                "description": "价格小数位数",
                                 "format": "int32"
                               },
                               "FreezeLevel": {
                                 "type": "integer",
+                                "description": "冻结级别",
                                 "format": "int32"
                               },
                               "IESlipLosing": {
                                 "type": "integer",
+                                "description": "现价执行亏损方向最大下降",
                                 "format": "int32"
                               },
                               "IESlipProfit": {
                                 "type": "integer",
+                                "description": "现价执行盈利方向最大下降",
                                 "format": "int32"
                               },
                               "IEVolumeMaxExt": {
                                 "type": "integer",
+                                "description": "现价执行最大交易量",
                                 "format": "int64"
                               },
                               "International": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "国际名称"
                               },
                               "MarginFlags": {
                                 "type": "integer",
+                                "description": "预付款检查模式",
                                 "format": "int32"
                               },
                               "MarginHedged": {
                                 "type": "number",
+                                "description": "锁仓预付款值",
                                 "format": "double"
                               },
                               "MarginInitial": {
                                 "type": "number",
+                                "description": "初始预付款大小",
                                 "format": "double"
                               },
                               "MarginMaintenance": {
                                 "type": "number",
+                                "description": "维持预付款大小",
                                 "format": "double"
                               },
                               "MarginRateCurrency": {
                                 "type": "number",
+                                "description": "预付款货币汇率",
                                 "format": "double"
                               },
                               "MarginRateLiquidity": {
                                 "type": "number",
+                                "description": "流动性比率",
                                 "format": "double"
                               },
                               "OrderFlags": {
                                 "type": "integer",
+                                "description": "订单类型标识",
                                 "format": "int32"
                               },
                               "Path": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易品种路径"
                               },
                               "PriceLimitMax": {
                                 "type": "number",
+                                "description": "最大价格限制",
                                 "format": "double"
                               },
                               "PriceLimitMin": {
                                 "type": "number",
+                                "description": "最小价格限制",
                                 "format": "double"
                               },
                               "PriceSettle": {
                                 "type": "number",
+                                "description": "结算价格",
                                 "format": "double"
                               },
                               "SessionTrade": {
                                 "type": "array",
+                                "description": "交易时间",
                                 "items": {
                                   "type": "object",
                                   "properties": {
                                     "quote": {
                                       "type": "array",
+                                      "description": "报价时间",
                                       "items": {
                                         "type": "object",
                                         "properties": {
                                           "from": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "description": "开始时间"
                                           },
                                           "to": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "description": "结束时间"
                                           }
                                         },
+                                        "description": "时间周期配置",
                                         "example": null
                                       }
                                     },
                                     "trade": {
                                       "type": "array",
+                                      "description": "交易时间",
                                       "items": {
                                         "type": "object",
                                         "properties": {
                                           "from": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "description": "开始时间"
                                           },
                                           "to": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "description": "结束时间"
                                           }
                                         },
+                                        "description": "时间周期配置",
                                         "example": null
                                       }
                                     },
                                     "weekDay": {
-                                      "type": "string"
+                                      "type": "string",
+                                      "description": "星期"
                                     }
                                   },
+                                  "description": "交易时段配置",
                                   "example": null
                                 }
                               },
                               "Source": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "报价源交易品种"
                               },
                               "StopsLevel": {
                                 "type": "integer",
+                                "description": "止损订单幅度",
                                 "format": "int32"
                               },
                               "TickBookDepth": {
                                 "type": "integer",
+                                "description": "市场深度范围",
                                 "format": "int32"
                               },
                               "TimeExpiration": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易到期日期"
                               },
                               "TimeStart": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易开始日期"
                               },
                               "TradeMode": {
                                 "type": "integer",
+                                "description": "交易模式",
                                 "format": "int32"
                               },
                               "Spread": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "点差"
                               },
                               "VolumeLimitExt": {
                                 "type": "integer",
+                                "description": "最大累计交易量",
                                 "format": "int64"
                               },
                               "VolumeMaxExt": {
                                 "type": "integer",
+                                "description": "最大交易量",
                                 "format": "int64"
                               },
                               "VolumeMinExt": {
                                 "type": "integer",
+                                "description": "最小交易量",
                                 "format": "int64"
                               },
                               "VolumeStepExt": {
                                 "type": "integer",
+                                "description": "交易量步长",
                                 "format": "int64"
                               },
                               "leverageGrade": {
                                 "type": "array",
+                                "description": "杠杆等级配置",
                                 "items": {
                                   "type": "object",
                                   "properties": {
                                     "from": {
                                       "type": "number",
+                                      "description": "起始值",
                                       "format": "double"
                                     },
                                     "initialAdvanceRate": {
                                       "type": "number",
+                                      "description": "初始预付款比率",
                                       "format": "double"
                                     },
                                     "maintenanceAdvanceRate": {
                                       "type": "number",
+                                      "description": "维持预付款比率",
                                       "format": "double"
                                     },
                                     "to": {
                                       "type": "number",
+                                      "description": "结束值",
                                       "format": "double"
                                     }
                                   },
+                                  "description": "杠杆等级配置",
                                   "example": null
                                 }
                               },
@@ -2779,37 +2833,46 @@
                                 "properties": {
                                   "buy": {
                                     "type": "number",
+                                    "description": "买入比率",
                                     "format": "double"
                                   },
                                   "buyLimit": {
                                     "type": "number",
+                                    "description": "买入限价单比率",
                                     "format": "double"
                                   },
                                   "buyStop": {
                                     "type": "number",
+                                    "description": "买入止损单比率",
                                     "format": "double"
                                   },
                                   "buyStopLimit": {
                                     "type": "number",
+                                    "description": "买入止损限价单比率",
                                     "format": "double"
                                   },
                                   "sell": {
                                     "type": "number",
+                                    "description": "卖出比率",
                                     "format": "double"
                                   },
                                   "sellLimit": {
                                     "type": "number",
+                                    "description": "卖出限价单比率",
                                     "format": "double"
                                   },
                                   "sellStop": {
                                     "type": "number",
+                                    "description": "卖出止损单比率",
                                     "format": "double"
                                   },
                                   "sellStopLimit": {
                                     "type": "number",
+                                    "description": "卖出止损限价单比率",
                                     "format": "double"
                                   }
                                 },
+                                "description": "预付款比率详情",
                                 "example": null
                               },
                               "marginRateMaintenance": {
@@ -2817,40 +2880,50 @@
                                 "properties": {
                                   "buy": {
                                     "type": "number",
+                                    "description": "买入比率",
                                     "format": "double"
                                   },
                                   "buyLimit": {
                                     "type": "number",
+                                    "description": "买入限价单比率",
                                     "format": "double"
                                   },
                                   "buyStop": {
                                     "type": "number",
+                                    "description": "买入止损单比率",
                                     "format": "double"
                                   },
                                   "buyStopLimit": {
                                     "type": "number",
+                                    "description": "买入止损限价单比率",
                                     "format": "double"
                                   },
                                   "sell": {
                                     "type": "number",
+                                    "description": "卖出比率",
                                     "format": "double"
                                   },
                                   "sellLimit": {
                                     "type": "number",
+                                    "description": "卖出限价单比率",
                                     "format": "double"
                                   },
                                   "sellStop": {
                                     "type": "number",
+                                    "description": "卖出止损单比率",
                                     "format": "double"
                                   },
                                   "sellStopLimit": {
                                     "type": "number",
+                                    "description": "卖出止损限价单比率",
                                     "format": "double"
                                   }
                                 },
+                                "description": "预付款比率详情",
                                 "example": null
                               }
                             },
+                            "description": "交易品种配置",
                             "example": null
                           },
                           "risk": {
@@ -2858,99 +2931,129 @@
                             "properties": {
                               "id": {
                                 "type": "integer",
+                                "description": "配置ID",
                                 "format": "int64"
                               },
                               "symbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易品种标识"
                               },
                               "version": {
                                 "type": "integer",
+                                "description": "配置版本",
                                 "format": "int32"
                               },
                               "longAnnualRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "多头年化费率"
                               },
                               "shortAnnualRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "空头年化费率"
                               },
                               "discountRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "优惠费率"
                               },
                               "baseRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "基准费率"
                               },
                               "specialSymbol": {
                                 "type": "integer",
+                                "description": "特殊现货标识：0=否，1=是",
                                 "format": "int32"
                               },
                               "fundingRateBaseType": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "资金费率基准类型"
                               },
                               "fundingRateThreshold": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "资金费率阈值"
                               },
                               "fundingRateStep": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "资金费率步长"
                               },
                               "fundingRateIncrease": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "资金费率递增值"
                               },
                               "fundingRateBase": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "资金费率基准"
                               },
                               "fundingRateMin": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "资金费率最小值"
                               },
                               "fundingRateMax": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "资金费率最大值"
                               },
                               "liquidationFeeType": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "强平手续费类型"
                               },
                               "liquidationFeeValue": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "强平手续费值"
                               },
                               "minLiquidationFee": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "最小强平手续费"
                               },
                               "fundingRateMode": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "资金费率模式"
                               },
                               "fundingRateExternalMarketSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "资金费率外部市场品种"
                               },
                               "groupName": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "分组名称"
                               },
                               "platformMaxSlippageType": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "平台最大滑点类型"
                               },
                               "platformMaxSlippage": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "平台最大滑点"
                               },
                               "tpSlMaxSlippageType": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "止盈止损最大滑点类型"
                               },
                               "tpSlMaxSlippage": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "止盈止损最大滑点"
                               },
                               "userLongPositionValueLimitUsdc": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "用户多头持仓价值上限(USDC)"
                               },
                               "userShortPositionValueLimitUsdc": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "用户空头持仓价值上限(USDC)"
                               },
                               "platformLongTotalPositionLimitUsdc": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "平台多头总持仓上限(USDC)"
                               },
                               "platformShortTotalPositionLimitUsdc": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "平台空头总持仓上限(USDC)"
                               },
                               "free": {
                                 "type": "object",
                                 "properties": {
                                   "transCostConfig": {
                                     "type": "array",
+                                    "description": "交易成本配置",
                                     "items": {
                                       "required": [
                                         "endTime",
@@ -3017,13 +3120,16 @@
                                           }
                                         }
                                       },
+                                      "description": "交易成本配置",
                                       "example": null
                                     }
                                   },
                                   "discountRate": {
-                                    "type": "number"
+                                    "type": "number",
+                                    "description": "优惠费率"
                                   }
                                 },
+                                "description": "风控档位配置",
                                 "example": null
                               },
                               "premium": {
@@ -3031,6 +3137,7 @@
                                 "properties": {
                                   "transCostConfig": {
                                     "type": "array",
+                                    "description": "交易成本配置",
                                     "items": {
                                       "required": [
                                         "endTime",
@@ -3097,16 +3204,20 @@
                                           }
                                         }
                                       },
+                                      "description": "交易成本配置",
                                       "example": null
                                     }
                                   },
                                   "discountRate": {
-                                    "type": "number"
+                                    "type": "number",
+                                    "description": "优惠费率"
                                   }
                                 },
+                                "description": "风控档位配置",
                                 "example": null
                               }
                             },
+                            "description": "风控侧品种静态配置",
                             "example": null
                           }
                         },
@@ -4359,11 +4470,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "每页显示条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "当前页码",
                   "format": "int64",
                   "example": 1
                 },
@@ -5571,151 +5684,190 @@
                       "type": "object",
                       "properties": {
                         "groupName": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "用户所属分组名字"
                         },
                         "commissionCfg": {
                           "type": "array",
+                          "description": "手续费配置",
                           "items": {
                             "type": "object",
                             "properties": {
                               "actionMode": {
                                 "type": "integer",
+                                "description": "取决于交易类型的手续费计算模式",
                                 "format": "int32"
                               },
                               "chargeMode": {
                                 "type": "integer",
+                                "description": "手续费收取时间",
                                 "format": "int32"
                               },
                               "description": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "手续费配置描述"
                               },
                               "entryMode": {
                                 "type": "integer",
+                                "description": "取决于交易方向的手续费计算模式",
                                 "format": "int32"
                               },
                               "mode": {
                                 "type": "integer",
+                                "description": "手续费类型",
                                 "format": "int32"
                               },
                               "name": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "手续费配置名称"
                               },
                               "path": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "从属于手续费的交易品种或交易品种组的路径"
                               },
                               "profitMode": {
                                 "type": "integer",
+                                "description": "根据交易利润设置费计算模式",
                                 "format": "int32"
                               },
                               "rangeMode": {
                                 "type": "integer",
+                                "description": "手续费范围的类型 — 依据交易量或流通",
                                 "format": "int32"
                               },
                               "reasonFlags": {
                                 "type": "integer",
+                                "description": "根据交易执行的原因手续费计算模式",
                                 "format": "int32"
                               },
                               "turnoverCurrency": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "计算钱款流通的货币"
                               },
                               "groupTier": {
                                 "type": "array",
+                                "description": "不同范围的手续费配置",
                                 "items": {
                                   "type": "object",
                                   "properties": {
                                     "currency": {
-                                      "type": "string"
+                                      "type": "string",
+                                      "description": "手续费计算货币"
                                     },
                                     "maximal": {
                                       "type": "number",
+                                      "description": "收取手续费的最大金额",
                                       "format": "double"
                                     },
                                     "minimal": {
                                       "type": "number",
+                                      "description": "收取手续费的最小金额",
                                       "format": "double"
                                     },
                                     "mode": {
                                       "type": "integer",
+                                      "description": "手续费收取方法",
                                       "format": "int32"
                                     },
                                     "rangeFrom": {
                                       "type": "number",
+                                      "description": "将从其收取手续费的最小交易量（流通）",
                                       "format": "double"
                                     },
                                     "rangeTo": {
                                       "type": "number",
+                                      "description": "将从其收取手续费的最大交易量（流通）",
                                       "format": "double"
                                     },
                                     "type": {
                                       "type": "integer",
+                                      "description": "手续费收取类型",
                                       "format": "int32"
                                     },
                                     "value": {
                                       "type": "number",
+                                      "description": "手续费金额",
                                       "format": "double"
                                     }
                                   },
+                                  "description": "手续费档位配置",
                                   "example": null
                                 }
                               }
                             },
+                            "description": "手续费配置",
                             "example": null
                           }
                         },
                         "leverageCfg": {
                           "type": "array",
+                          "description": "杠杆配置",
                           "items": {
                             "type": "object",
                             "properties": {
                               "description": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "杠杆配置描述"
                               },
                               "name": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "杠杆配置名字"
                               },
                               "path": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "从属于杠杆配置的交易品种或交易品种组的路径"
                               },
                               "rangeMode": {
                                 "type": "integer",
+                                "description": "杠杆档位匹配方式",
                                 "format": "int32"
                               },
                               "rangeValueCurrency": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "名义价值的计价货币"
                               },
                               "tiers": {
                                 "type": "array",
+                                "description": "不同范围的杠杆配置",
                                 "items": {
                                   "type": "object",
                                   "properties": {
                                     "marginRateInitial": {
                                       "type": "number",
+                                      "description": "初始保证金比例",
                                       "format": "double"
                                     },
                                     "marginRateMaintenance": {
                                       "type": "number",
+                                      "description": "维持保证金比例",
                                       "format": "double"
                                     },
                                     "rangeFrom": {
                                       "type": "number",
+                                      "description": "符合该杠杆配置的最小交易量",
                                       "format": "double"
                                     },
                                     "rangeTo": {
                                       "type": "number",
+                                      "description": "符合该杠杆配置的最大交易量",
                                       "format": "double"
                                     }
                                   },
+                                  "description": "杠杆档位配置",
                                   "example": null
                                 }
                               }
                             },
+                            "description": "杠杆配置",
                             "example": null
                           }
                         },
                         "marginCall": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Margin Call"
                         }
                       },
+                      "description": "用户组信息响应",
                       "example": null
                     },
                     "success": {
@@ -5753,11 +5905,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "每页显示条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "当前页码",
                   "format": "int64",
                   "example": 1
                 },
@@ -7537,64 +7691,45 @@
                                     "type": "number",
                                     "description": "持仓量（扩展精度）"
                                   },
-                                  "contractSizeStr": {
-                                    "type": "string"
-                                  },
-                                  "priceCurrentStr": {
-                                    "type": "string"
-                                  },
-                                  "usdValueStr": {
-                                    "type": "string"
+                                  "volumeDisplay": {
+                                    "type": "string",
+                                    "description": "持仓量展示值"
                                   },
                                   "volumeScale": {
                                     "type": "integer",
+                                    "description": "持仓量展示小数位数",
                                     "format": "int32"
-                                  },
-                                  "volumeDisplay": {
-                                    "type": "string"
                                   }
                                 },
                                 "description": "资产持仓明细",
                                 "example": null
                               }
                             },
-                            "balanceStr": {
-                              "type": "string"
-                            },
-                            "equityStr": {
-                              "type": "string"
-                            },
-                            "floatingStr": {
-                              "type": "string"
-                            },
-                            "marginStr": {
-                              "type": "string"
-                            },
-                            "marginFreeStr": {
-                              "type": "string"
-                            },
-                            "marginLevelStr": {
-                              "type": "string"
-                            },
                             "marginDisplay": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "保证金展示值（向下截断，保留 2 位小数）"
                             },
                             "marginScale": {
                               "type": "integer",
+                              "description": "保证金展示小数位数",
                               "format": "int32"
                             },
                             "marginFreeDisplay": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "可用保证金展示值（向下截断，保留 6 位小数）"
                             },
                             "marginFreeScale": {
                               "type": "integer",
+                              "description": "可用保证金展示小数位数",
                               "format": "int32"
                             },
                             "marginLevelDisplay": {
-                              "type": "string"
+                              "type": "string",
+                              "description": "保证金比例展示值（向下截断，数值不含百分号）"
                             },
                             "marginLevelScale": {
                               "type": "integer",
+                              "description": "保证金比例展示小数位数",
                               "format": "int32"
                             }
                           },
@@ -7640,11 +7775,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "每页显示条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "当前页码",
                   "format": "int64",
                   "example": 1
                 },
@@ -7661,14 +7798,17 @@
                 },
                 "from": {
                   "type": "integer",
+                  "description": "开始时间戳（Unix 时间戳，秒）",
                   "format": "int64"
                 },
                 "to": {
                   "type": "integer",
+                  "description": "结束时间戳（Unix 时间戳，秒）",
                   "format": "int64"
                 },
                 "symbol": {
                   "type": "string",
+                  "description": "交易品种名，可选筛选",
                   "example": "ETHUSD"
                 }
               },
@@ -9796,15 +9936,20 @@
                       "type": "object",
                       "properties": {
                         "symbol": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "交易品种",
+                          "example": "BTCUSDT"
                         },
                         "longVolume": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "多头持仓手数合计"
                         },
                         "shortVolume": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "空头持仓手数合计"
                         }
                       },
+                      "description": "合约品种多空持仓手数汇总",
                       "example": null
                     },
                     "success": {
@@ -10247,15 +10392,20 @@
                       "type": "object",
                       "properties": {
                         "symbol": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "交易品种",
+                          "example": "BTCUSDT"
                         },
                         "longNotional": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "多头持仓名义价值合计（保留 2 位小数，向下舍弃）"
                         },
                         "shortNotional": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "空头持仓名义价值合计（保留 2 位小数，向下舍弃）"
                         }
                       },
+                      "description": "合约品种多空名义价值汇总",
                       "example": null
                     },
                     "success": {
@@ -11492,24 +11642,29 @@
           "from": {
             "title": "起始值",
             "type": "number",
+            "description": "起始值",
             "format": "double"
           },
           "initialAdvanceRate": {
             "title": "初始预付款比率",
             "type": "number",
+            "description": "初始预付款比率",
             "format": "double"
           },
           "maintenanceAdvanceRate": {
             "title": "维持预付款比率",
             "type": "number",
+            "description": "维持预付款比率",
             "format": "double"
           },
           "to": {
             "title": "结束值",
             "type": "number",
+            "description": "结束值",
             "format": "double"
           }
-        }
+        },
+        "description": "杠杆等级配置"
       },
       "MarginRateDetail": {
         "title": "预付款比率详情",
@@ -11518,44 +11673,53 @@
           "buy": {
             "title": "买入比率",
             "type": "number",
+            "description": "买入比率",
             "format": "double"
           },
           "buyLimit": {
             "title": "买入限价单比率",
             "type": "number",
+            "description": "买入限价单比率",
             "format": "double"
           },
           "buyStop": {
             "title": "买入止损单比率",
             "type": "number",
+            "description": "买入止损单比率",
             "format": "double"
           },
           "buyStopLimit": {
             "title": "买入止损限价单比率",
             "type": "number",
+            "description": "买入止损限价单比率",
             "format": "double"
           },
           "sell": {
             "title": "卖出比率",
             "type": "number",
+            "description": "卖出比率",
             "format": "double"
           },
           "sellLimit": {
             "title": "卖出限价单比率",
             "type": "number",
+            "description": "卖出限价单比率",
             "format": "double"
           },
           "sellStop": {
             "title": "卖出止损单比率",
             "type": "number",
+            "description": "卖出止损单比率",
             "format": "double"
           },
           "sellStopLimit": {
             "title": "卖出止损限价单比率",
             "type": "number",
+            "description": "卖出止损限价单比率",
             "format": "double"
           }
-        }
+        },
+        "description": "预付款比率详情"
       },
       "Mt5Data": {
         "title": "交易品种配置",
@@ -11563,184 +11727,222 @@
         "properties": {
           "Category": {
             "title": "交易品种分类",
-            "type": "string"
+            "type": "string",
+            "description": "交易品种分类"
           },
           "ContractSize": {
             "title": "合约大小",
             "type": "number",
+            "description": "合约大小",
             "format": "double"
           },
           "CurrencyBase": {
             "title": "基础货币",
-            "type": "string"
+            "type": "string",
+            "description": "基础货币"
           },
           "CurrencyBaseDigits": {
             "title": "基础货币精度",
             "type": "integer",
+            "description": "基础货币精度",
             "format": "int32"
           },
           "CurrencyMargin": {
             "title": "预付款货币",
-            "type": "string"
+            "type": "string",
+            "description": "预付款货币"
           },
           "CurrencyMarginDigits": {
             "title": "预付款货币精度",
             "type": "integer",
+            "description": "预付款货币精度",
             "format": "int32"
           },
           "CurrencyProfit": {
             "title": "利润货币",
-            "type": "string"
+            "type": "string",
+            "description": "利润货币"
           },
           "CurrencyProfitDigits": {
             "title": "利润货币精度",
             "type": "integer",
+            "description": "利润货币精度",
             "format": "int32"
           },
           "Digits": {
             "title": "价格小数位数",
             "type": "integer",
+            "description": "价格小数位数",
             "format": "int32"
           },
           "FreezeLevel": {
             "title": "冻结级别",
             "type": "integer",
+            "description": "冻结级别",
             "format": "int32"
           },
           "IESlipLosing": {
             "title": "现价执行亏损方向最大下降",
             "type": "integer",
+            "description": "现价执行亏损方向最大下降",
             "format": "int32"
           },
           "IESlipProfit": {
             "title": "现价执行盈利方向最大下降",
             "type": "integer",
+            "description": "现价执行盈利方向最大下降",
             "format": "int32"
           },
           "IEVolumeMaxExt": {
             "title": "现价执行最大交易量",
             "type": "integer",
+            "description": "现价执行最大交易量",
             "format": "int64"
           },
           "International": {
             "title": "国际名称",
-            "type": "string"
+            "type": "string",
+            "description": "国际名称"
           },
           "MarginFlags": {
             "title": "预付款检查模式",
             "type": "integer",
+            "description": "预付款检查模式",
             "format": "int32"
           },
           "MarginHedged": {
             "title": "锁仓预付款值",
             "type": "number",
+            "description": "锁仓预付款值",
             "format": "double"
           },
           "MarginInitial": {
             "title": "初始预付款大小",
             "type": "number",
+            "description": "初始预付款大小",
             "format": "double"
           },
           "MarginMaintenance": {
             "title": "维持预付款大小",
             "type": "number",
+            "description": "维持预付款大小",
             "format": "double"
           },
           "MarginRateCurrency": {
             "title": "预付款货币汇率",
             "type": "number",
+            "description": "预付款货币汇率",
             "format": "double"
           },
           "MarginRateLiquidity": {
             "title": "流动性比率",
             "type": "number",
+            "description": "流动性比率",
             "format": "double"
           },
           "OrderFlags": {
             "title": "订单类型标识",
             "type": "integer",
+            "description": "订单类型标识",
             "format": "int32"
           },
           "Path": {
             "title": "交易品种路径",
-            "type": "string"
+            "type": "string",
+            "description": "交易品种路径"
           },
           "PriceLimitMax": {
             "title": "最大价格限制",
             "type": "number",
+            "description": "最大价格限制",
             "format": "double"
           },
           "PriceLimitMin": {
             "title": "最小价格限制",
             "type": "number",
+            "description": "最小价格限制",
             "format": "double"
           },
           "PriceSettle": {
             "title": "结算价格",
             "type": "number",
+            "description": "结算价格",
             "format": "double"
           },
           "SessionTrade": {
             "title": "交易时间",
             "type": "array",
+            "description": "交易时间",
             "items": {
               "$ref": "#/components/schemas/SessionTrade"
             }
           },
           "Source": {
             "title": "报价源交易品种",
-            "type": "string"
+            "type": "string",
+            "description": "报价源交易品种"
           },
           "StopsLevel": {
             "title": "止损订单幅度",
             "type": "integer",
+            "description": "止损订单幅度",
             "format": "int32"
           },
           "TickBookDepth": {
             "title": "市场深度范围",
             "type": "integer",
+            "description": "市场深度范围",
             "format": "int32"
           },
           "TimeExpiration": {
             "title": "交易到期日期",
-            "type": "string"
+            "type": "string",
+            "description": "交易到期日期"
           },
           "TimeStart": {
             "title": "交易开始日期",
-            "type": "string"
+            "type": "string",
+            "description": "交易开始日期"
           },
           "TradeMode": {
             "title": "交易模式",
             "type": "integer",
+            "description": "交易模式",
             "format": "int32"
           },
           "Spread": {
             "title": "点差",
-            "type": "number"
+            "type": "number",
+            "description": "点差"
           },
           "VolumeLimitExt": {
             "title": "最大累计交易量",
             "type": "integer",
+            "description": "最大累计交易量",
             "format": "int64"
           },
           "VolumeMaxExt": {
             "title": "最大交易量",
             "type": "integer",
+            "description": "最大交易量",
             "format": "int64"
           },
           "VolumeMinExt": {
             "title": "最小交易量",
             "type": "integer",
+            "description": "最小交易量",
             "format": "int64"
           },
           "VolumeStepExt": {
             "title": "交易量步长",
             "type": "integer",
+            "description": "交易量步长",
             "format": "int64"
           },
           "leverageGrade": {
             "title": "杠杆等级配置",
             "type": "array",
+            "description": "杠杆等级配置",
             "items": {
               "$ref": "#/components/schemas/LeverageGrade"
             }
@@ -11751,7 +11953,8 @@
           "marginRateMaintenance": {
             "$ref": "#/components/schemas/MarginRateDetail"
           }
-        }
+        },
+        "description": "交易品种配置"
       },
       "RetResultListStaticConfigBySymbolRes": {
         "type": "object",
@@ -12145,6 +12348,7 @@
           "quote": {
             "title": "报价时间",
             "type": "array",
+            "description": "报价时间",
             "items": {
               "$ref": "#/components/schemas/TimePeriod"
             }
@@ -12152,15 +12356,18 @@
           "trade": {
             "title": "交易时间",
             "type": "array",
+            "description": "交易时间",
             "items": {
               "$ref": "#/components/schemas/TimePeriod"
             }
           },
           "weekDay": {
             "title": "星期",
-            "type": "string"
+            "type": "string",
+            "description": "星期"
           }
-        }
+        },
+        "description": "交易时段配置"
       },
       "SlippageConfigDto": {
         "required": [
@@ -12200,7 +12407,8 @@
         "properties": {
           "symbol": {
             "title": "交易品种标识",
-            "type": "string"
+            "type": "string",
+            "description": "交易品种标识"
           },
           "mt5": {
             "$ref": "#/components/schemas/Mt5Data"
@@ -12218,121 +12426,150 @@
           "id": {
             "title": "配置ID",
             "type": "integer",
+            "description": "配置ID",
             "format": "int64"
           },
           "symbol": {
             "title": "交易品种标识",
-            "type": "string"
+            "type": "string",
+            "description": "交易品种标识"
           },
           "version": {
             "title": "配置版本",
             "type": "integer",
+            "description": "配置版本",
             "format": "int32"
           },
           "longAnnualRate": {
             "title": "多头年化费率",
-            "type": "number"
+            "type": "number",
+            "description": "多头年化费率"
           },
           "shortAnnualRate": {
             "title": "空头年化费率",
-            "type": "number"
+            "type": "number",
+            "description": "空头年化费率"
           },
           "discountRate": {
             "title": "优惠费率",
-            "type": "number"
+            "type": "number",
+            "description": "优惠费率"
           },
           "baseRate": {
             "title": "基准费率",
-            "type": "number"
+            "type": "number",
+            "description": "基准费率"
           },
           "specialSymbol": {
             "title": "特殊现货标识：0=否，1=是",
             "type": "integer",
+            "description": "特殊现货标识：0=否，1=是",
             "format": "int32"
           },
           "fundingRateBaseType": {
             "title": "资金费率基准类型",
-            "type": "string"
+            "type": "string",
+            "description": "资金费率基准类型"
           },
           "fundingRateThreshold": {
             "title": "资金费率阈值",
-            "type": "number"
+            "type": "number",
+            "description": "资金费率阈值"
           },
           "fundingRateStep": {
             "title": "资金费率步长",
-            "type": "number"
+            "type": "number",
+            "description": "资金费率步长"
           },
           "fundingRateIncrease": {
             "title": "资金费率递增值",
-            "type": "number"
+            "type": "number",
+            "description": "资金费率递增值"
           },
           "fundingRateBase": {
             "title": "资金费率基准",
-            "type": "number"
+            "type": "number",
+            "description": "资金费率基准"
           },
           "fundingRateMin": {
             "title": "资金费率最小值",
-            "type": "number"
+            "type": "number",
+            "description": "资金费率最小值"
           },
           "fundingRateMax": {
             "title": "资金费率最大值",
-            "type": "number"
+            "type": "number",
+            "description": "资金费率最大值"
           },
           "liquidationFeeType": {
             "title": "强平手续费类型",
-            "type": "string"
+            "type": "string",
+            "description": "强平手续费类型"
           },
           "liquidationFeeValue": {
             "title": "强平手续费值",
-            "type": "number"
+            "type": "number",
+            "description": "强平手续费值"
           },
           "minLiquidationFee": {
             "title": "最小强平手续费",
-            "type": "number"
+            "type": "number",
+            "description": "最小强平手续费"
           },
           "fundingRateMode": {
             "title": "资金费率模式",
-            "type": "string"
+            "type": "string",
+            "description": "资金费率模式"
           },
           "fundingRateExternalMarketSymbol": {
             "title": "资金费率外部市场品种",
-            "type": "string"
+            "type": "string",
+            "description": "资金费率外部市场品种"
           },
           "groupName": {
             "title": "分组名称",
-            "type": "string"
+            "type": "string",
+            "description": "分组名称"
           },
           "platformMaxSlippageType": {
             "title": "平台最大滑点类型",
-            "type": "string"
+            "type": "string",
+            "description": "平台最大滑点类型"
           },
           "platformMaxSlippage": {
             "title": "平台最大滑点",
-            "type": "number"
+            "type": "number",
+            "description": "平台最大滑点"
           },
           "tpSlMaxSlippageType": {
             "title": "止盈止损最大滑点类型",
-            "type": "string"
+            "type": "string",
+            "description": "止盈止损最大滑点类型"
           },
           "tpSlMaxSlippage": {
             "title": "止盈止损最大滑点",
-            "type": "number"
+            "type": "number",
+            "description": "止盈止损最大滑点"
           },
           "userLongPositionValueLimitUsdc": {
             "title": "用户多头持仓价值上限(USDC)",
-            "type": "number"
+            "type": "number",
+            "description": "用户多头持仓价值上限(USDC)"
           },
           "userShortPositionValueLimitUsdc": {
             "title": "用户空头持仓价值上限(USDC)",
-            "type": "number"
+            "type": "number",
+            "description": "用户空头持仓价值上限(USDC)"
           },
           "platformLongTotalPositionLimitUsdc": {
             "title": "平台多头总持仓上限(USDC)",
-            "type": "number"
+            "type": "number",
+            "description": "平台多头总持仓上限(USDC)"
           },
           "platformShortTotalPositionLimitUsdc": {
             "title": "平台空头总持仓上限(USDC)",
-            "type": "number"
+            "type": "number",
+            "description": "平台空头总持仓上限(USDC)"
           },
           "free": {
             "$ref": "#/components/schemas/StaticConfigRiskTierRsp"
@@ -12340,7 +12577,8 @@
           "premium": {
             "$ref": "#/components/schemas/StaticConfigRiskTierRsp"
           }
-        }
+        },
+        "description": "风控侧品种静态配置"
       },
       "StaticConfigRiskTierRsp": {
         "title": "Premium 档位配置",
@@ -12349,15 +12587,18 @@
           "transCostConfig": {
             "title": "交易成本配置",
             "type": "array",
+            "description": "交易成本配置",
             "items": {
               "$ref": "#/components/schemas/TransCostConfigDto"
             }
           },
           "discountRate": {
             "title": "优惠费率",
-            "type": "number"
+            "type": "number",
+            "description": "优惠费率"
           }
-        }
+        },
+        "description": "风控档位配置"
       },
       "TimePeriod": {
         "title": "时间周期配置",
@@ -12365,13 +12606,16 @@
         "properties": {
           "from": {
             "title": "开始时间",
-            "type": "string"
+            "type": "string",
+            "description": "开始时间"
           },
           "to": {
             "title": "结束时间",
-            "type": "string"
+            "type": "string",
+            "description": "结束时间"
           }
-        }
+        },
+        "description": "时间周期配置"
       },
       "TransCostConfigDto": {
         "title": "交易成本配置",
@@ -12410,7 +12654,8 @@
               "$ref": "#/components/schemas/SlippageConfigDto"
             }
           }
-        }
+        },
+        "description": "交易成本配置"
       },
       "SlippageEstimateReq": {
         "required": [
@@ -13518,12 +13763,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "每页显示条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64",
             "example": 1
           },
@@ -14273,62 +14520,75 @@
           "actionMode": {
             "title": "取决于交易类型的手续费计算模式",
             "type": "integer",
+            "description": "取决于交易类型的手续费计算模式",
             "format": "int32"
           },
           "chargeMode": {
             "title": "手续费收取时间",
             "type": "integer",
+            "description": "手续费收取时间",
             "format": "int32"
           },
           "description": {
             "title": "手续费配置描述",
-            "type": "string"
+            "type": "string",
+            "description": "手续费配置描述"
           },
           "entryMode": {
             "title": "取决于交易方向的手续费计算模式",
             "type": "integer",
+            "description": "取决于交易方向的手续费计算模式",
             "format": "int32"
           },
           "mode": {
             "title": "手续费类型",
             "type": "integer",
+            "description": "手续费类型",
             "format": "int32"
           },
           "name": {
             "title": "手续费配置名称",
-            "type": "string"
+            "type": "string",
+            "description": "手续费配置名称"
           },
           "path": {
             "title": "从属于手续费的交易品种或交易品种组的路径",
-            "type": "string"
+            "type": "string",
+            "description": "从属于手续费的交易品种或交易品种组的路径"
           },
           "profitMode": {
             "title": "根据交易利润设置费计算模式",
             "type": "integer",
+            "description": "根据交易利润设置费计算模式",
             "format": "int32"
           },
           "rangeMode": {
             "title": "手续费范围的类型 — 依据交易量或流通",
             "type": "integer",
+            "description": "手续费范围的类型 — 依据交易量或流通",
             "format": "int32"
           },
           "reasonFlags": {
             "title": "根据交易执行的原因手续费计算模式",
             "type": "integer",
+            "description": "根据交易执行的原因手续费计算模式",
             "format": "int32"
           },
           "turnoverCurrency": {
             "title": "计算钱款流通的货币",
-            "type": "string"
+            "type": "string",
+            "description": "计算钱款流通的货币"
           },
           "groupTier": {
             "title": "不同范围的手续费配置",
             "type": "array",
+            "description": "不同范围的手续费配置",
             "items": {
               "$ref": "#/components/schemas/GroupTier"
             }
           }
-        }
+        },
+        "description": "手续费配置"
       },
       "GroupTier": {
         "title": "不同范围的手续费配置",
@@ -14336,44 +14596,53 @@
         "properties": {
           "currency": {
             "title": "手续费计算货币",
-            "type": "string"
+            "type": "string",
+            "description": "手续费计算货币"
           },
           "maximal": {
             "title": "收取手续费的最大金额",
             "type": "number",
+            "description": "收取手续费的最大金额",
             "format": "double"
           },
           "minimal": {
             "title": "收取手续费的最小金额",
             "type": "number",
+            "description": "收取手续费的最小金额",
             "format": "double"
           },
           "mode": {
             "title": "手续费收取方法",
             "type": "integer",
+            "description": "手续费收取方法",
             "format": "int32"
           },
           "rangeFrom": {
             "title": "将从其收取手续费的最小交易量（流通）",
             "type": "number",
+            "description": "将从其收取手续费的最小交易量（流通）",
             "format": "double"
           },
           "rangeTo": {
             "title": "将从其收取手续费的最大交易量（流通）",
             "type": "number",
+            "description": "将从其收取手续费的最大交易量（流通）",
             "format": "double"
           },
           "type": {
             "title": "手续费收取类型",
             "type": "integer",
+            "description": "手续费收取类型",
             "format": "int32"
           },
           "value": {
             "title": "手续费金额",
             "type": "number",
+            "description": "手续费金额",
             "format": "double"
           }
-        }
+        },
+        "description": "手续费档位配置"
       },
       "LeverageConfig": {
         "title": "杠杆配置",
@@ -14381,33 +14650,40 @@
         "properties": {
           "description": {
             "title": "杠杆配置描述",
-            "type": "string"
+            "type": "string",
+            "description": "杠杆配置描述"
           },
           "name": {
             "title": "杠杆配置名字",
-            "type": "string"
+            "type": "string",
+            "description": "杠杆配置名字"
           },
           "path": {
             "title": "从属于杠杆配置的交易品种或交易品种组的路径",
-            "type": "string"
+            "type": "string",
+            "description": "从属于杠杆配置的交易品种或交易品种组的路径"
           },
           "rangeMode": {
             "title": "杠杆档位匹配方式",
             "type": "integer",
+            "description": "杠杆档位匹配方式",
             "format": "int32"
           },
           "rangeValueCurrency": {
             "title": "名义价值的计价货币",
-            "type": "string"
+            "type": "string",
+            "description": "名义价值的计价货币"
           },
           "tiers": {
             "title": "不同范围的杠杆配置",
             "type": "array",
+            "description": "不同范围的杠杆配置",
             "items": {
               "$ref": "#/components/schemas/Tier"
             }
           }
-        }
+        },
+        "description": "杠杆配置"
       },
       "RetResultUserGroupInfoRsp": {
         "type": "object",
@@ -14798,24 +15074,29 @@
           "marginRateInitial": {
             "title": "初始保证金比例",
             "type": "number",
+            "description": "初始保证金比例",
             "format": "double"
           },
           "marginRateMaintenance": {
             "title": "维持保证金比例",
             "type": "number",
+            "description": "维持保证金比例",
             "format": "double"
           },
           "rangeFrom": {
             "title": "符合该杠杆配置的最小交易量",
             "type": "number",
+            "description": "符合该杠杆配置的最小交易量",
             "format": "double"
           },
           "rangeTo": {
             "title": "符合该杠杆配置的最大交易量",
             "type": "number",
+            "description": "符合该杠杆配置的最大交易量",
             "format": "double"
           }
-        }
+        },
+        "description": "杠杆档位配置"
       },
       "UserGroupInfoRsp": {
         "title": "用户组信息响应",
@@ -14823,11 +15104,13 @@
         "properties": {
           "groupName": {
             "title": "用户所属分组名字",
-            "type": "string"
+            "type": "string",
+            "description": "用户所属分组名字"
           },
           "commissionCfg": {
             "title": "手续费配置",
             "type": "array",
+            "description": "手续费配置",
             "items": {
               "$ref": "#/components/schemas/CommissionConfig"
             }
@@ -14835,15 +15118,18 @@
           "leverageCfg": {
             "title": "杠杆配置",
             "type": "array",
+            "description": "杠杆配置",
             "items": {
               "$ref": "#/components/schemas/LeverageConfig"
             }
           },
           "marginCall": {
             "title": "Margin Call",
-            "type": "string"
+            "type": "string",
+            "description": "Margin Call"
           }
-        }
+        },
+        "description": "用户组信息响应"
       },
       "UserDealsReqV3": {
         "required": [
@@ -14856,12 +15142,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "每页显示条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64",
             "example": 1
           },
@@ -16085,24 +16373,14 @@
             "type": "number",
             "description": "持仓量（扩展精度）"
           },
-          "contractSizeStr": {
+          "volumeDisplay": {
             "type": "string",
-            "writeOnly": true
-          },
-          "priceCurrentStr": {
-            "type": "string",
-            "writeOnly": true
-          },
-          "usdValueStr": {
-            "type": "string",
-            "writeOnly": true
+            "description": "持仓量展示值"
           },
           "volumeScale": {
             "type": "integer",
+            "description": "持仓量展示小数位数",
             "format": "int32"
-          },
-          "volumeDisplay": {
-            "type": "string"
           }
         },
         "description": "资产持仓明细"
@@ -16532,49 +16810,31 @@
               "$ref": "#/components/schemas/AssetDTO"
             }
           },
-          "balanceStr": {
-            "type": "string",
-            "writeOnly": true
-          },
-          "equityStr": {
-            "type": "string",
-            "writeOnly": true
-          },
-          "floatingStr": {
-            "type": "string",
-            "writeOnly": true
-          },
-          "marginStr": {
-            "type": "string",
-            "writeOnly": true
-          },
-          "marginFreeStr": {
-            "type": "string",
-            "writeOnly": true
-          },
-          "marginLevelStr": {
-            "type": "string",
-            "writeOnly": true
-          },
           "marginDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "保证金展示值（向下截断，保留 2 位小数）"
           },
           "marginScale": {
             "type": "integer",
+            "description": "保证金展示小数位数",
             "format": "int32"
           },
           "marginFreeDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "可用保证金展示值（向下截断，保留 6 位小数）"
           },
           "marginFreeScale": {
             "type": "integer",
+            "description": "可用保证金展示小数位数",
             "format": "int32"
           },
           "marginLevelDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "保证金比例展示值（向下截断，数值不含百分号）"
           },
           "marginLevelScale": {
             "type": "integer",
+            "description": "保证金比例展示小数位数",
             "format": "int32"
           }
         },
@@ -16591,12 +16851,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "每页显示条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "当前页码",
             "format": "int64",
             "example": 1
           },
@@ -16614,16 +16876,19 @@
           "from": {
             "title": "开始时间戳（Unix时间戳，秒）",
             "type": "integer",
+            "description": "开始时间戳（Unix 时间戳，秒）",
             "format": "int64"
           },
           "to": {
             "title": "结束时间戳（Unix时间戳，秒）",
             "type": "integer",
+            "description": "结束时间戳（Unix 时间戳，秒）",
             "format": "int64"
           },
           "symbol": {
             "title": "交易品种名",
             "type": "string",
+            "description": "交易品种名，可选筛选",
             "example": "ETHUSD"
           }
         }
@@ -18165,15 +18430,20 @@
         "type": "object",
         "properties": {
           "symbol": {
-            "type": "string"
+            "type": "string",
+            "description": "交易品种",
+            "example": "BTCUSDT"
           },
           "longVolume": {
-            "type": "number"
+            "type": "number",
+            "description": "多头持仓手数合计"
           },
           "shortVolume": {
-            "type": "number"
+            "type": "number",
+            "description": "空头持仓手数合计"
           }
-        }
+        },
+        "description": "合约品种多空持仓手数汇总"
       },
       "RetResultContractSymbolPositionVolumeRsp": {
         "type": "object",
@@ -18561,15 +18831,20 @@
         "type": "object",
         "properties": {
           "symbol": {
-            "type": "string"
+            "type": "string",
+            "description": "交易品种",
+            "example": "BTCUSDT"
           },
           "longNotional": {
-            "type": "number"
+            "type": "number",
+            "description": "多头持仓名义价值合计（保留 2 位小数，向下舍弃）"
           },
           "shortNotional": {
-            "type": "number"
+            "type": "number",
+            "description": "空头持仓名义价值合计（保留 2 位小数，向下舍弃）"
           }
-        }
+        },
+        "description": "合约品种多空名义价值汇总"
       },
       "RetResultContractSymbolNotionalRsp": {
         "type": "object",

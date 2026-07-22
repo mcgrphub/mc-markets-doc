@@ -187,8 +187,8 @@ Paginated query of active and matured positions for the context user ID. Multipl
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort supported; comma-separated |
 | orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 
@@ -273,8 +273,8 @@ Aligns with admin redemption history: main table `ac_transaction_history` (`EARN
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort supported; comma-separated |
 | orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 

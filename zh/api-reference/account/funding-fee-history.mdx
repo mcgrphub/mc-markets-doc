@@ -28,8 +28,8 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| size | integer | 否 |  |
-| current | integer | 否 |  |
+| size | integer | 否 | 分页每页条数 |
+| current | integer | 否 | 分页当前页码，从 1 开始 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
 | orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
 | userId | string | 否 | 用户ID |
@@ -53,40 +53,40 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录ID |
+| id | integer | 交易记录主键 ID |
 | uid | string | 用户 UID |
-| transactionId | string | 交易ID |
-| symbolId | integer | 币种ID |
-| acSymbol | string | 币种名/兑出 |
-| network | string | 网络协议 |
-| exchangeSymbolId | integer | 兑换后币种ID |
-| exchangeSymbol | string | 兑换后币种名/兑入 |
+| transactionId | string | 业务交易流水号 |
+| symbolId | integer | 币种 ID |
+| acSymbol | string | 币种名称；闪兑时为兑出币种 |
+| network | string | 链上网络协议 |
+| exchangeSymbolId | integer | 兑换后币种 ID |
+| exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
 | transactionType | string | 交易类型枚举 |
-| status | string | 交易状态 |
+| status | string | 交易状态：SUCCESS / FAIL / PENDING |
 | amount | number | 交易金额 |
 | amountStr | string | 交易金额字符串 |
 | amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示精度 |
-| exchangeAmount | number | 兑换后金额 |
+| amountScale | integer | 交易金额展示小数位数 |
+| exchangeAmount | number | 兑换后到账金额 |
 | exchangeAmountDisplay | string | 兑换后金额展示值 |
 | fee | number | 交易手续费 |
-| feeDisplay | string | 交易手续费展示值 |
+| feeDisplay | string | 手续费展示值 |
 | createTime | string | 交易开始时间 |
 | finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因 |
+| failureReason | string | 失败原因说明 |
 | errorCode | string | 失败错误码 |
 | exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 兑换汇率（兑入/兑出） |
+| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
 | rateDisplay | string | 汇率展示值 |
-| txHash | string | 区块链交易哈希 |
-| feeSymbol | string | 手续费币种 |
+| txHash | string | 链上交易哈希 |
+| feeSymbol | string | 手续费计价币种 |
 | sourceAccountType | string | 来源账户类型 |
 | targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户ID |
-| targetAccountId | string | 目标账户ID |
-| sourceWalletAddress | string | 来源钱包地址 |
-| targetWalletAddress | string | 目标钱包地址 |
-| extParams | string | 扩展参数 |
+| sourceAccountId | string | 来源账户 ID |
+| targetAccountId | string | 目标账户 ID |
+| sourceWalletAddress | string | 来源链上钱包地址 |
+| targetWalletAddress | string | 目标链上钱包地址 |
+| extParams | string | 扩展参数 JSON 字符串 |
 | sourceAccountBalance | number | 源账户动账后余额 |
 | targetAccountBalance | number | 目标账户动账后余额 |
 | fundFlowType | string | 资金流向类型 |

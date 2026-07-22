@@ -202,7 +202,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| symbols | array | Yes |  |
+| symbols | array | Yes | Trading symbol list, up to 20 |
 
 ### Response `data` fields
 
@@ -460,7 +460,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| uid | string | Yes |  |
+| uid | string | Yes | User UID |
 
 ### Response `data` fields
 
@@ -540,66 +540,57 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes |  |
+| login | string | Yes | Trading account login |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| userAssets | object |  |
+| userAssets | object | User assets |
 
 `userAssets` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| balance | number |  |
-| equity | number |  |
-| floating | number |  |
-| margin | number |  |
-| marginFree | number |  |
-| marginLevel | number |  |
-| positions | array |  |
-| balanceStr | string |  |
-| equityStr | string |  |
-| floatingStr | string |  |
-| marginStr | string |  |
-| marginFreeStr | string |  |
-| marginLevelStr | string |  |
-| marginDisplay | string |  |
-| marginScale | integer |  |
-| marginFreeDisplay | string |  |
-| marginFreeScale | integer |  |
-| marginLevelDisplay | string |  |
-| marginLevelScale | integer |  |
+| balance | number | Balance |
+| equity | number | Equity |
+| floating | number | Floating P&L |
+| margin | number | Used margin |
+| marginFree | number | Free margin |
+| marginLevel | number | Margin level |
+| positions | array | Position list |
+| marginDisplay | string | Margin display value (truncated down to 2 decimals) |
+| marginScale | integer | Margin display decimal places |
+| marginFreeDisplay | string | Free margin display value (truncated down to 6 decimals) |
+| marginFreeScale | integer | Free margin display decimal places |
+| marginLevelDisplay | string | Margin level display value (truncated down; without `%`) |
+| marginLevelScale | integer | Margin level display decimal places |
 
 `userAssets.positions[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer |  |
-| login | integer |  |
-| action | integer |  |
-| contractSize | number |  |
-| freeMargin | number |  |
-| precision | integer |  |
-| priceDigits | integer |  |
-| currencyDigits | integer |  |
-| priceCurrent | number |  |
-| openPrice | number |  |
-| time | integer |  |
-| slPrice | number |  |
-| tpPrice | number |  |
-| rateProfit | number |  |
-| freeAmount | number |  |
-| symbol | string |  |
-| usdValue | number |  |
-| volume | number |  |
-| volumeExt | number |  |
-| contractSizeStr | string |  |
-| priceCurrentStr | string |  |
-| usdValueStr | string |  |
-| volumeDisplay | string |  |
-| volumeScale | integer |  |
+| id | integer | Position ID |
+| login | integer | Trading account login |
+| action | integer | Asset action (for example 0 = normal) |
+| contractSize | number | Contract size |
+| freeMargin | number | Free margin |
+| precision | integer | Precision |
+| priceDigits | integer | Price digits |
+| currencyDigits | integer | Currency digits |
+| priceCurrent | number | Current price |
+| openPrice | number | Open price |
+| time | integer | Open time |
+| slPrice | number | Stop-loss price |
+| tpPrice | number | Take-profit price |
+| rateProfit | number | Profit conversion rate |
+| freeAmount | number | Available quantity |
+| symbol | string | Trading symbol |
+| usdValue | number | USD-equivalent value |
+| volume | number | Position volume (standard precision) |
+| volumeExt | number | Position volume (extended precision) |
+| volumeDisplay | string | Position volume display value |
+| volumeScale | integer | Position volume display decimal places |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \

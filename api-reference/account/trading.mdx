@@ -29,7 +29,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| id | string | Yes |  |
+| id | string | Yes | Transaction ID (transactionId) |
 
 ### Response `data` fields
 
@@ -98,16 +98,16 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort; comma-separated fields |
 | orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 | trackingId | string | Yes | Unique request tracking ID |
-| symbolId | integer | No |  |
-| exchangeSymbolId | integer | No |  |
+| symbolId | integer | No | Filter by currency ID |
+| exchangeSymbolId | integer | No | Filter by destination currency ID |
 | transactionType | string | No | Transaction type enum |
 | transactionTypes | array | No | Applies only when transactionType==null |
-| status | string | No |  |
+| status | string | No | Filter by status: SUCCESS / FAIL / PENDING |
 | statuses | array | No | Applies only when status==null |
 | createTimeStart | string | No | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeStartTimestamp | integer | No | Unix timestamp (ms) |
@@ -232,16 +232,16 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort; comma-separated fields |
 | orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
 | trackingId | string | Yes | Unique request tracking ID |
-| symbolId | integer | No |  |
-| exchangeSymbolId | integer | No |  |
+| symbolId | integer | No | Filter by currency ID |
+| exchangeSymbolId | integer | No | Filter by destination currency ID |
 | transactionType | string | No | Transaction type enum |
 | transactionTypes | array | No | Applies only when transactionType==null |
-| status | string | No |  |
+| status | string | No | Filter by status: SUCCESS / FAIL / PENDING |
 | statuses | array | No | Applies only when status==null |
 | createTimeStart | string | No | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeStartTimestamp | integer | No | Unix timestamp (ms) |

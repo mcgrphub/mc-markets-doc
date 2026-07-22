@@ -461,6 +461,7 @@
                       "properties": {
                         "id": {
                           "type": "integer",
+                          "description": "交易记录主键 ID",
                           "format": "int64"
                         },
                         "uid": {
@@ -468,24 +469,30 @@
                           "description": "用户 UID"
                         },
                         "transactionId": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "业务交易流水号"
                         },
                         "symbolId": {
                           "type": "integer",
+                          "description": "币种 ID",
                           "format": "int64"
                         },
                         "acSymbol": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "币种名称；闪兑时为兑出币种"
                         },
                         "network": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "链上网络协议"
                         },
                         "exchangeSymbolId": {
                           "type": "integer",
+                          "description": "兑换后币种 ID",
                           "format": "int64"
                         },
                         "exchangeSymbol": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "兑换后币种名称；闪兑时为兑入币种"
                         },
                         "transactionType": {
                           "type": "string",
@@ -532,6 +539,7 @@
                         },
                         "status": {
                           "type": "string",
+                          "description": "交易状态：SUCCESS / FAIL / PENDING",
                           "enum": [
                             "SUCCESS",
                             "FAIL",
@@ -539,61 +547,79 @@
                           ]
                         },
                         "amount": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "交易金额"
                         },
                         "amountStr": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "交易金额字符串"
                         },
                         "amountDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "交易金额展示值"
                         },
                         "amountScale": {
                           "type": "integer",
+                          "description": "交易金额展示小数位数",
                           "format": "int32"
                         },
                         "exchangeAmount": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "兑换后到账金额"
                         },
                         "exchangeAmountDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "兑换后金额展示值"
                         },
                         "fee": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "交易手续费"
                         },
                         "feeDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "手续费展示值"
                         },
                         "createTime": {
                           "type": "string",
+                          "description": "交易开始时间",
                           "format": "date-time"
                         },
                         "finishTime": {
                           "type": "string",
+                          "description": "交易完成时间",
                           "format": "date-time"
                         },
                         "failureReason": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "失败原因说明"
                         },
                         "errorCode": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "失败错误码"
                         },
                         "exchangeRate": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "汇率"
                         },
                         "convertExchangeRate": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "闪兑汇率（兑入/兑出）"
                         },
                         "rateDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "汇率展示值"
                         },
                         "txHash": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "链上交易哈希"
                         },
                         "feeSymbol": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "手续费计价币种"
                         },
                         "sourceAccountType": {
                           "type": "string",
+                          "description": "来源账户类型",
                           "enum": [
                             "FUND_ACCOUNT",
                             "TRADING_ACCOUNT",
@@ -606,6 +632,7 @@
                         },
                         "targetAccountType": {
                           "type": "string",
+                          "description": "目标账户类型",
                           "enum": [
                             "FUND_ACCOUNT",
                             "TRADING_ACCOUNT",
@@ -617,28 +644,36 @@
                           ]
                         },
                         "sourceAccountId": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "来源账户 ID"
                         },
                         "targetAccountId": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "目标账户 ID"
                         },
                         "sourceWalletAddress": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "来源链上钱包地址"
                         },
                         "targetWalletAddress": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "目标链上钱包地址"
                         },
                         "extParams": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "扩展参数 JSON 字符串"
                         },
                         "sourceAccountBalance": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "源账户动账后余额"
                         },
                         "targetAccountBalance": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "目标账户动账后余额"
                         },
                         "fundFlowType": {
                           "type": "string",
+                          "description": "资金流向类型",
                           "enum": [
                             "CRYPTO_ADDRESS",
                             "FIAT"
@@ -667,10 +702,12 @@
                         },
                         "finishTimeTimestamp": {
                           "type": "integer",
+                          "description": "交易完成时间毫秒时间戳",
                           "format": "int64"
                         },
                         "createTimeTimestamp": {
                           "type": "integer",
+                          "description": "交易开始时间毫秒时间戳",
                           "format": "int64"
                         }
                       },
@@ -707,11 +744,13 @@
                 "properties": {
                   "size": {
                     "type": "integer",
+                    "description": "分页每页条数",
                     "format": "int64",
                     "example": 10
                   },
                   "current": {
                     "type": "integer",
+                    "description": "分页当前页码，从 1 开始",
                     "format": "int64",
                     "example": 1
                   },
@@ -735,10 +774,12 @@
                   },
                   "symbolId": {
                     "type": "integer",
+                    "description": "按币种 ID 筛选",
                     "format": "int64"
                   },
                   "exchangeSymbolId": {
                     "type": "integer",
+                    "description": "按兑换后币种 ID 筛选",
                     "format": "int64"
                   },
                   "transactionType": {
@@ -833,6 +874,7 @@
                   },
                   "status": {
                     "type": "string",
+                    "description": "按交易状态筛选：SUCCESS / FAIL / PENDING",
                     "enum": [
                       "SUCCESS",
                       "FAIL",
@@ -1307,6 +1349,7 @@
                             "properties": {
                               "id": {
                                 "type": "integer",
+                                "description": "交易记录主键 ID",
                                 "format": "int64"
                               },
                               "uid": {
@@ -1314,24 +1357,30 @@
                                 "description": "用户 UID"
                               },
                               "transactionId": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "业务交易流水号"
                               },
                               "symbolId": {
                                 "type": "integer",
+                                "description": "币种 ID",
                                 "format": "int64"
                               },
                               "acSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "币种名称；闪兑时为兑出币种"
                               },
                               "network": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "链上网络协议"
                               },
                               "exchangeSymbolId": {
                                 "type": "integer",
+                                "description": "兑换后币种 ID",
                                 "format": "int64"
                               },
                               "exchangeSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "兑换后币种名称；闪兑时为兑入币种"
                               },
                               "transactionType": {
                                 "type": "string",
@@ -1378,6 +1427,7 @@
                               },
                               "status": {
                                 "type": "string",
+                                "description": "交易状态：SUCCESS / FAIL / PENDING",
                                 "enum": [
                                   "SUCCESS",
                                   "FAIL",
@@ -1385,61 +1435,79 @@
                                 ]
                               },
                               "amount": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "交易金额"
                               },
                               "amountStr": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易金额字符串"
                               },
                               "amountDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易金额展示值"
                               },
                               "amountScale": {
                                 "type": "integer",
+                                "description": "交易金额展示小数位数",
                                 "format": "int32"
                               },
                               "exchangeAmount": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "兑换后到账金额"
                               },
                               "exchangeAmountDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "兑换后金额展示值"
                               },
                               "fee": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "交易手续费"
                               },
                               "feeDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "手续费展示值"
                               },
                               "createTime": {
                                 "type": "string",
+                                "description": "交易开始时间",
                                 "format": "date-time"
                               },
                               "finishTime": {
                                 "type": "string",
+                                "description": "交易完成时间",
                                 "format": "date-time"
                               },
                               "failureReason": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "失败原因说明"
                               },
                               "errorCode": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "失败错误码"
                               },
                               "exchangeRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "汇率"
                               },
                               "convertExchangeRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "闪兑汇率（兑入/兑出）"
                               },
                               "rateDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "汇率展示值"
                               },
                               "txHash": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "链上交易哈希"
                               },
                               "feeSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "手续费计价币种"
                               },
                               "sourceAccountType": {
                                 "type": "string",
+                                "description": "来源账户类型",
                                 "enum": [
                                   "FUND_ACCOUNT",
                                   "TRADING_ACCOUNT",
@@ -1452,6 +1520,7 @@
                               },
                               "targetAccountType": {
                                 "type": "string",
+                                "description": "目标账户类型",
                                 "enum": [
                                   "FUND_ACCOUNT",
                                   "TRADING_ACCOUNT",
@@ -1463,28 +1532,36 @@
                                 ]
                               },
                               "sourceAccountId": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "来源账户 ID"
                               },
                               "targetAccountId": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "目标账户 ID"
                               },
                               "sourceWalletAddress": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "来源链上钱包地址"
                               },
                               "targetWalletAddress": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "目标链上钱包地址"
                               },
                               "extParams": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "扩展参数 JSON 字符串"
                               },
                               "sourceAccountBalance": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "源账户动账后余额"
                               },
                               "targetAccountBalance": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "目标账户动账后余额"
                               },
                               "fundFlowType": {
                                 "type": "string",
+                                "description": "资金流向类型",
                                 "enum": [
                                   "CRYPTO_ADDRESS",
                                   "FIAT"
@@ -1513,10 +1590,12 @@
                               },
                               "finishTimeTimestamp": {
                                 "type": "integer",
+                                "description": "交易完成时间毫秒时间戳",
                                 "format": "int64"
                               },
                               "createTimeTimestamp": {
                                 "type": "integer",
+                                "description": "交易开始时间毫秒时间戳",
                                 "format": "int64"
                               }
                             },
@@ -2047,11 +2126,13 @@
                 "properties": {
                   "size": {
                     "type": "integer",
+                    "description": "分页每页条数",
                     "format": "int64",
                     "example": 10
                   },
                   "current": {
                     "type": "integer",
+                    "description": "分页当前页码，从 1 开始",
                     "format": "int64",
                     "example": 1
                   },
@@ -2075,10 +2156,12 @@
                   },
                   "symbolId": {
                     "type": "integer",
+                    "description": "按币种 ID 筛选",
                     "format": "int64"
                   },
                   "exchangeSymbolId": {
                     "type": "integer",
+                    "description": "按兑换后币种 ID 筛选",
                     "format": "int64"
                   },
                   "transactionType": {
@@ -2173,6 +2256,7 @@
                   },
                   "status": {
                     "type": "string",
+                    "description": "按交易状态筛选：SUCCESS / FAIL / PENDING",
                     "enum": [
                       "SUCCESS",
                       "FAIL",
@@ -2647,6 +2731,7 @@
                             "properties": {
                               "id": {
                                 "type": "integer",
+                                "description": "交易记录主键 ID",
                                 "format": "int64"
                               },
                               "uid": {
@@ -2654,24 +2739,30 @@
                                 "description": "用户 UID"
                               },
                               "transactionId": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "业务交易流水号"
                               },
                               "symbolId": {
                                 "type": "integer",
+                                "description": "币种 ID",
                                 "format": "int64"
                               },
                               "acSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "币种名称；闪兑时为兑出币种"
                               },
                               "network": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "链上网络协议"
                               },
                               "exchangeSymbolId": {
                                 "type": "integer",
+                                "description": "兑换后币种 ID",
                                 "format": "int64"
                               },
                               "exchangeSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "兑换后币种名称；闪兑时为兑入币种"
                               },
                               "transactionType": {
                                 "type": "string",
@@ -2718,6 +2809,7 @@
                               },
                               "status": {
                                 "type": "string",
+                                "description": "交易状态：SUCCESS / FAIL / PENDING",
                                 "enum": [
                                   "SUCCESS",
                                   "FAIL",
@@ -2725,61 +2817,79 @@
                                 ]
                               },
                               "amount": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "交易金额"
                               },
                               "amountStr": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易金额字符串"
                               },
                               "amountDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "交易金额展示值"
                               },
                               "amountScale": {
                                 "type": "integer",
+                                "description": "交易金额展示小数位数",
                                 "format": "int32"
                               },
                               "exchangeAmount": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "兑换后到账金额"
                               },
                               "exchangeAmountDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "兑换后金额展示值"
                               },
                               "fee": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "交易手续费"
                               },
                               "feeDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "手续费展示值"
                               },
                               "createTime": {
                                 "type": "string",
+                                "description": "交易开始时间",
                                 "format": "date-time"
                               },
                               "finishTime": {
                                 "type": "string",
+                                "description": "交易完成时间",
                                 "format": "date-time"
                               },
                               "failureReason": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "失败原因说明"
                               },
                               "errorCode": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "失败错误码"
                               },
                               "exchangeRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "汇率"
                               },
                               "convertExchangeRate": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "闪兑汇率（兑入/兑出）"
                               },
                               "rateDisplay": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "汇率展示值"
                               },
                               "txHash": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "链上交易哈希"
                               },
                               "feeSymbol": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "手续费计价币种"
                               },
                               "sourceAccountType": {
                                 "type": "string",
+                                "description": "来源账户类型",
                                 "enum": [
                                   "FUND_ACCOUNT",
                                   "TRADING_ACCOUNT",
@@ -2792,6 +2902,7 @@
                               },
                               "targetAccountType": {
                                 "type": "string",
+                                "description": "目标账户类型",
                                 "enum": [
                                   "FUND_ACCOUNT",
                                   "TRADING_ACCOUNT",
@@ -2803,28 +2914,36 @@
                                 ]
                               },
                               "sourceAccountId": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "来源账户 ID"
                               },
                               "targetAccountId": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "目标账户 ID"
                               },
                               "sourceWalletAddress": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "来源链上钱包地址"
                               },
                               "targetWalletAddress": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "目标链上钱包地址"
                               },
                               "extParams": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "扩展参数 JSON 字符串"
                               },
                               "sourceAccountBalance": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "源账户动账后余额"
                               },
                               "targetAccountBalance": {
-                                "type": "number"
+                                "type": "number",
+                                "description": "目标账户动账后余额"
                               },
                               "fundFlowType": {
                                 "type": "string",
+                                "description": "资金流向类型",
                                 "enum": [
                                   "CRYPTO_ADDRESS",
                                   "FIAT"
@@ -2853,10 +2972,12 @@
                               },
                               "finishTimeTimestamp": {
                                 "type": "integer",
+                                "description": "交易完成时间毫秒时间戳",
                                 "format": "int64"
                               },
                               "createTimeTimestamp": {
                                 "type": "integer",
+                                "description": "交易开始时间毫秒时间戳",
                                 "format": "int64"
                               }
                             },
@@ -5644,23 +5765,29 @@
                             "description": "汇率"
                           },
                           "minRechargeAmount": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "最小入金金额"
                           },
                           "minWithdrawAmount": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "最小出金金额"
                           },
                           "assetNet": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "资产所属网络标识"
                           },
                           "iconData": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "网络协议图标（Base64 或 URL）"
                           },
                           "depositStatus": {
                             "type": "integer",
+                            "description": "入金是否可用：0 否，1 是",
                             "format": "int32"
                           },
                           "withdrawalStatus": {
                             "type": "integer",
+                            "description": "出金是否可用：0 否，1 是",
                             "format": "int32"
                           }
                         },
@@ -6129,14 +6256,17 @@
                             "description": "汇率"
                           },
                           "minExchangeAmount": {
-                            "type": "number"
+                            "type": "number",
+                            "description": "最小闪兑金额"
                           },
                           "exchangeOutStatus": {
                             "type": "integer",
+                            "description": "是否可兑出：0 否，1 是",
                             "format": "int32"
                           },
                           "exchangeInStatus": {
                             "type": "integer",
+                            "description": "是否可兑入：0 否，1 是",
                             "format": "int32"
                           }
                         },
@@ -6617,23 +6747,29 @@
                           "description": "汇率"
                         },
                         "minRechargeAmount": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "最小入金金额"
                         },
                         "minWithdrawAmount": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "最小出金金额"
                         },
                         "assetNet": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "资产所属网络标识"
                         },
                         "iconData": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "网络协议图标（Base64 或 URL）"
                         },
                         "depositStatus": {
                           "type": "integer",
+                          "description": "入金是否可用：0 否，1 是",
                           "format": "int32"
                         },
                         "withdrawalStatus": {
                           "type": "integer",
+                          "description": "出金是否可用：0 否，1 是",
                           "format": "int32"
                         }
                       },
@@ -10463,11 +10599,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "分页每页条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "分页当前页码，从 1 开始",
                   "format": "int64",
                   "example": 1
                 },
@@ -13029,11 +13167,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "分页每页条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "分页当前页码，从 1 开始",
                   "format": "int64",
                   "example": 1
                 },
@@ -13548,10 +13688,6 @@
                                 "description": "定期：该笔持仓明细的申购时间；活期同产品汇总行为 null",
                                 "format": "date-time"
                               },
-                              "baseAnnualRateDisplay": {
-                                "type": "string",
-                                "description": "基础年利率展示值"
-                              },
                               "excessRewardAnnualRateDisplay": {
                                 "type": "string",
                                 "description": "超额奖励年化收益率展示值"
@@ -13568,14 +13704,18 @@
                                 "type": "string",
                                 "description": "历史利息总额展示值"
                               },
+                              "positionAmountDisplay": {
+                                "type": "string",
+                                "description": "持有中订单本金展示值"
+                              },
                               "subscribeTimeTimestamp": {
                                 "type": "integer",
                                 "description": "申购时间毫秒时间戳",
                                 "format": "int64"
                               },
-                              "positionAmountDisplay": {
+                              "baseAnnualRateDisplay": {
                                 "type": "string",
-                                "description": "持有中订单本金展示值"
+                                "description": "基础年利率展示值"
                               }
                             },
                             "description": "理财当前持仓",
@@ -13637,11 +13777,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "分页每页条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "分页当前页码，从 1 开始",
                   "format": "int64",
                   "example": 1
                 },
@@ -14725,6 +14867,44 @@
                                 "description": "币种小数位",
                                 "format": "int32"
                               },
+                              "dailyMaxRedeemAmountDisplay": {
+                                "type": "string",
+                                "description": "每日赎回上限展示值"
+                              },
+                              "rewardMinPositionDisplay": {
+                                "type": "string",
+                                "description": "订单持有金额门槛展示值"
+                              },
+                              "userDepositedAmountDisplay": {
+                                "type": "string",
+                                "description": "用户持仓本金合计展示值"
+                              },
+                              "userInterestAmountDisplay": {
+                                "type": "string",
+                                "description": "用户未结利息合计展示值"
+                              },
+                              "userSpotAvailableBalanceDisplay": {
+                                "type": "string",
+                                "description": "用户现货可用余额展示值"
+                              },
+                              "availableSubscriptionBalanceDisplay": {
+                                "type": "string",
+                                "description": "可申购余额展示值"
+                              },
+                              "subscriptionStartTimeTimestamp": {
+                                "type": "integer",
+                                "description": "申购开始时间毫秒时间戳",
+                                "format": "int64"
+                              },
+                              "subscriptionEndTimeTimestamp": {
+                                "type": "integer",
+                                "description": "申购结束时间毫秒时间戳",
+                                "format": "int64"
+                              },
+                              "maxDepositAmountDisplay": {
+                                "type": "string",
+                                "description": "单用户申购上限展示值"
+                              },
                               "annualRateDisplay": {
                                 "type": "string",
                                 "description": "基础年化收益率展示值"
@@ -14768,44 +14948,6 @@
                               "fundPoolAmountDisplay": {
                                 "type": "string",
                                 "description": "池上限展示值"
-                              },
-                              "dailyMaxRedeemAmountDisplay": {
-                                "type": "string",
-                                "description": "每日赎回上限展示值"
-                              },
-                              "rewardMinPositionDisplay": {
-                                "type": "string",
-                                "description": "订单持有金额门槛展示值"
-                              },
-                              "userDepositedAmountDisplay": {
-                                "type": "string",
-                                "description": "用户持仓本金合计展示值"
-                              },
-                              "userInterestAmountDisplay": {
-                                "type": "string",
-                                "description": "用户未结利息合计展示值"
-                              },
-                              "userSpotAvailableBalanceDisplay": {
-                                "type": "string",
-                                "description": "用户现货可用余额展示值"
-                              },
-                              "availableSubscriptionBalanceDisplay": {
-                                "type": "string",
-                                "description": "可申购余额展示值"
-                              },
-                              "maxDepositAmountDisplay": {
-                                "type": "string",
-                                "description": "单用户申购上限展示值"
-                              },
-                              "subscriptionStartTimeTimestamp": {
-                                "type": "integer",
-                                "description": "申购开始时间毫秒时间戳",
-                                "format": "int64"
-                              },
-                              "subscriptionEndTimeTimestamp": {
-                                "type": "integer",
-                                "description": "申购结束时间毫秒时间戳",
-                                "format": "int64"
                               }
                             },
                             "description": "理财产品项（概览）",
@@ -16212,6 +16354,7 @@
                         },
                         "timestamp": {
                           "type": "integer",
+                          "description": "汇率报价时间戳（毫秒）",
                           "format": "int64"
                         },
                         "oneFromToQuantity": {
@@ -16347,11 +16490,13 @@
               "properties": {
                 "size": {
                   "type": "integer",
+                  "description": "分页每页条数",
                   "format": "int64",
                   "example": 10
                 },
                 "current": {
                   "type": "integer",
+                  "description": "分页当前页码，从 1 开始",
                   "format": "int64",
                   "example": 1
                 },
@@ -17248,6 +17393,7 @@
           "id": {
             "title": "交易记录ID",
             "type": "integer",
+            "description": "交易记录主键 ID",
             "format": "int64"
           },
           "uid": {
@@ -17257,29 +17403,35 @@
           },
           "transactionId": {
             "title": "交易ID",
-            "type": "string"
+            "type": "string",
+            "description": "业务交易流水号"
           },
           "symbolId": {
             "title": "币种ID",
             "type": "integer",
+            "description": "币种 ID",
             "format": "int64"
           },
           "acSymbol": {
             "title": "币种名/兑出",
-            "type": "string"
+            "type": "string",
+            "description": "币种名称；闪兑时为兑出币种"
           },
           "network": {
             "title": "网络协议",
-            "type": "string"
+            "type": "string",
+            "description": "链上网络协议"
           },
           "exchangeSymbolId": {
             "title": "兑换后币种ID",
             "type": "integer",
+            "description": "兑换后币种 ID",
             "format": "int64"
           },
           "exchangeSymbol": {
             "title": "兑换后币种名/兑入",
-            "type": "string"
+            "type": "string",
+            "description": "兑换后币种名称；闪兑时为兑入币种"
           },
           "transactionType": {
             "$ref": "#/components/schemas/TransactionTypeEnum"
@@ -17287,6 +17439,7 @@
           "status": {
             "title": "交易状态",
             "type": "string",
+            "description": "交易状态：SUCCESS / FAIL / PENDING",
             "enum": [
               "SUCCESS",
               "FAIL",
@@ -17295,78 +17448,96 @@
           },
           "amount": {
             "title": "交易金额",
-            "type": "number"
+            "type": "number",
+            "description": "交易金额"
           },
           "amountStr": {
             "title": "交易金额字符串",
-            "type": "string"
+            "type": "string",
+            "description": "交易金额字符串"
           },
           "amountDisplay": {
             "title": "交易金额展示值",
-            "type": "string"
+            "type": "string",
+            "description": "交易金额展示值"
           },
           "amountScale": {
             "title": "交易金额展示精度",
             "type": "integer",
+            "description": "交易金额展示小数位数",
             "format": "int32"
           },
           "exchangeAmount": {
             "title": "兑换后金额",
-            "type": "number"
+            "type": "number",
+            "description": "兑换后到账金额"
           },
           "exchangeAmountDisplay": {
             "title": "兑换后金额展示值",
-            "type": "string"
+            "type": "string",
+            "description": "兑换后金额展示值"
           },
           "fee": {
             "title": "交易手续费",
-            "type": "number"
+            "type": "number",
+            "description": "交易手续费"
           },
           "feeDisplay": {
             "title": "交易手续费展示值",
-            "type": "string"
+            "type": "string",
+            "description": "手续费展示值"
           },
           "createTime": {
             "title": "交易开始时间",
             "type": "string",
+            "description": "交易开始时间",
             "format": "date-time"
           },
           "finishTime": {
             "title": "交易完成时间",
             "type": "string",
+            "description": "交易完成时间",
             "format": "date-time"
           },
           "failureReason": {
             "title": "失败原因",
-            "type": "string"
+            "type": "string",
+            "description": "失败原因说明"
           },
           "errorCode": {
             "title": "失败错误码",
-            "type": "string"
+            "type": "string",
+            "description": "失败错误码"
           },
           "exchangeRate": {
             "title": "汇率",
-            "type": "number"
+            "type": "number",
+            "description": "汇率"
           },
           "convertExchangeRate": {
             "title": "兑换汇率（兑入/兑出）",
-            "type": "number"
+            "type": "number",
+            "description": "闪兑汇率（兑入/兑出）"
           },
           "rateDisplay": {
             "title": "汇率展示值",
-            "type": "string"
+            "type": "string",
+            "description": "汇率展示值"
           },
           "txHash": {
             "title": "区块链交易哈希",
-            "type": "string"
+            "type": "string",
+            "description": "链上交易哈希"
           },
           "feeSymbol": {
             "title": "手续费币种",
-            "type": "string"
+            "type": "string",
+            "description": "手续费计价币种"
           },
           "sourceAccountType": {
             "title": "来源账户类型",
             "type": "string",
+            "description": "来源账户类型",
             "enum": [
               "FUND_ACCOUNT",
               "TRADING_ACCOUNT",
@@ -17380,6 +17551,7 @@
           "targetAccountType": {
             "title": "目标账户类型",
             "type": "string",
+            "description": "目标账户类型",
             "enum": [
               "FUND_ACCOUNT",
               "TRADING_ACCOUNT",
@@ -17392,35 +17564,43 @@
           },
           "sourceAccountId": {
             "title": "来源账户ID",
-            "type": "string"
+            "type": "string",
+            "description": "来源账户 ID"
           },
           "targetAccountId": {
             "title": "目标账户ID",
-            "type": "string"
+            "type": "string",
+            "description": "目标账户 ID"
           },
           "sourceWalletAddress": {
             "title": "来源钱包地址",
-            "type": "string"
+            "type": "string",
+            "description": "来源链上钱包地址"
           },
           "targetWalletAddress": {
             "title": "目标钱包地址",
-            "type": "string"
+            "type": "string",
+            "description": "目标链上钱包地址"
           },
           "extParams": {
             "title": "扩展参数",
-            "type": "string"
+            "type": "string",
+            "description": "扩展参数 JSON 字符串"
           },
           "sourceAccountBalance": {
             "title": "源账户动账后余额",
-            "type": "number"
+            "type": "number",
+            "description": "源账户动账后余额"
           },
           "targetAccountBalance": {
             "title": "目标账户动账后余额",
-            "type": "number"
+            "type": "number",
+            "description": "目标账户动账后余额"
           },
           "fundFlowType": {
             "title": "资金流向类型",
             "type": "string",
+            "description": "资金流向类型",
             "enum": [
               "CRYPTO_ADDRESS",
               "FIAT"
@@ -17442,11 +17622,13 @@
           "finishTimeTimestamp": {
             "title": "交易完成时间毫秒时间戳",
             "type": "integer",
+            "description": "交易完成时间毫秒时间戳",
             "format": "int64"
           },
           "createTimeTimestamp": {
             "title": "交易开始时间毫秒时间戳",
             "type": "integer",
+            "description": "交易开始时间毫秒时间戳",
             "format": "int64"
           }
         }
@@ -17503,12 +17685,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "分页每页条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "分页当前页码，从 1 开始",
             "format": "int64",
             "example": 1
           },
@@ -17536,11 +17720,13 @@
           "symbolId": {
             "title": "币种ID",
             "type": "integer",
+            "description": "按币种 ID 筛选",
             "format": "int64"
           },
           "exchangeSymbolId": {
             "title": "兑换后币种ID",
             "type": "integer",
+            "description": "按兑换后币种 ID 筛选",
             "format": "int64"
           },
           "transactionType": {
@@ -17557,6 +17743,7 @@
           "status": {
             "title": "交易状态",
             "type": "string",
+            "description": "按交易状态筛选：SUCCESS / FAIL / PENDING",
             "enum": [
               "SUCCESS",
               "FAIL",
@@ -19000,28 +19187,34 @@
           },
           "minRechargeAmount": {
             "title": "最小入金金额",
-            "type": "number"
+            "type": "number",
+            "description": "最小入金金额"
           },
           "minWithdrawAmount": {
             "title": "最小出金金额",
-            "type": "number"
+            "type": "number",
+            "description": "最小出金金额"
           },
           "assetNet": {
             "title": "资产网络",
-            "type": "string"
+            "type": "string",
+            "description": "资产所属网络标识"
           },
           "iconData": {
             "title": "网络协议图标",
-            "type": "string"
+            "type": "string",
+            "description": "网络协议图标（Base64 或 URL）"
           },
           "depositStatus": {
             "title": "入金是否可用,[0:否,1:是]",
             "type": "integer",
+            "description": "入金是否可用：0 否，1 是",
             "format": "int32"
           },
           "withdrawalStatus": {
             "title": "出金是否可用,[0:否,1:是]",
             "type": "integer",
+            "description": "出金是否可用：0 否，1 是",
             "format": "int32"
           }
         },
@@ -19062,16 +19255,19 @@
           },
           "minExchangeAmount": {
             "title": "最小兑换金额",
-            "type": "number"
+            "type": "number",
+            "description": "最小闪兑金额"
           },
           "exchangeOutStatus": {
             "title": "兑出是否可用,[0:否,1:是]",
             "type": "integer",
+            "description": "是否可兑出：0 否，1 是",
             "format": "int32"
           },
           "exchangeInStatus": {
             "title": "兑入是否可用,[0:否,1:是]",
             "type": "integer",
+            "description": "是否可兑入：0 否，1 是",
             "format": "int32"
           }
         }
@@ -22428,12 +22624,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "分页每页条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "分页当前页码，从 1 开始",
             "format": "int64",
             "example": 1
           },
@@ -23893,6 +24091,10 @@
             "title": "可用(不包含挂单占用部分)，只有USDC品种该字段才不为0",
             "type": "number"
           },
+          "volumeExtDec": {
+            "type": "number",
+            "description": "实际持仓量（volumeExt 按精度换算后的可读值）"
+          },
           "volumeDisplay": {
             "type": "string",
             "description": "总余额展示值"
@@ -23901,9 +24103,6 @@
             "type": "integer",
             "description": "总余额展示精度",
             "format": "int32"
-          },
-          "volumeExtDec": {
-            "type": "number"
           }
         },
         "description": "持仓信息，key为交易品种，value为持仓详情"
@@ -24853,12 +25052,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "分页每页条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "分页当前页码，从 1 开始",
             "format": "int64",
             "example": 1
           },
@@ -24995,10 +25196,6 @@
             "description": "定期：该笔持仓明细的申购时间；活期同产品汇总行为 null",
             "format": "date-time"
           },
-          "baseAnnualRateDisplay": {
-            "type": "string",
-            "description": "基础年利率展示值"
-          },
           "excessRewardAnnualRateDisplay": {
             "type": "string",
             "description": "超额奖励年化收益率展示值"
@@ -25015,14 +25212,18 @@
             "type": "string",
             "description": "历史利息总额展示值"
           },
+          "positionAmountDisplay": {
+            "type": "string",
+            "description": "持有中订单本金展示值"
+          },
           "subscribeTimeTimestamp": {
             "type": "integer",
             "description": "申购时间毫秒时间戳",
             "format": "int64"
           },
-          "positionAmountDisplay": {
+          "baseAnnualRateDisplay": {
             "type": "string",
-            "description": "持有中订单本金展示值"
+            "description": "基础年利率展示值"
           }
         },
         "description": "理财当前持仓"
@@ -26041,6 +26242,44 @@
             "description": "币种小数位",
             "format": "int32"
           },
+          "dailyMaxRedeemAmountDisplay": {
+            "type": "string",
+            "description": "每日赎回上限展示值"
+          },
+          "rewardMinPositionDisplay": {
+            "type": "string",
+            "description": "订单持有金额门槛展示值"
+          },
+          "userDepositedAmountDisplay": {
+            "type": "string",
+            "description": "用户持仓本金合计展示值"
+          },
+          "userInterestAmountDisplay": {
+            "type": "string",
+            "description": "用户未结利息合计展示值"
+          },
+          "userSpotAvailableBalanceDisplay": {
+            "type": "string",
+            "description": "用户现货可用余额展示值"
+          },
+          "availableSubscriptionBalanceDisplay": {
+            "type": "string",
+            "description": "可申购余额展示值"
+          },
+          "subscriptionStartTimeTimestamp": {
+            "type": "integer",
+            "description": "申购开始时间毫秒时间戳",
+            "format": "int64"
+          },
+          "subscriptionEndTimeTimestamp": {
+            "type": "integer",
+            "description": "申购结束时间毫秒时间戳",
+            "format": "int64"
+          },
+          "maxDepositAmountDisplay": {
+            "type": "string",
+            "description": "单用户申购上限展示值"
+          },
           "annualRateDisplay": {
             "type": "string",
             "description": "基础年化收益率展示值"
@@ -26084,44 +26323,6 @@
           "fundPoolAmountDisplay": {
             "type": "string",
             "description": "池上限展示值"
-          },
-          "dailyMaxRedeemAmountDisplay": {
-            "type": "string",
-            "description": "每日赎回上限展示值"
-          },
-          "rewardMinPositionDisplay": {
-            "type": "string",
-            "description": "订单持有金额门槛展示值"
-          },
-          "userDepositedAmountDisplay": {
-            "type": "string",
-            "description": "用户持仓本金合计展示值"
-          },
-          "userInterestAmountDisplay": {
-            "type": "string",
-            "description": "用户未结利息合计展示值"
-          },
-          "userSpotAvailableBalanceDisplay": {
-            "type": "string",
-            "description": "用户现货可用余额展示值"
-          },
-          "availableSubscriptionBalanceDisplay": {
-            "type": "string",
-            "description": "可申购余额展示值"
-          },
-          "maxDepositAmountDisplay": {
-            "type": "string",
-            "description": "单用户申购上限展示值"
-          },
-          "subscriptionStartTimeTimestamp": {
-            "type": "integer",
-            "description": "申购开始时间毫秒时间戳",
-            "format": "int64"
-          },
-          "subscriptionEndTimeTimestamp": {
-            "type": "integer",
-            "description": "申购结束时间毫秒时间戳",
-            "format": "int64"
           }
         },
         "description": "理财产品项（概览）"
@@ -27333,6 +27534,7 @@
           "timestamp": {
             "title": "时间戳",
             "type": "integer",
+            "description": "汇率报价时间戳（毫秒）",
             "format": "int64"
           },
           "oneFromToQuantity": {
@@ -27828,12 +28030,14 @@
           "size": {
             "title": "每页显示条数",
             "type": "integer",
+            "description": "分页每页条数",
             "format": "int64",
             "example": 10
           },
           "current": {
             "title": "当前页",
             "type": "integer",
+            "description": "分页当前页码，从 1 开始",
             "format": "int64",
             "example": 1
           },

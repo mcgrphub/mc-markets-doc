@@ -202,7 +202,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| symbols | array | 是 |  |
+| symbols | array | 是 | 交易品种列表，最多 20 个 |
 
 ### 响应 `data` 字段
 
@@ -214,7 +214,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | --- | --- | --- |
 | symbol | string | 交易品种标识 |
 | mt5 | object | 交易品种配置 |
-| risk | object | 风控配置信息 |
+| risk | object | 风控侧品种静态配置 |
 
 `data[].mt5` 字段：
 
@@ -351,8 +351,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
 | platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
 | platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | Premium 档位配置 |
-| premium | object | Premium 档位配置 |
+| free | object | 风控档位配置 |
+| premium | object | 风控档位配置 |
 
 `data[].risk.free` 字段：
 
@@ -460,7 +460,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| uid | string | 是 |  |
+| uid | string | 是 | 用户 UID |
 
 ### 响应 `data` 字段
 
@@ -540,7 +540,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 |  |
+| login | string | 是 | 交易账户登录号 |
 
 ### 响应 `data` 字段
 
@@ -559,18 +559,12 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 | marginFree | number | 可用保证金 |
 | marginLevel | number | 保证金比例 |
 | positions | array | 持仓列表 |
-| balanceStr | string |  |
-| equityStr | string |  |
-| floatingStr | string |  |
-| marginStr | string |  |
-| marginFreeStr | string |  |
-| marginLevelStr | string |  |
-| marginDisplay | string |  |
-| marginScale | integer |  |
-| marginFreeDisplay | string |  |
-| marginFreeScale | integer |  |
-| marginLevelDisplay | string |  |
-| marginLevelScale | integer |  |
+| marginDisplay | string | 保证金展示值（向下截断，保留 2 位小数） |
+| marginScale | integer | 保证金展示小数位数 |
+| marginFreeDisplay | string | 可用保证金展示值（向下截断，保留 6 位小数） |
+| marginFreeScale | integer | 可用保证金展示小数位数 |
+| marginLevelDisplay | string | 保证金比例展示值（向下截断，数值不含百分号） |
+| marginLevelScale | integer | 保证金比例展示小数位数 |
 
 `userAssets.positions[]` 元素：
 
@@ -595,11 +589,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 | usdValue | number | 折算美元价值 |
 | volume | number | 持仓量（标准精度） |
 | volumeExt | number | 持仓量（扩展精度） |
-| contractSizeStr | string |  |
-| priceCurrentStr | string |  |
-| usdValueStr | string |  |
-| volumeScale | integer |  |
-| volumeDisplay | string |  |
+| volumeDisplay | string | 持仓量展示值 |
+| volumeScale | integer | 持仓量展示小数位数 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \

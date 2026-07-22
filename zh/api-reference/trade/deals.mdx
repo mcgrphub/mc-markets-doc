@@ -29,10 +29,10 @@ description: "成交相关 OpenAPI 接口。"
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| size | integer | 否 |  |
-| current | integer | 否 |  |
-| orderBy | string | 否 |  |
-| sortOrder | string | 否 |  |
+| size | integer | 否 | 每页显示条数 |
+| current | integer | 否 | 当前页码 |
+| orderBy | string | 否 | 排序字段，多个用逗号分隔 |
+| sortOrder | string | 否 | 排序方向：ASC / DESC |
 | type | string | 是 | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并 |
 | from | integer | 是 | 开始时间戳（Unix时间戳，秒） |
 | to | integer | 是 | 结束时间戳（Unix时间戳，秒） |
@@ -131,8 +131,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| symbol | string | 是 |  |
-| limit | integer | 是 |  |
+| symbol | string | 是 | 交易品种 |
+| limit | integer | 是 | 返回条数 |
 
 ### 响应 `data` 字段
 

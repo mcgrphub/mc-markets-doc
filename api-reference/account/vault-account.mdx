@@ -103,8 +103,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| from | string | No |  |
-| to | string | No |  |
+| from | string | No | Start date |
+| to | string | No | End date |
 
 ### Response `data` fields
 
@@ -161,8 +161,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-i
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| from | string | No |  |
-| to | string | No |  |
+| from | string | No | Start date |
+| to | string | No | End date |
 
 ### Response `data` fields
 
@@ -265,16 +265,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 | annualYieldRate | number | APY |
 | myTotalDeposit | number | My Total Deposit |
 | totalHistoricalEarnings | number | Historical Total Yield |
-| totalLockedAmountDisplay | string |  |
-| portfolioVaultBalanceDisplay | string |  |
-| portfolioVaultBalanceScale | integer |  |
-| totalHistoricalEarningsDisplay | string |  |
-| totalHistoricalEarningsScale | integer |  |
-| totalLockedAmountScale | integer |  |
-| annualYieldRateDisplay | string |  |
-| annualYieldRateScale | integer |  |
-| myTotalDepositDisplay | string |  |
-| myTotalDepositScale | integer |  |
+| totalLockedAmountDisplay | string | Total locked amount display value |
+| portfolioVaultBalanceDisplay | string | Portfolio vault balance display value |
+| portfolioVaultBalanceScale | integer | Portfolio vault balance display decimal places |
+| totalHistoricalEarningsDisplay | string | Historical total earnings display value |
+| totalHistoricalEarningsScale | integer | Historical total earnings display decimal places |
+| totalLockedAmountScale | integer | Total locked amount display decimal places |
+| annualYieldRateDisplay | string | Annual yield rate display value |
+| annualYieldRateScale | integer | Annual yield rate display decimal places |
+| myTotalDepositDisplay | string | My total deposit display value |
+| myTotalDepositScale | integer | My total deposit display decimal places |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats" \
@@ -294,8 +294,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| from | string | No |  |
-| to | string | No |  |
+| from | string | No | Start date |
+| to | string | No | End date |
 
 ### Response `data` fields
 

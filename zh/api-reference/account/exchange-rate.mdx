@@ -97,7 +97,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | exchangeRate | number | 汇率 |
-| timestamp | integer | 时间戳 |
+| timestamp | integer | 汇率报价时间戳（毫秒） |
 | oneFromToQuantity | number | 1个[from]币可兑换[to]币的数量 |
 | oneToFromQuantity | number | 1 个[to]币可兑换[from]币的数量 |
 | bookPriceDotMap | object | 汇率转换过程的的报价-包含多个汇率转换步骤,key=币对（警告：仅非生产环境有数据，用于测试汇率准确性） |

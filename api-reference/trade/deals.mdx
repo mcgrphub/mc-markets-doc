@@ -29,10 +29,10 @@ Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
-| orderBy | string | No |  |
-| sortOrder | string | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number |
+| orderBy | string | No | Sort fields, comma-separated |
+| sortOrder | string | No | Sort direction: ASC / DESC |
 | type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined |
 | from | integer | Yes | Start timestamp (Unix timestamp, seconds) |
 | to | integer | Yes | End timestamp (Unix timestamp, seconds) |
@@ -131,8 +131,8 @@ Query recent deals by symbol; result count is controlled by `limit`.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| symbol | string | Yes |  |
-| limit | integer | Yes |  |
+| symbol | string | Yes | Trading symbol |
+| limit | integer | Yes | Number of items to return |
 
 ### Response `data` fields
 

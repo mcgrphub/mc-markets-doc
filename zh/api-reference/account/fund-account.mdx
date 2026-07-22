@@ -73,7 +73,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| spotId | string | 是 |  |
+| spotId | string | 是 | 现货账户 ID |
 
 ### 响应 `data` 字段
 
@@ -103,9 +103,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 | volumeExt | number | 实际持仓量 |
 | openPrice | number | 当前价格 |
 | freeAmount | number | 可用(不包含挂单占用部分)，只有USDC品种该字段才不为0 |
+| volumeExtDec | number | 实际持仓量（volumeExt 按精度换算后的可读值） |
 | volumeDisplay | string | 总余额展示值 |
 | volumeScale | integer | 总余额展示精度 |
-| volumeExtDec | number |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \

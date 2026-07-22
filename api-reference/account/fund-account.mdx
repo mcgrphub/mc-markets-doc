@@ -73,7 +73,7 @@ Query spot account positions.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| spotId | string | Yes |  |
+| spotId | string | Yes | Spot account ID |
 
 ### Response `data` fields
 
@@ -105,7 +105,7 @@ Query spot account positions.
 | freeAmount | number | Available (excluding portion locked by pending orders). This field is non-zero only for USDC |
 | volumeDisplay | string | Total balance display value |
 | volumeScale | integer | Total balance display precision |
-| volumeExtDec | number |  |
+| volumeExtDec | number | Actual position volume (readable value after volumeExt precision conversion) |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \

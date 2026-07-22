@@ -41,10 +41,10 @@ description: "币种相关 OpenAPI 接口。"
 | exchangeRate | number | 汇率 |
 | minRechargeAmount | number | 最小入金金额 |
 | minWithdrawAmount | number | 最小出金金额 |
-| assetNet | string | 资产网络 |
-| iconData | string | 网络协议图标 |
-| depositStatus | integer | 入金是否可用,[0:否,1:是] |
-| withdrawalStatus | integer | 出金是否可用,[0:否,1:是] |
+| assetNet | string | 资产所属网络标识 |
+| iconData | string | 网络协议图标（Base64 或 URL） |
+| depositStatus | integer | 入金是否可用：0 否，1 是 |
+| withdrawalStatus | integer | 出金是否可用：0 否，1 是 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
@@ -74,9 +74,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 | minTradeUnit | number | 最小动账单位 |
 | pricePrecision | integer | 价格精度 |
 | exchangeRate | number | 汇率 |
-| minExchangeAmount | number | 最小兑换金额 |
-| exchangeOutStatus | integer | 兑出是否可用,[0:否,1:是] |
-| exchangeInStatus | integer | 兑入是否可用,[0:否,1:是] |
+| minExchangeAmount | number | 最小闪兑金额 |
+| exchangeOutStatus | integer | 是否可兑出：0 否，1 是 |
+| exchangeInStatus | integer | 是否可兑入：0 否，1 是 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchange/list" \
@@ -111,10 +111,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 | exchangeRate | number | 汇率 |
 | minRechargeAmount | number | 最小入金金额 |
 | minWithdrawAmount | number | 最小出金金额 |
-| assetNet | string | 资产网络 |
-| iconData | string | 网络协议图标 |
-| depositStatus | integer | 入金是否可用,[0:否,1:是] |
-| withdrawalStatus | integer | 出金是否可用,[0:否,1:是] |
+| assetNet | string | 资产所属网络标识 |
+| iconData | string | 网络协议图标（Base64 或 URL） |
+| depositStatus | integer | 入金是否可用：0 否，1 是 |
+| withdrawalStatus | integer | 出金是否可用：0 否，1 是 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/detail/{id}" \

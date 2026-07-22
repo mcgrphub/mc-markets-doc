@@ -981,6 +981,7 @@
                   "example": 500
                 }
               },
+              "description": "K线数据查询请求",
               "example": null
             }
           }
@@ -2783,7 +2784,8 @@
             "format": "int32",
             "example": 500
           }
-        }
+        },
+        "description": "K线数据查询请求"
       },
       "CompactKlineDataDisplayRsp": {
         "type": "object",

@@ -28,11 +28,11 @@ description: "交易品种列表等 Risk 交易相关接口。"
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| size | integer | 否 |  |
-| current | integer | 否 |  |
+| size | integer | 否 | 每页显示条数 |
+| current | integer | 否 | 当前页码 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
 | orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
-| group | string | 否 |  |
+| group | string | 否 | 产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种 |
 
 ### 响应 `data` 字段
 
@@ -50,24 +50,24 @@ description: "交易品种列表等 Risk 交易相关接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 币种 |
+| symbol | string | 交易品种 |
 | fundingRate | number | 资金费率 |
-| fundingRateStr | string | 资金费率原始decimal字符串 |
-| fundingRateDisplay | string | 资金费率展示值 |
-| fundingRateScale | integer | 资金费率展示小数位 |
+| fundingRateStr | string | 资金费率原始字符串 |
+| fundingRateDisplay | string | 资金费率展示值（百分比文本） |
+| fundingRateScale | integer | 资金费率展示小数位数 |
 | annualRateDisplay | string | 年化资金费率展示值 |
-| settlementPrice | number | 平仓价格 |
-| settlementPriceStr | string | 平仓价格原始decimal字符串 |
-| settlementPriceDisplay | string | 平仓价格展示值 |
-| settlementPriceScale | integer | 平仓价格展示小数位 |
+| settlementPrice | number | 结算价格 |
+| settlementPriceStr | string | 结算价格原始字符串 |
+| settlementPriceDisplay | string | 结算价格展示值 |
+| settlementPriceScale | integer | 结算价格展示小数位数 |
 | longInterestRate | number | 多头利息费率 |
-| longInterestRateStr | string | 多头利息费率原始decimal字符串 |
+| longInterestRateStr | string | 多头利息费率原始字符串 |
 | shortInterestRate | number | 空头利息费率 |
-| shortInterestRateStr | string | 空头利息费率原始decimal字符串 |
-| isSettlementRate | boolean | 是否是结算费率 |
-| nextSettlementTime | integer | 下次结算时间 unix时间戳 |
-| timestamp | integer | 资金费率生成时间 unix时间戳 |
-| settlementCycle | integer | 结算周期（单位：秒） |
+| shortInterestRateStr | string | 空头利息费率原始字符串 |
+| isSettlementRate | boolean | 是否为结算费率记录 |
+| nextSettlementTime | integer | 下次结算时间（Unix 毫秒时间戳） |
+| timestamp | integer | 资金费率生成时间（Unix 毫秒时间戳） |
+| settlementCycle | integer | 结算周期（秒） |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \

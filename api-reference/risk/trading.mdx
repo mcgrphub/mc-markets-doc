@@ -28,11 +28,11 @@ Query the trading symbol list for the current user.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number |
 | orderBy | string | No | Multi-field sort; comma-separated |
 | orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
-| group | string | No |  |
+| group | string | No | Product group (last segment of MT5 Path, e.g. Forex); omit or leave empty to return direct child symbols under all configured groups |
 
 ### Response `data` fields
 

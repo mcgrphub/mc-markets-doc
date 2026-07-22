@@ -32,14 +32,14 @@ Query the trading account fund movement list (collateral increase/decrease histo
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| size | integer | No |  |
-| current | integer | No |  |
-| orderBy | string | No |  |
-| sortOrder | string | No |  |
+| size | integer | No | Page size |
+| current | integer | No | Current page number |
+| orderBy | string | No | Sort fields, comma-separated |
+| sortOrder | string | No | Sort direction: ASC / DESC |
 | login | string | Yes | MT5 contract account ID / spot account ID |
-| from | integer | Yes |  |
-| to | integer | Yes |  |
-| symbol | string | No |  |
+| from | integer | Yes | Start timestamp (Unix seconds) |
+| to | integer | Yes | End timestamp (Unix seconds) |
+| symbol | string | No | Trading symbol name (optional filter) |
 
 ### Response `data` fields
 
@@ -215,9 +215,9 @@ Query PnL for a time range (for example, the past week). UID is taken from the `
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| from | integer | No |  |
-| to | integer | No |  |
-| login | string | Yes |  |
+| from | integer | No | Start timestamp (seconds), optional |
+| to | integer | No | End timestamp (seconds), optional |
+| login | string | Yes | Trading account login |
 
 ### Response `data` fields
 
@@ -249,15 +249,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| symbol | string | Yes |  |
+| symbol | string | Yes | Trading symbol |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbol | string |  |
-| longVolume | number |  |
-| shortVolume | number |  |
+| symbol | string | Trading symbol |
+| longVolume | number | Total long position volume |
+| shortVolume | number | Total short position volume |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract-volume-by-symbol" \
@@ -280,15 +280,15 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| symbol | string | Yes |  |
+| symbol | string | Yes | Trading symbol |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbol | string |  |
-| longNotional | number |  |
-| shortNotional | number |  |
+| symbol | string | Trading symbol |
+| longNotional | number | Total long notional value (2 decimals, truncated down) |
+| shortNotional | number | Total short notional value (2 decimals, truncated down) |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract-notional-by-symbol" \
