@@ -15,6 +15,10 @@
   },
   "servers": [
     {
+      "url": "https://test-gateway.mcconnects.com",
+      "description": "测试环境 API 网关"
+    },
+    {
       "url": "https://gateway.mcconnects.com",
       "description": "生产环境 API 网关"
     }
@@ -34,7 +38,7 @@
           "交易"
         ],
         "summary": "交易品种列表",
-        "description": "根据当前用户的UID查询交易品种列表\n所需权限: READ",
+        "description": "查询当前可用的交易品种列表\n所需权限: READ",
         "operationId": "list",
         "parameters": [
           {
@@ -69,7 +73,8 @@
                   ]
                 },
                 "group": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "产品分组，可选"
                 }
               },
               "example": null
@@ -169,7 +174,7 @@
           "资金费率"
         ],
         "summary": "分页查询交易币种资金费率历史数据",
-        "description": "所需权限: READ",
+        "description": "分页查询交易品种资金费率历史\n所需权限: READ",
         "operationId": "page",
         "parameters": [
           {
@@ -219,7 +224,7 @@
                   ]
                 }
               },
-              "description": "风控参数配置分页查询请求",
+              "description": "资金费率历史分页查询请求",
               "example": null
             }
           }
@@ -404,7 +409,8 @@
           },
           "group": {
             "title": "产品分组",
-            "type": "string"
+            "type": "string",
+            "description": "产品分组，可选"
           }
         }
       },
@@ -534,7 +540,7 @@
             ]
           }
         },
-        "description": "风控参数配置分页查询请求"
+        "description": "资金费率历史分页查询请求"
       },
       "BasePageRspFundingRateDto": {
         "type": "object",

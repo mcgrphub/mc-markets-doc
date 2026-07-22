@@ -31,13 +31,15 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | Spec tag (internal) | External Chinese | English | Status |
 | --- | --- | --- | --- |
 | 业务前端-交易 | 交易 | Trading | example / when seen |
-| MLP账户 | 金库账户 | Vault account | confirmed (Spec tag still MLP账户; do not use “MLP 账户” in reader copy) |
+| 金库账户 | 金库账户 | Vault account | confirmed (current Spec tag; path segment still `mlp`; keep `MLP_*` enums untranslated) |
+| MLP账户 | 金库账户 | Vault account | historical Spec tag; do not use in reader copy |
 | 理财账户 | 理财账户 | Finance account | confirmed |
 | 交易 | 交易 | Trading | confirmed (use Trading; risk Spec used “Trading”, account/trade used “Trade” — standardize on **Trading** for the tag label) |
 | 币种 | 币种 | Currency | confirmed |
 | 资金账户 | 资金账户 | Fund account | confirmed |
 | 汇率 | 汇率 | Exchange rate | confirmed |
-| 成交订单服务 | 成交订单 | Deal orders | confirmed |
+| 成交订单 | 成交订单 | Deal orders | confirmed (current Spec tag) |
+| 成交订单服务 | 成交订单 | Deal orders | historical Spec tag |
 | 资金费历史记录 | 资金费历史 | Funding fee history | confirmed |
 | 交易账户 | 交易账户 | Trading account | confirmed |
 | 订单 | 订单 | Orders | confirmed |

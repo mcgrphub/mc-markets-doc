@@ -18,7 +18,6 @@ description: "金库账户相关 OpenAPI 接口。"
 | GET | /openapi/v1/mc-account/mlp/treasury-info | READ | 获取金库账户相关信息 |
 | GET | /openapi/v1/mc-account/mlp/deposit-info | READ | 获取金库账户存款信息 |
 | GET | /openapi/v1/mc-account/mlp/core/stats | READ | 获取金库账户统计信息 |
-| GET | /openapi/v1/mc-account/mlp/config | READ | 查询金库账户参数 |
 | GET | /openapi/v1/mc-account/mlp/apr-data | READ | 获取金库账户 APR 数据 |
 | GET | /openapi/v1/mc-account/mlp/account/assets | READ | 查询金库账户资产详情 |
 
@@ -262,57 +261,23 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| totalLockedAmount | number | 总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值 |
+| totalLockedAmount | number | 总锁仓量 = 存入金库总金额 + TVL 金额基准值 |
 | annualYieldRate | number | 年化收益率 |
 | myTotalDeposit | number | 我的总存款 |
 | totalHistoricalEarnings | number | 历史总收益 |
-| totalLockedAmountDisplay | string |  |
-| portfolioVaultBalanceDisplay | string |  |
-| portfolioVaultBalanceScale | integer |  |
-| totalHistoricalEarningsDisplay | string |  |
-| totalHistoricalEarningsScale | integer |  |
-| totalLockedAmountScale | integer |  |
-| annualYieldRateDisplay | string |  |
-| annualYieldRateScale | integer |  |
-| myTotalDepositDisplay | string |  |
-| myTotalDepositScale | integer |  |
+| totalLockedAmountDisplay | string | 总锁仓量展示值 |
+| portfolioVaultBalanceDisplay | string | 投资组合金库余额展示值 |
+| portfolioVaultBalanceScale | integer | 投资组合金库余额展示精度 |
+| totalHistoricalEarningsDisplay | string | 历史总收益展示值 |
+| totalHistoricalEarningsScale | integer | 历史总收益展示精度 |
+| totalLockedAmountScale | integer | 总锁仓量展示精度 |
+| annualYieldRateDisplay | string | 年化收益率展示值 |
+| annualYieldRateScale | integer | 年化收益率展示精度 |
+| myTotalDepositDisplay | string | 我的总存款展示值 |
+| myTotalDepositScale | integer | 我的总存款展示精度 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-```
-
----
-
-## 查询金库账户参数
-
-`GET /openapi/v1/mc-account/mlp/config` — 权限 `READ`。
-
-查询当前业务线下的金库账户收益率等参数。
-
-### 响应 `data` 字段
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| id | integer | 配置ID |
-| businessLineId | integer | 业务线ID |
-| annualYieldRate | number | 调整收益率（年化），单位：百分比 |
-| lockPeriodDays | integer | 锁仓期，单位：天 |
-| singleUserDepositLimit | number | 单用户存款上限，单位：USDC |
-| tvlBaseAmount | number | TVL金额基准值，单位：USDC |
-| integralTierConfig | string | 积分档位配置，格式：积分最小值:存款限额比例,...，例如：50:25,300:50,1500:75,10000:100 |
-| createBy | string | 创建人 |
-| createTime | string | 创建时间 |
-| updateBy | string | 更新人 |
-| updateTime | string | 更新时间 |
-| createTimeTimestamp | integer | 创建时间毫秒时间戳 |
-| updateTimeTimestamp | integer | 更新时间毫秒时间戳 |
-
-```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \

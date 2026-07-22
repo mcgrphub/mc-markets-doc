@@ -122,11 +122,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 `GET /openapi/v1/mc-account/fund/account/por` — 权限 `READ`。
 
+查询当前用户储备金证明（Proof of Reserves）；可按批次号筛选。
+
 ### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| batchId | integer | 否 |  |
+| batchId | integer | 否 | 快照批次号；不传则返回默认/最新可用批次 |
 
 ### 响应 `data` 字段
 

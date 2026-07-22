@@ -157,14 +157,14 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | minRedeemAmount | number | 最小赎回金额 |
 | digit | integer | 币种精度（小数位） |
 | subscribedAmount | number | 已申购金额：池内净留存申购本金（与资金池上限校验口径一致：累计存入-累计赎回+累计赎息） |
-| fundPoolAmount | number | 池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制） |
+| fundPoolAmount | number | 池上限：最大资金池；null 或 ≤0 表示不限制 |
 | availableSubscriptionBalance | number | 可申购余额：池上限剩余可存入额度；池未设上限时为 null |
 | subscriptionStartTime | string | 申购开始时间；与结束时间均为 null 表示不限制 |
 | subscriptionEndTime | string | 申购结束时间；与开始时间均为 null 表示不限制 |
-| maxDepositAmount | number | 最大申购额：单户最高存入额（ac_finance_product_config.max_deposit_amount；null 或 ≤0 表示不限制） |
+| maxDepositAmount | number | 最大申购额：单户最高存入额；null 或 ≤0 表示不限制 |
 | dailyMaxRedeemAmount | number | 每日提取上限 |
-| subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
 | subscriptionStartTimeTimestamp | integer | 申购开始时间毫秒时间戳 |
+| subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/products/catalog" \
@@ -209,7 +209,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/produc
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
+| uid | string | 用户 UID |
 | transactionId | string | 交易ID |
 | symbolId | integer | 币种ID |
 | acSymbol | string | 币种名/兑出 |
@@ -295,7 +295,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
+| uid | string | 用户 UID |
 | transactionId | string | 交易ID |
 | symbolId | integer | 币种ID |
 | acSymbol | string | 币种名/兑出 |
@@ -359,10 +359,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| totalDepositValue | number | 用户存入总额（各币种本金 × 对应预言机价，折 USDC；未登录为0） |
-| totalInterestValue | number | 用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestValue 一致：小数位=FinanceConstants.DECIMAL_SCALE、ROUND_DOWN；未登录为0） |
-| yesterdayInterestValue | number | 昨日利息（自然日昨日 Asia/Shanghai 已入账结息流水，按同套预言机折 USDC；未登录为0） |
-| products | array | 按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBalance（与理财产品目录口径一致） |
+| totalDepositValue | number | 用户存入总额（各币种本金按参考价折 USDC；未登录为 0） |
+| totalInterestValue | number | 用户历史结息总额（按币种汇总后折 USDC；未登录为 0） |
+| yesterdayInterestValue | number | 昨日利息（折 USDC；未登录为 0） |
+| products | array | 按产品维度的明细列表（含用户持仓汇总与产品申购/资金池字段，口径与理财产品目录一致） |
 | totalDepositValueDisplay | string | 用户存入总额展示值 |
 | totalInterestValueDisplay | string | 用户历史结息总额展示值 |
 | yesterdayInterestValueDisplay | string | 昨日利息展示值 |
@@ -379,45 +379,45 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | dailyMaxRedeemAmount | number | 每日赎回上限（null 或 ≤0 表示不限制） |
 | pauseRedeem | boolean | 是否暂停赎回（true 表示已暂停，不可发起赎回） |
 | annualRate | number | 基础年化收益率%（不含积分奖励） |
-| rewardAnnualRate | number | 奖励年利率：超额奖励档年化%（配置 excess_reward_annual_rate） |
+| rewardAnnualRate | number | 奖励年利率：超额奖励档年化% |
 | totalAnnualRate | number | 总年化%=基础+奖励（展示用） |
 | minDepositAmount | number | 最小存入金额 |
 | minRedeemAmount | number | 最小提取金额 |
 | subscriptionStartTime | string | 申购开始时间；与结束时间均为 null 表示不限制 |
 | subscriptionEndTime | string | 申购结束时间；与开始时间均为 null 表示不限制 |
-| rewardMinHoldingDays | integer | 订单持有满天数：享受超额奖励档需连续持仓满（天）（reward_min_holding_days） |
-| rewardMinPosition | number | 订单持有金额不低于：与持仓天数同时满足才分层计息（reward_min_position） |
-| oraclePrice | number | 预言机价格（计价币） |
-| userDepositedAmount | number | 当前用户在该产品下的持仓本金合计（ac_user_finance_position.principal_balance，持有中+已到期；未登录为0） |
-| userInterestAmount | number | 当前用户在该产品下的未结利息合计（ac_user_finance_position.interest_balance；未登录为0） |
-| availableBalance | number | 当前用户在该产品下的持仓账面合计：本金+利息+冻结（ac_user_finance_position；未登录为0） |
+| rewardMinHoldingDays | integer | 订单持有满天数：享受超额奖励档需连续持仓满（天） |
+| rewardMinPosition | number | 订单持有金额不低于：与持仓天数同时满足才分层计息 |
+| oraclePrice | number | 计价参考价格（折算用） |
+| userDepositedAmount | number | 当前用户在该产品下的持仓本金合计（持有中+已到期；未登录为 0） |
+| userInterestAmount | number | 当前用户在该产品下的未结利息合计（未登录为 0） |
+| availableBalance | number | 当前用户在该产品下的持仓账面合计：本金+利息+冻结（未登录为 0） |
 | userSpotAvailableBalance | number | 当前用户该币种现货可用余额（与产品无关，同币种多产品返回相同值；未登录为0） |
-| totalDeposited | number | 平台该产品累计存入量（ac_finance_product.total_deposited） |
-| totalPrincipal | number | 平台该产品当前留存本金（ac_finance_product 口径：total_deposited - total_withdrawn + total_interest_withdrawn） |
+| totalDeposited | number | 平台该产品累计存入量 |
+| totalPrincipal | number | 平台该产品当前留存本金（累计存入-累计赎回+累计赎息） |
 | subscribedAmount | number | 已申购金额：池内净留存申购本金（与资金池上限校验口径一致：累计存入-累计赎回+累计赎息） |
-| fundPoolAmount | number | 池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制） |
+| fundPoolAmount | number | 池上限：最大资金池；null 或 ≤0 表示不限制 |
 | availableSubscriptionBalance | number | 可申购余额：池上限剩余可存入额度；池未设上限时为 null |
 | digit | integer | 币种小数位 |
+| annualRateDisplay | string | 基础年化收益率展示值 |
+| rewardAnnualRateDisplay | string | 奖励年利率展示值 |
+| totalAnnualRateDisplay | string | 总年化展示值 |
+| minDepositAmountDisplay | string | 最小存入金额展示值 |
+| minRedeemAmountDisplay | string | 最小提取金额展示值 |
+| oraclePriceDisplay | string | 计价参考价格展示值 |
+| availableBalanceDisplay | string | 用户持仓账面合计展示值 |
+| totalDepositedDisplay | string | 平台累计存入量展示值 |
+| totalPrincipalDisplay | string | 平台当前留存本金展示值 |
+| subscribedAmountDisplay | string | 已申购金额展示值 |
+| fundPoolAmountDisplay | string | 池上限展示值 |
 | dailyMaxRedeemAmountDisplay | string | 每日赎回上限展示值 |
 | rewardMinPositionDisplay | string | 订单持有金额门槛展示值 |
 | userDepositedAmountDisplay | string | 用户持仓本金合计展示值 |
 | userInterestAmountDisplay | string | 用户未结利息合计展示值 |
 | userSpotAvailableBalanceDisplay | string | 用户现货可用余额展示值 |
 | availableSubscriptionBalanceDisplay | string | 可申购余额展示值 |
-| annualRateDisplay | string | 基础年化收益率展示值 |
-| rewardAnnualRateDisplay | string | 奖励年利率展示值 |
-| totalAnnualRateDisplay | string | 总年化展示值 |
-| minDepositAmountDisplay | string | 最小存入金额展示值 |
-| minRedeemAmountDisplay | string | 最小提取金额展示值 |
-| oraclePriceDisplay | string | 预言机价格展示值 |
-| availableBalanceDisplay | string | 用户持仓账面合计展示值 |
-| totalDepositedDisplay | string | 平台累计存入量展示值 |
-| totalPrincipalDisplay | string | 平台当前留存本金展示值 |
-| subscribedAmountDisplay | string | 已申购金额展示值 |
-| fundPoolAmountDisplay | string | 池上限展示值 |
 | maxDepositAmountDisplay | string | 单用户申购上限展示值 |
-| subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
 | subscriptionStartTimeTimestamp | integer | 申购开始时间毫秒时间戳 |
+| subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview" \

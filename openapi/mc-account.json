@@ -38,12 +38,13 @@
           "交易"
         ],
         "summary": "根据transactionId查询交易记录详情",
-        "description": "所需权限: READ",
+        "description": "按交易 ID 查询当前用户的单笔交易记录详情\n所需权限: READ",
         "operationId": "selectTransactionId",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "交易 ID（transactionId）",
             "required": true,
             "schema": {
               "type": "string"
@@ -464,7 +465,7 @@
                         },
                         "uid": {
                           "type": "string",
-                          "description": "关联账户表"
+                          "description": "用户 UID"
                         },
                         "transactionId": {
                           "type": "string"
@@ -693,7 +694,7 @@
           "交易"
         ],
         "summary": "分页查询交易记录",
-        "description": "所需权限: READ",
+        "description": "按条件分页查询当前用户的交易记录\n所需权限: READ",
         "operationId": "transactionRecordPage",
         "requestBody": {
           "content": {
@@ -1310,7 +1311,7 @@
                               },
                               "uid": {
                                 "type": "string",
-                                "description": "关联账户表"
+                                "description": "用户 UID"
                               },
                               "transactionId": {
                                 "type": "string"
@@ -1564,8 +1565,8 @@
         "tags": [
           "交易"
         ],
-        "summary": "兑换v2, 支持询价",
-        "description": "需要先调用[触发2FA验证]接口,触发2FA验证\n所需权限: TRADE",
+        "summary": "闪兑（支持询价）",
+        "description": "完成闪兑兑换；需先调用闪兑汇率查询获取有效的 quoteSessionId\n所需权限: TRADE",
         "operationId": "exchangeV2",
         "requestBody": {
           "content": {
@@ -1596,37 +1597,9 @@
                     "type": "number",
                     "description": "兑换金额/兑换币种的数量"
                   },
-                  "verify2FaTokens": {
-                    "type": "array",
-                    "description": "通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证",
-                    "items": {
-                      "required": [
-                        "token",
-                        "twoFAType"
-                      ],
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "description": "通过2FA验证接口获取的临时验证令牌"
-                        },
-                        "twoFAType": {
-                          "type": "string",
-                          "description": "验证器类型",
-                          "enum": [
-                            "SMS",
-                            "GA",
-                            "EMAIL"
-                          ]
-                        }
-                      },
-                      "description": "通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证",
-                      "example": null
-                    }
-                  },
                   "quoteSessionId": {
                     "type": "string",
-                    "description": "asw1w123a"
+                    "description": "询价会话 ID，来自闪兑汇率查询接口"
                   }
                 },
                 "example": null
@@ -2061,7 +2034,7 @@
           "交易"
         ],
         "summary": "分页查询资金流水记录",
-        "description": "所需权限: READ",
+        "description": "按条件分页查询当前用户的资金流水记录\n所需权限: READ",
         "operationId": "accountRecordPage",
         "requestBody": {
           "content": {
@@ -2678,7 +2651,7 @@
                               },
                               "uid": {
                                 "type": "string",
-                                "description": "关联账户表"
+                                "description": "用户 UID"
                               },
                               "transactionId": {
                                 "type": "string"
@@ -2930,10 +2903,10 @@
     "/openapi/v1/mc-account/mlp/account/withdraw": {
       "post": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "MLP账户提现",
-        "description": "MLP账户提现，从MLP账户转出到资金账户，然后划入交易账户。优先扣减本金，再扣减收益\n所需权限: TRADE",
+        "summary": "金库账户提现",
+        "description": "从金库账户提现到交易账户；优先扣减本金，再扣减收益\n所需权限: TRADE",
         "operationId": "mlpWithdraw",
         "requestBody": {
           "content": {
@@ -2952,14 +2925,14 @@
                   },
                   "symbolId": {
                     "type": "string",
-                    "description": "币种ID"
+                    "description": "币种 ID"
                   },
                   "amount": {
                     "type": "number",
                     "description": "提现金额"
                   }
                 },
-                "description": "MLP账户提现请求",
+                "description": "金库账户提现请求",
                 "example": null
               }
             }
@@ -3389,10 +3362,10 @@
     "/openapi/v1/mc-account/mlp/account/deposit": {
       "post": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "MLP账户存款",
-        "description": "MLP账户存款，从交易账户转出到资金账户，然后存入MLP账户\n所需权限: TRADE",
+        "summary": "金库账户存款",
+        "description": "从交易账户存入金库账户\n所需权限: TRADE",
         "operationId": "mlpDeposit",
         "requestBody": {
           "content": {
@@ -3411,14 +3384,14 @@
                   },
                   "symbolId": {
                     "type": "string",
-                    "description": "币种ID"
+                    "description": "币种 ID"
                   },
                   "amount": {
                     "type": "number",
                     "description": "存款金额"
                   }
                 },
-                "description": "MLP账户存款请求",
+                "description": "金库账户存款请求",
                 "example": null
               }
             }
@@ -3851,7 +3824,7 @@
           "理财账户"
         ],
         "summary": "理财账户提现（活期）",
-        "description": "仅支持活期产品：传入产品代码与提现金额，从理财转出到资金账户再划入现货。定期多笔持仓请使用「定期持仓提现」接口并指定持仓明细 id\n所需权限: TRADE",
+        "description": "仅支持活期产品：传入产品代码与提现金额，赎回至现货账户。定期多笔持仓请使用「定期持仓提现」接口并指定持仓明细 id\n所需权限: TRADE",
         "operationId": "withdraw",
         "requestBody": {
           "content": {
@@ -4310,7 +4283,7 @@
           "理财账户"
         ],
         "summary": "理财定期持仓提现",
-        "description": "仅支持定期产品：指定持仓明细 id（持有中或已到期均可；与当前持仓接口 positionId 一致），后端按该笔本金+利息全额赎回，工作流与活期提现一致\n所需权限: TRADE",
+        "description": "定期产品：指定持仓明细 id，按该笔本金+利息全额赎回\n所需权限: TRADE",
         "operationId": "withdrawFixed",
         "requestBody": {
           "content": {
@@ -4765,7 +4738,7 @@
           "理财账户"
         ],
         "summary": "理财账户存款",
-        "description": "理财账户存款，从现货账户划出到资金账户，然后存入理财产品\n所需权限: TRADE",
+        "description": "从现货账户存入理财产品\n所需权限: TRADE",
         "operationId": "deposit",
         "requestBody": {
           "content": {
@@ -5224,7 +5197,7 @@
           "币种"
         ],
         "summary": "查询币种网络列表",
-        "description": "所需权限: READ",
+        "description": "查询当前业务线可用币种及其网络配置列表\n所需权限: READ",
         "operationId": "list",
         "responses": {
           "400": {
@@ -5713,7 +5686,7 @@
           "币种"
         ],
         "summary": "查询可兑换币种列表",
-        "description": "所需权限: READ",
+        "description": "查询当前业务线可用于闪兑的币种列表\n所需权限: READ",
         "operationId": "exchangeList",
         "responses": {
           "400": {
@@ -6188,7 +6161,7 @@
           "币种"
         ],
         "summary": "查询币种详情",
-        "description": "所需权限: READ",
+        "description": "按币种 ID 查询币种及网络详情\n所需权限: READ",
         "operationId": "detail",
         "parameters": [
           {
@@ -6682,10 +6655,10 @@
     "/openapi/v1/mc-account/mlp/yesterday-yield-rate-data": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP昨日回报率数据",
-        "description": "所需权限: READ",
+        "summary": "获取金库昨日回报率数据",
+        "description": "按时间区间查询金库昨日回报率图表数据\n所需权限: READ",
         "operationId": "getMlpYieldRateData",
         "parameters": [
           {
@@ -6697,14 +6670,16 @@
               "properties": {
                 "from": {
                   "type": "string",
+                  "description": "开始日期",
                   "format": "date-time"
                 },
                 "to": {
                   "type": "string",
+                  "description": "结束日期",
                   "format": "date-time"
                 }
               },
-              "description": "Mlp前台图表请求对象",
+              "description": "金库图表查询请求",
               "example": null
             }
           }
@@ -7133,7 +7108,7 @@
                             "description": "收益率展示值"
                           }
                         },
-                        "description": "MLP图表数据响应",
+                        "description": "金库图表数据响应",
                         "example": null
                       }
                     },
@@ -7152,10 +7127,10 @@
     "/openapi/v1/mc-account/mlp/withdraw-info": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP提款信息",
-        "description": "所需权限: READ",
+        "summary": "获取金库提款信息",
+        "description": "获取当前用户金库可提本金、可提收益与最大可提金额\n所需权限: READ",
         "operationId": "getMlpWithdrawInfo",
         "responses": {
           "400": {
@@ -7590,7 +7565,7 @@
                           "description": "可提本金展示值"
                         }
                       },
-                      "description": "MLP提款信息响应",
+                      "description": "金库提款信息响应",
                       "example": null
                     },
                     "success": {
@@ -7608,10 +7583,10 @@
     "/openapi/v1/mc-account/mlp/tvl-data": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP金库TVL数据",
-        "description": "所需权限: READ",
+        "summary": "获取金库 TVL 数据",
+        "description": "按时间区间查询金库 TVL 图表数据\n所需权限: READ",
         "operationId": "getMlpTvlData",
         "parameters": [
           {
@@ -7623,14 +7598,16 @@
               "properties": {
                 "from": {
                   "type": "string",
+                  "description": "开始日期",
                   "format": "date-time"
                 },
                 "to": {
                   "type": "string",
+                  "description": "结束日期",
                   "format": "date-time"
                 }
               },
-              "description": "Mlp前台图表请求对象",
+              "description": "金库图表查询请求",
               "example": null
             }
           }
@@ -8059,7 +8036,7 @@
                             "description": "收益率展示值"
                           }
                         },
-                        "description": "MLP图表数据响应",
+                        "description": "金库图表数据响应",
                         "example": null
                       }
                     },
@@ -8078,10 +8055,10 @@
     "/openapi/v1/mc-account/mlp/treasury-info": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP金库相关信息",
-        "description": "所需权限: READ",
+        "summary": "获取金库相关信息",
+        "description": "获取金库介绍、收益统计与用户表现等汇总信息\n所需权限: READ",
         "operationId": "getMlpTreasuryInfo",
         "responses": {
           "400": {
@@ -8560,7 +8537,7 @@
                           "description": "我的表现-锁定存款展示值"
                         }
                       },
-                      "description": "MLP金库信息响应",
+                      "description": "金库信息响应",
                       "example": null
                     },
                     "success": {
@@ -8578,10 +8555,10 @@
     "/openapi/v1/mc-account/mlp/deposit-info": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP存款信息",
-        "description": "所需权限: READ",
+        "summary": "获取金库存款信息",
+        "description": "获取当前用户金库可存额度、已存入金额与积分相关限额\n所需权限: READ",
         "operationId": "getMlpDepositInfo",
         "responses": {
           "400": {
@@ -9041,7 +9018,7 @@
                           "description": "已存入金额展示值"
                         }
                       },
-                      "description": "MLP存款信息响应",
+                      "description": "金库存款信息响应",
                       "example": null
                     },
                     "success": {
@@ -9059,10 +9036,10 @@
     "/openapi/v1/mc-account/mlp/core/stats": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP统计信息",
-        "description": "所需权限: READ",
+        "summary": "获取金库统计信息",
+        "description": "获取金库总锁仓量、年化收益率及用户存款与收益等统计\n所需权限: READ",
         "operationId": "getMlpStats",
         "responses": {
           "400": {
@@ -9474,7 +9451,7 @@
                       "properties": {
                         "totalLockedAmount": {
                           "type": "number",
-                          "description": "总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值"
+                          "description": "总锁仓量 = 存入金库总金额 + TVL 金额基准值"
                         },
                         "annualYieldRate": {
                           "type": "number",
@@ -9489,533 +9466,52 @@
                           "description": "历史总收益"
                         },
                         "totalLockedAmountDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "总锁仓量展示值"
                         },
                         "portfolioVaultBalanceDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "投资组合金库余额展示值"
                         },
                         "portfolioVaultBalanceScale": {
                           "type": "integer",
+                          "description": "投资组合金库余额展示精度",
                           "format": "int32"
                         },
                         "totalHistoricalEarningsDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "历史总收益展示值"
                         },
                         "totalHistoricalEarningsScale": {
                           "type": "integer",
+                          "description": "历史总收益展示精度",
                           "format": "int32"
                         },
                         "totalLockedAmountScale": {
                           "type": "integer",
+                          "description": "总锁仓量展示精度",
                           "format": "int32"
                         },
                         "annualYieldRateDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "年化收益率展示值"
                         },
                         "annualYieldRateScale": {
                           "type": "integer",
+                          "description": "年化收益率展示精度",
                           "format": "int32"
                         },
                         "myTotalDepositDisplay": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "我的总存款展示值"
                         },
                         "myTotalDepositScale": {
                           "type": "integer",
+                          "description": "我的总存款展示精度",
                           "format": "int32"
                         }
                       },
-                      "description": "MLP核心指标数据",
-                      "example": null
-                    },
-                    "success": {
-                      "type": "boolean"
-                    }
-                  },
-                  "example": null
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/openapi/v1/mc-account/mlp/config": {
-      "get": {
-        "tags": [
-          "MLP账户"
-        ],
-        "summary": "查询MLP参数",
-        "description": "查询当前请求上下文业务线下的 MLP 收益率等参数，逻辑与后台 MlpConfigController#getConfig 一致，响应为 OpenAPI 专用模型。\n所需权限: READ",
-        "operationId": "getConfig",
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "object"
-                    },
-                    "success": {
-                      "type": "boolean"
-                    }
-                  },
-                  "example": null
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "code": {
-                      "type": "string"
-                    },
-                    "codeKey": {
-                      "type": "string",
-                      "enum": [
-                        "DEFAULT",
-                        "SIGN_ERROR",
-                        "NOT_EXIST",
-                        "ALREADY_EXIST",
-                        "REPEAT_OPERATION",
-                        "PARAM_ERROR",
-                        "PERMISSION_DENIED",
-                        "OPERATION_FAILED",
-                        "DATA_FORMAT_ERROR",
-                        "NETWORK_ERROR",
-                        "TIMEOUT_ERROR",
-                        "CONFIG_ERROR",
-                        "STATUS_ERROR",
-                        "VERSION_INCOMPATIBLE",
-                        "SERVICE_UNAVAILABLE",
-                        "DATA_INTEGRITY_ERROR",
-                        "CONCURRENT_CONFLICT",
-                        "RESOURCE_LOCKED",
-                        "QUOTA_EXCEEDED",
-                        "DEPENDENCY_ERROR",
-                        "BUSINESS_RULE_CONFLICT",
-                        "ROLE_PERMISSION_INVALID",
-                        "ROLE_ALREADY_EXIST",
-                        "ROLE_NOT_EXIST",
-                        "ROLE_ADMIN_CANNOT_MODIFY",
-                        "ROLE_ADMIN_CANNOT_DELETE",
-                        "BUSINESS_LINE_NAME_EXIST",
-                        "BUSINESS_LINE_NOT_EXIST",
-                        "BUSINESS_LINE_NOT_PERMITTED",
-                        "TRANSFER_FAILED",
-                        "TRANSFER_AMOUNT_INVALID",
-                        "TRANSFER_ACCOUNT_NOT_EXIST",
-                        "TRANSFER_ACCOUNT_FROZEN",
-                        "TRANSFER_LIMIT_EXCEEDED",
-                        "EXCHANGE_RATE_NOT_FOUND",
-                        "EXCHANGE_RATE_INVALID",
-                        "EXCHANGE_RATE_SERVICE_ERROR",
-                        "EXCHANGE_RATE_QUOTE_INVALID",
-                        "EXCHANGE_SYMBOL_ERROR",
-                        "ACCOUNT_NOT_EXIST",
-                        "ACCOUNT_FROZEN",
-                        "ACCOUNT_BALANCE_INSUFFICIENT",
-                        "ACCOUNT_OPERATION_FAILED",
-                        "ACCOUNT_PARAM_INVALID",
-                        "ACCOUNT_PASSWORD_INVALID",
-                        "ACCOUNT_TOKEN_GENERATE_FAILED",
-                        "TWO_FA_NOT_BOUND",
-                        "TWO_FA_ALREADY_BOUND",
-                        "TWO_FA_VERIFY_FAILED",
-                        "TWO_FA_CODE_INVALID",
-                        "TWO_FA_SESSION_EXPIRED",
-                        "TWO_FA_TYPE_NOT_SUPPORTED",
-                        "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
-                        "TWO_FA_RESET_WITHIN_24H",
-                        "TWO_FA_ADDRESS_LOCK_PERIOD",
-                        "TWO_FA_FUND_PASSWORD_INVALID",
-                        "TWO_FA_TICKET_INVALID",
-                        "TWO_FA_TICKET_USER_MISMATCH",
-                        "TWO_FA_TICKET_SCENE_MISMATCH",
-                        "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
-                        "TWO_FA_SEND_TOO_FREQUENT",
-                        "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
-                        "TWO_FA_CODE_SEND_FAILED",
-                        "TWO_FA_FUND_PASSWORD_NOT_SET",
-                        "TWO_FA_FUND_PASSWORD_WRONG",
-                        "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
-                        "TWO_FA_FUND_PASSWORD_ALREADY_SET",
-                        "SAFE_BOX_NOT_EXIST",
-                        "SAFE_BOX_LOCK_FAILED",
-                        "SAFE_BOX_BALANCE_INSUFFICIENT",
-                        "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
-                        "SAFE_BOX_FREEZE_FAILED",
-                        "SAFE_BOX_UNFREEZE_FAILED",
-                        "SAFE_BOX_TRANSFER_IN_FAILED",
-                        "SAFE_BOX_TRANSFER_OUT_FAILED",
-                        "SAFE_BOX_PASSWORD_INVALID",
-                        "SAFE_BOX_OPERATION_FAILED",
-                        "WITHDRAWAL_AMOUNT_INVALID",
-                        "WITHDRAWAL_ADDRESS_INVALID",
-                        "WITHDRAWAL_WHITELIST_REQUIRED",
-                        "WITHDRAWAL_LIMIT_EXCEEDED",
-                        "WITHDRAWAL_SERVICE_ERROR",
-                        "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
-                        "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
-                        "WITHDRAWAL_PENDING_RECORD_EXISTS",
-                        "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
-                        "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
-                        "CURRENCY_NOT_EXIST",
-                        "CURRENCY_NOT_ENABLED",
-                        "CURRENCY_NETWORK_NOT_EXIST",
-                        "CURRENCY_BALANCE_INSUFFICIENT",
-                        "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
-                        "CURRENCY_ADDRESS_EXIST",
-                        "CURRENCY_ADDRESS_LABEL_EXIST",
-                        "BLACKLIST_UID_REQUIRED",
-                        "BLACKLIST_WALLET_REQUIRED",
-                        "BLACKLIST_ALREADY_EXIST",
-                        "BLACKLIST_NOT_EXIST",
-                        "KYC_LEVEL_QUERY_FAILED",
-                        "KYC_CFG_ALREADY_EXIST",
-                        "KYC_LEVEL_INVALID",
-                        "KYC_USER_NOT_VERIFIED",
-                        "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
-                        "KYC_RWA_DEAL_QUERY_FAILED",
-                        "KYC_L0_NOT_PASSED",
-                        "KYC_CERT_NO_DUPLICATE",
-                        "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
-                        "KYC_CERT_VALID_UNTIL_EXPIRED",
-                        "KYC_CERT_VALID_FROM_FORMAT_ERROR",
-                        "KYC_CERT_VALID_DATE_RANGE_ERROR",
-                        "KYC_CERT_PERMANENT_FLAG_INVALID",
-                        "KYC_FLOW_NOT_CONFIGURED",
-                        "KYC_FLOW_STEP_NOT_CONFIGURED",
-                        "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
-                        "KYC_APPLY_ALREADY_EXISTS",
-                        "KYC_APPLY_NOT_EXIST",
-                        "KYC_APPLY_DETAIL_NOT_EXIST",
-                        "KYC_APPLY_FLOW_NOT_EXIST",
-                        "KYC_SUB_FLOW_NOT_EXIST",
-                        "KYC_APPLY_STATUS_CANCELED",
-                        "KYC_APPLY_STATUS_PASSED",
-                        "KYC_APPLY_STATUS_SUBMITTED",
-                        "KYC_STEP_PREREQUISITE_NOT_MET",
-                        "KYC_AUDIT_LEVEL_NOT_L0",
-                        "KYC_AUDIT_STATUS_NOT_PENDING",
-                        "KYC_USER_INFO_NOT_EXIST",
-                        "KYC_NO_FIELD_TO_UPDATE",
-                        "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
-                        "KYC_AUDIT_NO_SUBMIT_DATA",
-                        "KYC_AUDIT_ALREADY_REJECTED",
-                        "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
-                        "KYC_AUDIT_FLOW_NOT_FOUND",
-                        "KYC_FLOW_CONFIG_NOT_EXIST",
-                        "KYC_STEP_CODE_NOT_FOUND",
-                        "KYC_STEP_LEVEL_NOT_CONFIGURED",
-                        "KYC_PROOF_REQUIRED",
-                        "KYC_IMAGE_OBJECT_KEY_INVALID",
-                        "KYC_IMAGE_ACCESS_DENIED",
-                        "KYC_PRESIGN_TYPE_INVALID",
-                        "KYC_QUOTA_INVALID",
-                        "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
-                        "KYC_BUSINESS_LINE_CONTEXT_MISSING",
-                        "KYC_SYNC_FUND_ACCOUNT_FAILED",
-                        "KYC_STATE_MACHINE_INIT_FAILED",
-                        "KYC_REJECT_NEED_APPLY_NO",
-                        "KYC_CFG_NOT_EXIST",
-                        "KYC_APPLY_NO_OR_UID_REQUIRED",
-                        "KYC_SUB_FLOW_NO_REQUIRED",
-                        "KYC_UID_REQUIRED",
-                        "KYC_BUSINESS_LINE_ID_REQUIRED",
-                        "KYC_REQUEST_BODY_REQUIRED",
-                        "KYC_USER_OR_BUSINESS_LINE_MISSING",
-                        "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
-                        "KYC_OSS_NOT_ENABLED",
-                        "KYC_OSS_CLIENT_NOT_INITIALIZED",
-                        "KYC_OSS_CONFIG_MISSING",
-                        "KYC_USER_NOT_LOGGED_IN",
-                        "KYC_FACE_MIME_INVALID",
-                        "KYC_IMAGE_MIME_INVALID",
-                        "KYC_REQUIRED_FIELD_MISSING",
-                        "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
-                        "KYC_AUDIT_COMMENT_REQUIRED",
-                        "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
-                        "ASSET_ACCOUNT_NOT_EXIST",
-                        "ASSET_LOCK_FAILED",
-                        "ASSET_NOT_EXIST",
-                        "ASSET_ADD_FAILED",
-                        "ASSET_UNFREEZE_FAILED",
-                        "ASSET_CREATE_LOCK_FAILED",
-                        "ASSET_CREATE_FAILED",
-                        "ASSET_BALANCE_INSUFFICIENT",
-                        "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
-                        "ASSET_FREEZE_FAILED",
-                        "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
-                        "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
-                        "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
-                        "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
-                        "FUND_ACCOUNT_NOT_EXIST",
-                        "FUND_ACCOUNT_ALREADY_EXIST",
-                        "FUND_ACCOUNT_CREATE_FAILED",
-                        "FUND_ACCOUNT_UPDATE_FAILED",
-                        "FUND_ACCOUNT_DELETE_FAILED",
-                        "FUND_ACCOUNT_PARAM_INVALID",
-                        "FUND_ACCOUNT_LOCK_FAILED",
-                        "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
-                        "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
-                        "FUND_ACCOUNT_CONTACT_REQUIRED",
-                        "FUND_ACCOUNT_MOBILE_ALREADY_USED",
-                        "FUND_ACCOUNT_EMAIL_ALREADY_USED",
-                        "TRANSACTION_RECORD_NOT_EXIST",
-                        "TRANSACTION_FORBIDDEN",
-                        "TRANSACTION_IN_PROGRESS",
-                        "TRANSACTION_AMOUNT_TOO_LOW",
-                        "TRANSACTION_REQUEST_FREQUENTLY",
-                        "TRANSACTION_BALANCE_INSUFFICIENT",
-                        "WEBHOOK_SIGNATURE_INVALID",
-                        "WEBHOOK_EVENT_TYPE_INVALID",
-                        "WEBHOOK_PAYLOAD_INVALID",
-                        "WEBHOOK_DEPOSIT_DETAIL_INVALID",
-                        "WEBHOOK_DEPOSIT_STATUS_INVALID",
-                        "WITHDRAWAL_AUDIT_NOT_EXIST",
-                        "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
-                        "WITHDRAWAL_AUDIT_CREATE_FAILED",
-                        "WITHDRAWAL_AUDIT_UPDATE_FAILED",
-                        "WITHDRAWAL_AUDIT_DELETE_FAILED",
-                        "WITHDRAWAL_AUDIT_PARAM_INVALID",
-                        "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
-                        "WITHDRAWAL_AUDIT_STATUS_INVALID",
-                        "WITHDRAWAL_AUDIT_REJECT_ERROR",
-                        "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
-                        "WITHDRAW_LOCK_PERIOD_ERROR",
-                        "PAYMENT_OPERATION_FAILED",
-                        "MT_GROUP_NOT_FOUND",
-                        "MT_MEM",
-                        "MT_DEALER_SEND",
-                        "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
-                        "MT_POSITION_GET_BY_LOGIN",
-                        "MT_POSITION_VOLUME_NOT_ENOUGH",
-                        "MT_DEDUCT_COLLATERAL_FAILED",
-                        "MT_DEALER_RESULT_FAILED",
-                        "MT_INPUT_SERIALIZE_FAILED",
-                        "MT_AMOUNT_DECIMAL",
-                        "MT_MTRISK_NOT_FOUND",
-                        "PROOF_FUND_ALREADY_EXIST",
-                        "PROOF_FUND_NOT_EXIST",
-                        "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
-                        "USER_WALLET_CONFIG_ALREADY_EXIST",
-                        "USER_WALLET_CONFIG_DELETE_FAILED",
-                        "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
-                        "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
-                        "MLP_CONFIG_NOT_FOUND",
-                        "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
-                        "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
-                        "MLP_INTEGRAL_TIER_CONFIG_INVALID",
-                        "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
-                        "TICKET_NOT_EXIST",
-                        "TICKET_PENDING_EXISTS",
-                        "TICKET_CLOSED_CANNOT_SEND",
-                        "TICKET_EVALUATE_FAILED",
-                        "TICKET_STATUS_INVALID",
-                        "ORDER_OPERATION_FAILED",
-                        "ORDER_SELL_NOT_SUPPORTED",
-                        "TP_SL_NOT_SUPPORTED",
-                        "SYMBOL_NOT_EXIST",
-                        "ORDER_VALUE_VOLUME_LIMIT_ERROR",
-                        "SYMBOL_NOT_SUPPORTED_ERROR",
-                        "SLIPPAGE_PARAM_ERROR",
-                        "SLIPPAGE_ESTIMATE_ERROR",
-                        "COMMON_ERROR",
-                        "COMMON_PARAMS_ERROR",
-                        "COMMON_MEM_ERROR",
-                        "ORDER_REQUEST_REJECT",
-                        "ORDER_REQUEST_CANCEL",
-                        "ORDER_REQUEST_PLACED",
-                        "ORDER_REQUEST_DONE",
-                        "ORDER_REQUEST_ERROR",
-                        "ORDER_REQUEST_TIMEOUT",
-                        "ORDER_REQUEST_INVALID",
-                        "ORDER_REQUEST_INVALID_VOLUME",
-                        "ORDER_REQUEST_INVALID_PRICE",
-                        "ORDER_REQUEST_INVALID_STOPS",
-                        "ORDER_REQUEST_TRADE_DISABLED",
-                        "ORDER_REQUEST_MARKET_CLOSED",
-                        "ORDER_REQUEST_NO_MONEY",
-                        "ORDER_REQUEST_TOO_MANY",
-                        "ORDER_REQUEST_INVALID_ORDER",
-                        "COMMON_OK",
-                        "ORDER_REQUEST_PRICE_OFF",
-                        "POSITION_OBTAIN_ERROR",
-                        "POSITION_VALUE_LIMIT_EXCEEDED",
-                        "POSITION_MARGIN_INSUFFICIENT",
-                        "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
-                        "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
-                        "FATIGUE_LIMIT",
-                        "TEMPLATE_DISABLED",
-                        "CHANNEL_NOT_SUPPORT",
-                        "TEMPLATE_PARAM_MISMATCH",
-                        "TEMPLATE_CONTENT_NOT_FOUND",
-                        "TEMPLATE_CONTENT_INCONSISTENT",
-                        "USER_NOT_FOUND",
-                        "USERNAME_EXISTS",
-                        "EMAIL_EXISTS",
-                        "PASSWORD_ERROR",
-                        "USER_DATA_VALIDATION_FAILED",
-                        "USER_BATCH_OPERATION_FAILED",
-                        "OLD_PASSWORD_SAME",
-                        "NEW_PASSWORD_NOT_MATCH",
-                        "ACCOUNT_TIER_OPERATION_FAILED",
-                        "BUSINESS_LINE_NOT_FOUND",
-                        "BUSINESS_LINE_NAME_EXISTS",
-                        "BUSINESS_LINE_SAVE_FAILED",
-                        "BUSINESS_LINE_UPDATE_FAILED",
-                        "BUSINESS_LINE_DELETE_FAILED",
-                        "BUSINESS_LINE_EMAIL_EXISTS",
-                        "BUSINESS_LINE_STATUS_ERROR",
-                        "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
-                        "BUSINESS_TYPE_EXCEPTION",
-                        "BUSINESS_TYPE_INVALID",
-                        "ROLE_NOT_FOUND",
-                        "ROLE_CODE_EXISTS",
-                        "ROLE_ADMIN_OPERATION_DENIED",
-                        "ROLE_STATUS_ERROR",
-                        "ROLE_BATCH_OPERATION_FAILED",
-                        "PERMISSION_NOT_FOUND",
-                        "PERMISSION_CODE_EXISTS",
-                        "PERMISSION_IN_USE",
-                        "PERMISSION_HAS_CHILDREN",
-                        "PERMISSION_CIRCULAR_REFERENCE",
-                        "SYMBOL_STATUS_CLOSED",
-                        "SYMBOL_SOURCE_DISABLED",
-                        "SYMBOL_SOURCE_SYMBOL_DISABLED",
-                        "SYMBOL_SOURCE_NAME_EXISTS",
-                        "TRADE_SYMBOL_NAME_EXISTS",
-                        "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
-                        "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
-                        "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
-                        "TRADE_SYMBOL_BOOK_NULL",
-                        "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
-                        "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
-                        "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
-                        "ALARM_NOTIFICATION_TYPE_INVALID",
-                        "RULE_MAPPING_NOT_CONFIGURED",
-                        "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
-                        "KLINE_DATA_SOURCE_GET_FAILED",
-                        "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
-                        "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
-                        "PROMOTION_PARAM_ERROR",
-                        "PROMOTION_CAMPAIGN_NOT_FOUND",
-                        "PROMOTION_CAMPAIGN_OFFLINE",
-                        "PROMOTION_CAMPAIGN_NOT_STARTED",
-                        "PROMOTION_CAMPAIGN_ENDED",
-                        "PROMOTION_USER_SCOPE_MISMATCH",
-                        "PROMOTION_USER_NOT_ENROLLED",
-                        "PROMOTION_TASK_NOT_FOUND",
-                        "PROMOTION_TASK_NOT_CLAIMABLE",
-                        "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
-                        "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
-                        "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
-                        "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
-                        "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
-                        "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
-                        "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
-                        "PROMOTION_POOL_SUMMARY_FROZEN",
-                        "PROMOTION_DISPATCH_DUPLICATE_PENDING",
-                        "PROMOTION_WEALTH_PRODUCT_INVALID",
-                        "PROMOTION_RELEASE_SYMBOL_INVALID",
-                        "PROMOTION_TRADE_SYMBOL_INVALID"
-                      ]
-                    },
-                    "params": {
-                      "type": "object"
-                    },
-                    "localizedMessage": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "description": "配置ID",
-                          "format": "int64"
-                        },
-                        "businessLineId": {
-                          "type": "integer",
-                          "description": "业务线ID",
-                          "format": "int64"
-                        },
-                        "annualYieldRate": {
-                          "type": "number",
-                          "description": "调整收益率（年化），单位：百分比"
-                        },
-                        "lockPeriodDays": {
-                          "type": "integer",
-                          "description": "锁仓期，单位：天",
-                          "format": "int32"
-                        },
-                        "singleUserDepositLimit": {
-                          "type": "number",
-                          "description": "单用户存款上限，单位：USDC"
-                        },
-                        "tvlBaseAmount": {
-                          "type": "number",
-                          "description": "TVL金额基准值，单位：USDC"
-                        },
-                        "integralTierConfig": {
-                          "type": "string",
-                          "description": "积分档位配置，格式：积分最小值:存款限额比例,...，例如：50:25,300:50,1500:75,10000:100"
-                        },
-                        "createBy": {
-                          "type": "string",
-                          "description": "创建人"
-                        },
-                        "createTime": {
-                          "type": "string",
-                          "description": "创建时间",
-                          "format": "date-time"
-                        },
-                        "updateBy": {
-                          "type": "string",
-                          "description": "更新人"
-                        },
-                        "updateTime": {
-                          "type": "string",
-                          "description": "更新时间",
-                          "format": "date-time"
-                        },
-                        "createTimeTimestamp": {
-                          "type": "integer",
-                          "description": "创建时间毫秒时间戳",
-                          "format": "int64"
-                        },
-                        "updateTimeTimestamp": {
-                          "type": "integer",
-                          "description": "更新时间毫秒时间戳",
-                          "format": "int64"
-                        }
-                      },
-                      "description": "MLP 参数配置（OpenAPI）",
+                      "description": "金库核心指标数据",
                       "example": null
                     },
                     "success": {
@@ -10033,10 +9529,10 @@
     "/openapi/v1/mc-account/mlp/apr-data": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "获取MLP APR数据",
-        "description": "所需权限: READ",
+        "summary": "获取金库 APR 数据",
+        "description": "按时间区间查询金库 APR 图表数据\n所需权限: READ",
         "operationId": "getMlpAprData",
         "parameters": [
           {
@@ -10048,14 +9544,16 @@
               "properties": {
                 "from": {
                   "type": "string",
+                  "description": "开始日期",
                   "format": "date-time"
                 },
                 "to": {
                   "type": "string",
+                  "description": "结束日期",
                   "format": "date-time"
                 }
               },
-              "description": "Mlp前台图表请求对象",
+              "description": "金库图表查询请求",
               "example": null
             }
           }
@@ -10484,7 +9982,7 @@
                             "description": "收益率展示值"
                           }
                         },
-                        "description": "MLP图表数据响应",
+                        "description": "金库图表数据响应",
                         "example": null
                       }
                     },
@@ -10503,10 +10001,10 @@
     "/openapi/v1/mc-account/mlp/account/assets": {
       "get": {
         "tags": [
-          "MLP账户"
+          "金库账户"
         ],
-        "summary": "查询MLP账户资产详情",
-        "description": "所需权限: READ",
+        "summary": "查询金库账户资产详情",
+        "description": "查询当前用户金库账户各币种本金与收益余额\n所需权限: READ",
         "operationId": "mlpAssets",
         "responses": {
           "400": {
@@ -10931,7 +10429,7 @@
                             "description": "可用收益"
                           }
                         },
-                        "description": "MLP账户资产DTO",
+                        "description": "金库账户资产",
                         "example": null
                       }
                     },
@@ -10953,7 +10451,7 @@
           "资金费历史记录"
         ],
         "summary": "资金费历史记录分页查询接口V2",
-        "description": "feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amount\n所需权限: READ",
+        "description": "分页查询资金费与利息费用历史记录\n所需权限: READ",
         "operationId": "pageV2",
         "parameters": [
           {
@@ -10993,7 +10491,7 @@
                 },
                 "login": {
                   "type": "string",
-                  "description": "mt5登录账号"
+                  "description": "交易账户登录号"
                 },
                 "dealTimeStart": {
                   "type": "string",
@@ -11434,7 +10932,7 @@
                               },
                               "login": {
                                 "type": "string",
-                                "description": "mt5登录账号"
+                                "description": "交易账户登录号"
                               },
                               "businessLineId": {
                                 "type": "integer",
@@ -11497,25 +10995,6 @@
                                 "description": "费用结算批次时间(整点时间)",
                                 "format": "date-time"
                               },
-                              "dealTimeTimestamp": {
-                                "type": "integer",
-                                "description": "扣费时间毫秒时间戳",
-                                "format": "int64"
-                              },
-                              "feeRateDisplay": {
-                                "type": "string",
-                                "description": "资金费率展示值，ratio转百分比后四舍五入至4位小数"
-                              },
-                              "feeRateScale": {
-                                "type": "integer",
-                                "description": "资金费率展示精度",
-                                "format": "int32"
-                              },
-                              "batchTimeTimestamp": {
-                                "type": "integer",
-                                "description": "费用结算批次时间毫秒时间戳",
-                                "format": "int64"
-                              },
                               "amountDisplay": {
                                 "type": "string",
                                 "description": "资金费金额展示值，向上保留8位小数"
@@ -11533,6 +11012,25 @@
                               "updateTimeTimestamp": {
                                 "type": "integer",
                                 "description": "记录更新时间毫秒时间戳",
+                                "format": "int64"
+                              },
+                              "dealTimeTimestamp": {
+                                "type": "integer",
+                                "description": "扣费时间毫秒时间戳",
+                                "format": "int64"
+                              },
+                              "feeRateDisplay": {
+                                "type": "string",
+                                "description": "资金费率展示值，ratio转百分比后四舍五入至4位小数"
+                              },
+                              "feeRateScale": {
+                                "type": "integer",
+                                "description": "资金费率展示精度",
+                                "format": "int32"
+                              },
+                              "batchTimeTimestamp": {
+                                "type": "integer",
+                                "description": "费用结算批次时间毫秒时间戳",
                                 "format": "int64"
                               }
                             },
@@ -11583,7 +11081,7 @@
           "资金账户"
         ],
         "summary": "获取持仓信息V2",
-        "description": "获取持仓信息\n所需权限: READ",
+        "description": "获取现货账户持仓列表\n所需权限: READ",
         "operationId": "positionsV2",
         "responses": {
           "400": {
@@ -12023,12 +11521,13 @@
           "资金账户"
         ],
         "summary": "获取现货账户持仓信息",
-        "description": "获取现货账户持仓信息\n所需权限: READ",
+        "description": "按现货账户 ID 查询现货账户持仓信息\n所需权限: READ",
         "operationId": "getSpotPositions",
         "parameters": [
           {
             "name": "spotId",
             "in": "query",
+            "description": "现货账户 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -12472,13 +11971,14 @@
         "tags": [
           "资金账户"
         ],
-        "summary": "查询用户资金证明",
-        "description": "所需权限: READ",
+        "summary": "查询用户储备金证明（PoR）",
+        "description": "查询当前用户储备金证明（Proof of Reserves）；可按批次号筛选\n所需权限: READ",
         "operationId": "por",
         "parameters": [
           {
             "name": "batchId",
             "in": "query",
+            "description": "快照批次号；不传则返回默认/最新可用批次",
             "required": false,
             "schema": {
               "type": "integer",
@@ -13460,7 +12960,7 @@
                           },
                           "fundPoolAmount": {
                             "type": "number",
-                            "description": "池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制）"
+                            "description": "池上限：最大资金池；null 或 ≤0 表示不限制"
                           },
                           "availableSubscriptionBalance": {
                             "type": "number",
@@ -13478,20 +12978,20 @@
                           },
                           "maxDepositAmount": {
                             "type": "number",
-                            "description": "最大申购额：单户最高存入额（ac_finance_product_config.max_deposit_amount；null 或 ≤0 表示不限制）"
+                            "description": "最大申购额：单户最高存入额；null 或 ≤0 表示不限制"
                           },
                           "dailyMaxRedeemAmount": {
                             "type": "number",
                             "description": "每日提取上限"
                           },
-                          "subscriptionEndTimeTimestamp": {
-                            "type": "integer",
-                            "description": "申购结束时间毫秒时间戳",
-                            "format": "int64"
-                          },
                           "subscriptionStartTimeTimestamp": {
                             "type": "integer",
                             "description": "申购开始时间毫秒时间戳",
+                            "format": "int64"
+                          },
+                          "subscriptionEndTimeTimestamp": {
+                            "type": "integer",
+                            "description": "申购结束时间毫秒时间戳",
                             "format": "int64"
                           }
                         },
@@ -13517,7 +13017,7 @@
           "理财账户"
         ],
         "summary": "理财当前持仓",
-        "description": "根据上下文 uid 分页查询持有中/已到期持仓；活期同产品多笔汇总为一行。返回列表按 product_code 升序、再 currency 升序。positionAmount 为持仓本金合计（不含未结利息，利息见 currentRewardAmount）；cumulativeRewardAmount 为该产品该币种下历史结息原币种合计，不折 USDC。未登录或缺少业务线时返回空页\n所需权限: READ",
+        "description": "分页查询当前用户持有中/已到期持仓；活期同产品多笔汇总为一行\n所需权限: READ",
         "operationId": "holdingPositions",
         "parameters": [
           {
@@ -14007,7 +13507,7 @@
                               },
                               "positionAmount": {
                                 "type": "number",
-                                "description": "持有中订单的本金：活期同产品多笔为 principal_balance 合计；不含未结利息与冻结（利息见 currentRewardAmount）"
+                                "description": "持有中订单的本金：活期同产品多笔为本金合计；不含未结利息与冻结（利息见 currentRewardAmount）"
                               },
                               "baseAnnualRate": {
                                 "type": "number",
@@ -14024,15 +13524,15 @@
                               },
                               "eligibleRewardAmount": {
                                 "type": "number",
-                                "description": "订单持有金额不低于：享受超额奖励档所需的持仓本金门槛（产品配置 reward_min_position；无超额分层时可为 null）"
+                                "description": "订单持有金额不低于：享受超额奖励档所需的持仓本金门槛；无超额分层时可为 null"
                               },
                               "currentRewardAmount": {
                                 "type": "number",
-                                "description": "当前持有利息: ac_user_finance_position 中该用户、该产品、该币种下持有中利息合计；单位为该产品资产币种（与 currency 一致），不折 USDC"
+                                "description": "当前持有利息合计；单位为该产品资产币种（与 currency 一致），不折 USDC"
                               },
                               "cumulativeRewardAmount": {
                                 "type": "number",
-                                "description": "历史利息总额：ac_finance_transaction 中该用户、该产品、该币种下成功 INTEREST 流水的 amount 合计；单位为该产品资产币种（与 currency 一致），不折 USDC"
+                                "description": "历史利息总额；单位为该产品资产币种（与 currency 一致），不折 USDC"
                               },
                               "status": {
                                 "type": "string",
@@ -14045,8 +13545,12 @@
                               },
                               "subscribeTime": {
                                 "type": "string",
-                                "description": "定期：该笔持仓明细的申购时间（ac_user_finance_position.create_time，申购成功落库时刻）；活期同产品汇总行为 null",
+                                "description": "定期：该笔持仓明细的申购时间；活期同产品汇总行为 null",
                                 "format": "date-time"
+                              },
+                              "baseAnnualRateDisplay": {
+                                "type": "string",
+                                "description": "基础年利率展示值"
                               },
                               "excessRewardAnnualRateDisplay": {
                                 "type": "string",
@@ -14063,10 +13567,6 @@
                               "cumulativeRewardAmountDisplay": {
                                 "type": "string",
                                 "description": "历史利息总额展示值"
-                              },
-                              "baseAnnualRateDisplay": {
-                                "type": "string",
-                                "description": "基础年利率展示值"
                               },
                               "subscribeTimeTimestamp": {
                                 "type": "integer",
@@ -14125,7 +13625,7 @@
           "理财账户"
         ],
         "summary": "用户赎回明细",
-        "description": "与后台赎回明细一致：主表 ac_transaction_history（EARN_WITHDRAWAL），按 create_time 分页；productCode、类型、持仓关联等来自 ac_finance_transaction（tx_id = transaction_id，WITHDRAW）；赎回金额与时间为动账主单 amount、create_time\n所需权限: READ",
+        "description": "分页查询理财赎回明细，含产品、金额与时间等信息\n所需权限: READ",
         "operationId": "historyPositions",
         "parameters": [
           {
@@ -14610,30 +14110,30 @@
                               },
                               "redeemAmount": {
                                 "type": "number",
-                                "description": "本笔赎回金额：动账主单 ac_transaction_history.amount 绝对值（与后台赎回明细一致）"
+                                "description": "本笔赎回金额"
                               },
                               "endTime": {
                                 "type": "string",
-                                "description": "本笔赎回时间：动账主单 ac_transaction_history.create_time（与后台赎回明细 redeemTime 一致）",
+                                "description": "本笔赎回时间",
                                 "format": "date-time"
                               },
                               "expireTime": {
                                 "type": "string",
-                                "description": "关联持仓到期日：ac_user_finance_position.end_time；无关联持仓时为 null",
+                                "description": "关联持仓到期日；无关联持仓时为 null",
                                 "format": "date-time"
-                              },
-                              "endTimeTimestamp": {
-                                "type": "integer",
-                                "description": "本笔赎回时间毫秒时间戳",
-                                "format": "int64"
                               },
                               "expireTimeTimestamp": {
                                 "type": "integer",
                                 "description": "关联持仓到期日毫秒时间戳",
                                 "format": "int64"
+                              },
+                              "endTimeTimestamp": {
+                                "type": "integer",
+                                "description": "本笔赎回时间毫秒时间戳",
+                                "format": "int64"
                               }
                             },
-                            "description": "理财历史持仓",
+                            "description": "理财赎回明细",
                             "example": null
                           }
                         },
@@ -14680,7 +14180,7 @@
           "理财账户"
         ],
         "summary": "理财概览",
-        "description": "按产品维度返回 products，顺序为 product_code 升序、再 currency 升序；用户侧 userDepositedAmount/userInterestAmount/availableBalance 来自该产品在 ac_user_finance_position 的持仓汇总（该产品币种）。totalDepositValue 为各产品持仓本金×预言机价折 USDC 之和。totalInterestValue、yesterdayInterestValue 仍为结息流水按币种折 USDC。userSpotAvailableBalance 为现货币种维度，同币种产品值相同。未登录时用户侧为0\n所需权限: READ",
+        "description": "按产品汇总理财概览：持仓本金、利息与可用余额等（金额按 USDC 折算展示）\n所需权限: READ",
         "operationId": "overview",
         "responses": {
           "400": {
@@ -15092,19 +14592,19 @@
                       "properties": {
                         "totalDepositValue": {
                           "type": "number",
-                          "description": "用户存入总额（各币种本金 × 对应预言机价，折 USDC；未登录为0）"
+                          "description": "用户存入总额（各币种本金按参考价折 USDC；未登录为 0）"
                         },
                         "totalInterestValue": {
                           "type": "number",
-                          "description": "用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestValue 一致：小数位=FinanceConstants.DECIMAL_SCALE、ROUND_DOWN；未登录为0）"
+                          "description": "用户历史结息总额（按币种汇总后折 USDC；未登录为 0）"
                         },
                         "yesterdayInterestValue": {
                           "type": "number",
-                          "description": "昨日利息（自然日昨日 Asia/Shanghai 已入账结息流水，按同套预言机折 USDC；未登录为0）"
+                          "description": "昨日利息（折 USDC；未登录为 0）"
                         },
                         "products": {
                           "type": "array",
-                          "description": "按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBalance（与理财产品目录口径一致）",
+                          "description": "按产品维度的明细列表（含用户持仓汇总与产品申购/资金池字段，口径与理财产品目录一致）",
                           "items": {
                             "type": "object",
                             "properties": {
@@ -15147,7 +14647,7 @@
                               },
                               "rewardAnnualRate": {
                                 "type": "number",
-                                "description": "奖励年利率：超额奖励档年化%（配置 excess_reward_annual_rate）"
+                                "description": "奖励年利率：超额奖励档年化%"
                               },
                               "totalAnnualRate": {
                                 "type": "number",
@@ -15173,28 +14673,28 @@
                               },
                               "rewardMinHoldingDays": {
                                 "type": "integer",
-                                "description": "订单持有满天数：享受超额奖励档需连续持仓满（天）（reward_min_holding_days）",
+                                "description": "订单持有满天数：享受超额奖励档需连续持仓满（天）",
                                 "format": "int32"
                               },
                               "rewardMinPosition": {
                                 "type": "number",
-                                "description": "订单持有金额不低于：与持仓天数同时满足才分层计息（reward_min_position）"
+                                "description": "订单持有金额不低于：与持仓天数同时满足才分层计息"
                               },
                               "oraclePrice": {
                                 "type": "number",
-                                "description": "预言机价格（计价币）"
+                                "description": "计价参考价格（折算用）"
                               },
                               "userDepositedAmount": {
                                 "type": "number",
-                                "description": "当前用户在该产品下的持仓本金合计（ac_user_finance_position.principal_balance，持有中+已到期；未登录为0）"
+                                "description": "当前用户在该产品下的持仓本金合计（持有中+已到期；未登录为 0）"
                               },
                               "userInterestAmount": {
                                 "type": "number",
-                                "description": "当前用户在该产品下的未结利息合计（ac_user_finance_position.interest_balance；未登录为0）"
+                                "description": "当前用户在该产品下的未结利息合计（未登录为 0）"
                               },
                               "availableBalance": {
                                 "type": "number",
-                                "description": "当前用户在该产品下的持仓账面合计：本金+利息+冻结（ac_user_finance_position；未登录为0）"
+                                "description": "当前用户在该产品下的持仓账面合计：本金+利息+冻结（未登录为 0）"
                               },
                               "userSpotAvailableBalance": {
                                 "type": "number",
@@ -15202,11 +14702,11 @@
                               },
                               "totalDeposited": {
                                 "type": "number",
-                                "description": "平台该产品累计存入量（ac_finance_product.total_deposited）"
+                                "description": "平台该产品累计存入量"
                               },
                               "totalPrincipal": {
                                 "type": "number",
-                                "description": "平台该产品当前留存本金（ac_finance_product 口径：total_deposited - total_withdrawn + total_interest_withdrawn）"
+                                "description": "平台该产品当前留存本金（累计存入-累计赎回+累计赎息）"
                               },
                               "subscribedAmount": {
                                 "type": "number",
@@ -15214,7 +14714,7 @@
                               },
                               "fundPoolAmount": {
                                 "type": "number",
-                                "description": "池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制）"
+                                "description": "池上限：最大资金池；null 或 ≤0 表示不限制"
                               },
                               "availableSubscriptionBalance": {
                                 "type": "number",
@@ -15224,6 +14724,50 @@
                                 "type": "integer",
                                 "description": "币种小数位",
                                 "format": "int32"
+                              },
+                              "annualRateDisplay": {
+                                "type": "string",
+                                "description": "基础年化收益率展示值"
+                              },
+                              "rewardAnnualRateDisplay": {
+                                "type": "string",
+                                "description": "奖励年利率展示值"
+                              },
+                              "totalAnnualRateDisplay": {
+                                "type": "string",
+                                "description": "总年化展示值"
+                              },
+                              "minDepositAmountDisplay": {
+                                "type": "string",
+                                "description": "最小存入金额展示值"
+                              },
+                              "minRedeemAmountDisplay": {
+                                "type": "string",
+                                "description": "最小提取金额展示值"
+                              },
+                              "oraclePriceDisplay": {
+                                "type": "string",
+                                "description": "计价参考价格展示值"
+                              },
+                              "availableBalanceDisplay": {
+                                "type": "string",
+                                "description": "用户持仓账面合计展示值"
+                              },
+                              "totalDepositedDisplay": {
+                                "type": "string",
+                                "description": "平台累计存入量展示值"
+                              },
+                              "totalPrincipalDisplay": {
+                                "type": "string",
+                                "description": "平台当前留存本金展示值"
+                              },
+                              "subscribedAmountDisplay": {
+                                "type": "string",
+                                "description": "已申购金额展示值"
+                              },
+                              "fundPoolAmountDisplay": {
+                                "type": "string",
+                                "description": "池上限展示值"
                               },
                               "dailyMaxRedeemAmountDisplay": {
                                 "type": "string",
@@ -15249,66 +14793,22 @@
                                 "type": "string",
                                 "description": "可申购余额展示值"
                               },
-                              "annualRateDisplay": {
-                                "type": "string",
-                                "description": "基础年化收益率展示值"
-                              },
-                              "rewardAnnualRateDisplay": {
-                                "type": "string",
-                                "description": "奖励年利率展示值"
-                              },
-                              "totalAnnualRateDisplay": {
-                                "type": "string",
-                                "description": "总年化展示值"
-                              },
-                              "minDepositAmountDisplay": {
-                                "type": "string",
-                                "description": "最小存入金额展示值"
-                              },
-                              "minRedeemAmountDisplay": {
-                                "type": "string",
-                                "description": "最小提取金额展示值"
-                              },
-                              "oraclePriceDisplay": {
-                                "type": "string",
-                                "description": "预言机价格展示值"
-                              },
-                              "availableBalanceDisplay": {
-                                "type": "string",
-                                "description": "用户持仓账面合计展示值"
-                              },
-                              "totalDepositedDisplay": {
-                                "type": "string",
-                                "description": "平台累计存入量展示值"
-                              },
-                              "totalPrincipalDisplay": {
-                                "type": "string",
-                                "description": "平台当前留存本金展示值"
-                              },
-                              "subscribedAmountDisplay": {
-                                "type": "string",
-                                "description": "已申购金额展示值"
-                              },
-                              "fundPoolAmountDisplay": {
-                                "type": "string",
-                                "description": "池上限展示值"
-                              },
                               "maxDepositAmountDisplay": {
                                 "type": "string",
                                 "description": "单用户申购上限展示值"
-                              },
-                              "subscriptionEndTimeTimestamp": {
-                                "type": "integer",
-                                "description": "申购结束时间毫秒时间戳",
-                                "format": "int64"
                               },
                               "subscriptionStartTimeTimestamp": {
                                 "type": "integer",
                                 "description": "申购开始时间毫秒时间戳",
                                 "format": "int64"
+                              },
+                              "subscriptionEndTimeTimestamp": {
+                                "type": "integer",
+                                "description": "申购结束时间毫秒时间戳",
+                                "format": "int64"
                               }
                             },
-                            "description": "理财产品项（C端概览）",
+                            "description": "理财产品项（概览）",
                             "example": null
                           }
                         },
@@ -15325,7 +14825,7 @@
                           "description": "昨日利息展示值"
                         }
                       },
-                      "description": "理财概览（C端）",
+                      "description": "理财概览",
                       "example": null
                     },
                     "success": {
@@ -15346,7 +14846,7 @@
           "汇率"
         ],
         "summary": "汇率查询",
-        "description": "所需权限: READ",
+        "description": "按资产类型与币种对查询汇率\n所需权限: READ",
         "operationId": "exchangeRate",
         "parameters": [
           {
@@ -15810,7 +15310,7 @@
           "汇率"
         ],
         "summary": "美元汇率查询",
-        "description": "所需权限: READ",
+        "description": "查询各币种兑美元（USD）的汇率列表\n所需权限: READ",
         "operationId": "exchangeRateUsd",
         "responses": {
           "400": {
@@ -16832,10 +16332,10 @@
     "/openapi/v1/mc-account/deal-order": {
       "get": {
         "tags": [
-          "成交订单服务"
+          "成交订单"
         ],
         "summary": "分页查询成交订单",
-        "description": "所需权限: READ",
+        "description": "按条件分页查询当前用户的成交订单列表\n所需权限: READ",
         "operationId": "page",
         "parameters": [
           {
@@ -17018,15 +16518,16 @@
     "/openapi/v1/mc-account/deal-order/{dealId}": {
       "get": {
         "tags": [
-          "成交订单服务"
+          "成交订单"
         ],
         "summary": "成交单详情查询",
-        "description": "所需权限: READ",
+        "description": "按成交单 ID 查询成交订单详情\n所需权限: READ",
         "operationId": "detail_1",
         "parameters": [
           {
             "name": "dealId",
             "in": "path",
+            "description": "成交单 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -17752,7 +17253,7 @@
           "uid": {
             "title": "用户UID",
             "type": "string",
-            "description": "关联账户表"
+            "description": "用户 UID"
           },
           "transactionId": {
             "title": "交易ID",
@@ -18553,46 +18054,12 @@
             "type": "number",
             "description": "兑换金额/兑换币种的数量"
           },
-          "verify2FaTokens": {
-            "title": "2FA验证Token列表",
-            "type": "array",
-            "description": "通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证",
-            "items": {
-              "$ref": "#/components/schemas/TwoFATokenInfo"
-            }
-          },
           "quoteSessionId": {
             "title": "询价会话ID",
             "type": "string",
-            "description": "asw1w123a"
+            "description": "询价会话 ID，来自闪兑汇率查询接口"
           }
         }
-      },
-      "TwoFATokenInfo": {
-        "title": "2FA验证Token列表",
-        "required": [
-          "token",
-          "twoFAType"
-        ],
-        "type": "object",
-        "properties": {
-          "token": {
-            "title": "2FA验证Token",
-            "type": "string",
-            "description": "通过2FA验证接口获取的临时验证令牌"
-          },
-          "twoFAType": {
-            "title": "2FA类型",
-            "type": "string",
-            "description": "验证器类型",
-            "enum": [
-              "SMS",
-              "GA",
-              "EMAIL"
-            ]
-          }
-        },
-        "description": "通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证"
       },
       "RetResultString": {
         "type": "object",
@@ -18992,7 +18459,7 @@
           "symbolId": {
             "title": "币种ID",
             "type": "string",
-            "description": "币种ID"
+            "description": "币种 ID"
           },
           "amount": {
             "title": "提现金额",
@@ -19002,7 +18469,7 @@
             "description": "提现金额"
           }
         },
-        "description": "MLP账户提现请求"
+        "description": "金库账户提现请求"
       },
       "MlpDepositReq": {
         "required": [
@@ -19020,7 +18487,7 @@
           "symbolId": {
             "title": "币种ID",
             "type": "string",
-            "description": "币种ID"
+            "description": "币种 ID"
           },
           "amount": {
             "title": "存款金额",
@@ -19030,7 +18497,7 @@
             "description": "存款金额"
           }
         },
-        "description": "MLP账户存款请求"
+        "description": "金库账户存款请求"
       },
       "FinanceWithdrawReq": {
         "required": [
@@ -20382,15 +19849,17 @@
           "from": {
             "title": "开始时间",
             "type": "string",
+            "description": "开始日期",
             "format": "date-time"
           },
           "to": {
             "title": "结束时间",
             "type": "string",
+            "description": "结束日期",
             "format": "date-time"
           }
         },
-        "description": "Mlp前台图表请求对象"
+        "description": "金库图表查询请求"
       },
       "MlpGraphDataRsp": {
         "type": "object",
@@ -20409,7 +19878,7 @@
             "description": "收益率展示值"
           }
         },
-        "description": "MLP图表数据响应"
+        "description": "金库图表数据响应"
       },
       "RetResultListMlpGraphDataRsp": {
         "type": "object",
@@ -20824,7 +20293,7 @@
             "description": "可提本金展示值"
           }
         },
-        "description": "MLP提款信息响应"
+        "description": "金库提款信息响应"
       },
       "RetResultMlpWithdrawInfoRsp": {
         "type": "object",
@@ -21280,7 +20749,7 @@
             "description": "我的表现-锁定存款展示值"
           }
         },
-        "description": "MLP金库信息响应"
+        "description": "金库信息响应"
       },
       "RetResultMlpTreasuryInfoRsp": {
         "type": "object",
@@ -21717,7 +21186,7 @@
             "description": "已存入金额展示值"
           }
         },
-        "description": "MLP存款信息响应"
+        "description": "金库存款信息响应"
       },
       "RetResultMlpDepositInfoRsp": {
         "type": "object",
@@ -22106,7 +21575,7 @@
         "properties": {
           "totalLockedAmount": {
             "type": "number",
-            "description": "总锁仓量 = 存入MLP金库中总金额 + TVL金额基准值"
+            "description": "总锁仓量 = 存入金库总金额 + TVL 金额基准值"
           },
           "annualYieldRate": {
             "type": "number",
@@ -22121,42 +21590,52 @@
             "description": "历史总收益"
           },
           "totalLockedAmountDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "总锁仓量展示值"
           },
           "portfolioVaultBalanceDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "投资组合金库余额展示值"
           },
           "portfolioVaultBalanceScale": {
             "type": "integer",
+            "description": "投资组合金库余额展示精度",
             "format": "int32"
           },
           "totalHistoricalEarningsDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "历史总收益展示值"
           },
           "totalHistoricalEarningsScale": {
             "type": "integer",
+            "description": "历史总收益展示精度",
             "format": "int32"
           },
           "totalLockedAmountScale": {
             "type": "integer",
+            "description": "总锁仓量展示精度",
             "format": "int32"
           },
           "annualYieldRateDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "年化收益率展示值"
           },
           "annualYieldRateScale": {
             "type": "integer",
+            "description": "年化收益率展示精度",
             "format": "int32"
           },
           "myTotalDepositDisplay": {
-            "type": "string"
+            "type": "string",
+            "description": "我的总存款展示值"
           },
           "myTotalDepositScale": {
             "type": "integer",
+            "description": "我的总存款展示精度",
             "format": "int32"
           }
         },
-        "description": "MLP核心指标数据"
+        "description": "金库核心指标数据"
       },
       "RetResultMlpCoreStatsDto": {
         "type": "object",
@@ -22540,453 +22019,6 @@
           }
         }
       },
-      "OpenApiMlpYieldConfigRsp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "配置ID",
-            "format": "int64"
-          },
-          "businessLineId": {
-            "type": "integer",
-            "description": "业务线ID",
-            "format": "int64"
-          },
-          "annualYieldRate": {
-            "type": "number",
-            "description": "调整收益率（年化），单位：百分比"
-          },
-          "lockPeriodDays": {
-            "type": "integer",
-            "description": "锁仓期，单位：天",
-            "format": "int32"
-          },
-          "singleUserDepositLimit": {
-            "type": "number",
-            "description": "单用户存款上限，单位：USDC"
-          },
-          "tvlBaseAmount": {
-            "type": "number",
-            "description": "TVL金额基准值，单位：USDC"
-          },
-          "integralTierConfig": {
-            "type": "string",
-            "description": "积分档位配置，格式：积分最小值:存款限额比例,...，例如：50:25,300:50,1500:75,10000:100"
-          },
-          "createBy": {
-            "type": "string",
-            "description": "创建人"
-          },
-          "createTime": {
-            "type": "string",
-            "description": "创建时间",
-            "format": "date-time"
-          },
-          "updateBy": {
-            "type": "string",
-            "description": "更新人"
-          },
-          "updateTime": {
-            "type": "string",
-            "description": "更新时间",
-            "format": "date-time"
-          },
-          "createTimeTimestamp": {
-            "type": "integer",
-            "description": "创建时间毫秒时间戳",
-            "format": "int64"
-          },
-          "updateTimeTimestamp": {
-            "type": "integer",
-            "description": "更新时间毫秒时间戳",
-            "format": "int64"
-          }
-        },
-        "description": "MLP 参数配置（OpenAPI）"
-      },
-      "RetResultOpenApiMlpYieldConfigRsp": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "codeKey": {
-            "type": "string",
-            "enum": [
-              "DEFAULT",
-              "SIGN_ERROR",
-              "NOT_EXIST",
-              "ALREADY_EXIST",
-              "REPEAT_OPERATION",
-              "PARAM_ERROR",
-              "PERMISSION_DENIED",
-              "OPERATION_FAILED",
-              "DATA_FORMAT_ERROR",
-              "NETWORK_ERROR",
-              "TIMEOUT_ERROR",
-              "CONFIG_ERROR",
-              "STATUS_ERROR",
-              "VERSION_INCOMPATIBLE",
-              "SERVICE_UNAVAILABLE",
-              "DATA_INTEGRITY_ERROR",
-              "CONCURRENT_CONFLICT",
-              "RESOURCE_LOCKED",
-              "QUOTA_EXCEEDED",
-              "DEPENDENCY_ERROR",
-              "BUSINESS_RULE_CONFLICT",
-              "ROLE_PERMISSION_INVALID",
-              "ROLE_ALREADY_EXIST",
-              "ROLE_NOT_EXIST",
-              "ROLE_ADMIN_CANNOT_MODIFY",
-              "ROLE_ADMIN_CANNOT_DELETE",
-              "BUSINESS_LINE_NAME_EXIST",
-              "BUSINESS_LINE_NOT_EXIST",
-              "BUSINESS_LINE_NOT_PERMITTED",
-              "TRANSFER_FAILED",
-              "TRANSFER_AMOUNT_INVALID",
-              "TRANSFER_ACCOUNT_NOT_EXIST",
-              "TRANSFER_ACCOUNT_FROZEN",
-              "TRANSFER_LIMIT_EXCEEDED",
-              "EXCHANGE_RATE_NOT_FOUND",
-              "EXCHANGE_RATE_INVALID",
-              "EXCHANGE_RATE_SERVICE_ERROR",
-              "EXCHANGE_RATE_QUOTE_INVALID",
-              "EXCHANGE_SYMBOL_ERROR",
-              "ACCOUNT_NOT_EXIST",
-              "ACCOUNT_FROZEN",
-              "ACCOUNT_BALANCE_INSUFFICIENT",
-              "ACCOUNT_OPERATION_FAILED",
-              "ACCOUNT_PARAM_INVALID",
-              "ACCOUNT_PASSWORD_INVALID",
-              "ACCOUNT_TOKEN_GENERATE_FAILED",
-              "TWO_FA_NOT_BOUND",
-              "TWO_FA_ALREADY_BOUND",
-              "TWO_FA_VERIFY_FAILED",
-              "TWO_FA_CODE_INVALID",
-              "TWO_FA_SESSION_EXPIRED",
-              "TWO_FA_TYPE_NOT_SUPPORTED",
-              "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
-              "TWO_FA_RESET_WITHIN_24H",
-              "TWO_FA_ADDRESS_LOCK_PERIOD",
-              "TWO_FA_FUND_PASSWORD_INVALID",
-              "TWO_FA_TICKET_INVALID",
-              "TWO_FA_TICKET_USER_MISMATCH",
-              "TWO_FA_TICKET_SCENE_MISMATCH",
-              "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
-              "TWO_FA_SEND_TOO_FREQUENT",
-              "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
-              "TWO_FA_CODE_SEND_FAILED",
-              "TWO_FA_FUND_PASSWORD_NOT_SET",
-              "TWO_FA_FUND_PASSWORD_WRONG",
-              "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
-              "TWO_FA_FUND_PASSWORD_ALREADY_SET",
-              "SAFE_BOX_NOT_EXIST",
-              "SAFE_BOX_LOCK_FAILED",
-              "SAFE_BOX_BALANCE_INSUFFICIENT",
-              "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
-              "SAFE_BOX_FREEZE_FAILED",
-              "SAFE_BOX_UNFREEZE_FAILED",
-              "SAFE_BOX_TRANSFER_IN_FAILED",
-              "SAFE_BOX_TRANSFER_OUT_FAILED",
-              "SAFE_BOX_PASSWORD_INVALID",
-              "SAFE_BOX_OPERATION_FAILED",
-              "WITHDRAWAL_AMOUNT_INVALID",
-              "WITHDRAWAL_ADDRESS_INVALID",
-              "WITHDRAWAL_WHITELIST_REQUIRED",
-              "WITHDRAWAL_LIMIT_EXCEEDED",
-              "WITHDRAWAL_SERVICE_ERROR",
-              "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
-              "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
-              "WITHDRAWAL_PENDING_RECORD_EXISTS",
-              "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
-              "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
-              "CURRENCY_NOT_EXIST",
-              "CURRENCY_NOT_ENABLED",
-              "CURRENCY_NETWORK_NOT_EXIST",
-              "CURRENCY_BALANCE_INSUFFICIENT",
-              "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
-              "CURRENCY_ADDRESS_EXIST",
-              "CURRENCY_ADDRESS_LABEL_EXIST",
-              "BLACKLIST_UID_REQUIRED",
-              "BLACKLIST_WALLET_REQUIRED",
-              "BLACKLIST_ALREADY_EXIST",
-              "BLACKLIST_NOT_EXIST",
-              "KYC_LEVEL_QUERY_FAILED",
-              "KYC_CFG_ALREADY_EXIST",
-              "KYC_LEVEL_INVALID",
-              "KYC_USER_NOT_VERIFIED",
-              "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
-              "KYC_RWA_DEAL_QUERY_FAILED",
-              "KYC_L0_NOT_PASSED",
-              "KYC_CERT_NO_DUPLICATE",
-              "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
-              "KYC_CERT_VALID_UNTIL_EXPIRED",
-              "KYC_CERT_VALID_FROM_FORMAT_ERROR",
-              "KYC_CERT_VALID_DATE_RANGE_ERROR",
-              "KYC_CERT_PERMANENT_FLAG_INVALID",
-              "KYC_FLOW_NOT_CONFIGURED",
-              "KYC_FLOW_STEP_NOT_CONFIGURED",
-              "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
-              "KYC_APPLY_ALREADY_EXISTS",
-              "KYC_APPLY_NOT_EXIST",
-              "KYC_APPLY_DETAIL_NOT_EXIST",
-              "KYC_APPLY_FLOW_NOT_EXIST",
-              "KYC_SUB_FLOW_NOT_EXIST",
-              "KYC_APPLY_STATUS_CANCELED",
-              "KYC_APPLY_STATUS_PASSED",
-              "KYC_APPLY_STATUS_SUBMITTED",
-              "KYC_STEP_PREREQUISITE_NOT_MET",
-              "KYC_AUDIT_LEVEL_NOT_L0",
-              "KYC_AUDIT_STATUS_NOT_PENDING",
-              "KYC_USER_INFO_NOT_EXIST",
-              "KYC_NO_FIELD_TO_UPDATE",
-              "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
-              "KYC_AUDIT_NO_SUBMIT_DATA",
-              "KYC_AUDIT_ALREADY_REJECTED",
-              "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
-              "KYC_AUDIT_FLOW_NOT_FOUND",
-              "KYC_FLOW_CONFIG_NOT_EXIST",
-              "KYC_STEP_CODE_NOT_FOUND",
-              "KYC_STEP_LEVEL_NOT_CONFIGURED",
-              "KYC_PROOF_REQUIRED",
-              "KYC_IMAGE_OBJECT_KEY_INVALID",
-              "KYC_IMAGE_ACCESS_DENIED",
-              "KYC_PRESIGN_TYPE_INVALID",
-              "KYC_QUOTA_INVALID",
-              "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
-              "KYC_BUSINESS_LINE_CONTEXT_MISSING",
-              "KYC_SYNC_FUND_ACCOUNT_FAILED",
-              "KYC_STATE_MACHINE_INIT_FAILED",
-              "KYC_REJECT_NEED_APPLY_NO",
-              "KYC_CFG_NOT_EXIST",
-              "KYC_APPLY_NO_OR_UID_REQUIRED",
-              "KYC_SUB_FLOW_NO_REQUIRED",
-              "KYC_UID_REQUIRED",
-              "KYC_BUSINESS_LINE_ID_REQUIRED",
-              "KYC_REQUEST_BODY_REQUIRED",
-              "KYC_USER_OR_BUSINESS_LINE_MISSING",
-              "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
-              "KYC_OSS_NOT_ENABLED",
-              "KYC_OSS_CLIENT_NOT_INITIALIZED",
-              "KYC_OSS_CONFIG_MISSING",
-              "KYC_USER_NOT_LOGGED_IN",
-              "KYC_FACE_MIME_INVALID",
-              "KYC_IMAGE_MIME_INVALID",
-              "KYC_REQUIRED_FIELD_MISSING",
-              "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
-              "KYC_AUDIT_COMMENT_REQUIRED",
-              "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
-              "ASSET_ACCOUNT_NOT_EXIST",
-              "ASSET_LOCK_FAILED",
-              "ASSET_NOT_EXIST",
-              "ASSET_ADD_FAILED",
-              "ASSET_UNFREEZE_FAILED",
-              "ASSET_CREATE_LOCK_FAILED",
-              "ASSET_CREATE_FAILED",
-              "ASSET_BALANCE_INSUFFICIENT",
-              "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
-              "ASSET_FREEZE_FAILED",
-              "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
-              "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
-              "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
-              "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
-              "FUND_ACCOUNT_NOT_EXIST",
-              "FUND_ACCOUNT_ALREADY_EXIST",
-              "FUND_ACCOUNT_CREATE_FAILED",
-              "FUND_ACCOUNT_UPDATE_FAILED",
-              "FUND_ACCOUNT_DELETE_FAILED",
-              "FUND_ACCOUNT_PARAM_INVALID",
-              "FUND_ACCOUNT_LOCK_FAILED",
-              "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
-              "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
-              "FUND_ACCOUNT_CONTACT_REQUIRED",
-              "FUND_ACCOUNT_MOBILE_ALREADY_USED",
-              "FUND_ACCOUNT_EMAIL_ALREADY_USED",
-              "TRANSACTION_RECORD_NOT_EXIST",
-              "TRANSACTION_FORBIDDEN",
-              "TRANSACTION_IN_PROGRESS",
-              "TRANSACTION_AMOUNT_TOO_LOW",
-              "TRANSACTION_REQUEST_FREQUENTLY",
-              "TRANSACTION_BALANCE_INSUFFICIENT",
-              "WEBHOOK_SIGNATURE_INVALID",
-              "WEBHOOK_EVENT_TYPE_INVALID",
-              "WEBHOOK_PAYLOAD_INVALID",
-              "WEBHOOK_DEPOSIT_DETAIL_INVALID",
-              "WEBHOOK_DEPOSIT_STATUS_INVALID",
-              "WITHDRAWAL_AUDIT_NOT_EXIST",
-              "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
-              "WITHDRAWAL_AUDIT_CREATE_FAILED",
-              "WITHDRAWAL_AUDIT_UPDATE_FAILED",
-              "WITHDRAWAL_AUDIT_DELETE_FAILED",
-              "WITHDRAWAL_AUDIT_PARAM_INVALID",
-              "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
-              "WITHDRAWAL_AUDIT_STATUS_INVALID",
-              "WITHDRAWAL_AUDIT_REJECT_ERROR",
-              "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
-              "WITHDRAW_LOCK_PERIOD_ERROR",
-              "PAYMENT_OPERATION_FAILED",
-              "MT_GROUP_NOT_FOUND",
-              "MT_MEM",
-              "MT_DEALER_SEND",
-              "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
-              "MT_POSITION_GET_BY_LOGIN",
-              "MT_POSITION_VOLUME_NOT_ENOUGH",
-              "MT_DEDUCT_COLLATERAL_FAILED",
-              "MT_DEALER_RESULT_FAILED",
-              "MT_INPUT_SERIALIZE_FAILED",
-              "MT_AMOUNT_DECIMAL",
-              "MT_MTRISK_NOT_FOUND",
-              "PROOF_FUND_ALREADY_EXIST",
-              "PROOF_FUND_NOT_EXIST",
-              "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
-              "USER_WALLET_CONFIG_ALREADY_EXIST",
-              "USER_WALLET_CONFIG_DELETE_FAILED",
-              "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
-              "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
-              "MLP_CONFIG_NOT_FOUND",
-              "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
-              "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
-              "MLP_INTEGRAL_TIER_CONFIG_INVALID",
-              "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
-              "TICKET_NOT_EXIST",
-              "TICKET_PENDING_EXISTS",
-              "TICKET_CLOSED_CANNOT_SEND",
-              "TICKET_EVALUATE_FAILED",
-              "TICKET_STATUS_INVALID",
-              "ORDER_OPERATION_FAILED",
-              "ORDER_SELL_NOT_SUPPORTED",
-              "TP_SL_NOT_SUPPORTED",
-              "SYMBOL_NOT_EXIST",
-              "ORDER_VALUE_VOLUME_LIMIT_ERROR",
-              "SYMBOL_NOT_SUPPORTED_ERROR",
-              "SLIPPAGE_PARAM_ERROR",
-              "SLIPPAGE_ESTIMATE_ERROR",
-              "COMMON_ERROR",
-              "COMMON_PARAMS_ERROR",
-              "COMMON_MEM_ERROR",
-              "ORDER_REQUEST_REJECT",
-              "ORDER_REQUEST_CANCEL",
-              "ORDER_REQUEST_PLACED",
-              "ORDER_REQUEST_DONE",
-              "ORDER_REQUEST_ERROR",
-              "ORDER_REQUEST_TIMEOUT",
-              "ORDER_REQUEST_INVALID",
-              "ORDER_REQUEST_INVALID_VOLUME",
-              "ORDER_REQUEST_INVALID_PRICE",
-              "ORDER_REQUEST_INVALID_STOPS",
-              "ORDER_REQUEST_TRADE_DISABLED",
-              "ORDER_REQUEST_MARKET_CLOSED",
-              "ORDER_REQUEST_NO_MONEY",
-              "ORDER_REQUEST_TOO_MANY",
-              "ORDER_REQUEST_INVALID_ORDER",
-              "COMMON_OK",
-              "ORDER_REQUEST_PRICE_OFF",
-              "POSITION_OBTAIN_ERROR",
-              "POSITION_VALUE_LIMIT_EXCEEDED",
-              "POSITION_MARGIN_INSUFFICIENT",
-              "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
-              "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
-              "FATIGUE_LIMIT",
-              "TEMPLATE_DISABLED",
-              "CHANNEL_NOT_SUPPORT",
-              "TEMPLATE_PARAM_MISMATCH",
-              "TEMPLATE_CONTENT_NOT_FOUND",
-              "TEMPLATE_CONTENT_INCONSISTENT",
-              "USER_NOT_FOUND",
-              "USERNAME_EXISTS",
-              "EMAIL_EXISTS",
-              "PASSWORD_ERROR",
-              "USER_DATA_VALIDATION_FAILED",
-              "USER_BATCH_OPERATION_FAILED",
-              "OLD_PASSWORD_SAME",
-              "NEW_PASSWORD_NOT_MATCH",
-              "ACCOUNT_TIER_OPERATION_FAILED",
-              "BUSINESS_LINE_NOT_FOUND",
-              "BUSINESS_LINE_NAME_EXISTS",
-              "BUSINESS_LINE_SAVE_FAILED",
-              "BUSINESS_LINE_UPDATE_FAILED",
-              "BUSINESS_LINE_DELETE_FAILED",
-              "BUSINESS_LINE_EMAIL_EXISTS",
-              "BUSINESS_LINE_STATUS_ERROR",
-              "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
-              "BUSINESS_TYPE_EXCEPTION",
-              "BUSINESS_TYPE_INVALID",
-              "ROLE_NOT_FOUND",
-              "ROLE_CODE_EXISTS",
-              "ROLE_ADMIN_OPERATION_DENIED",
-              "ROLE_STATUS_ERROR",
-              "ROLE_BATCH_OPERATION_FAILED",
-              "PERMISSION_NOT_FOUND",
-              "PERMISSION_CODE_EXISTS",
-              "PERMISSION_IN_USE",
-              "PERMISSION_HAS_CHILDREN",
-              "PERMISSION_CIRCULAR_REFERENCE",
-              "SYMBOL_STATUS_CLOSED",
-              "SYMBOL_SOURCE_DISABLED",
-              "SYMBOL_SOURCE_SYMBOL_DISABLED",
-              "SYMBOL_SOURCE_NAME_EXISTS",
-              "TRADE_SYMBOL_NAME_EXISTS",
-              "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
-              "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
-              "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
-              "TRADE_SYMBOL_BOOK_NULL",
-              "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
-              "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
-              "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
-              "ALARM_NOTIFICATION_TYPE_INVALID",
-              "RULE_MAPPING_NOT_CONFIGURED",
-              "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
-              "KLINE_DATA_SOURCE_GET_FAILED",
-              "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
-              "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
-              "PROMOTION_PARAM_ERROR",
-              "PROMOTION_CAMPAIGN_NOT_FOUND",
-              "PROMOTION_CAMPAIGN_OFFLINE",
-              "PROMOTION_CAMPAIGN_NOT_STARTED",
-              "PROMOTION_CAMPAIGN_ENDED",
-              "PROMOTION_USER_SCOPE_MISMATCH",
-              "PROMOTION_USER_NOT_ENROLLED",
-              "PROMOTION_TASK_NOT_FOUND",
-              "PROMOTION_TASK_NOT_CLAIMABLE",
-              "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
-              "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
-              "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
-              "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
-              "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
-              "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
-              "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
-              "PROMOTION_POOL_SUMMARY_FROZEN",
-              "PROMOTION_DISPATCH_DUPLICATE_PENDING",
-              "PROMOTION_WEALTH_PRODUCT_INVALID",
-              "PROMOTION_RELEASE_SYMBOL_INVALID",
-              "PROMOTION_TRADE_SYMBOL_INVALID"
-            ]
-          },
-          "params": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "localizedMessage": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/OpenApiMlpYieldConfigRsp"
-          },
-          "success": {
-            "type": "boolean"
-          }
-        }
-      },
       "MlpAssetDto": {
         "type": "object",
         "properties": {
@@ -23003,7 +22035,7 @@
             "description": "可用收益"
           }
         },
-        "description": "MLP账户资产DTO"
+        "description": "金库账户资产"
       },
       "RetResultListMlpAssetDto": {
         "type": "object",
@@ -23427,7 +22459,7 @@
           },
           "login": {
             "type": "string",
-            "description": "mt5登录账号"
+            "description": "交易账户登录号"
           },
           "dealTimeStart": {
             "type": "string",
@@ -23488,7 +22520,7 @@
           },
           "login": {
             "type": "string",
-            "description": "mt5登录账号"
+            "description": "交易账户登录号"
           },
           "businessLineId": {
             "type": "integer",
@@ -23551,25 +22583,6 @@
             "description": "费用结算批次时间(整点时间)",
             "format": "date-time"
           },
-          "dealTimeTimestamp": {
-            "type": "integer",
-            "description": "扣费时间毫秒时间戳",
-            "format": "int64"
-          },
-          "feeRateDisplay": {
-            "type": "string",
-            "description": "资金费率展示值，ratio转百分比后四舍五入至4位小数"
-          },
-          "feeRateScale": {
-            "type": "integer",
-            "description": "资金费率展示精度",
-            "format": "int32"
-          },
-          "batchTimeTimestamp": {
-            "type": "integer",
-            "description": "费用结算批次时间毫秒时间戳",
-            "format": "int64"
-          },
           "amountDisplay": {
             "type": "string",
             "description": "资金费金额展示值，向上保留8位小数"
@@ -23587,6 +22600,25 @@
           "updateTimeTimestamp": {
             "type": "integer",
             "description": "记录更新时间毫秒时间戳",
+            "format": "int64"
+          },
+          "dealTimeTimestamp": {
+            "type": "integer",
+            "description": "扣费时间毫秒时间戳",
+            "format": "int64"
+          },
+          "feeRateDisplay": {
+            "type": "string",
+            "description": "资金费率展示值，ratio转百分比后四舍五入至4位小数"
+          },
+          "feeRateScale": {
+            "type": "integer",
+            "description": "资金费率展示精度",
+            "format": "int32"
+          },
+          "batchTimeTimestamp": {
+            "type": "integer",
+            "description": "费用结算批次时间毫秒时间戳",
             "format": "int64"
           }
         },
@@ -25393,7 +24425,7 @@
           },
           "fundPoolAmount": {
             "type": "number",
-            "description": "池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制）"
+            "description": "池上限：最大资金池；null 或 ≤0 表示不限制"
           },
           "availableSubscriptionBalance": {
             "type": "number",
@@ -25411,20 +24443,20 @@
           },
           "maxDepositAmount": {
             "type": "number",
-            "description": "最大申购额：单户最高存入额（ac_finance_product_config.max_deposit_amount；null 或 ≤0 表示不限制）"
+            "description": "最大申购额：单户最高存入额；null 或 ≤0 表示不限制"
           },
           "dailyMaxRedeemAmount": {
             "type": "number",
             "description": "每日提取上限"
           },
-          "subscriptionEndTimeTimestamp": {
-            "type": "integer",
-            "description": "申购结束时间毫秒时间戳",
-            "format": "int64"
-          },
           "subscriptionStartTimeTimestamp": {
             "type": "integer",
             "description": "申购开始时间毫秒时间戳",
+            "format": "int64"
+          },
+          "subscriptionEndTimeTimestamp": {
+            "type": "integer",
+            "description": "申购结束时间毫秒时间戳",
             "format": "int64"
           }
         },
@@ -25922,7 +24954,7 @@
           },
           "positionAmount": {
             "type": "number",
-            "description": "持有中订单的本金：活期同产品多笔为 principal_balance 合计；不含未结利息与冻结（利息见 currentRewardAmount）"
+            "description": "持有中订单的本金：活期同产品多笔为本金合计；不含未结利息与冻结（利息见 currentRewardAmount）"
           },
           "baseAnnualRate": {
             "type": "number",
@@ -25939,15 +24971,15 @@
           },
           "eligibleRewardAmount": {
             "type": "number",
-            "description": "订单持有金额不低于：享受超额奖励档所需的持仓本金门槛（产品配置 reward_min_position；无超额分层时可为 null）"
+            "description": "订单持有金额不低于：享受超额奖励档所需的持仓本金门槛；无超额分层时可为 null"
           },
           "currentRewardAmount": {
             "type": "number",
-            "description": "当前持有利息: ac_user_finance_position 中该用户、该产品、该币种下持有中利息合计；单位为该产品资产币种（与 currency 一致），不折 USDC"
+            "description": "当前持有利息合计；单位为该产品资产币种（与 currency 一致），不折 USDC"
           },
           "cumulativeRewardAmount": {
             "type": "number",
-            "description": "历史利息总额：ac_finance_transaction 中该用户、该产品、该币种下成功 INTEREST 流水的 amount 合计；单位为该产品资产币种（与 currency 一致），不折 USDC"
+            "description": "历史利息总额；单位为该产品资产币种（与 currency 一致），不折 USDC"
           },
           "status": {
             "type": "string",
@@ -25960,8 +24992,12 @@
           },
           "subscribeTime": {
             "type": "string",
-            "description": "定期：该笔持仓明细的申购时间（ac_user_finance_position.create_time，申购成功落库时刻）；活期同产品汇总行为 null",
+            "description": "定期：该笔持仓明细的申购时间；活期同产品汇总行为 null",
             "format": "date-time"
+          },
+          "baseAnnualRateDisplay": {
+            "type": "string",
+            "description": "基础年利率展示值"
           },
           "excessRewardAnnualRateDisplay": {
             "type": "string",
@@ -25978,10 +25014,6 @@
           "cumulativeRewardAmountDisplay": {
             "type": "string",
             "description": "历史利息总额展示值"
-          },
-          "baseAnnualRateDisplay": {
-            "type": "string",
-            "description": "基础年利率展示值"
           },
           "subscribeTimeTimestamp": {
             "type": "integer",
@@ -26445,30 +25477,30 @@
           },
           "redeemAmount": {
             "type": "number",
-            "description": "本笔赎回金额：动账主单 ac_transaction_history.amount 绝对值（与后台赎回明细一致）"
+            "description": "本笔赎回金额"
           },
           "endTime": {
             "type": "string",
-            "description": "本笔赎回时间：动账主单 ac_transaction_history.create_time（与后台赎回明细 redeemTime 一致）",
+            "description": "本笔赎回时间",
             "format": "date-time"
           },
           "expireTime": {
             "type": "string",
-            "description": "关联持仓到期日：ac_user_finance_position.end_time；无关联持仓时为 null",
+            "description": "关联持仓到期日；无关联持仓时为 null",
             "format": "date-time"
-          },
-          "endTimeTimestamp": {
-            "type": "integer",
-            "description": "本笔赎回时间毫秒时间戳",
-            "format": "int64"
           },
           "expireTimeTimestamp": {
             "type": "integer",
             "description": "关联持仓到期日毫秒时间戳",
             "format": "int64"
+          },
+          "endTimeTimestamp": {
+            "type": "integer",
+            "description": "本笔赎回时间毫秒时间戳",
+            "format": "int64"
           }
         },
-        "description": "理财历史持仓"
+        "description": "理财赎回明细"
       },
       "RetResultBasePageRspFinanceHistoryPositionRsp": {
         "type": "object",
@@ -26857,19 +25889,19 @@
         "properties": {
           "totalDepositValue": {
             "type": "number",
-            "description": "用户存入总额（各币种本金 × 对应预言机价，折 USDC；未登录为0）"
+            "description": "用户存入总额（各币种本金按参考价折 USDC；未登录为 0）"
           },
           "totalInterestValue": {
             "type": "number",
-            "description": "用户历史结息总额（ac_finance_transaction 成功 INTEREST 按币种汇总 amount 后 × 同概览预言机价，折 USDC；计算口径与 totalDepositValue、yesterdayInterestValue 一致：小数位=FinanceConstants.DECIMAL_SCALE、ROUND_DOWN；未登录为0）"
+            "description": "用户历史结息总额（按币种汇总后折 USDC；未登录为 0）"
           },
           "yesterdayInterestValue": {
             "type": "number",
-            "description": "昨日利息（自然日昨日 Asia/Shanghai 已入账结息流水，按同套预言机折 USDC；未登录为0）"
+            "description": "昨日利息（折 USDC；未登录为 0）"
           },
           "products": {
             "type": "array",
-            "description": "按产品维度：每条对应 ac_finance_product + 配置；用户金额来自该产品下持仓汇总，平台字段来自产品汇总表；含 subscribedAmount、fundPoolAmount、availableSubscriptionBalance（与理财产品目录口径一致）",
+            "description": "按产品维度的明细列表（含用户持仓汇总与产品申购/资金池字段，口径与理财产品目录一致）",
             "items": {
               "$ref": "#/components/schemas/FinanceProductItemRsp"
             }
@@ -26887,7 +25919,7 @@
             "description": "昨日利息展示值"
           }
         },
-        "description": "理财概览（C端）"
+        "description": "理财概览"
       },
       "FinanceProductItemRsp": {
         "type": "object",
@@ -26931,7 +25963,7 @@
           },
           "rewardAnnualRate": {
             "type": "number",
-            "description": "奖励年利率：超额奖励档年化%（配置 excess_reward_annual_rate）"
+            "description": "奖励年利率：超额奖励档年化%"
           },
           "totalAnnualRate": {
             "type": "number",
@@ -26957,28 +25989,28 @@
           },
           "rewardMinHoldingDays": {
             "type": "integer",
-            "description": "订单持有满天数：享受超额奖励档需连续持仓满（天）（reward_min_holding_days）",
+            "description": "订单持有满天数：享受超额奖励档需连续持仓满（天）",
             "format": "int32"
           },
           "rewardMinPosition": {
             "type": "number",
-            "description": "订单持有金额不低于：与持仓天数同时满足才分层计息（reward_min_position）"
+            "description": "订单持有金额不低于：与持仓天数同时满足才分层计息"
           },
           "oraclePrice": {
             "type": "number",
-            "description": "预言机价格（计价币）"
+            "description": "计价参考价格（折算用）"
           },
           "userDepositedAmount": {
             "type": "number",
-            "description": "当前用户在该产品下的持仓本金合计（ac_user_finance_position.principal_balance，持有中+已到期；未登录为0）"
+            "description": "当前用户在该产品下的持仓本金合计（持有中+已到期；未登录为 0）"
           },
           "userInterestAmount": {
             "type": "number",
-            "description": "当前用户在该产品下的未结利息合计（ac_user_finance_position.interest_balance；未登录为0）"
+            "description": "当前用户在该产品下的未结利息合计（未登录为 0）"
           },
           "availableBalance": {
             "type": "number",
-            "description": "当前用户在该产品下的持仓账面合计：本金+利息+冻结（ac_user_finance_position；未登录为0）"
+            "description": "当前用户在该产品下的持仓账面合计：本金+利息+冻结（未登录为 0）"
           },
           "userSpotAvailableBalance": {
             "type": "number",
@@ -26986,11 +26018,11 @@
           },
           "totalDeposited": {
             "type": "number",
-            "description": "平台该产品累计存入量（ac_finance_product.total_deposited）"
+            "description": "平台该产品累计存入量"
           },
           "totalPrincipal": {
             "type": "number",
-            "description": "平台该产品当前留存本金（ac_finance_product 口径：total_deposited - total_withdrawn + total_interest_withdrawn）"
+            "description": "平台该产品当前留存本金（累计存入-累计赎回+累计赎息）"
           },
           "subscribedAmount": {
             "type": "number",
@@ -26998,7 +26030,7 @@
           },
           "fundPoolAmount": {
             "type": "number",
-            "description": "池上限：最大资金池（ac_finance_product_config.fund_pool_amount；null 或 ≤0 表示不限制）"
+            "description": "池上限：最大资金池；null 或 ≤0 表示不限制"
           },
           "availableSubscriptionBalance": {
             "type": "number",
@@ -27008,6 +26040,50 @@
             "type": "integer",
             "description": "币种小数位",
             "format": "int32"
+          },
+          "annualRateDisplay": {
+            "type": "string",
+            "description": "基础年化收益率展示值"
+          },
+          "rewardAnnualRateDisplay": {
+            "type": "string",
+            "description": "奖励年利率展示值"
+          },
+          "totalAnnualRateDisplay": {
+            "type": "string",
+            "description": "总年化展示值"
+          },
+          "minDepositAmountDisplay": {
+            "type": "string",
+            "description": "最小存入金额展示值"
+          },
+          "minRedeemAmountDisplay": {
+            "type": "string",
+            "description": "最小提取金额展示值"
+          },
+          "oraclePriceDisplay": {
+            "type": "string",
+            "description": "计价参考价格展示值"
+          },
+          "availableBalanceDisplay": {
+            "type": "string",
+            "description": "用户持仓账面合计展示值"
+          },
+          "totalDepositedDisplay": {
+            "type": "string",
+            "description": "平台累计存入量展示值"
+          },
+          "totalPrincipalDisplay": {
+            "type": "string",
+            "description": "平台当前留存本金展示值"
+          },
+          "subscribedAmountDisplay": {
+            "type": "string",
+            "description": "已申购金额展示值"
+          },
+          "fundPoolAmountDisplay": {
+            "type": "string",
+            "description": "池上限展示值"
           },
           "dailyMaxRedeemAmountDisplay": {
             "type": "string",
@@ -27033,66 +26109,22 @@
             "type": "string",
             "description": "可申购余额展示值"
           },
-          "annualRateDisplay": {
-            "type": "string",
-            "description": "基础年化收益率展示值"
-          },
-          "rewardAnnualRateDisplay": {
-            "type": "string",
-            "description": "奖励年利率展示值"
-          },
-          "totalAnnualRateDisplay": {
-            "type": "string",
-            "description": "总年化展示值"
-          },
-          "minDepositAmountDisplay": {
-            "type": "string",
-            "description": "最小存入金额展示值"
-          },
-          "minRedeemAmountDisplay": {
-            "type": "string",
-            "description": "最小提取金额展示值"
-          },
-          "oraclePriceDisplay": {
-            "type": "string",
-            "description": "预言机价格展示值"
-          },
-          "availableBalanceDisplay": {
-            "type": "string",
-            "description": "用户持仓账面合计展示值"
-          },
-          "totalDepositedDisplay": {
-            "type": "string",
-            "description": "平台累计存入量展示值"
-          },
-          "totalPrincipalDisplay": {
-            "type": "string",
-            "description": "平台当前留存本金展示值"
-          },
-          "subscribedAmountDisplay": {
-            "type": "string",
-            "description": "已申购金额展示值"
-          },
-          "fundPoolAmountDisplay": {
-            "type": "string",
-            "description": "池上限展示值"
-          },
           "maxDepositAmountDisplay": {
             "type": "string",
             "description": "单用户申购上限展示值"
-          },
-          "subscriptionEndTimeTimestamp": {
-            "type": "integer",
-            "description": "申购结束时间毫秒时间戳",
-            "format": "int64"
           },
           "subscriptionStartTimeTimestamp": {
             "type": "integer",
             "description": "申购开始时间毫秒时间戳",
             "format": "int64"
+          },
+          "subscriptionEndTimeTimestamp": {
+            "type": "integer",
+            "description": "申购结束时间毫秒时间戳",
+            "format": "int64"
           }
         },
-        "description": "理财产品项（C端概览）"
+        "description": "理财产品项（概览）"
       },
       "RetResultFinanceOverviewRsp": {
         "type": "object",

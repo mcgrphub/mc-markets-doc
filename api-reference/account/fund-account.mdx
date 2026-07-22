@@ -122,11 +122,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 `GET /openapi/v1/mc-account/fund/account/por` — permission `READ`.
 
+Query the current user's Proof of Reserves (PoR). You can filter by batch ID.
+
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| batchId | integer | No |  |
+| batchId | integer | No | Snapshot batch ID; omit to use the default / latest available batch |
 
 ### Response `data` fields
 

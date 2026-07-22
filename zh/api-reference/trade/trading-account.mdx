@@ -58,8 +58,8 @@ description: "交易账户相关 OpenAPI 接口。"
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | order | integer | 订单号，主键 |
-| login | integer | 登录账号，MT5账户登录号 |
-| dealer | integer | 交易商ID，MT5交易商编号 |
+| login | integer | 交易账户登录号 |
+| dealer | integer | 交易商ID |
 | symbol | string | 交易品种，如EURUSD、GBPUSD等 |
 | digits | integer | 价格精度，交易品种的价格小数位数 |
 | digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
@@ -89,11 +89,11 @@ description: "交易账户相关 OpenAPI 接口。"
 | priceSlScale | integer | 止损价格展示小数位 |
 | priceTpDisplay | string | 止盈价格展示值 |
 | priceTpScale | integer | 止盈价格展示小数位 |
-| volumeInitialExt | number | 初始扩展手数，订单的初始扩展手数（用于大额订单） |
-| quantity | number | 用户数量，等于初始 volumeInitialExt 除以 10^8 |
+| volumeInitialExt | number | 初始交易量（扩展精度） |
+| quantity | number | 用户数量，初始扩展交易量经持仓量精度换算后的值 |
 | volumeInitialDisplay | string | 初始手数展示值 |
 | volumeInitialScale | integer | 初始手数展示小数位 |
-| volumeCurrentExt | number | 当前扩展手数，订单的当前扩展手数 |
+| volumeCurrentExt | number | 当前交易量（扩展精度） |
 | volumeCurrentDisplay | string | 当前手数展示值 |
 | volumeCurrentScale | integer | 当前手数展示小数位 |
 | rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
@@ -106,7 +106,7 @@ description: "交易账户相关 OpenAPI 接口。"
 | externalID | string | 外部ID，外部系统关联的ID |
 | priceSL | number | 止损价格，设置的止损价位 |
 | priceTP | number | 止盈价格，设置的止盈价位 |
-| expertID | integer | 专家顾问ID，如果订单由EA（Expert Advisor）创建，则记录EA的ID |
+| expertID | integer | 专家顾问ID，如果订单由 EA 创建，则记录 EA 的 ID |
 | positionID | integer | 持仓ID，关联的持仓ID |
 | positionByID | integer | 反向持仓ID，关联的反向持仓ID |
 
@@ -146,14 +146,14 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| position | integer | 持仓编号，MT5系统中的持仓唯一标识 |
-| login | integer | 登录账号，MT5账户登录号 |
-| dealer | integer | 交易商ID，MT5交易商编号 |
+| position | integer | 持仓编号，持仓唯一标识 |
+| login | integer | 交易账户登录号 |
+| dealer | integer | 交易商ID |
 | symbol | string | 交易品种，如EURUSD、GBPUSD等 |
 | action | integer | 操作类型，0-买入，1-卖出 |
 | digits | integer | 价格精度，交易品种的价格小数位数 |
 | digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
-| profitCurrencyDigits | integer | 盈亏货币展示精度，优先取持仓 DigitsCurrency，其次 mt5_symbols.CurrencyProfitDigits，最后回退 2 |
+| profitCurrencyDigits | integer | 盈亏货币展示精度，优先取持仓货币精度，其次品种盈亏货币精度，最后回退 2 |
 | reason | integer | 原因，持仓变更的原因代码 |
 | contractSize | number | 合约大小，每手合约的标准大小 |
 | timeCreate | integer | 创建时间，持仓创建的时间戳，毫秒级，长度13位 |
@@ -170,7 +170,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 | priceSlScale | integer | 止损价格展示小数位 |
 | priceTpDisplay | string | 止盈价格展示值 |
 | priceTpScale | integer | 止盈价格展示小数位 |
-| volumeExt | integer | 扩展手数，持仓的扩展手数（用于大额订单）,转浮点数需要除100000000 |
+| volumeExt | integer | 持仓量（扩展精度），需按持仓量精度换算 |
 | volumeDisplay | string | 持仓手数展示值 |
 | volumeScale | integer | 持仓手数展示小数位 |
 | positionValueDisplay | string | 持仓价值展示值 |
@@ -185,13 +185,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 | activationTime | integer | 激活时间，挂单的激活时间戳 |
 | activationPrice | number | 激活价格，挂单的激活价格 |
 | activationFlags | integer | 激活标志，挂单激活的标志位 |
-| volume | integer | 手数，持仓的交易手数,转浮点数需要除10000 |
+| volume | integer | 手数（标准精度），需按持仓量精度换算 |
 | fundingRate | number | 资金费 |
 | interest | number | 利息 |
 | externalID | string | 外部ID，外部系统关联的ID |
 | priceSL | number | 止损价格，设置的止损价位 |
 | priceTP | number | 止盈价格，设置的止盈价位 |
-| expertID | integer | 专家顾问ID，如果持仓由EA（Expert Advisor）创建，则记录EA的ID |
+| expertID | integer | 专家顾问ID，如果持仓由 EA 创建，则记录 EA 的 ID |
 | expertPositionID | integer | 专家顾问持仓ID，EA创建的持仓关联ID |
 
 ```bash

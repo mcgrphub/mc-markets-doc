@@ -12,7 +12,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | Get transaction record details by transactionId |
 | POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | Paginate transaction records |
-| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | Exchange v2 (quote-supported) |
+| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | Flash conversion (quote-supported) |
 | POST | /openapi/v1/mc-account/transaction/account/record/page | READ | Paginate fund account ledger records |
 
 <Note>
@@ -188,11 +188,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 ---
 
-## Exchange v2 (quote-supported)
+## Flash conversion (quote-supported)
 
 `POST /openapi/v1/mc-account/transaction/exchange/v2` — permission `TRADE`.
 
-Complete 2FA verification first, then pass the temporary tokens in `verify2FaTokens`.
+Complete a flash conversion. First call [Query flash conversion exchange rate](/api-reference/account/exchange-rate#query-flash-conversion-exchange-rate) to get a valid `quoteSessionId`.
 
 ### Request body (JSON)
 
@@ -202,8 +202,7 @@ Complete 2FA verification first, then pass the temporary tokens in `verify2FaTok
 | symbol | string | Yes | e.g. BTC/USDT |
 | exchangeSymbol | string | Yes | e.g. BTC/USDT |
 | amount | number | Yes | Exchange amount / quantity of the exchange symbol |
-| verify2FaTokens | array | No | Temporary verification tokens from the 2FA verification API; supports multiple 2FA types |
-| quoteSessionId | string | Yes | Quote session ID from the rate quote |
+| quoteSessionId | string | Yes | Quote session ID from the flash conversion rate quote |
 
 ### Response `data` fields
 

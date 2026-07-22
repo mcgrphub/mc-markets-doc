@@ -18,7 +18,6 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | GET | /openapi/v1/mc-account/mlp/treasury-info | READ | Vault account treasury info |
 | GET | /openapi/v1/mc-account/mlp/deposit-info | READ | Vault account deposit info |
 | GET | /openapi/v1/mc-account/mlp/core/stats | READ | Vault account statistics |
-| GET | /openapi/v1/mc-account/mlp/config | READ | Query Vault account parameters |
 | GET | /openapi/v1/mc-account/mlp/apr-data | READ | Vault account APR data |
 | GET | /openapi/v1/mc-account/mlp/account/assets | READ | Vault account asset details |
 
@@ -279,40 +278,6 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-```
-
----
-
-## Query Vault account parameters
-
-`GET /openapi/v1/mc-account/mlp/config` — permission `READ`.
-
-Query Vault account yield rate and related parameters for the current business line.
-
-### Response `data` fields
-
-| Field | Type | Description |
-| --- | --- | --- |
-| id | integer | Configuration ID |
-| businessLineId | integer | Business Line ID |
-| annualYieldRate | number | Adjusted yield rate (annualized), unit: percentage |
-| lockPeriodDays | integer | Lock-up period, unit: days |
-| singleUserDepositLimit | number | Per-user deposit cap, unit: USDC |
-| tvlBaseAmount | number | TVL amount base value, unit: USDC |
-| integralTierConfig | string | Points tier configuration, format: minPoints:depositLimitRatio,... e.g., 50:25,300:50,1500:75,10000:100 |
-| createBy | string | Created By |
-| createTime | string | Creation Time |
-| updateBy | string | Updated By |
-| updateTime | string | Update Time |
-| createTimeTimestamp | integer | Creation time millisecond timestamp |
-| updateTimeTimestamp | integer | Update time millisecond timestamp |
-
-```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/config" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \

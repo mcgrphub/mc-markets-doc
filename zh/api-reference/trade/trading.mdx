@@ -45,9 +45,9 @@ description: "交易相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | 交易引擎返回状态码 |
+| orderId | string | 订单ID（如有） |
+| params | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -87,9 +87,9 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | 交易引擎返回状态码 |
+| orderId | string | 订单ID（如有） |
+| params | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -132,9 +132,9 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | 交易引擎返回状态码 |
+| orderId | string | 订单ID（如有） |
+| params | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -176,9 +176,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | 交易引擎返回状态码 |
+| orderId | string | 订单ID（如有） |
+| params | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -213,7 +213,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | symbol | string | 交易品种标识 |
-| mt5 | object | MT5数据配置 |
+| mt5 | object | 交易品种配置 |
 | risk | object | 风控配置信息 |
 
 `data[].mt5` 字段：
@@ -546,19 +546,19 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| userAssets | object |  |
+| userAssets | object | 用户资产 |
 
 `userAssets` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| balance | number |  |
-| equity | number |  |
-| floating | number |  |
-| margin | number |  |
-| marginFree | number |  |
-| marginLevel | number |  |
-| positions | array |  |
+| balance | number | 余额 |
+| equity | number | 净值 |
+| floating | number | 浮动盈亏 |
+| margin | number | 已用保证金 |
+| marginFree | number | 可用保证金 |
+| marginLevel | number | 保证金比例 |
+| positions | array | 持仓列表 |
 | balanceStr | string |  |
 | equityStr | string |  |
 | floatingStr | string |  |
@@ -576,30 +576,30 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer |  |
-| login | integer |  |
-| action | integer |  |
-| contractSize | number |  |
-| freeMargin | number |  |
-| precision | integer |  |
-| priceDigits | integer |  |
-| currencyDigits | integer |  |
-| priceCurrent | number |  |
-| openPrice | number |  |
-| time | integer |  |
-| slPrice | number |  |
-| tpPrice | number |  |
-| rateProfit | number |  |
-| freeAmount | number |  |
-| symbol | string |  |
-| usdValue | number |  |
-| volume | number |  |
-| volumeExt | number |  |
+| id | integer | 持仓号 |
+| login | integer | 交易账户登录号 |
+| action | integer | 资产动作（例如 0=普通） |
+| contractSize | number | 合约面值 |
+| freeMargin | number | 可用保证金 |
+| precision | integer | 精度 |
+| priceDigits | integer | 价格精度 |
+| currencyDigits | integer | 货币精度 |
+| priceCurrent | number | 当前价格 |
+| openPrice | number | 开仓价格 |
+| time | integer | 开仓时间 |
+| slPrice | number | 止损价格 |
+| tpPrice | number | 止盈价格 |
+| rateProfit | number | 盈亏汇率 |
+| freeAmount | number | 可用数量 |
+| symbol | string | 交易品种 |
+| usdValue | number | 折算美元价值 |
+| volume | number | 持仓量（标准精度） |
+| volumeExt | number | 持仓量（扩展精度） |
 | contractSizeStr | string |  |
 | priceCurrentStr | string |  |
 | usdValueStr | string |  |
-| volumeDisplay | string |  |
 | volumeScale | integer |  |
+| volumeDisplay | string |  |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/assets" \
@@ -629,9 +629,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| code | string | MT5返回状态码 |
-| orderId | string | MT5订单ID(如果有) |
-| params | object | MT5返回参数(透传给前端或者做业务逻辑处理) |
+| code | string | 交易引擎返回状态码 |
+| orderId | string | 订单ID（如有） |
+| params | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

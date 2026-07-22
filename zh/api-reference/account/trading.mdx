@@ -12,7 +12,7 @@ description: "交易相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | 根据transactionId查询交易记录详情 |
 | POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | 分页查询交易记录 |
-| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | 兑换v2, 支持询价 |
+| POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | 闪兑（支持询价） |
 | POST | /openapi/v1/mc-account/transaction/account/record/page | READ | 分页查询资金流水记录 |
 
 <Note>
@@ -36,7 +36,7 @@ description: "交易相关 OpenAPI 接口。"
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
+| uid | string | 用户 UID |
 | transactionId | string | 交易ID |
 | symbolId | integer | 币种ID |
 | acSymbol | string | 币种名/兑出 |
@@ -132,7 +132,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
+| uid | string | 用户 UID |
 | transactionId | string | 交易ID |
 | symbolId | integer | 币种ID |
 | acSymbol | string | 币种名/兑出 |
@@ -188,11 +188,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 ---
 
-## 兑换v2, 支持询价
+## 闪兑（支持询价）
 
 `POST /openapi/v1/mc-account/transaction/exchange/v2` — 权限 `TRADE`。
 
-需要先完成 2FA 验证，并将临时令牌填入 `verify2FaTokens`。
+完成闪兑兑换。需先调用[闪兑汇率查询](/zh/api-reference/account/exchange-rate#闪兑汇率查询)获取有效的 `quoteSessionId`。
 
 ### 请求体（JSON）
 
@@ -202,8 +202,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | symbol | string | 是 | 如 BTC/USDT |
 | exchangeSymbol | string | 是 | 如 BTC/USDT |
 | amount | number | 是 | 兑换金额/兑换币种的数量 |
-| verify2FaTokens | array | 否 | 通过2FA验证接口获取的临时验证令牌列表，支持多种类型的2FA验证 |
-| quoteSessionId | string | 是 | asw1w123a |
+| quoteSessionId | string | 是 | 询价会话 ID，来自闪兑汇率查询接口 |
 
 ### 响应 `data` 字段
 
@@ -267,7 +266,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | id | integer | 交易记录ID |
-| uid | string | 关联账户表 |
+| uid | string | 用户 UID |
 | transactionId | string | 交易ID |
 | symbolId | integer | 币种ID |
 | acSymbol | string | 币种名/兑出 |
