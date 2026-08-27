@@ -4,7 +4,7 @@ sidebarTitle: "Requests & Responses"
 description: "Reference for MC OpenAPI HTTP requests and JSON responses: signing headers, request body format, response envelope, and HTTP status codes."
 ---
 
-MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the required signing headers, and — where applicable — a JSON body. Every response is a JSON envelope with `code`, `msg`, `data`, and `success`.
+MC OpenAPI is a JSON-over-HTTPS API. Every call targets a gateway host under `/openapi/v1/`, carries the required signing headers, and — where applicable — a JSON body. Envelope fields depend on the response source: business services, a small number of legacy endpoints, and gateway authentication errors do not return identical shapes.
 
 ## Request format
 
@@ -18,9 +18,8 @@ Include the following headers on every request:
 | `X-Signature` | Yes | HMAC-SHA256 signature over the canonical string (**Base64**) |
 | `X-Timestamp` | Yes | Current Unix time in **milliseconds** |
 | `X-Nonce` | Yes | New value per request; **UUID v4**, or ≥32 hex characters (`0-9a-fA-F`) |
-| `Content-Type` | Recommended for `POST` / `PUT` / `PATCH` | `application/json` |
+| `Content-Type` | Recommended with a JSON body | `application/json`, including for `DELETE` with a body |
 | `Accept` | Recommended | `application/json` |
-| `X-Signature-Version` | Optional | Suggested value `2` (troubleshooting) |
 
 <Warning>
   Requests without valid signing headers or `X-Nonce`, or with a `X-Timestamp` outside the allowed window, are rejected. Never commit your Secret Key to source control or expose it in client-side code.
@@ -41,8 +40,9 @@ See [Authentication](/authentication) for the exact string-to-sign format and re
 ```
 
 - Omit the entire `QUERY_STRING` line when there is no query (do **not** insert a blank line).
+- Sign decoded logical query names and values; apply transport encoding separately when sending the URL.
 - `SIGNED_HEADERS` includes `x-access-key`, `x-nonce`, and `x-timestamp` (lowercase keys, sorted).
-- For `POST`/`PUT`/`PATCH` with a non-empty body, append the SHA-256 of the raw body bytes as **lowercase hex**.
+- For `POST`/`PUT`/`PATCH`/`DELETE` with a non-empty body, append the SHA-256 of the raw body bytes as **lowercase hex**.
 - `X-Signature` is Base64, not hex.
 
 ### Example: query the USD exchange rates
@@ -59,25 +59,49 @@ curl --request GET \
 
 ## Response format
 
-All responses are JSON. The MC OpenAPI wraps every result in a common envelope.
+All responses are JSON, but do not assume every endpoint returns the same fields. Treat the response schema on the endpoint page as authoritative.
 
-### Response envelope
+### Business-service response (primary)
+
+Most Account, Trade, and Aggregator endpoints use this envelope. The following example shows a parameter validation failure:
 
 ```json
 {
-  "code": "0",
-  "msg": "success",
-  "data": { },
-  "success": true
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
+  "codeKey": "PARAM_ERROR",
+  "params": {
+    "field": "type"
+  },
+  "localizedMessage": "Invalid request parameter",
+  "data": null,
+  "success": false
 }
 ```
 
-<ResponseField name="code" type="string">
-  Business status code. `"0"` indicates success. Any other value indicates a business-level error — see [Error Handling](/concepts/errors).
+<ResponseField name="status" type="integer">
+  HTTP-style status value carried in the envelope. The actual HTTP status remains authoritative for transport handling.
 </ResponseField>
 
-<ResponseField name="msg" type="string">
-  Human-readable status message. For successful calls this is typically `"success"`. On failure it describes the reason.
+<ResponseField name="message" type="string">
+  Default message for logging. Do not branch on its exact text.
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  Business status code. Its type and success value can vary by service version; use it together with `success`.
+</ResponseField>
+
+<ResponseField name="codeKey" type="string">
+  Stable business error key, such as `PARAM_ERROR`. Prefer this field for branching when present.
+</ResponseField>
+
+<ResponseField name="params" type="object | null">
+  Message interpolation parameters. It may be empty when the message has no parameters.
+</ResponseField>
+
+<ResponseField name="localizedMessage" type="string | null">
+  Message localized for the request language. It may be empty when no localized text is available.
 </ResponseField>
 
 <ResponseField name="data" type="object | array | null">
@@ -85,17 +109,41 @@ All responses are JSON. The MC OpenAPI wraps every result in a common envelope.
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
-  Convenience flag; `true` when `code == "0"`, otherwise `false`.
+  Whether the business operation succeeded. Do not infer business success from HTTP `200` alone.
 </ResponseField>
 
+### Other response variants
+
+| Source | Fields | Client handling |
+| --- | --- | --- |
+| A small number of legacy Account endpoints | `code`, `msg`, `data`, `extraFieldMap`, `success` | Fall back to `msg` for the message |
+| Risk endpoints | `status`, `message`, `code`, `data`, `success` | Do not assume `codeKey` exists |
+| API Gateway authentication errors | `status`, `code`, `message` | Handle by HTTP status and `message`; there is no `success`, `data`, or `codeKey` |
+
+For example, the API Gateway returns this shape when an Access Key lacks the endpoint permission:
+
+```json
+{
+  "status": 401,
+  "code": 401,
+  "message": "没有访问该接口的权限"
+}
+```
+
 ### Paginated list response
+
+The business-code and message values below illustrate the shape only; actual values and null-field serialization depend on the endpoint response.
 
 Endpoints that return a page of results place a page object inside `data`:
 
 ```json
 {
+  "status": 200,
+  "message": "success",
   "code": "0",
-  "msg": "success",
+  "codeKey": "DEFAULT",
+  "params": {},
+  "localizedMessage": "success",
   "success": true,
   "data": {
     "pageNum": 1,
@@ -119,13 +167,12 @@ MC OpenAPI uses standard HTTP status codes for transport-level outcomes. Even on
 | --- | --- |
 | `200` | Request delivered successfully. Check `code` in the JSON envelope for the business result. |
 | `400` | Malformed request — missing parameters or invalid JSON body. |
-| `401` | Signature invalid, `X-Timestamp` skewed, or Access Key not recognised. |
-| `403` | Access Key is valid but lacks the required scope (`READ`, `TRADE`, or `WITHDRAW`). |
+| `401` | Signature invalid, `X-Timestamp` skewed, Access Key not recognised, or the key lacks the endpoint permission. |
 | `404` | The endpoint or resource does not exist. |
 | `429` | Rate limit exceeded — see [Rate Limits](/guides/rate-limits). |
 | `500` | Unexpected gateway error. Retry with backoff. |
 | `503` | Gateway temporarily unavailable. Retry with backoff. |
 
 <Tip>
-  Log the `code`, `msg`, and any correlation ID from response headers on every non-`200` response — it makes support requests much faster to triage.
+  Log `code`, `codeKey`, `message` / `localizedMessage` / `msg`, and any correlation ID from response headers on every non-`200` response.
 </Tip>

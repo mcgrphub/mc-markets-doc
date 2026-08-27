@@ -5,7 +5,7 @@ description: "使用 Access Key (AK) / Secret Key (SK) 与 HMAC-SHA256 签名对
 ---
 
 <Note>
-  每次请求必须携带 `X-Nonce`（**UUID v4**，或 ≥32 位十六进制）；`POST` / `PUT` / `PATCH` 且请求体非空时，须将请求体 SHA-256 纳入签名。
+  每次请求必须携带 `X-Nonce`（**UUID v4**，或 ≥32 位十六进制）；`POST` / `PUT` / `PATCH` / `DELETE` 且请求体非空时，须将请求体 SHA-256 纳入签名。
 </Note>
 
 所有 OpenAPI 请求必须通过 **API 网关** 访问，并使用 **Access Key（AK）** 与 **Secret Key（SK）** 进行鉴权。网关会校验签名、检查 nonce 防重放、检查 API Key 权限，并将请求转发至对应的后端服务。
@@ -30,8 +30,8 @@ https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/
 
 | 凭证 | 格式 | 示例 |
 | --- | --- | --- |
-| **Access Key（AK）** | `AK` \+ 16 位大写十六进制字符 | `AKF013EB0CC51E4BEB` |
-| **Secret Key（SK）** | `SK` \+ Base64URL 编码的随机字符串 | `SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc` |
+| **Access Key（AK）** | `AK` \+ 16 位大写十六进制字符 | `AK0000000000000000`（虚构占位值） |
+| **Secret Key（SK）** | `SK` \+ Base64URL 编码的随机字符串 | `SK0000000000000000000000000000000000000000000`（虚构占位值） |
 
 - **Secret Key 仅在创建时展示一次**，请妥善保存，之后无法再次查看。
 - 每个 API Key 绑定一个用户账号和业务线。
@@ -47,6 +47,9 @@ https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/
   </Step>
   <Step title="创建新的 API Key，并选择所需权限（READ、TRADE、WITHDRAW）。">
   </Step>
+  <Step title="按页面提示完成安全验证。">
+    若当前业务线启用了二次验证策略，你必须先完成 GA 验证和邮箱验证码校验；未启用时不会出现该步骤。
+  </Step>
   <Step title="创建成功后，立即复制并安全保存 Access Key 与 Secret Key。">
   </Step>
 </Steps>
@@ -61,8 +64,7 @@ https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/
 | `X-Signature` | 是 | HMAC-SHA256 签名（Base64 编码） |
 | `X-Timestamp` | 是 | 当前 Unix 时间戳，单位为 **毫秒** |
 | `X-Nonce` | 是 | 每次请求新生成；**UUID v4**，或 ≥32 位十六进制（`0-9a-fA-F`） |
-| `Content-Type` | POST/PUT/PATCH 建议 | 发送 JSON 时使用 `application/json` |
-| `X-Signature-Version` | 否 | 建议填 `2`，仅用于排障 |
+| `Content-Type` | 有 JSON body 时建议 | 使用 `application/json`；包括带 body 的 `DELETE` 请求 |
 
 HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均可），但待签名字符串中的头名一律使用**小写**。
 
@@ -97,7 +99,7 @@ HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均
 | --- | --- |
 | `HTTP_METHOD` | 大写 HTTP 方法，如 `GET`、`POST`、`PUT`、`PATCH`、`DELETE` |
 | `REQUEST_URI` | 不含域名的完整网关路径，如 `/openapi/v1/mc-account/symbol/list` |
-| `QUERY_STRING` | Query 按 key 字典序（ASCII 升序），格式 `key1=value1&key2=value2`。**无 Query 时整行省略**（**不要**插入空行） |
+| `QUERY_STRING` | 对 URL query 完成解码后，按参数名的自然字典序升序排列，再以原始逻辑值拼成 `key1=value1&key2=value2`。不要把 `%XX` 或 `+` 编码后的传输字符串直接用于签名。**无 Query 时整行省略**（**不要**插入空行） |
 | `SIGNED_HEADERS` | `x-access-key`、`x-nonce`、`x-timestamp` 按 key 字典序拼接为 `key=value&...` |
 | `TIMESTAMP` | 与 `X-Timestamp` 相同（毫秒） |
 | `NONCE` | 与 `X-Nonce` 相同 |
@@ -123,8 +125,8 @@ HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均
 
 | 路径 | 条件 | `BODY_SHA256_HEX` 行 |
 | --- | --- | --- |
-| **路径 A** | `GET`；或 `POST`/`PUT`/`PATCH` 且 **空 body**（如 `Content-Length: 0`） | **不追加** |
-| **路径 B** | `POST`/`PUT`/`PATCH` 且 **body 非空** | 追加 `SHA-256(原始 body 字节)` 的小写 hex |
+| **路径 A** | `GET`；或 `POST`/`PUT`/`PATCH`/`DELETE` 且 **空 body**（如 `Content-Length: 0`） | **不追加** |
+| **路径 B** | `POST`/`PUT`/`PATCH`/`DELETE` 且 **body 非空** | 追加 `SHA-256(原始 body 字节)` 的小写 hex |
 
 - 客户端签名与发送必须使用 **相同的原始 body 字节**（不要依赖网关侧重排 JSON）。
 - 请求体上限 **10MB**（与网关 `gateway.request.max-body-size-bytes` 一致），超限返回 **413**。
@@ -133,7 +135,9 @@ HTTP 头名**大小写不敏感**（例如 `x-access-key` 与 `X-Access-Key` 均
 
 - **禁止**同一 query key 出现多次（如 `?a=1&a=2`），否则 **401**。
 - **禁止**参与签名的请求头出现多个值（如两个 `X-Nonce`），否则 **401**。
-- 每个 query key 在签名中只取一个值；URL 与 stringToSign 中的 query 必须一致。
+- 签名使用**解码后的逻辑参数名和值**；发送 URL 时再对相同参数分别进行 URL 编码。
+- 例如逻辑参数 `keyword=BTC USDT`、`symbol=BTC+USDT` 的签名行是 `keyword=BTC USDT&symbol=BTC+USDT`，传输 query 可以是 `keyword=BTC+USDT&symbol=BTC%2BUSDT`。
+- 已发布接口的 query 参数名均为 ASCII 标识符。按参数名进行非 locale-aware 的自然排序；不要使用会随语言环境变化的排序规则。
 
 ### 签名算法
 
@@ -183,43 +187,65 @@ signature = Base64( HMAC-SHA256( secretKey, stringToSign ) )
 
 ### 示例 1：GET 路径 A（无 query）
 
+以下 Access Key、nonce 与时间戳均为虚构测试值。
+
 **待签名字符串：**
 
 ```text
 GET
 /openapi/v1/mc-account/symbol/list
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
 
 ```
 
 ### 示例 2：GET 带 query
 
-URI：`/openapi/v1/mc-account/symbol/list`，Query：`current=1&size=10`
+使用与示例 3 相同的虚构凭证、时间戳和 nonce。URI 为 `/openapi/v1/mc-account/finance/products/catalog`，逻辑 Query 为 `type=CURRENT`：
 
 ```text
 GET
-/openapi/v1/mc-account/symbol/list
-current=1&size=10
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
+/openapi/v1/mc-account/finance/products/catalog
+type=CURRENT
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
 
+```
+
+使用 `SK0000000000000000000000000000000000000000000` 计算后，标准 Base64 签名必须为：
+
+```text
+PQSrUTpUsOO5lfGDrf7zCsIiaT2um2tqefV4vIA4CAU=
 ```
 
 ### 示例 3：POST 路径 B（含 body）
 
-Body 原始字节：`{"current":1,"size":10}` → SHA-256 hex（请自行计算实际值）：
+Body 原始 UTF-8 字节：`{"current":1,"size":10}`
+
+- Access Key：`AK0000000000000000`
+- Secret Key：`SK0000000000000000000000000000000000000000000`
+- Timestamp：`1720500000123`
+- Nonce：`00000000-0000-4000-8000-000000000000`
+- Body SHA-256：`ca159c415df7d2d049070542f25f080c1bbadf96650a1673190fc893b432bd7c`
+
+以上凭证仅用于测试，不能用于任何环境。完整待签名字符串为：
 
 ```text
 POST
 /openapi/v1/mc-account/transaction/account/record/page
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
-a1b2c3...（64 位小写 hex，为 body 的 SHA-256）
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
+ca159c415df7d2d049070542f25f080c1bbadf96650a1673190fc893b432bd7c
 
+```
+
+使用上述 Secret Key 执行 HMAC-SHA256 并进行标准 Base64 编码后，结果必须为：
+
+```text
+kW32YyCpnCVVGPDTjnd9IVwGJp3cdkOI5IHaloADKvo=
 ```
 
 ## 代码示例
@@ -250,7 +276,10 @@ def sign_request(
     parts = [method.upper(), uri]
 
     if query_params:
-        query_string = "&".join(f"{k}={v}" for k, v in sorted(query_params.items()))
+        # 使用解码后的逻辑值生成签名行；URL 编码仅用于发送请求。
+        query_string = "&".join(
+            f"{k}={v}" for k, v in sorted((str(k), str(v)) for k, v in query_params.items())
+        )
         parts.append(query_string)
 
     signed_headers = "&".join(
@@ -266,7 +295,7 @@ def sign_request(
     parts.extend([signed_headers, timestamp, nonce])
 
     body_bytes = body if body is not None else b""
-    if body_bytes and method.upper() in {"POST", "PUT", "PATCH"}:
+    if body_bytes and method.upper() in {"POST", "PUT", "PATCH", "DELETE"}:
         parts.append(hashlib.sha256(body_bytes).hexdigest())
 
     string_to_sign = "\n".join(parts) + "\n"
@@ -279,7 +308,6 @@ def sign_request(
         "X-Timestamp": timestamp,
         "X-Nonce": nonce,
         "X-Signature": signature,
-        "X-Signature-Version": "2",
     }
 
 # GET 示例
@@ -352,7 +380,8 @@ public class McOpenApiSigner {
 
     private static boolean isWriteMethod(String method) {
         String m = method.toUpperCase();
-        return "POST".equals(m) || "PUT".equals(m) || "PATCH".equals(m);
+        return "POST".equals(m) || "PUT".equals(m) || "PATCH".equals(m)
+                || "DELETE".equals(m);
     }
 
     private static String sha256Hex(byte[] bytes) throws Exception {
@@ -394,7 +423,7 @@ function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey)
   parts.push(headerStr, timestamp, nonce);
 
   const body = bodyBuffer || Buffer.alloc(0);
-  if (body.length > 0 && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
+  if (body.length > 0 && ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())) {
     parts.push(crypto.createHash("sha256").update(body).digest("hex"));
   }
 
@@ -409,7 +438,6 @@ function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey)
     "X-Timestamp": timestamp,
     "X-Nonce": nonce,
     "X-Signature": signature,
-    "X-Signature-Version": "2",
   };
 }
 ```
@@ -464,8 +492,8 @@ function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey)
 - [ ] 每次请求带新的 `X-Nonce`（**UUID v4**，或 ≥32 位 hex），且与签名字符串一致
 - [ ] 请求地址为 **网关** URL
 - [ ] URI 与文档网关路径一致
-- [ ] Query 与 stringToSign 一致，**无重复 query key**
-- [ ] POST/PUT/PATCH 非空 body 已计算 **SHA-256 hex** 并作为最后一行
+- [ ] Query 签名使用解码后的逻辑值，URL 使用相同参数的传输编码，且**无重复 query key**
+- [ ] POST/PUT/PATCH/DELETE 非空 body 已计算 **SHA-256 hex** 并作为最后一行
 - [ ] 签名与发送的 body **字节一致**
 - [ ] `X-Timestamp` 在 ±10 分钟内
 - [ ] API Key 具备目标接口权限

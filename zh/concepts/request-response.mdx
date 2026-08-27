@@ -4,7 +4,7 @@ sidebarTitle: "请求与响应"
 description: "MC OpenAPI HTTP 请求与 JSON 响应参考:签名头、body 格式、响应信封与 HTTP 状态码。"
 ---
 
-MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关，携带鉴权所需请求头；请求带 body 时为 JSON。所有响应都是包含 `code`、`msg`、`data`、`success` 的 JSON 信封。
+MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的网关，携带鉴权所需请求头；请求带 body 时为 JSON。响应外壳取决于响应来源：业务服务、少量旧版接口和网关鉴权错误的字段并不完全相同。
 
 ## 请求格式
 
@@ -16,9 +16,8 @@ MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的
 | `X-Signature` | 是 | 待签名字符串的 HMAC-SHA256 签名（**Base64**） |
 | `X-Timestamp` | 是 | 当前 Unix 时间（**毫秒**） |
 | `X-Nonce` | 是 | 每次请求新生成；**UUID v4**，或 ≥32 位十六进制（`0-9a-fA-F`） |
-| `Content-Type` | POST/PUT/PATCH 建议 | `application/json` |
+| `Content-Type` | 有 JSON body 时建议 | `application/json`；包括带 body 的 `DELETE` 请求 |
 | `Accept` | 建议 | `application/json` |
-| `X-Signature-Version` | 否 | 建议填 `2`（排障用） |
 
 <Warning>
   缺少有效签名头、`X-Nonce`，或 `X-Timestamp` 超出允许区间的请求将被拒绝。切勿将 Secret Key 提交到代码仓库或在客户端暴露。
@@ -39,8 +38,9 @@ MC OpenAPI 是 JSON-over-HTTPS API。每次调用均面向 `/openapi/v1/` 下的
 ```
 
 - 无 query 时 **整行省略** `QUERY_STRING`（不要插入空行）。
+- Query 签名使用解码后的逻辑参数名和值；发送 URL 时再进行传输编码。
 - `SIGNED_HEADERS` 含 `x-access-key`、`x-nonce`、`x-timestamp`（小写 key，字典序）。
-- `POST`/`PUT`/`PATCH` 且 body 非空时，追加 body 原始字节的 SHA-256 **小写 hex**。
+- `POST`/`PUT`/`PATCH`/`DELETE` 且 body 非空时，追加 body 原始字节的 SHA-256 **小写 hex**。
 - `X-Signature` 为 Base64，不是 hex。
 
 ### 示例：查询 USD 汇率
@@ -57,25 +57,49 @@ curl --request GET \
 
 ## 响应格式
 
-所有响应都是 JSON。MC OpenAPI 将每次结果包在统一信封中。
+所有响应都是 JSON，但不能假定所有接口都返回同一组字段。请以具体接口页的响应 schema 为准。
 
-### 响应信封
+### 业务服务响应（主流）
+
+当前大多数 Account、Trade 和 Aggregator 接口使用以下外壳。下面是参数校验失败的结构示例：
 
 ```json
 {
-  "code": "0",
-  "msg": "success",
-  "data": { },
-  "success": true
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
+  "codeKey": "PARAM_ERROR",
+  "params": {
+    "field": "type"
+  },
+  "localizedMessage": "Invalid request parameter",
+  "data": null,
+  "success": false
 }
 ```
 
-<ResponseField name="code" type="string">
-  业务状态码。`"0"` 代表成功。其他值为业务失败 — 见 [错误处理](/zh/concepts/errors)。
+<ResponseField name="status" type="integer">
+  响应外壳中的 HTTP 风格状态值。仍应以实际 HTTP 状态码为准。
 </ResponseField>
 
-<ResponseField name="msg" type="string">
-  人类可读的消息。成功时通常为 `"success"`;失败时描述原因。
+<ResponseField name="message" type="string">
+  默认消息。适合记录日志，不要依赖精确文案做业务分支。
+</ResponseField>
+
+<ResponseField name="code" type="string">
+  业务状态码。成功值和类型可能因服务版本不同；结合 `success` 判断。
+</ResponseField>
+
+<ResponseField name="codeKey" type="string">
+  稳定的业务错误键，例如 `PARAM_ERROR`。字段存在时，优先用于错误分支。
+</ResponseField>
+
+<ResponseField name="params" type="object | null">
+  用于消息插值的参数；没有参数时可能为空。
+</ResponseField>
+
+<ResponseField name="localizedMessage" type="string | null">
+  按请求语言生成的消息；没有本地化内容时可能为空。
 </ResponseField>
 
 <ResponseField name="data" type="object | array | null">
@@ -83,15 +107,39 @@ curl --request GET \
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
-  便捷标志;`code == "0"` 时为 `true`。
+  业务是否成功。不要仅凭 HTTP `200` 判断业务成功。
 </ResponseField>
 
-### 分页响应
+### 其他响应变体
+
+| 来源 | 字段 | 客户端处理 |
+| --- | --- | --- |
+| 少量旧版 Account 接口 | `code`、`msg`、`data`、`extraFieldMap`、`success` | 消息回退读取 `msg` |
+| Risk 接口 | `status`、`message`、`code`、`data`、`success` | 不假定存在 `codeKey` |
+| API 网关鉴权错误 | `status`、`code`、`message` | 按 HTTP 状态和 `message` 处理；没有 `success`、`data` 或 `codeKey` |
+
+API 网关拒绝签名或权限时，例如：
 
 ```json
 {
+  "status": 401,
+  "code": 401,
+  "message": "没有访问该接口的权限"
+}
+```
+
+### 分页响应
+
+下面的业务码和消息值仅用于展示结构；具体字段值及空字段是否序列化以接口响应为准。
+
+```json
+{
+  "status": 200,
+  "message": "success",
   "code": "0",
-  "msg": "success",
+  "codeKey": "DEFAULT",
+  "params": {},
+  "localizedMessage": "success",
   "success": true,
   "data": {
     "pageNum": 1,
@@ -115,13 +163,12 @@ MC OpenAPI 使用标准 HTTP 状态码表示传输层结果。即使返回 `200 
 | --- | --- |
 | `200` | 请求已送达,检查 JSON 信封中的 `code` 确认业务结果。 |
 | `400` | 请求格式错误——参数缺失或 JSON 不合法。 |
-| `401` | 签名无效、`X-Timestamp` 偏离或 Access Key 不可识别。 |
-| `403` | Access Key 有效但缺少必需权限(`READ`、`TRADE`、`WITHDRAW`)。 |
+| `401` | 签名无效、`X-Timestamp` 偏离、Access Key 不可识别，或 Key 缺少接口所需权限。 |
 | `404` | 接口或资源不存在。 |
 | `429` | 频率限制——见 [频率限制](/zh/guides/rate-limits)。 |
 | `500` | 网关内部错误。指数退避重试。 |
 | `503` | 网关临时不可用。指数退避重试。 |
 
 <Tip>
-  非 `200` 响应时记录 `code`、`msg` 与响应头中的 correlation ID,便于排障与联系支持。
+  非 `200` 响应时记录 `code`、`codeKey`、`message` / `localizedMessage` / `msg` 与响应头中的 correlation ID，便于排障与联系支持。
 </Tip>

@@ -135,7 +135,7 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| type | string | Yes | Product type: flexible / fixed-term |
+| type | string | Yes | Product type enum: `CURRENT` (flexible) or `FIXED` (fixed-term) |
 
 ### Response `data` fields
 
@@ -147,7 +147,7 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 | --- | --- | --- |
 | productCode | string | Product Code |
 | productName | string | Product Name |
-| type | string | Type: Demand/Term |
+| type | string | Product type enum: `CURRENT` (flexible) or `FIXED` (fixed-term) |
 | currency | string | Currency |
 | annualRate | number | Base APY% |
 | rewardAnnualRate | number | Excess reward APY% (config tier) |
@@ -167,13 +167,32 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 | subscriptionEndTimeTimestamp | integer | Subscription end time millisecond timestamp |
 
 ```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/products/catalog" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "type=VALUE"
+ACCESS_KEY="${MC_ACCESS_KEY:?Set MC_ACCESS_KEY}"
+SECRET_KEY="${MC_SECRET_KEY:?Set MC_SECRET_KEY}"
+METHOD="GET"
+PATH_="/openapi/v1/mc-account/finance/products/catalog"
+TYPE="CURRENT"
+CANONICAL_QUERY="type=${TYPE}"
+TIMESTAMP=$(python3 -c 'import time; print(int(time.time() * 1000))')
+NONCE=$(python3 -c 'import uuid; print(uuid.uuid4())')
+SIGNED_HEADERS="x-access-key=${ACCESS_KEY}&x-nonce=${NONCE}&x-timestamp=${TIMESTAMP}"
+
+SIGNATURE=$(
+  printf '%s\n%s\n%s\n%s\n%s\n%s\n' \
+    "$METHOD" "$PATH_" "$CANONICAL_QUERY" "$SIGNED_HEADERS" "$TIMESTAMP" "$NONCE" \
+  | openssl dgst -sha256 -hmac "$SECRET_KEY" -binary \
+  | openssl base64 -A
+)
+
+curl -sS -G "https://gateway.mcconnects.com${PATH_}" \
+  -H "X-Access-Key: ${ACCESS_KEY}" \
+  -H "X-Signature: ${SIGNATURE}" \
+  -H "X-Timestamp: ${TIMESTAMP}" \
+  -H "X-Nonce: ${NONCE}" \
+  --data-urlencode "type=${TYPE}"
 ```
+
+`CANONICAL_QUERY` uses the unencoded logical value `type=CURRENT`; `curl --data-urlencode` only builds the transport URL. Validate your implementation first with the [fixed query signing vector](/authentication#example-2-get-with-query).
 
 ---
 
@@ -372,7 +391,7 @@ Returns `products` by product dimension, ordered by `product_code` ascending, th
 | Field | Type | Description |
 | --- | --- | --- |
 | productCode | string | Product Code |
-| type | string | Product type: Demand / Term |
+| type | string | Product type enum: `CURRENT` (flexible) or `FIXED` (fixed-term) |
 | currency | string | Currency |
 | lockPeriodDays | integer | Lock-up days (term); 0 for demand products |
 | maxDepositAmount | number | Per-user subscription cap (per-user max deposit; null or ≤0 means no limit) |

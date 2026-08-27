@@ -22,12 +22,16 @@ Most list endpoints accept additional filter parameters (for example, `startTime
 
 ## Response shape
 
-A paginated response places a page object inside `data`:
+A paginated response places a page object inside `data`. The business-code and message values below illustrate the shape only; actual values and null-field serialization depend on the endpoint response.
 
 ```json
 {
+  "status": 200,
+  "message": "success",
   "code": "0",
-  "msg": "success",
+  "codeKey": "COMMON_OK",
+  "params": {},
+  "localizedMessage": "success",
   "success": true,
   "data": {
     "pageNum": 1,

@@ -20,6 +20,8 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
 
     Optionally configure an IP whitelist (up to 15 IPv4 addresses). Copy the **Access Key** and **Secret Key** immediately — the Secret Key is shown only once.
 
+    If two-factor verification is enabled for your business line, complete the GA and email verification prompts.
+
     <Warning>
       Never commit the Secret Key to source control, and never expose it in client-side code.
     </Warning>
@@ -43,7 +45,7 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
     {SIGNED_HEADERS}     # x-access-key, x-nonce, x-timestamp — lowercase keys, sorted
     {TIMESTAMP}
     {NONCE}
-    [{BODY_SHA256_HEX}]  # only for POST/PUT/PATCH with a non-empty body
+    [{BODY_SHA256_HEX}]  # for non-empty POST/PUT/PATCH/DELETE bodies
     ```
 
     See [Authentication](/authentication) for the full rules and Python / Java / Node.js samples.
@@ -89,7 +91,6 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
       -H "X-Signature: ${SIGNATURE}" \
       -H "X-Timestamp: ${TIMESTAMP}" \
       -H "X-Nonce: ${NONCE}" \
-      -H "X-Signature-Version: 2" \
       "https://gateway.mcconnects.com${URI}"
     ```
 

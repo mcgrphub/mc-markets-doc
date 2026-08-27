@@ -5,7 +5,7 @@ description: "Authenticate MC OpenAPI requests with Access Key (AK) / Secret Key
 ---
 
 <Note>
-  Every request must include `X-Nonce` (**UUID v4**, or ≥32 hex characters). For `POST` / `PUT` / `PATCH` with a non-empty body, include the request body SHA-256 in the signature.
+  Every request must include `X-Nonce` (**UUID v4**, or ≥32 hex characters). For `POST` / `PUT` / `PATCH` / `DELETE` with a non-empty body, include the request body SHA-256 in the signature.
 </Note>
 
 All OpenAPI requests must be sent to the **API Gateway** and authenticated with an **Access Key (AK)** and **Secret Key (SK)** pair. The gateway validates your signature, enforces nonce replay protection, checks API Key permissions, and forwards the request to the appropriate backend service.
@@ -30,8 +30,8 @@ Each API Key consists of two parts:
 
 | Credential | Format | Example |
 | --- | --- | --- |
-| **Access Key (AK)** | `AK` \+ 16 uppercase hex characters | `AKF013EB0CC51E4BEB` |
-| **Secret Key (SK)** | `SK` \+ Base64URL-encoded random string | `SKTWRUHyCkE2eOehHp9McVWPjYusIeo8pMun9km06JuHc` |
+| **Access Key (AK)** | `AK` \+ 16 uppercase hex characters | `AK0000000000000000` (fictional placeholder) |
+| **Secret Key (SK)** | `SK` \+ Base64URL-encoded random string | `SK0000000000000000000000000000000000000000000` (fictional placeholder) |
 
 - The **Secret Key is shown only once** when the API Key is created. Store it securely — it cannot be retrieved again.
 - Each API Key is bound to a user account and business line.
@@ -47,6 +47,9 @@ Each API Key consists of two parts:
   </Step>
   <Step title="Create a new API Key, selecting the required permissions (READ, TRADE, WITHDRAW).">
   </Step>
+  <Step title="Complete the security verification shown on the page.">
+    If two-factor verification is enabled for your business line, you must complete both GA verification and email verification. This step is omitted when the policy is disabled.
+  </Step>
   <Step title="Copy and securely store both the Access Key and Secret Key immediately after creation.">
   </Step>
 </Steps>
@@ -61,8 +64,7 @@ Every authenticated request must include the following HTTP headers:
 | `X-Signature` | Yes | HMAC-SHA256 signature (Base64-encoded) |
 | `X-Timestamp` | Yes | Current Unix timestamp in **milliseconds** |
 | `X-Nonce` | Yes | New value per request; **UUID v4**, or ≥32 hex characters (`0-9a-fA-F`) |
-| `Content-Type` | Recommended for POST/PUT/PATCH | Use `application/json` when sending JSON |
-| `X-Signature-Version` | No | Suggested value `2` for troubleshooting |
+| `Content-Type` | Recommended with a JSON body | Use `application/json`, including for a `DELETE` request with a body |
 
 HTTP header names are **case-insensitive** (for example, `x-access-key` and `X-Access-Key` are equivalent). In the string to sign, header names are always **lowercase**.
 
@@ -97,7 +99,7 @@ Signing prevents tampering and replay attacks. For each request:
 | --- | --- |
 | `HTTP_METHOD` | Uppercase HTTP method, e.g. `GET`, `POST`, `PUT`, `PATCH`, `DELETE` |
 | `REQUEST_URI` | Full gateway path without the host, e.g. `/openapi/v1/mc-account/symbol/list` |
-| `QUERY_STRING` | Query parameters sorted by key (ASCII ascending), formatted as `key1=value1&key2=value2`. **Omit the entire line** if there are no query parameters (do **not** insert a blank line) |
+| `QUERY_STRING` | Decode the URL query, sort parameter names in ascending natural order, and join the logical values as `key1=value1&key2=value2`. Do not sign the transport string containing `%XX` or `+` encoding. **Omit the entire line** when there are no query parameters (do **not** insert a blank line) |
 | `SIGNED_HEADERS` | `x-access-key`, `x-nonce`, and `x-timestamp` sorted by key and joined as `key=value&...` |
 | `TIMESTAMP` | Same value as `X-Timestamp` (milliseconds) |
 | `NONCE` | Same value as `X-Nonce` |
@@ -123,8 +125,8 @@ Other headers (such as `Content-Type`) **do not** participate in the signature.
 
 | Path | Condition | `BODY_SHA256_HEX` line |
 | --- | --- | --- |
-| **Path A** | `GET`; or `POST`/`PUT`/`PATCH` with an **empty body** (e.g. `Content-Length: 0`) | **Not appended** |
-| **Path B** | `POST`/`PUT`/`PATCH` with a **non-empty body** | Append lowercase hex of `SHA-256(raw body bytes)` |
+| **Path A** | `GET`; or `POST`/`PUT`/`PATCH`/`DELETE` with an **empty body** (e.g. `Content-Length: 0`) | **Not appended** |
+| **Path B** | `POST`/`PUT`/`PATCH`/`DELETE` with a **non-empty body** | Append lowercase hex of `SHA-256(raw body bytes)` |
 
 - The client must use the **same raw body bytes** for signing and sending (do not rely on the gateway to re-serialize JSON).
 - Maximum request body size is **10 MB** (consistent with gateway `gateway.request.max-body-size-bytes`); exceeding the limit returns **413**.
@@ -133,7 +135,9 @@ Other headers (such as `Content-Type`) **do not** participate in the signature.
 
 - **Do not** repeat the same query key (e.g. `?a=1&a=2`); otherwise **401**.
 - **Do not** send multiple values for signed headers (e.g. two `X-Nonce` headers); otherwise **401**.
-- Each query key contributes only one value in the signature; the query in the URL must match the query in the string to sign.
+- Sign the **decoded logical parameter names and values**. URL-encode the same parameters separately when sending the request.
+- For example, logical parameters `keyword=BTC USDT` and `symbol=BTC+USDT` produce the signed line `keyword=BTC USDT&symbol=BTC+USDT`; the transport query can be `keyword=BTC+USDT&symbol=BTC%2BUSDT`.
+- Published endpoint query names are ASCII identifiers. Sort names by natural, non-locale-aware order; do not use locale-dependent sorting.
 
 ### Signature algorithm
 
@@ -183,44 +187,65 @@ The gateway determines the client IP in this order: `X-Forwarded-For` → `X-Rea
 
 ### Example 1: GET path A (no query)
 
+The Access Key, nonce, and timestamp below are fictional test values.
+
 **String to sign:**
 
 ```text
 GET
 /openapi/v1/mc-account/symbol/list
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
 
 ```
 
 ### Example 2: GET with query
 
-URI: `/openapi/v1/mc-account/symbol/list`, Query: `current=1&size=10`
+Use the same fictional credentials, timestamp, and nonce as example 3. The URI is `/openapi/v1/mc-account/finance/products/catalog`, and the logical query is `type=CURRENT`:
 
 ```text
 GET
-/openapi/v1/mc-account/symbol/list
-current=1&size=10
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
+/openapi/v1/mc-account/finance/products/catalog
+type=CURRENT
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
 
+```
+
+Signing with `SK0000000000000000000000000000000000000000000` must produce this standard Base64 value:
+
+```text
+PQSrUTpUsOO5lfGDrf7zCsIiaT2um2tqefV4vIA4CAU=
 ```
 
 ### Example 3: POST path B (with body)
 
-Raw body bytes: `{"current":1,"size":10}` → SHA-256 hex (compute the actual value yourself):
+Raw UTF-8 body bytes: `{"current":1,"size":10}`
+
+- Access Key: `AK0000000000000000`
+- Secret Key: `SK0000000000000000000000000000000000000000000`
+- Timestamp: `1720500000123`
+- Nonce: `00000000-0000-4000-8000-000000000000`
+- Body SHA-256: `ca159c415df7d2d049070542f25f080c1bbadf96650a1673190fc893b432bd7c`
+
+These credentials are test-only and cannot be used in any environment. The complete string to sign is:
 
 ```text
 POST
 /openapi/v1/mc-account/transaction/account/record/page
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
-a1b2c3... (64-char lowercase hex of the body SHA-256)
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
+ca159c415df7d2d049070542f25f080c1bbadf96650a1673190fc893b432bd7c
 
+```
 
+HMAC-SHA256 with the Secret Key above, followed by standard Base64 encoding, must produce:
+
+```text
+kW32YyCpnCVVGPDTjnd9IVwGJp3cdkOI5IHaloADKvo=
 ```
 
 ## Code examples
@@ -251,7 +276,10 @@ def sign_request(
     parts = [method.upper(), uri]
 
     if query_params:
-        query_string = "&".join(f"{k}={v}" for k, v in sorted(query_params.items()))
+        # Sign decoded logical values. URL encoding is only for transport.
+        query_string = "&".join(
+            f"{k}={v}" for k, v in sorted((str(k), str(v)) for k, v in query_params.items())
+        )
         parts.append(query_string)
 
     signed_headers = "&".join(
@@ -267,7 +295,7 @@ def sign_request(
     parts.extend([signed_headers, timestamp, nonce])
 
     body_bytes = body if body is not None else b""
-    if body_bytes and method.upper() in {"POST", "PUT", "PATCH"}:
+    if body_bytes and method.upper() in {"POST", "PUT", "PATCH", "DELETE"}:
         parts.append(hashlib.sha256(body_bytes).hexdigest())
 
     string_to_sign = "\n".join(parts) + "\n"
@@ -280,7 +308,6 @@ def sign_request(
         "X-Timestamp": timestamp,
         "X-Nonce": nonce,
         "X-Signature": signature,
-        "X-Signature-Version": "2",
     }
 
 # GET example
@@ -353,7 +380,8 @@ public class McOpenApiSigner {
 
     private static boolean isWriteMethod(String method) {
         String m = method.toUpperCase();
-        return "POST".equals(m) || "PUT".equals(m) || "PATCH".equals(m);
+        return "POST".equals(m) || "PUT".equals(m) || "PATCH".equals(m)
+                || "DELETE".equals(m);
     }
 
     private static String sha256Hex(byte[] bytes) throws Exception {
@@ -395,7 +423,7 @@ function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey)
   parts.push(headerStr, timestamp, nonce);
 
   const body = bodyBuffer || Buffer.alloc(0);
-  if (body.length > 0 && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
+  if (body.length > 0 && ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())) {
     parts.push(crypto.createHash("sha256").update(body).digest("hex"));
   }
 
@@ -410,7 +438,6 @@ function signRequest(method, uri, queryParams, bodyBuffer, accessKey, secretKey)
     "X-Timestamp": timestamp,
     "X-Nonce": nonce,
     "X-Signature": signature,
-    "X-Signature-Version": "2",
   };
 }
 ```
@@ -465,8 +492,8 @@ Authentication failures typically return HTTP **401 Unauthorized**; request body
 - [ ] Every request includes a new `X-Nonce` (**UUID v4**, or ≥32 hex chars) that matches the string to sign
 - [ ] Request URL uses the **gateway** base URL
 - [ ] URI matches the documented gateway path
-- [ ] Query matches the string to sign; **no duplicate query keys**
-- [ ] Non-empty POST/PUT/PATCH body includes **SHA-256 hex** as the final line
+- [ ] The signed query uses decoded logical values; the URL uses the matching transport encoding; **no duplicate query keys**
+- [ ] A non-empty POST/PUT/PATCH/DELETE body includes **SHA-256 hex** as the final line
 - [ ] Signed body bytes **match** sent body bytes
 - [ ] `X-Timestamp` is within ±10 minutes
 - [ ] API Key has required permissions for the target endpoint

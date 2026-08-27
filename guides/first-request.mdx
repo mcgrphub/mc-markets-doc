@@ -48,9 +48,9 @@ For `GET /openapi/v1/mc-account/exchange-rate/query/usd` (path A, no query, no b
 ```text
 GET
 /openapi/v1/mc-account/exchange-rate/query/usd
-x-access-key=AKF013EB0CC51E4BEB&x-nonce=550e8400-e29b-41d4-a716-446655440000&x-timestamp=1747890123456
-1747890123456
-550e8400-e29b-41d4-a716-446655440000
+x-access-key=AK0000000000000000&x-nonce=00000000-0000-4000-8000-000000000000&x-timestamp=1720500000123
+1720500000123
+00000000-0000-4000-8000-000000000000
 
 ```
 
@@ -69,8 +69,12 @@ METHOD="GET"
 PATH_="/openapi/v1/mc-account/exchange-rate/query/usd"
 
 SIGNED_HEADERS="x-access-key=${ACCESS_KEY}&x-nonce=${NONCE}&x-timestamp=${TS}"
-CANONICAL=$(printf "%s\n%s\n%s\n%s\n%s\n" "$METHOD" "$PATH_" "$SIGNED_HEADERS" "$TS" "$NONCE")
-SIGNATURE=$(printf "%s" "$CANONICAL" | openssl dgst -sha256 -hmac "$SECRET_KEY" -binary | openssl base64)
+SIGNATURE=$(
+  printf '%s\n%s\n%s\n%s\n%s\n' \
+    "$METHOD" "$PATH_" "$SIGNED_HEADERS" "$TS" "$NONCE" \
+  | openssl dgst -sha256 -hmac "$SECRET_KEY" -binary \
+  | openssl base64 -A
+)
 
 curl --request GET \
   --url "https://gateway.mcconnects.com${PATH_}" \
@@ -78,7 +82,6 @@ curl --request GET \
   --header "X-Signature: ${SIGNATURE}" \
   --header "X-Timestamp: ${TS}" \
   --header "X-Nonce: ${NONCE}" \
-  --header "X-Signature-Version: 2" \
   --header "Accept: application/json"
 ```
 
@@ -118,7 +121,6 @@ resp = requests.get(
         "X-Signature": signature,
         "X-Timestamp": ts,
         "X-Nonce": nonce,
-        "X-Signature-Version": "2",
         "Accept": "application/json",
     },
 )
@@ -162,7 +164,6 @@ const res = await fetch(BASE_URL + path, {
     "X-Signature": signature,
     "X-Timestamp": ts,
     "X-Nonce": nonce,
-    "X-Signature-Version": "2",
     Accept: "application/json",
   },
 });
@@ -172,25 +173,29 @@ console.log(res.status, await res.json());
 
 ## Step 4 — Read the response
 
-A successful response looks like this:
+A successful response contains the primary business-envelope fields. The business-code and message values below illustrate the shape only; actual values and null-field serialization depend on the endpoint response:
 
 ```json
 {
+  "status": 200,
+  "message": "success",
   "code": "0",
-  "msg": "success",
+  "codeKey": "COMMON_OK",
+  "params": {},
+  "localizedMessage": "success",
   "success": true,
   "data": [
-    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "EUR", "rate": "0.9187" },
-    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "JPY", "rate": "155.42" },
-    { "symbolType": "CRYPTO", "baseCurrency": "USD", "targetCurrency": "BTC", "rate": "0.0000148" }
+    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "EUR", "exchangeRate": "0.9187" },
+    { "symbolType": "FIAT", "baseCurrency": "USD", "targetCurrency": "JPY", "exchangeRate": "155.42" },
+    { "symbolType": "CRYPTO", "baseCurrency": "USD", "targetCurrency": "BTC", "exchangeRate": "0.0000148" }
   ]
 }
 ```
 
-- `code == "0"` — the call succeeded.
+- Check the HTTP status, `success`, and `code` together; do not assume every service uses the same success code.
 - `data` — the payload (see the exchange-rate pages under **Market data** in the [API Reference](/api-reference/overview) for the full schema).
 
-If `code` is not `"0"`, inspect `msg` and consult the [Error Handling](/concepts/errors) reference.
+On failure, branch on `codeKey` / `code` and use `localizedMessage` / `message` for display or logging. Only a small number of legacy endpoints use `msg`. See [Error Handling](/concepts/errors).
 
 ## Next steps
 

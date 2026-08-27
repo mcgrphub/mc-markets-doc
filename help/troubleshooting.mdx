@@ -9,31 +9,31 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 ## HTTP 401 — signature or timestamp problem
 
 ```json
-{ "code": "40001", "msg": "Invalid signature", "success": false }
+{ "status": 401, "code": 401, "message": "签名无效" }
 ```
 
 ### Checklist
 
-- **Signature check.** Confirm a new `X-Nonce` is present (**UUID v4**, or ≥32 hex characters) and the string to sign includes `SIGNED_HEADERS` (with `x-nonce`), `TIMESTAMP`, and `NONCE`. The header value must match the string to sign exactly. For non-empty `POST`/`PUT`/`PATCH` bodies, append the body SHA-256 as lowercase hex.
+- **Signature check.** Confirm a new `X-Nonce` is present (**UUID v4**, or ≥32 hex characters) and the string to sign includes `SIGNED_HEADERS` (with `x-nonce`), `TIMESTAMP`, and `NONCE`. The header value must match the string to sign exactly. For non-empty `POST`/`PUT`/`PATCH`/`DELETE` bodies, append the body SHA-256 as lowercase hex.
 - **Nonce format and reuse.** Not UUID v4 and not ≥32 hex → message `非法 nonce 格式`. Reusing a nonce under the same Access Key within the replay window → message `请求重放`.
 - **No blank query line.** When there is no query, omit the `QUERY_STRING` line entirely — do not insert a blank line.
 - **Body match.** Serialize the JSON body **once** and reuse the same bytes for signing and the HTTP request.
-- **Query ordering.** Sort query parameters by key ascending, joined `key=value` with `&`. Duplicate query keys are rejected.
+- **Query ordering.** Sign decoded logical names and values sorted by key and joined as `key=value` with `&`; encode the transport URL separately. Duplicate query keys are rejected.
 - **Method / path case.** Method is uppercase (`GET`, not `get`). Path is the gateway-visible path without the base URL.
 - **Correct key.** `X-Access-Key` is the Access Key; sign with the Secret Key.
 - **Digest format.** `X-Signature` is the **Base64** encoding of the HMAC-SHA256 digest (with padding), not lowercase hex.
 
 ```json
-{ "code": "40002", "msg": "Timestamp expired", "success": false }
+{ "status": 401, "code": 401, "message": "时间戳无效或已过期" }
 ```
 
 - `X-Timestamp` must be current time in **milliseconds** (13 digits, e.g. `1731657600000`), not seconds.
-- Sync your machine clock via NTP. A drift of only a few seconds can trigger this error.
+- Sync your machine clock via NTP. The timestamp must be within ±10 minutes of server time.
 - For batches, regenerate both the timestamp and the **nonce** on every call (new UUID v4 or ≥32 hex characters each time).
-## HTTP 403 — insufficient permission
+## HTTP 401 — insufficient permission
 
 ```json
-{ "code": "40301", "msg": "Permission denied", "success": false }
+{ "status": 401, "code": 401, "message": "没有访问该接口的权限" }
 ```
 
 - Your Access Key exists and the signature is valid, but the key does not have the required scope.
@@ -49,7 +49,16 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 ## HTTP 400 — malformed request
 
 ```json
-{ "code": "42201", "msg": "Parameter validation failed", "success": false }
+{
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
+  "codeKey": "PARAM_ERROR",
+  "params": {},
+  "localizedMessage": "Invalid request parameter",
+  "data": null,
+  "success": false
+}
 ```
 
 - The `Content-Type: application/json` header is missing on a `POST`/`PUT` with a JSON body.
@@ -75,7 +84,16 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 Do not assume `200 OK` means success. Always check `code`:
 
 ```json
-{ "code": "60001", "msg": "Insufficient balance", "success": false, "data": null }
+{
+  "status": 200,
+  "message": "Insufficient balance",
+  "code": "2004003",
+  "codeKey": "ACCOUNT_BALANCE_INSUFFICIENT",
+  "params": {},
+  "localizedMessage": "Insufficient balance",
+  "data": null,
+  "success": false
+}
 ```
 
 Typical categories:
@@ -92,7 +110,7 @@ When you file a support request, include the following. It roughly quarters the 
 2. **Timestamp** — the `X-Timestamp` value on the failing request.
 3. **Full path with query string.**
 4. **Response body** (Secret Key redacted; other data intact).
-5. **Canonical string** you signed (last line = the same `X-Timestamp`).
+5. **Canonical string** you signed, including query, signed headers, timestamp, nonce, and the body hash when applicable. Preserve the trailing newline.
 
 <Warning>
   Never share your Secret Key when asking for help — not with support, not with colleagues, not in issue trackers. If a Secret Key has been exposed, disable the key immediately and generate a new one.

@@ -20,6 +20,8 @@ description: "创建 MC Access Key / Secret Key，使用 HMAC-SHA256 签名（�
 
     可选配置 IP 白名单（最多 15 个 IPv4 地址）。立即复制 **Access Key** 和 **Secret Key** —— Secret Key 仅显示一次。
 
+    若当前业务线启用了二次验证策略，请按页面提示完成 GA 验证和邮箱验证码校验。
+
     <Warning>
       切勿将 Secret Key 提交到源代码库，也不要在客户端代码中暴露。
     </Warning>
@@ -43,7 +45,7 @@ description: "创建 MC Access Key / Secret Key，使用 HMAC-SHA256 签名（�
     {SIGNED_HEADERS}     # x-access-key&x-nonce&x-timestamp，小写并按 key 排序
     {TIMESTAMP}
     {NONCE}
-    [{BODY_SHA256_HEX}]  # 仅 POST/PUT/PATCH 且 body 非空时追加
+    [{BODY_SHA256_HEX}]  # POST/PUT/PATCH/DELETE 且 body 非空时追加
     ```
 
     完整规则与 Python / Java / Node.js 示例请参见 [认证](/zh/authentication)。
@@ -89,7 +91,6 @@ description: "创建 MC Access Key / Secret Key，使用 HMAC-SHA256 签名（�
       -H "X-Signature: ${SIGNATURE}" \
       -H "X-Timestamp: ${TIMESTAMP}" \
       -H "X-Nonce: ${NONCE}" \
-      -H "X-Signature-Version: 2" \
       "https://gateway.mcconnects.com${URI}"
     ```
 

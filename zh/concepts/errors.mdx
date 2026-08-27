@@ -15,28 +15,45 @@ MC OpenAPI 在**两层**报告失败：标准 HTTP 状态码，以及 JSON 信�
 
 ## 错误响应格式
 
-失败响应保持相同信封，`success` 为 `false`，并返回非成功业务 `code`：
+业务服务通常返回完整业务外壳；网关鉴权错误使用更精简的外壳。完整变体见 [请求与响应](/zh/concepts/request-response)。以下为业务参数错误示例：
 
 ```json
 {
-  "code": 1000005,
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
   "codeKey": "PARAM_ERROR",
-  "msg": "Invalid request parameter",
+  "params": {
+    "field": "type"
+  },
+  "localizedMessage": "Invalid request parameter",
   "success": false,
   "data": null
 }
 ```
 
+<ResponseField name="status" type="integer">
+  外壳中的 HTTP 风格状态值；实际 HTTP 状态码仍是传输层判断依据。
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  默认消息。适合写入日志，不要依赖精确文案做分支。
+</ResponseField>
+
 <ResponseField name="code" type="integer | string">
-  业务状态码。成功时常见为 `0` / `200`（视封装路径而定）。失败时为 **7 位**错误码。
+  业务状态码。类型和成功值可能因服务版本不同；业务错误通常为 7 位代码。
 </ResponseField>
 
 <ResponseField name="codeKey" type="string">
-  稳定的错误键，例如 `PARAM_ERROR`、`SIGN_ERROR`。分支逻辑优先使用 `codeKey` 或 `code`，不要依赖 `msg`。
+  稳定的错误键，例如 `PARAM_ERROR`、`SIGN_ERROR`。字段存在时优先使用 `codeKey` 或 `code`。
 </ResponseField>
 
-<ResponseField name="msg" type="string">
-  人类可读的消息，适合写入日志；不要依赖其精确文案做分支。
+<ResponseField name="params" type="object | null">
+  消息插值参数；没有参数时可能为空。
+</ResponseField>
+
+<ResponseField name="localizedMessage" type="string | null">
+  按请求语言生成的消息；没有本地化内容时可能为空。
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
@@ -52,8 +69,7 @@ MC OpenAPI 在**两层**报告失败：标准 HTTP 状态码，以及 JSON 信�
 | 码 | 发生时机 | 应对 |
 | --- | --- | --- |
 | `400` | JSON 格式错误、参数缺失 | 修正后重试。 |
-| `401` | `X-Signature` 缺失/无效或 `X-Timestamp` 偏离 | 校对签名与时钟，重新签名后重试。 |
-| `403` | Access Key 缺少必需权限 | 在 **API Key 管理** 页面勾选 `READ`/`TRADE`/`WITHDRAW`。 |
+| `401` | `X-Signature` 缺失/无效、`X-Timestamp` 偏离，或 Access Key 缺少接口权限 | 校对签名与时钟；若消息为 `没有访问该接口的权限`，调整 Key 权限。 |
 | `404` | 路径错误或资源 ID 不存在 | 核对 URL 与 ID。 |
 | `429` | 频率限制 | 退避重试—见 [频率限制](/zh/guides/rate-limits)。 |
 | `500`/`502`/`503` | 网关/上游错误 | 指数退避重试。 |
@@ -64,14 +80,14 @@ MC OpenAPI 在**两层**报告失败：标准 HTTP 状态码，以及 JSON 信�
 
 | `codeKey` | `code` | 含义 | 建议处理 |
 | --- | --- | --- | --- |
-| `PARAM_ERROR` | `1000005` | 请求参数无效 | 根据 `msg` 修正参数。 |
+| `PARAM_ERROR` | `1000005` | 请求参数无效 | 根据 `message` / `localizedMessage` 修正参数。 |
 | `NOT_EXIST` | `1000002` | 资源不存在 | 核对请求中的 ID。 |
 | `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | 余额不足 | 充值或减小金额。 |
-| `ORDER_OPERATION_FAILED` | `2100001` | 订单操作失败 | 查看 `msg`；仅在瞬时错误时重试。 |
+| `ORDER_OPERATION_FAILED` | `2100001` | 订单操作失败 | 查看 `message` / `localizedMessage`；仅在瞬时错误时重试。 |
 | `DEFAULT` | `1000000` | 内部错误 | 指数退避重试；若问题持续，请联系支持。 |
 
 <Note>
-  AK/SK 鉴权失败（如 `签名无效`）由网关返回，**没有** `codeKey`，见 [认证](/zh/authentication)。分支逻辑优先使用稳定的 `codeKey`。
+  AK/SK 鉴权失败（包括权限不足）由网关返回 `status`、`code`、`message`，**没有** `codeKey`。见 [认证](/zh/authentication)。
 </Note>
 
 ## 错误处理示例
@@ -96,7 +112,8 @@ def call(method, path, body=""):
     if response.status_code == 401:
         raise AuthError(code_key, payload.get("msg") or payload.get("message"))
 
-    raise BusinessError(code_key, payload.get("msg"))
+    message = payload.get("localizedMessage") or payload.get("message") or payload.get("msg")
+    raise BusinessError(code_key, message)
 
 
 def with_backoff(fn, *args, max_retries=5, **kwargs):
@@ -129,7 +146,8 @@ async function call(method, path, body = "") {
   if (res.status === 401) {
     throw new AuthError(codeKey, payload.msg || payload.message);
   }
-  throw new BusinessError(codeKey, payload.msg);
+  const message = payload.localizedMessage || payload.message || payload.msg;
+  throw new BusinessError(codeKey, message);
 }
 ```
 

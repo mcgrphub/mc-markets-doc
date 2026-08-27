@@ -22,10 +22,16 @@ MC OpenAPI 所有列表接口采用基于页号的分页。你使用 `pageNum` �
 
 ## 响应形式
 
+分页对象位于业务响应的 `data` 中。下面的业务码和消息值仅用于展示结构；具体字段值及空字段是否序列化以接口响应为准。
+
 ```json
 {
+  "status": 200,
+  "message": "success",
   "code": "0",
-  "msg": "success",
+  "codeKey": "COMMON_OK",
+  "params": {},
+  "localizedMessage": "success",
   "success": true,
   "data": {
     "pageNum": 1,
@@ -43,8 +49,6 @@ MC OpenAPI 所有列表接口采用基于页号的分页。你使用 `pageNum` �
   }
 }
 ```
-
-    
 
 ## 遍历全部页
 

@@ -15,28 +15,45 @@ Always inspect `success` / `code` / `codeKey` even when the HTTP status is `200`
 
 ## Error response format
 
-Failed calls keep the same envelope shape, with `success: false` and a non-success business `code`:
+Business services usually return the full business envelope, while gateway authentication errors use a smaller envelope. See [Requests & Responses](/concepts/request-response) for all variants. This example shows a business parameter error:
 
 ```json
 {
-  "code": 1000005,
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
   "codeKey": "PARAM_ERROR",
-  "msg": "Invalid request parameter",
+  "params": {
+    "field": "type"
+  },
+  "localizedMessage": "Invalid request parameter",
   "success": false,
   "data": null
 }
 ```
 
+<ResponseField name="status" type="integer">
+  HTTP-style status value in the envelope. Use the actual HTTP status for transport handling.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Default message for logging. Do not branch on its exact text.
+</ResponseField>
+
 <ResponseField name="code" type="integer | string">
-  Business status code. Success responses typically use `0` / `200` depending on the envelope path. Failures use a **7-digit** error code.
+  Business status code. Its type and success value can vary by service version; business failures commonly use a 7-digit code.
 </ResponseField>
 
 <ResponseField name="codeKey" type="string">
-  Stable error key, for example `PARAM_ERROR` or `SIGN_ERROR`. Prefer branching on `codeKey` or `code`, not on `msg`.
+  Stable error key, for example `PARAM_ERROR` or `SIGN_ERROR`. Prefer `codeKey` or `code` when this field exists.
 </ResponseField>
 
-<ResponseField name="msg" type="string">
-  Human-readable message. Suitable for logs; do not branch on the exact string.
+<ResponseField name="params" type="object | null">
+  Message interpolation parameters. It may be empty.
+</ResponseField>
+
+<ResponseField name="localizedMessage" type="string | null">
+  Message localized for the request language. It may be empty.
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
@@ -52,8 +69,7 @@ Failed calls keep the same envelope shape, with `success: false` and a non-succe
 | Code | When it occurs | What to do |
 | --- | --- | --- |
 | `400` | Malformed JSON, missing required parameter | Fix the request and retry. |
-| `401` | Missing / invalid `X-Signature`, or `X-Timestamp` skewed | Re-check the signing algorithm and clock; re-sign and retry. |
-| `403` | Access Key lacks the required scope | Add `READ` / `TRADE` / `WITHDRAW` in the key management console. |
+| `401` | Missing / invalid `X-Signature`, `X-Timestamp` skewed, or missing endpoint permission | Re-check signing and the clock. If `message` is `没有访问该接口的权限`, update the key permissions. |
 | `404` | Path is wrong, or the resource ID does not exist | Verify the URL and IDs. |
 | `429` | Rate limit exceeded | Back off — see [Rate Limits](/guides/rate-limits). |
 | `500` / `502` / `503` | Gateway or upstream error | Retry with exponential backoff. |
@@ -64,14 +80,14 @@ Full catalog: [Error codes](/api-reference/error-codes) (public OpenAPI-reachabl
 
 | `codeKey` | `code` | Meaning | Suggested action |
 | --- | --- | --- | --- |
-| `PARAM_ERROR` | `1000005` | Invalid request parameter | Fix parameters per `msg`. |
+| `PARAM_ERROR` | `1000005` | Invalid request parameter | Fix parameters using `message` / `localizedMessage`. |
 | `NOT_EXIST` | `1000002` | Resource does not exist | Verify IDs in the request. |
 | `ACCOUNT_BALANCE_INSUFFICIENT` | `2004003` | Insufficient balance | Top up or reduce the amount. |
-| `ORDER_OPERATION_FAILED` | `2100001` | Order operation failed | Inspect `msg`; retry only if transient. |
+| `ORDER_OPERATION_FAILED` | `2100001` | Order operation failed | Inspect `message` / `localizedMessage`; retry only if transient. |
 | `DEFAULT` | `1000000` | Internal server error | Retry with backoff; contact support if it persists. |
 
 <Note>
-  AK/SK authentication failures (for example `签名无效`) come from the gateway and have **no** `codeKey` — see [Authentication](/authentication). Prefer `codeKey` for switch/case logic.
+  AK/SK authentication failures, including permission failures, return `status`, `code`, and `message` from the gateway and have **no** `codeKey`. See [Authentication](/authentication).
 </Note>
 
 ## Handling errors
@@ -96,7 +112,8 @@ def call(method, path, body=""):
     if response.status_code == 401:
         raise AuthError(code_key, payload.get("msg") or payload.get("message"))
 
-    raise BusinessError(code_key, payload.get("msg"))
+    message = payload.get("localizedMessage") or payload.get("message") or payload.get("msg")
+    raise BusinessError(code_key, message)
 
 
 def with_backoff(fn, *args, max_retries=5, **kwargs):
@@ -129,7 +146,8 @@ async function call(method, path, body = "") {
   if (res.status === 401) {
     throw new AuthError(codeKey, payload.msg || payload.message);
   }
-  throw new BusinessError(codeKey, payload.msg);
+  const message = payload.localizedMessage || payload.message || payload.msg;
+  throw new BusinessError(codeKey, message);
 }
 ```
 
