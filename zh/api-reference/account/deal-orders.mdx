@@ -48,55 +48,23 @@ description: "成交订单相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
-| uid | string | 用户 UID |
-| transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
-| acSymbol | string | 币种名称；闪兑时为兑出币种 |
-| network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
-| exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因说明 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 链上交易哈希 |
-| feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户 ID |
-| targetAccountId | string | 目标账户 ID |
-| sourceWalletAddress | string | 来源链上钱包地址 |
-| targetWalletAddress | string | 目标链上钱包地址 |
-| extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| remark | string | 备注信息 |
+| dealAmount | number | 成交价值(USDC) |
+| dealAmountDisplay | string | 成交价值展示值 |
+| dealAmountScale | integer | 成交价值展示小数位 |
+| commission | number | 费用 |
+| commissionDisplay | string | 费用展示值 |
+| commissionScale | integer | 费用展示小数位 |
+| profit | number | 已实现盈亏 |
+| profitDisplay | string | 已实现盈亏展示值 |
+| profitScale | integer | 已实现盈亏展示小数位 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```
@@ -124,11 +92,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 | dealId | integer | 成交单号 |
 | dealTime | string | 成交时间 |
 | dealTimeTimestamp | integer | 成交时间毫秒时间戳 |
-| type | string | 交易类型 |
+| type | string | 交易类型；可选值：`EnDealActionEnum{id=0, description='买入交易'}`、`EnDealActionEnum{id=1, description='卖出交易'}`、`EnDealActionEnum{id=2, description='结余操作'}`、`EnDealActionEnum{id=3, description='信贷操作'}`、`EnDealActionEnum{id=4, description='其他费用/出金'}`、`EnDealActionEnum{id=5, description='更正操作'}`、`EnDealActionEnum{id=6, description='红利。该类型的操作影响客户的信贷资产'}`、`EnDealActionEnum{id=7, description='手续费'}`、`EnDealActionEnum{id=8, description='每日手续费'}`、`EnDealActionEnum{id=9, description='每月手续费'}`、`En |
 | symbolPair | string | 交易对 |
 | baseSymbolId | integer | 基础币种ID |
 | quoteSymbolId | integer | 计价币种ID |
-| entry | string | 方向 |
+| entry | string | 方向；可选值：`ENTRY_IN`、`ENTRY_OUT`、`ENTRY_INOUT`、`ENTRY_OUT_BY` |
 | price | number | 委托价格 |
 | pricePosition | number | 成交均价 |
 | lot | number | 委托数量 |
@@ -143,7 +111,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 | contractSize | integer | 合约大小 |
 | stopLoss | number | 止损价 |
 | takeProfit | number | 止盈价 |
-| onChainStatus | string | 上链状态 |
+| onChainStatus | string | 上链状态；可选值：`PENDING`、`INITIALIZING`、`SUBMITTED`、`CONFIRMED`、`FAILED`、`RETRYING` |
 | txHash | string | 区块链交易哈希 |
 | retryCount | integer | 重试次数 |
 | gasUsed | integer | 实际消耗的Gas |
@@ -155,13 +123,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 | confirmTime | string | 确认时间 |
 | confirmTimeTimestamp | integer | 确认时间毫秒时间戳 |
 | remark | string | 备注信息 |
-| accountType | string | 账户类型 |
+| accountType | string | 账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
 
 ```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/{dealId}" \
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/1000001" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "dealId=1"
 ```

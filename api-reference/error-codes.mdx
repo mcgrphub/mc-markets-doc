@@ -4,16 +4,19 @@ sidebarTitle: "Error codes"
 description: "Business error codes (`code` / `codeKey`) reachable from public MC OpenAPI endpoints."
 ---
 
-Most business responses use a JSON envelope with both a numeric `code` and a string `codeKey`.
+Most business responses use a JSON envelope with both a string `code` and a string `codeKey`.
 Use `code` / `codeKey` for branching; treat `message` / `msg` as a human-readable hint only.
 
 This page lists only codes that public MC OpenAPI endpoints may return on business call paths. Gateway AK/SK failures use a different envelope — see the end of this page.
 
 ```json
 {
-  "code": 1000005,
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
   "codeKey": "PARAM_ERROR",
-  "msg": "Invalid request parameter",
+  "params": {},
+  "localizedMessage": "Invalid request parameter",
   "success": false,
   "data": null
 }

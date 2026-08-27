@@ -132,27 +132,29 @@ For example, the API Gateway returns this shape when an Access Key lacks the end
 
 ### Paginated list response
 
-The business-code and message values below illustrate the shape only; actual values and null-field serialization depend on the endpoint response.
+This example uses the success values from `RetResult.data()`; the exact `data` fields depend on the endpoint schema.
 
 Endpoints that return a page of results place a page object inside `data`:
 
 ```json
 {
   "status": 200,
-  "message": "success",
-  "code": "0",
-  "codeKey": "DEFAULT",
+  "message": "ok",
+  "code": "200",
+  "codeKey": null,
   "params": {},
-  "localizedMessage": "success",
+  "localizedMessage": null,
   "success": true,
   "data": {
-    "pageNum": 1,
-    "pageSize": 20,
+    "records": [
+      { "transactionId": "T-1001", "amount": 125.5, "acSymbol": "USDT" }
+    ],
     "total": 132,
+    "size": 20,
+    "current": 1,
     "pages": 7,
-    "list": [
-      { "transactionId": "T-1001", "amount": "125.50", "currency": "USDT" }
-    ]
+    "hasPrevious": false,
+    "hasNext": true
   }
 }
 ```

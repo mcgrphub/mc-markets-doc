@@ -4,16 +4,19 @@ sidebarTitle: "错误码"
 description: "MC OpenAPI 公开接口可能返回的业务错误码（`code` / `codeKey`）。"
 ---
 
-多数业务响应使用统一 JSON 信封，同时返回数字 `code` 与字符串 `codeKey`。
+多数业务响应使用统一 JSON 信封，同时返回字符串 `code` 与字符串 `codeKey`。
 业务分支请使用 `code` / `codeKey`；`message` / `msg` 仅作可读说明，不要依赖其精确文案。
 
 本页仅收录 **MC OpenAPI 公开接口** 业务调用链中可能返回的错误码。网关 AK/SK 鉴权失败不走此信封，见文末。
 
 ```json
 {
-  "code": 1000005,
+  "status": 400,
+  "message": "Invalid request parameter",
+  "code": "1000005",
   "codeKey": "PARAM_ERROR",
-  "msg": "Invalid request parameter",
+  "params": {},
+  "localizedMessage": "Invalid request parameter",
   "success": false,
   "data": null
 }

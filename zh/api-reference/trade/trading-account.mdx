@@ -57,69 +57,25 @@ description: "交易账户相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| order | integer | 订单号，主键 |
-| login | integer | 交易账户登录号 |
-| dealer | integer | 交易商ID |
-| symbol | string | 交易品种，如EURUSD、GBPUSD等 |
-| digits | integer | 价格精度，交易品种的价格小数位数 |
-| digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
-| contractSize | number | 合约大小，每手合约的标准大小 |
-| state | integer | 订单状态 |
-| reason | integer | 原因，订单变更的原因代码 |
-| timeSetup | integer | 下单时间，订单创建的时间戳，毫秒级，长度13位 |
-| timeExpiration | integer | 到期时间，订单的到期时间戳，毫秒级，长度13位 |
-| timeDone | integer | 完成时间，订单完成的时间戳，毫秒级，长度13位 |
-| timeSetupMsc | integer | 下单时间（毫秒），订单创建的时间戳（毫秒），毫秒级，长度13位 |
-| timeDoneMsc | integer | 完成时间（毫秒），订单完成的时间戳（毫秒），毫秒级，长度13位 |
-| modifyFlags | integer | 修改标志，订单修改的标志位 |
-| type | integer | 订单类型，如买入、卖出等 |
-| typeFill | integer | 成交类型，订单的填充方式 |
-| typeTime | integer | 有效时间类型，订单的有效期类型 |
-| priceOrder | number | 订单价格，订单的执行价格 |
-| priceOrderStr | string | 订单价格原始字符串 |
-| priceOrderDisplay | string | 订单价格展示值 |
-| priceOrderScale | integer | 订单价格展示小数位 |
-| priceTrigger | number | 触发价格，订单的触发价格 |
-| priceTriggerDisplay | string | 触发价格展示值 |
-| priceTriggerScale | integer | 触发价格展示小数位 |
-| priceCurrent | number | 当前价格，订单的当前市场价格 |
-| priceCurrentDisplay | string | 当前价格展示值 |
-| priceCurrentScale | integer | 当前价格展示小数位 |
-| priceSlDisplay | string | 止损价格展示值 |
-| priceSlScale | integer | 止损价格展示小数位 |
-| priceTpDisplay | string | 止盈价格展示值 |
-| priceTpScale | integer | 止盈价格展示小数位 |
-| volumeInitialExt | number | 初始交易量（扩展精度） |
-| quantity | number | 用户数量，初始扩展交易量经持仓量精度换算后的值 |
-| volumeInitialDisplay | string | 初始手数展示值 |
-| volumeInitialScale | integer | 初始手数展示小数位 |
-| volumeCurrentExt | number | 当前交易量（扩展精度） |
-| volumeCurrentDisplay | string | 当前手数展示值 |
-| volumeCurrentScale | integer | 当前手数展示小数位 |
-| rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
-| activationMode | integer | 激活模式，挂单的激活模式（如挂单激活方式） |
-| activationTime | integer | 激活时间，挂单的激活时间戳 |
-| activationPrice | number | 激活价格，挂单的激活价格 |
-| activationFlags | integer | 激活标志，挂单激活的标志位 |
-| volumeInitial | number | 初始手数，订单的初始交易手数 |
-| volumeCurrent | number | 当前手数，订单的当前交易手数 |
-| externalID | string | 外部ID，外部系统关联的ID |
-| priceSL | number | 止损价格，设置的止损价位 |
-| priceTP | number | 止盈价格，设置的止盈价位 |
-| expertID | integer | 专家顾问ID，如果订单由 EA 创建，则记录 EA 的 ID |
-| positionID | integer | 持仓ID，关联的持仓ID |
-| positionByID | integer | 反向持仓ID，关联的反向持仓ID |
+| symbol | string | 产品名称 |
+| volume | integer | 动账量，正为增加，负为扣减 |
+| value | number | 折合USDC价值（动账时刻） |
+| position | integer | 关联持仓ID，若有 |
+| reason | integer | 动账原因-枚举 |
+| price | number | 对USDC价格（动账时刻） |
+| timestamp | integer | 时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1" \
-  --data-urlencode "login=VALUE" \
-  --data-urlencode "from=1755792000"
+  --data-urlencode "login=10000001" \
+  --data-urlencode "from=1755792000" \
+  --data-urlencode "to=1755878400"
 ```
 
 ---
@@ -199,8 +155,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "login=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "login=10000001"
 ```
 
 ---
@@ -233,8 +189,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "login=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "login=10000001"
 ```
 
 ---
@@ -264,7 +220,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=BTCUSDT"
 ```
 
@@ -295,6 +251,6 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=BTCUSDT"
 ```

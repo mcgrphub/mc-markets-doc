@@ -12,7 +12,7 @@ MC OpenAPI is a JSON-over-HTTPS API for the MC Multi-Account System (MC-account)
   </Card>
 
   <Card title="Pagination" icon="layer-group" href="/concepts/pagination">
-    How `pageNum` / `pageSize` work on list endpoints and how to iterate through large result sets.
+    Regular `current` / `size` / `records` pagination and the ranking `page` / `pageSize` / `items` variant.
   </Card>
 
   <Card title="Error Handling" icon="circle-exclamation" href="/concepts/errors">
@@ -36,7 +36,7 @@ API Reference is grouped by product domain (MDX files still live under gateway-s
 | --- | --- | --- |
 | Market data | Market data, currency, exchange rate | `READ` |
 | Trading | Orders and positions, trading account, orders, deals, account trading, deal orders, funding fee history, trading symbols, funding rate | `READ`, `TRADE` |
-| Finance | Finance account, vault account, fund account | `READ`, `TRADE`, `WITHDRAW` |
+| Finance | Finance account, vault account, fund account | `READ`, `TRADE` |
 
 Request paths may still include service segments such as `/openapi/v1/mc-account/`, `/openapi/v1/mc-trade/`, `/openapi/v1/mc-risk/`, and `/openapi/v1/mc-aggregator/`. Use the full path when signing. See the [API Reference overview](/api-reference/overview).
 

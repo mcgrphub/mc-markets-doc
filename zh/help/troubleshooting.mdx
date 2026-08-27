@@ -69,11 +69,12 @@ description: "诊断并修复常见 MC OpenAPI 错误:签名失败、时间戳�
 ## HTTP 429 — 频率限制
 
 ```json
-{ "code": "42901", "msg": "Too many requests", "success": false }
+{ "status": 429, "code": 429, "message": "请求过于频繁，请稍后重试" }
 ```
 
 - 指数退避 \+ 抖动,参阅 [频率限制](/zh/guides/rate-limits) 中可拷贝的重试封装。
-- 常规负载下仍频繁命中,降低轮询频率或联系支持升级层级。
+- 以 HTTP `429` 为限流判断依据；其他网关限流组件的响应体可能不同。
+- 常规负载下仍频繁命中时，降低轮询频率并记录路径、时间和 correlation ID。
 
 ## HTTP 5xx — 网关错误
 

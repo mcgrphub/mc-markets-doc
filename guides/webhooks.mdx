@@ -1,103 +1,116 @@
 ---
-title: "Polling for Updates in MC OpenAPI"
-sidebarTitle: "Polling for Updates"
-description: "MC OpenAPI is request-response only — use these polling patterns to detect new transactions, balance changes, and rate updates."
+title: "Poll for MC OpenAPI updates"
+sidebarTitle: "Polling updates"
+description: "Poll current MC OpenAPI endpoints with AK/SK v2 signing for transaction, balance, position, and funding-fee changes."
 ---
 
 <Note>
-  MC OpenAPI does not currently deliver webhooks or push events. Integrations that need to detect new activity should poll the relevant list endpoints on a schedule using the patterns below.
+  The current public Specs do not expose a webhook or event-stream endpoint. Poll the relevant query endpoint when you need to detect new activity.
 </Note>
 
-## What to poll
+## Pollable endpoints
 
-Choose the endpoint that most tightly matches the event you care about:
+The intervals below are client-side starting recommendations, not backend SLAs or fixed limits. Adjust them for your latency needs, payload size, and observed `429` responses.
 
-| You want to detect | Poll this endpoint | Suggested frequency |
+| What to detect | Endpoint | Suggested starting interval |
 | --- | --- | --- |
-| New transaction records | `POST /openapi/v1/transaction/transaction/record/page` | 30–60 s |
-| Balance / deposit / withdrawal changes | `POST /openapi/v1/mc-account/finance/account/overview` | 60 s |
-| Spot position changes | `GET /openapi/v1/mc-account/fund/account/spot/positions/v2` | 60–300 s |
-| Funding-fee events | `POST /openapi/v1/mc-account/funding-fee-record/page/v2` | 300 s (settled every 8 h upstream) |
-| Exchange-rate updates | `GET /openapi/v1/mc-account/exchange-rate/query/usd` | 60–300 s |
+| New transaction records | `POST /openapi/v1/mc-account/transaction/transaction/record/page` | 30–60 seconds |
+| Finance account changes | `GET /openapi/v1/mc-account/finance/account/overview` | 60 seconds |
+| Spot position changes | `GET /openapi/v1/mc-account/fund/account/spot-account/positions?spotId=...` | 60–300 seconds |
+| Funding-fee records | `GET /openapi/v1/mc-account/funding-fee-record/page/v2` | 300 seconds |
+| USD exchange-rate updates | `GET /openapi/v1/mc-account/exchange-rate/query/usd` | 60–300 seconds |
 
-See the [API Reference](/api-reference/overview) for the full request/response shape of each endpoint.
+## Watermarks and deduplication
 
-## Efficient polling pattern
+1. Store the greatest processed `createTimeTimestamp` and use `transactionId` as an idempotency key.
+2. Set `createTimeStartTimestamp` to that watermark on the next poll.
+3. Traverse `data.records` with `current` / `size` until `hasNext` is `false`.
+4. Persist business processing before advancing the watermark.
+5. Time boundaries can return duplicates, so deduplicate by business ID.
 
-The goal is to fetch **only what is new** since the last poll and never re-download the entire history.
-
-1. Record a **watermark** — the highest `createdTime` (or `transactionId`) you have already processed.
-2. On each poll, request records with `startTime = watermark + 1` (or an equivalent filter).
-3. Iterate pages if `pages > 1` — see [Pagination](/concepts/pagination).
-4. Persist the new watermark **only after** you have durably processed the batch (write to your DB, publish to your queue, etc.). This avoids missing records if your worker crashes mid-batch.
-5. Sleep, then repeat.
-
-### Python example
+## Python example
 
 ```python
-import time, hmac, hashlib, json, requests
+import base64
+import hashlib
+import hmac
+import json
+import os
+import time
+import uuid
+
+import requests
 
 BASE_URL = "https://gateway.mcconnects.com"
-ACCESS_KEY, SECRET_KEY = "…", "…"
+ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
+SECRET_KEY = os.environ["MC_SECRET_KEY"]
 
-def sign(method, path, query, body, ts):
-    canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
-    return hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
 
-def poll_new_transactions(watermark_ms: int, page_size: int = 100):
-    path = "/openapi/v1/transaction/transaction/record/page"
-    page_num = 1
-    new_watermark = watermark_ms
-    collected = []
+def signed_headers(path: str, body: bytes) -> dict[str, str]:
+    timestamp = str(int(time.time() * 1000))
+    nonce = str(uuid.uuid4())
+    canonical_headers = (
+        f"x-access-key={ACCESS_KEY}&x-nonce={nonce}&x-timestamp={timestamp}"
+    )
+    body_hash = hashlib.sha256(body).hexdigest()
+    string_to_sign = "\n".join(
+        ["POST", path, canonical_headers, timestamp, nonce, body_hash]
+    ) + "\n"
+    signature = base64.b64encode(
+        hmac.new(
+            SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256
+        ).digest()
+    ).decode()
+    return {
+        "X-Access-Key": ACCESS_KEY,
+        "X-Signature": signature,
+        "X-Timestamp": timestamp,
+        "X-Nonce": nonce,
+        "Content-Type": "application/json",
+    }
+
+
+def poll_transactions(watermark_ms: int, page_size: int = 20) -> tuple[list[dict], int]:
+    path = "/openapi/v1/mc-account/transaction/transaction/record/page"
+    current = 1
+    records = []
+    next_watermark = watermark_ms
 
     while True:
-        body = json.dumps({
-            "pageNum": page_num, "pageSize": page_size,
-            "startTime": watermark_ms + 1,
-        }, separators=(",", ":"))
-        ts = str(int(time.time() * 1000))
-        signature = sign("POST", path, "", body, ts)
-        r = requests.post(
-            BASE_URL + path,
-            headers={
-                "X-Access-Key": ACCESS_KEY,
-                "X-Signature": signature,
-                "X-Timestamp": ts,
-                "Content-Type": "application/json",
+        body = json.dumps(
+            {
+                "current": current,
+                "size": page_size,
+                "createTimeStartTimestamp": watermark_ms,
             },
+            separators=(",", ":"),
+        ).encode()
+        response = requests.post(
+            BASE_URL + path,
+            headers=signed_headers(path, body),
             data=body,
+            timeout=15,
         )
-        r.raise_for_status()
-        page = r.json()["data"]
+        response.raise_for_status()
+        page = response.json()["data"]
 
-        for record in page["list"]:
-            collected.append(record)
-            new_watermark = max(new_watermark, record["createdTime"])
+        for record in page["records"]:
+            records.append(record)
+            next_watermark = max(
+                next_watermark,
+                record.get("createTimeTimestamp", watermark_ms),
+            )
 
-        if page_num >= page["pages"]:
-            break
-        page_num += 1
-
-    return collected, new_watermark
-
-
-watermark = load_watermark_from_db()
-while True:
-    records, watermark = poll_new_transactions(watermark)
-    if records:
-        handle_new_records(records)   # your business logic
-        persist_watermark(watermark)  # only after successful processing
-    time.sleep(30)
+        if not page.get("hasNext", current < page["pages"]):
+            return records, next_watermark
+        current += 1
 ```
 
-## Best practices
+See [Authentication](/authentication) for the complete signing rules and [Pagination](/concepts/pagination) for pagination shapes.
 
-- **Never poll faster than you need.** Every extra call eats into your [rate limit](/guides/rate-limits) budget.
-- **Add jitter** to your polling interval (`sleep(30 + random(0, 5))`) so multiple workers don't hit the gateway in lockstep.
-- **Persist watermarks durably.** In-memory state is lost on restart and can cause duplicate or missed records.
-- **Deduplicate on the receiving side.** Even with watermarks, network retries and eventual consistency can produce the same record twice — use `transactionId` (or the endpoint's natural key) as an idempotency key.
-- **Back off on `429` / `5xx`.** Reuse the [exponential-backoff helper](/guides/rate-limits#recommended-handling-exponential-backoff-with-jitter) for every poll.
+## Operational guidance
 
-<Tip>
-  If your use case truly requires push delivery, contact MC support to discuss options for your account tier.
-</Tip>
+- Add random jitter to polling intervals so multiple instances do not request simultaneously.
+- Apply exponential backoff with jitter to HTTP `429` and transient `5xx` responses.
+- Do not write Secret Keys, watermarks, or account data from responses to public logs.
+- Use the real `spotId` when querying spot positions; do not pass a UID as that parameter.

@@ -52,7 +52,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "finance-withdraw-demo-001",
+  "productCode": "USDT_CURRENT",
+  "amount": 10
 }' 
 ```
 
@@ -85,7 +87,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "finance-fixed-withdraw-demo-001",
+  "positionId": 10001
 }' 
 ```
 
@@ -104,6 +107,7 @@ Deposit to the Finance account: transfer from the trading account to the fund ac
 | trackingId | string | Yes | Unique request tracking ID |
 | productCode | string | Yes | Finance product code, e.g. USDT_CURRENT |
 | amount | number | Yes | Deposit amount |
+| couponId | string | No | Interest coupon ID. Omit it to subscribe without a coupon or coupon locking. |
 
 ### Response `data` fields
 
@@ -119,7 +123,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "finance-deposit-demo-001",
+  "productCode": "USDT_CURRENT",
+  "amount": 10
 }' 
 ```
 
@@ -151,7 +157,11 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 | currency | string | Currency |
 | annualRate | number | Base APY% |
 | rewardAnnualRate | number | Excess reward APY% (config tier) |
-| maxAnnualRate | number | Max APY% = Base + Reward |
+| maxAnnualRate | number | Maximum APY% = base + flexible-product excess reward + the signed-in user's highest eligible coupon rate |
+| couponSupported | boolean | Whether the product supports interest coupons |
+| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
+| rewardMinHoldingDays | integer | Minimum continuous holding days required for the excess reward tier; null or 0 for fixed-term products |
+| rewardMinPosition | number | Principal threshold required for the excess reward tier; null or 0 for fixed-term products |
 | periodDays | integer | Term days, 0 for demand products |
 | minDepositAmount | number | Minimum Deposit Amount |
 | minRedeemAmount | number | Minimum Redemption Amount |
@@ -227,55 +237,42 @@ Paginated query of active and matured positions for the context user ID. Multipl
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| positionId | integer | Position detail ID; null when multiple flexible positions for the same product are aggregated |
+| productName | string | Product name |
+| productCode | string | Product code |
+| currency | string | Asset currency |
+| digit | integer | Currency precision in decimal places |
+| lockPeriodDays | integer | Lock-up days for fixed-term products; 0 for flexible products |
+| type | string | Product type: `CURRENT` or `FIXED` |
+| positionAmount | number | Position principal; excludes unsettled interest and frozen amounts |
+| baseAnnualRate | number | Base annual rate percentage |
+| rewardMinHoldingDays | integer | Minimum continuous holding days required for the excess reward tier |
+| excessRewardAnnualRate | number | Excess reward annual rate percentage |
+| eligibleRewardAmount | number | Principal threshold required for the excess reward tier |
+| currentRewardAmount | number | Current unsettled interest in the product currency |
+| cumulativeRewardAmount | number | Historical interest total in the product currency |
+| status | string | Position status: `HOLDING`, `REDEEMED`, or `EXPIRED` |
+| subscribeTime | string | Subscription time for a fixed-term detail; null for an aggregated flexible row |
+| couponId | string | Bound interest coupon ID |
+| couponNominalAnnualRate | number | Coupon nominal annual rate percentage |
+| couponBoostAmountUsdc | number | Coupon boost amount in USDC |
+| couponQuoteUsdcPerProduct | number | Product-currency-to-USDC quote captured when the coupon was locked |
+| couponQuoteTimeMs | integer | Quote time as a Unix timestamp in milliseconds |
+| pauseRedeem | boolean | Whether redemption is suspended; `true` means redemption cannot currently be initiated |
+| excessRewardAnnualRateDisplay | string | Excess reward annual rate display value |
+| eligibleRewardAmountDisplay | string | Reward principal threshold display value |
+| currentRewardAmountDisplay | string | Current unsettled interest display value |
+| cumulativeRewardAmountDisplay | string | Historical interest total display value |
+| positionAmountDisplay | string | Position principal display value |
+| subscribeTimeTimestamp | integer | Subscription time as a Unix timestamp in milliseconds |
+| baseAnnualRateDisplay | string | Base annual rate display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/holding" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```
@@ -313,55 +310,29 @@ Aligns with admin redemption history: main table `ac_transaction_history` (`EARN
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
-| uid | string | Associated Account Table |
-| transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
-| acSymbol | string | Currency Name / From |
-| network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
-| exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
-| amountStr | string | Transaction Amount String |
-| amountDisplay | string | Transaction amount display value |
-| amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
-| exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
-| feeDisplay | string | Trading fee display value |
-| createTime | string | Trade Start Time |
-| finishTime | string | Trade Completion Time |
-| failureReason | string | Failure Reason |
-| errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
-| rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
-| feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
-| sourceAccountId | string | Source Account ID |
-| targetAccountId | string | Target Account ID |
-| sourceWalletAddress | string | Source Wallet Address |
-| targetWalletAddress | string | Target Wallet Address |
-| extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
-| recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
-| payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| productName | string | Product name |
+| productCode | string | Product code |
+| currency | string | Asset currency |
+| digit | integer | Currency precision in decimal places |
+| lockPeriodDays | integer | Lock-up days for fixed-term products; 0 for flexible products |
+| type | string | Product type: `CURRENT` or `FIXED` |
+| redeemAmount | number | Redemption amount |
+| endTime | string | Redemption time |
+| expireTime | string | Related position maturity date; null when no position is linked |
+| expireTimeTimestamp | integer | Related position maturity time as a Unix timestamp in milliseconds |
+| endTimeTimestamp | integer | Redemption time as a Unix timestamp in milliseconds |
+| subscribeTimeTimestamp | integer | Related position subscription time as a Unix timestamp in milliseconds |
+| subscribeTime | string | Related position subscription time |
+| currentRewardAmount | number | Current interest; 0 after redemption or the stored position snapshot value |
+| cumulativeRewardAmount | number | Cumulative interest |
+| status | string | Always `REDEEMED` in this list |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/history" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```
@@ -399,7 +370,9 @@ Returns `products` by product dimension, ordered by `product_code` ascending, th
 | pauseRedeem | boolean | Whether redemption is suspended (true means suspended, redemption cannot be initiated) |
 | annualRate | number | Base APY% (excluding point rewards) |
 | rewardAnnualRate | number | Reward annual rate: excess reward tier APY% (config excess_reward_annual_rate) |
-| totalAnnualRate | number | Total APY% = Base + Reward (for display) |
+| totalAnnualRate | number | Total APY% = base + reward + the signed-in user's highest eligible coupon rate |
+| couponSupported | boolean | Whether the product supports interest coupons |
+| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
 | minDepositAmount | number | Minimum Deposit Amount |
 | minRedeemAmount | number | Minimum Withdrawal Amount |
 | subscriptionStartTime | string | Subscription start time; if both start and end are null, no restriction applies |

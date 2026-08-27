@@ -19,6 +19,10 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
 </Note>
 
+<Info>
+  Transaction filter enums: `transactionMethod` accepts `CHAIN_TX`, `USER_TRANSFER`, or `OTHER`. `transactionType` accepts `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `SAFEBOX_TRANSFER_OUT`, `ROLLBACK`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, or `PROMO_REWARD_OUT`.
+</Info>
+
 ---
 
 ## Get transaction record details by transactionId
@@ -79,7 +83,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | createTimeTimestamp | integer | Trade start time millisecond timestamp |
 
 ```bash
-curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}" \
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/TXN-20260827-0001" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
@@ -182,7 +186,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "current": 1,
+  "size": 20
 }' 
 ```
 
@@ -218,7 +223,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "exchange-demo-001",
+  "symbol": "BTC",
+  "exchangeSymbol": "USDT",
+  "amount": 0.01,
+  "quoteSessionId": "QUOTE_DEMO_001"
 }' 
 ```
 
@@ -316,6 +325,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "current": 1,
+  "size": 20
 }' 
 ```

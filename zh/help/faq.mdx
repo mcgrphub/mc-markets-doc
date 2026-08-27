@@ -17,8 +17,8 @@ description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、
 
   <Accordion title="每个接口需要什么权限?">
     - `READ` — 大多查询接口(交易、持仓、汇率、币种元数据、PoR)。
-    - `TRADE` — 理财产品申购与定期订阅。
-    - `WITHDRAW` — 理财产品赎回。
+    - `TRADE` — 下单、撤单，以及当前公开的理财申购和赎回接口。
+    - `WITHDRAW` — API Key 支持的权限类型；当前公开 Spec 中没有要求该权限的接口。
 
     具体权限在 [API 参考](/zh/api-reference/overview) 的接口页中标注。
   </Accordion>
@@ -28,13 +28,13 @@ description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、
 
 <AccordionGroup>
   <Accordion title="到底签名什么?">
-    待签名字符串包含方法、URI、可选 query、参与签名的头（`x-access-key` / `x-nonce` / `x-timestamp`）、时间戳、nonce，以及（`POST`/`PUT`/`PATCH` 非空 body 时）body 的 SHA-256 小写 hex。`X-Signature` 为 HMAC-SHA256 的 **Base64**（不是 hex）。每次请求须带新的 `X-Nonce`（**UUID v4**，或 ≥32 位十六进制）。完整规则见 [认证](/zh/authentication)。
+    待签名字符串包含方法、URI、可选 query、参与签名的头（`x-access-key` / `x-nonce` / `x-timestamp`）、时间戳、nonce，以及（`POST`/`PUT`/`PATCH`/`DELETE` 非空 body 时）body 的 SHA-256 小写 hex。`X-Signature` 为 HMAC-SHA256 的 **Base64**（不是 hex）。每次请求须带新的 `X-Nonce`（**UUID v4**，或 ≥32 位十六进制）。完整规则见 [认证](/zh/authentication)。
   </Accordion>
 
   <Accordion title="返回签名无效怎么办?">
     按可能性排序:
 
-    1. 待签名字符串缺少 `X-Nonce` 或（非空 `POST`/`PUT`/`PATCH` 时）body SHA-256。
+    1. 待签名字符串缺少 `X-Nonce` 或（非空 `POST`/`PUT`/`PATCH`/`DELETE` 时）body SHA-256。
     2. 待签名字符串与网关预期不一致——打印并逐字节对比（含 `X-Nonce` 值是否与头一致）。
     3. 签名时使用的 body 与实际发送的 body 不一致（多余空格、重排 JSON）。序列化一次，两处复用同一字节。
     4. 把 Access Key 当作 Secret Key。
@@ -44,8 +44,8 @@ description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、
     另见 [排障](/zh/help/troubleshooting)。
   </Accordion>
 
-  <Accordion title="返回 code 40002(时间戳过期) 怎么办?">
-    本机时钟与网关偏离。`X-Timestamp` 必须是当前 UTC **毫秒**(非秒),并位于服务器时间附近。使用 NTP 同步。
+  <Accordion title="返回时间戳无效或已过期怎么办?">
+    网关通常返回 HTTP `401`，并在 `message` 中说明时间戳错误。本机时钟与网关偏离时，`X-Timestamp` 必须改为当前 UTC **毫秒**（非秒）并使用 NTP 同步。
   </Accordion>
 
   <Accordion title="如何无停机轮换密钥?">
@@ -57,11 +57,11 @@ description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、
 
 <AccordionGroup>
   <Accordion title="哪些接口返回分页响应?">
-    所有列表型接口(交易记录、资金费历史)均返回 `pageNum`、`pageSize`、`total`、`pages` 与 `list`。见 [分页](/zh/concepts/pagination)。
+    大多数业务列表使用请求 `current` / `size`，并返回 `records`、`total`、`current`、`size`、`pages`、`hasPrevious`、`hasNext`。行情排行榜使用 `page` / `pageSize` 和 `items`。见 [分页](/zh/concepts/pagination)。
   </Accordion>
 
-  <Accordion title="pageSize 最大多少?">
-    多数列表接口上限为 `100`。具体以 [API 参考](/zh/api-reference/overview) 为准。
+  <Accordion title="每页最多可以请求多少条?">
+    没有适用于所有接口的统一文档值。请使用具体接口 schema 中的 `size` 或 `pageSize` 限制；未声明时从较小值开始，并根据响应和限流情况调整。
   </Accordion>
 
   <Accordion title="如何获取实时更新?">
@@ -77,11 +77,11 @@ description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、
   </Accordion>
 
   <Accordion title="v1 与 v2 接口差异?">
-    部分资源(现货持仓、资金费记录)提供 v2。v2 为当前推荐版本,返回额外字段。见 [版本管理](/zh/api-reference/versioning)。
+    当前公开 Spec 同时包含上下文用户持仓 `/fund/account/spot/positions/v2`，以及按 `spotId` 查询的 `/fund/account/spot-account/positions`；资金费记录路径为 `/funding-fee-record/page/v2`。它们不是可以任意互换的版本别名，请按 [API 参考](/zh/api-reference/overview) 选择接口。
   </Accordion>
 
   <Accordion title="数字字段是数字还是字符串?">
-    所有金额、价格、汇率都以**字符串**返回以保留精度。使用十进制库解析(Python `Decimal`、JavaScript `bignumber.js`、Java `BigDecimal`),不要使用浮点型。
+    字段类型以具体接口 schema 为准：部分字段是 JSON `number`，部分接口同时提供 `*Display` 或字符串字段。计算时使用十进制库（Python `Decimal`、JavaScript `bignumber.js`、Java `BigDecimal`），不要假定所有数值都是同一种 JSON 类型。
   </Accordion>
 </AccordionGroup>
 
@@ -93,7 +93,7 @@ description: "MC OpenAPI 常见问题解答:签名、权限、网关、分页、
   </Accordion>
 
   <Accordion title="频率限制如何实施?">
-    网关按 Access Key 计数。超限后返回 HTTP `429` 与 `code: "42901"`。退避策略见 [频率限制](/zh/guides/rate-limits)。
+    限流键取决于鉴权阶段和路由配置，可能使用 IP、路径加 IP、Access Key 或 UID。客户端应以 HTTP `429` 为准，不要依赖固定业务码。退避策略见 [频率限制](/zh/guides/rate-limits)。
   </Accordion>
 
   <Accordion title="如何提 Bug 或需求?">

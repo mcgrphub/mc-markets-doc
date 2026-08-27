@@ -50,31 +50,16 @@ Query the trading symbol list for the current user.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbol | string | Currency |
-| fundingRate | number | Funding Rate |
-| fundingRateStr | string | Funding rate raw decimal string |
-| fundingRateDisplay | string | Funding rate display value |
-| fundingRateScale | integer | Funding rate display decimal places |
-| annualRateDisplay | string | Annualized funding rate display value |
-| settlementPrice | number | Close Price |
-| settlementPriceStr | string | Close price raw decimal string |
-| settlementPriceDisplay | string | Close price display value |
-| settlementPriceScale | integer | Close price display decimal places |
-| longInterestRate | number | Long Interest Rate |
-| longInterestRateStr | string | Long interest rate raw decimal string |
-| shortInterestRate | number | Short Interest Rate |
-| shortInterestRateStr | string | Short interest rate raw decimal string |
-| isSettlementRate | boolean | Whether it is the settlement rate |
-| nextSettlementTime | integer | Next settlement time Unix timestamp |
-| timestamp | integer | Funding rate generation time Unix timestamp |
-| settlementCycle | integer | Settlement cycle (unit: seconds) |
+| symbol | string | Product name |
+| group | string | Product group |
+| flags | string | Symbol flags: `MORTGAGE`, `TRADE`, or `SPOT` |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```

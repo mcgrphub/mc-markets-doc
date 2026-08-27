@@ -54,69 +54,66 @@ description: "成交相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| order | integer | 订单号，主键 |
+| deal | integer | 成交号，主键 |
 | login | integer | 交易账户登录号 |
 | dealer | integer | 交易商ID |
-| symbol | string | 交易品种，如EURUSD、GBPUSD等 |
+| order | integer | 订单号，关联的订单号 |
+| action | integer | 0-买入, 1-卖出 |
+| entry | integer | 0-开仓，1-平仓 |
+| reason | integer | 原因，成交变更的原因代码 |
 | digits | integer | 价格精度，交易品种的价格小数位数 |
 | digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
 | contractSize | number | 合约大小，每手合约的标准大小 |
-| state | integer | 订单状态 |
-| reason | integer | 原因，订单变更的原因代码 |
-| timeSetup | integer | 下单时间，订单创建的时间戳，毫秒级，长度13位 |
-| timeExpiration | integer | 到期时间，订单的到期时间戳，毫秒级，长度13位 |
-| timeDone | integer | 完成时间，订单完成的时间戳，毫秒级，长度13位 |
-| timeSetupMsc | integer | 下单时间（毫秒），订单创建的时间戳（毫秒），毫秒级，长度13位 |
-| timeDoneMsc | integer | 完成时间（毫秒），订单完成的时间戳（毫秒），毫秒级，长度13位 |
-| modifyFlags | integer | 修改标志，订单修改的标志位 |
-| type | integer | 订单类型，如买入、卖出等 |
-| typeFill | integer | 成交类型，订单的填充方式 |
-| typeTime | integer | 有效时间类型，订单的有效期类型 |
-| priceOrder | number | 订单价格，订单的执行价格 |
-| priceOrderStr | string | 订单价格原始字符串 |
-| priceOrderDisplay | string | 订单价格展示值 |
-| priceOrderScale | integer | 订单价格展示小数位 |
-| priceTrigger | number | 触发价格，订单的触发价格 |
-| priceTriggerDisplay | string | 触发价格展示值 |
-| priceTriggerScale | integer | 触发价格展示小数位 |
-| priceCurrent | number | 当前价格，订单的当前市场价格 |
-| priceCurrentDisplay | string | 当前价格展示值 |
-| priceCurrentScale | integer | 当前价格展示小数位 |
-| priceSlDisplay | string | 止损价格展示值 |
-| priceSlScale | integer | 止损价格展示小数位 |
-| priceTpDisplay | string | 止盈价格展示值 |
-| priceTpScale | integer | 止盈价格展示小数位 |
-| volumeInitialExt | number | 初始交易量（扩展精度） |
-| quantity | number | 用户数量，初始扩展交易量经持仓量精度换算后的值 |
-| volumeInitialDisplay | string | 初始手数展示值 |
-| volumeInitialScale | integer | 初始手数展示小数位 |
-| volumeCurrentExt | number | 当前交易量（扩展精度） |
-| volumeCurrentDisplay | string | 当前手数展示值 |
-| volumeCurrentScale | integer | 当前手数展示小数位 |
+| time | integer | 成交时间，成交发生的时间戳，毫秒级，长度13位 |
+| timeMsc | integer | 成交时间（毫秒），成交发生的时间戳（毫秒），毫秒级，长度13位 |
+| symbol | string | 交易品种，如EURUSD、GBPUSD等 |
+| price | number | 成交价格，成交的执行价格 |
+| volumeExt | integer | 成交量（扩展精度），需按持仓量精度换算 |
+| quantity | number | 用户数量，volumeExt 经持仓量精度换算后的值 |
+| profit | number | 盈亏，成交产生的盈亏金额 |
+| storage | number | 库存费，持仓产生的库存费用 |
+| commission | number | 佣金，成交产生的佣金费用 |
+| commissionDisplay | string | 佣金展示值，按带符号 CEILING 固定保留 6 位小数 |
+| commissionScale | integer | 佣金展示小数位 |
+| profitDisplay | string | 盈亏展示值，按 HALF_UP 固定保留 8 位小数 |
+| profitScale | integer | 盈亏展示小数位 |
+| fee | number | 手续费，成交产生的手续费用 |
+| rateProfit | number | 盈亏汇率，计算盈亏时使用的汇率 |
 | rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
-| activationMode | integer | 激活模式，挂单的激活模式（如挂单激活方式） |
-| activationTime | integer | 激活时间，挂单的激活时间戳 |
-| activationPrice | number | 激活价格，挂单的激活价格 |
-| activationFlags | integer | 激活标志，挂单激活的标志位 |
-| volumeInitial | number | 初始手数，订单的初始交易手数 |
-| volumeCurrent | number | 当前手数，订单的当前交易手数 |
+| profitRaw | number | 原始盈亏，成交的原始盈亏金额（未考虑汇率） |
+| pricePosition | number | 持仓价格，持仓的平均价格 |
+| volumeClosedExt | integer | 已平仓交易量（扩展精度） |
+| tickValue | number | 点值，每个点的价值 |
+| tickSize | number | 点大小，每个点的大小 |
+| flags | integer | 标志位，成交的标志位 |
+| value | number | 价值，成交的价值 |
+| gateway | string | 网关，成交的网关名称 |
+| priceGateway | number | 网关价格，网关的成交价格 |
+| modifyFlags | integer | 修改标志，成交修改的标志位 |
+| marketBid | number | 市场买价，市场当前的买价 |
+| marketAsk | number | 市场卖价，市场当前的卖价 |
+| marketLast | number | 市场最后价，市场最后的成交价 |
+| volume | integer | 手数（标准精度），需按持仓量精度换算 |
+| volumeClosed | integer | 已平仓手数，已平仓的交易手数 |
 | externalID | string | 外部ID，外部系统关联的ID |
+| expertID | integer | 专家顾问ID，如果成交由 EA 创建，则记录 EA 的 ID |
+| positionID | integer | 持仓ID，关联的持仓ID |
 | priceSL | number | 止损价格，设置的止损价位 |
 | priceTP | number | 止盈价格，设置的止盈价位 |
-| expertID | integer | 专家顾问ID，如果订单由 EA 创建，则记录 EA 的 ID |
-| positionID | integer | 持仓ID，关联的持仓ID |
-| positionByID | integer | 反向持仓ID，关联的反向持仓ID |
+| on_chain_status | string | 链上状态 |
+| tx_hash | string | 链上交易哈希 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/v3" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1" \
-  --data-urlencode "type=VALUE" \
-  --data-urlencode "from=1755792000"
+  --data-urlencode "type=CONTRACT" \
+  --data-urlencode "from=1755792000" \
+  --data-urlencode "to=1755878400"
 ```
 
 ---
@@ -153,7 +150,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=BTCUSDT" \
   --data-urlencode "limit=1"
 ```

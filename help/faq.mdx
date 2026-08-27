@@ -17,8 +17,8 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
 
   <Accordion title="Which permission does an endpoint require?">
     - `READ` — most query endpoints (transactions, positions, exchange rates, symbol metadata, PoR snapshots).
-    - `TRADE` — finance-account deposit and fixed-term subscriptions.
-    - `WITHDRAW` — finance-account withdrawals.
+    - `TRADE` — order operations and the currently public Finance deposit and redemption endpoints.
+    - `WITHDRAW` — an available API Key scope; no endpoint in the current public Specs requires it.
 
     The required scope is listed on each endpoint page under [API Reference](/api-reference/overview).
   </Accordion>
@@ -28,13 +28,13 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
 
 <AccordionGroup>
   <Accordion title="What exactly do I sign?">
-    The string to sign includes method, URI, optional query, signed headers (`x-access-key` / `x-nonce` / `x-timestamp`), timestamp, nonce, and (for non-empty `POST`/`PUT`/`PATCH` bodies) the lowercase SHA-256 hex of the raw body. Put the HMAC-SHA256 digest in `X-Signature` as **Base64** (not hex). Every request needs a new `X-Nonce` (**UUID v4**, or ≥32 hex characters). Full rules: [Authentication](/authentication).
+    The string to sign includes method, URI, optional query, signed headers (`x-access-key` / `x-nonce` / `x-timestamp`), timestamp, nonce, and (for non-empty `POST`/`PUT`/`PATCH`/`DELETE` bodies) the lowercase SHA-256 hex of the raw body. Put the HMAC-SHA256 digest in `X-Signature` as **Base64** (not hex). Every request needs a new `X-Nonce` (**UUID v4**, or ≥32 hex characters). Full rules: [Authentication](/authentication).
   </Accordion>
 
   <Accordion title="I get an invalid signature. What's wrong?">
     In order of likelihood:
 
-    1. The string to sign is missing `X-Nonce` or (for non-empty `POST`/`PUT`/`PATCH`) the body SHA-256.
+    1. The string to sign is missing `X-Nonce` or (for non-empty `POST`/`PUT`/`PATCH`/`DELETE`) the body SHA-256.
     2. The string to sign does not match what the gateway expects — print it and compare byte-for-byte (including whether `X-Nonce` matches the header).
     3. You signed different body bytes than you sent (extra whitespace, reordered JSON). Serialize once and reuse the exact bytes.
     4. You used the Access Key in place of the Secret Key.
@@ -44,8 +44,8 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
     See also [Troubleshooting](/help/troubleshooting).
   </Accordion>
 
-  <Accordion title="I get code 40002 (timestamp expired). What's wrong?">
-    Your machine's clock is skewed from the gateway. `X-Timestamp` must be current UTC time in **milliseconds** (not seconds), and within a small window of the server clock. Sync via NTP.
+  <Accordion title="I get a timestamp invalid or expired error. What's wrong?">
+    The gateway normally returns HTTP `401` and describes the timestamp problem in `message`. Use current UTC time in **milliseconds**, not seconds, and synchronize the machine clock with NTP.
   </Accordion>
 
   <Accordion title="Can I rotate keys without downtime?">
@@ -57,11 +57,11 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
 
 <AccordionGroup>
   <Accordion title="Which endpoints return a paginated response?">
-    Every list-style endpoint (transaction records, funding-fee history) returns `pageNum`, `pageSize`, `total`, `pages`, and `list`. See [Pagination](/concepts/pagination).
+    Most business lists request `current` / `size` and return `records`, `total`, `current`, `size`, `pages`, `hasPrevious`, and `hasNext`. Market rankings use `page` / `pageSize` and `items`. See [Pagination](/concepts/pagination).
   </Accordion>
 
-  <Accordion title="What is the largest pageSize I can request?">
-    Most list endpoints allow up to `100`. Check the specific endpoint under [API Reference](/api-reference/overview) for its documented limit.
+  <Accordion title="How many records can I request per page?">
+    There is no single documented limit for every endpoint. Use the `size` or `pageSize` constraint in the endpoint schema. If none is declared, start with a modest value and adjust for responses and rate limiting.
   </Accordion>
 
   <Accordion title="How do I get real-time updates?">
@@ -77,11 +77,11 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
   </Accordion>
 
   <Accordion title="What is the difference between v1 and v2 endpoints?">
-    Some resources (spot positions, funding-fee records) have both v1 and v2 variants. The v2 versions are the current recommendation and return additional fields. See [Versioning](/api-reference/versioning) for the full list.
+    The current public Specs include `/fund/account/spot/positions/v2` for the context user and `/fund/account/spot-account/positions` for a specified `spotId`; funding-fee records use `/funding-fee-record/page/v2`. These are not interchangeable version aliases. Choose the operation from the [API Reference](/api-reference/overview).
   </Accordion>
 
   <Accordion title="Are numeric fields returned as numbers or strings?">
-    All monetary amounts, prices, and rates are returned as **strings** to preserve precision. Parse them with a decimal library (Python `Decimal`, JavaScript `bignumber.js`, Java `BigDecimal`) — never with floating-point.
+    Follow each endpoint schema. Some fields are JSON `number`; some endpoints also provide string or `*Display` fields. Use a decimal library (Python `Decimal`, JavaScript `bignumber.js`, Java `BigDecimal`) for calculations, and do not assume one JSON type for every numeric value.
   </Accordion>
 </AccordionGroup>
 
@@ -93,7 +93,7 @@ description: "Answers to common MC OpenAPI questions: signing, permissions, gate
   </Accordion>
 
   <Accordion title="How are rate limits enforced?">
-    Per-Access-Key at the gateway. Exceeding the limit returns HTTP `429` with `code: "42901"`. See [Rate Limits](/guides/rate-limits) for the recommended backoff strategy.
+    The key depends on the authentication stage and route configuration and can be IP, path plus IP, Access Key, or UID. Treat HTTP `429` as authoritative instead of depending on a fixed business code. See [Rate Limits](/guides/rate-limits).
   </Accordion>
 
   <Accordion title="Where do I report a bug or request a feature?">

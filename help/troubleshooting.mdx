@@ -68,11 +68,12 @@ Use this guide as a decision tree when a request fails. Always inspect **both** 
 ## HTTP 429 — rate limited
 
 ```json
-{ "code": "42901", "msg": "Too many requests", "success": false }
+{ "status": 429, "code": 429, "message": "请求过于频繁，请稍后重试" }
 ```
 
 - Back off with exponential delay \+ jitter — see [Rate Limits](/guides/rate-limits) for a copy-pasteable retry helper.
-- If you routinely hit `429` under normal load, reduce polling frequency or contact support about a higher tier.
+- Use HTTP `429` as the rate-limit signal; other gateway limiters can return a different body.
+- If you routinely hit `429`, reduce polling frequency and record the path, request time, and correlation ID.
 
 ## HTTP 5xx — gateway error
 

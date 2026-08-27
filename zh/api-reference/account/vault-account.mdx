@@ -55,7 +55,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "vault-withdraw-demo-001",
+  "symbolId": "1",
+  "amount": 10
 }'
 ```
 
@@ -89,7 +91,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "vault-deposit-demo-001",
+  "symbolId": "1",
+  "amount": 10
 }'
 ```
 

@@ -50,31 +50,16 @@ description: "交易品种列表等 Risk 交易相关接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbol | string | 交易品种 |
-| fundingRate | number | 资金费率 |
-| fundingRateStr | string | 资金费率原始字符串 |
-| fundingRateDisplay | string | 资金费率展示值（百分比文本） |
-| fundingRateScale | integer | 资金费率展示小数位数 |
-| annualRateDisplay | string | 年化资金费率展示值 |
-| settlementPrice | number | 结算价格 |
-| settlementPriceStr | string | 结算价格原始字符串 |
-| settlementPriceDisplay | string | 结算价格展示值 |
-| settlementPriceScale | integer | 结算价格展示小数位数 |
-| longInterestRate | number | 多头利息费率 |
-| longInterestRateStr | string | 多头利息费率原始字符串 |
-| shortInterestRate | number | 空头利息费率 |
-| shortInterestRateStr | string | 空头利息费率原始字符串 |
-| isSettlementRate | boolean | 是否为结算费率记录 |
-| nextSettlementTime | integer | 下次结算时间（Unix 毫秒时间戳） |
-| timestamp | integer | 资金费率生成时间（Unix 毫秒时间戳） |
-| settlementCycle | integer | 结算周期（秒） |
+| symbol | string | 产品名称 |
+| group | string | 产品分组 |
+| flags | string | 品种标签, MORTGAGE:抵押品，TRADE:交易品种,SPOT:现货 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```

@@ -1,46 +1,41 @@
 ---
-title: "MC OpenAPI Rate Limits"
-sidebarTitle: "Rate Limits"
-description: "How MC OpenAPI enforces rate limits per Access Key, how to detect throttling, and how to implement exponential backoff."
+title: "MC OpenAPI rate limits"
+sidebarTitle: "Rate limits"
+description: "Recognize HTTP 429 responses from MC OpenAPI and retry safely with exponential backoff and jitter."
 ---
 
-MC OpenAPI enforces per-Access-Key request-rate limits at the gateway to protect the platform and ensure fair capacity for every integration.
+MC OpenAPI applies traffic protection at the API Gateway. Treat HTTP **`429 Too Many Requests`** as the authoritative rate-limit signal.
 
 <Note>
-  Exact per-endpoint limits depend on your account tier. If you need higher throughput for a production integration, contact MC support.
+  The rate-limit key depends on the request stage and route configuration. Before authentication, a limiter can key by IP or path plus IP. After authentication, it can key by a trusted Access Key or UID. Do not assume every endpoint is limited only by Access Key.
 </Note>
 
-## How limits are applied
+The fixed source does not define one limit value that applies to every public endpoint. Use the effective route configuration and observed responses for capacity planning.
 
-- Limits are counted **per Access Key**, not per source IP.
-- Some heavy endpoints (paginated history queries, PoR snapshots) have stricter limits than lightweight metadata endpoints.
+## Recognize rate limiting
 
-## Detecting throttling
-
-When you exceed a limit, the gateway responds with **HTTP `429 Too Many Requests`** and a business error envelope:
+The AK/SK v2 protection layer returns this typical response:
 
 ```json
 {
-  "code": "42901",
-  "msg": "Too many requests",
-  "success": false,
-  "data": null
+  "status": 429,
+  "code": 429,
+  "message": "请求过于频繁，请稍后重试"
 }
 ```
 
-Always check both signals:
+Other gateway limiters can produce a different body. Clients should:
 
-- HTTP status code — reliable transport-level indicator.
-- The `code` field in the JSON envelope — `"42901"` (or another rate-limit code documented alongside the endpoint) indicates throttling.
+1. Check whether the HTTP status is `429`.
+2. Record `message` for diagnostics when the response is JSON.
+3. Avoid depending on fixed `42901`, `msg`, or `success` fields.
 
-## Recommended handling: exponential backoff with jitter
-
-When you get a `429`, do **not** retry immediately in a tight loop. Wait, then retry with an exponentially growing delay plus a small random jitter to avoid synchronized retry storms.
-
-### Python
+## Exponential backoff with jitter
 
 ```python
-import time, random, requests
+import random
+import time
+
 
 def call_with_backoff(send_request, *, max_retries=6, base=1.0, cap=30.0):
     for attempt in range(max_retries):
@@ -48,43 +43,33 @@ def call_with_backoff(send_request, *, max_retries=6, base=1.0, cap=30.0):
         if response.status_code != 429:
             return response
 
-        payload = {}
-        try:
-            payload = response.json()
-        except ValueError:
-            pass
-        if payload.get("code") not in {"42901", None}:
-            return response  # Not a rate-limit error
-
-        delay = min(cap, base * (2 ** attempt)) + random.uniform(0, 0.5)
+        delay = min(cap, base * (2**attempt)) + random.uniform(0, 0.5)
         time.sleep(delay)
 
-    raise RuntimeError("Exceeded max retries after repeated 429 responses")
+    raise RuntimeError("Exceeded max retries after repeated HTTP 429 responses")
 ```
 
-### JavaScript
-
 ```javascript
-async function callWithBackoff(sendRequest, { maxRetries = 6, base = 1000, cap = 30_000 } = {}) {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const res = await sendRequest();
-    if (res.status !== 429) return res;
+async function callWithBackoff(
+  sendRequest,
+  { maxRetries = 6, base = 1000, cap = 30_000 } = {},
+) {
+  for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+    const response = await sendRequest();
+    if (response.status !== 429) return response;
 
-    const delay = Math.min(cap, base * 2 ** attempt) + Math.floor(Math.random() * 500);
-    await new Promise((r) => setTimeout(r, delay));
+    const delay = Math.min(cap, base * 2 ** attempt)
+      + Math.floor(Math.random() * 500);
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
-  throw new Error("Exceeded max retries after repeated 429 responses");
+  throw new Error("Exceeded max retries after repeated HTTP 429 responses");
 }
 ```
 
-## Best practices
+## Request guidance
 
-- **Batch and page efficiently.** Use the largest `pageSize` an endpoint allows — see [Pagination](/concepts/pagination).
-- **Cache slow-changing data.** Symbol lists, exchange metadata, and USD rate tables change slowly; cache them locally for at least a few minutes.
-- **Separate keys per workload.** Use one Access Key for interactive queries and another for background jobs so a bursty job doesn't starve user traffic.
-- **Sync your clocks.** A skewed clock produces `401` signing failures, not `429` — but you'll waste your rate budget on retries. Use NTP.
-- **Handle `5xx` the same way.** For `500`, `502`, and `503`, use the same exponential-backoff strategy.
-
-<Tip>
-  Log the response `code`, `msg`, and any correlation IDs on every `429`. If throttling is frequent even under normal load, contact support with those log entries to review your tier.
-</Tip>
+- Reduce unnecessary polling and cache slow-changing currency and exchange-rate data.
+- Persist pagination progress so a failed job can resume from the unfinished page.
+- Generate a new timestamp, nonce, and signature for every retry.
+- Back off on transient `500`, `502`, and `503` responses, but do not automatically retry parameter or permission errors.
+- Log request time, path, HTTP status, and correlation ID; never log the Secret Key.

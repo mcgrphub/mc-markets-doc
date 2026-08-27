@@ -57,7 +57,12 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "login": "10000001",
+  "order": 123456789,
+  "symbol": "BTCUSDT",
+  "type": 0,
+  "priceSL": 60000,
+  "priceTP": 70000
 }' 
 ```
 
@@ -99,7 +104,17 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "login": "10000001",
+  "symbol": "BTCUSDT",
+  "price": 65000,
+  "type": 2,
+  "typeTime": 0,
+  "expiration": 0,
+  "priceTrigger": 0,
+  "priceSL": 60000,
+  "priceTP": 70000,
+  "order": 123456789,
+  "volumeExt": 100000000
 }' 
 ```
 
@@ -144,7 +159,13 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "login": "10000001",
+  "symbol": "BTCUSDT",
+  "volumeExt": 100000000,
+  "price": 0,
+  "type": 0,
+  "typeFill": 1,
+  "typeTime": 0
 }' 
 ```
 
@@ -188,7 +209,14 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "login": "10000001",
+  "symbol": "BTCUSDT",
+  "volumeExt": 100000000,
+  "price": 0,
+  "type": 1,
+  "position": 123456789,
+  "typeFill": 1,
+  "typeTime": 0
 }' 
 ```
 
@@ -413,8 +441,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "symbols=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "symbols=BTCUSDT"
 ```
 
 ---
@@ -443,8 +471,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "login=VALUE" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "login=10000001" \
   --data-urlencode "type=1" \
   --data-urlencode "volumeExt=1" \
   --data-urlencode "symbol=BTCUSDT"
@@ -526,8 +554,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "uid=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "uid=10000001"
 ```
 
 ---
@@ -597,8 +625,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "login=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "login=10000001"
 ```
 
 ---
@@ -632,6 +660,9 @@ curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/ord
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "login": "10000001",
+  "order": 123456789,
+  "type": 2,
+  "symbol": "BTCUSDT"
 }' 
 ```

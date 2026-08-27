@@ -130,25 +130,27 @@ API 网关拒绝签名或权限时，例如：
 
 ### 分页响应
 
-下面的业务码和消息值仅用于展示结构；具体字段值及空字段是否序列化以接口响应为准。
+下面示例使用 `RetResult.data()` 的成功值；具体 `data` 字段以接口响应 schema 为准。
 
 ```json
 {
   "status": 200,
-  "message": "success",
-  "code": "0",
-  "codeKey": "DEFAULT",
+  "message": "ok",
+  "code": "200",
+  "codeKey": null,
   "params": {},
-  "localizedMessage": "success",
+  "localizedMessage": null,
   "success": true,
   "data": {
-    "pageNum": 1,
-    "pageSize": 20,
+    "records": [
+      { "transactionId": "T-1001", "amount": 125.5, "acSymbol": "USDT" }
+    ],
     "total": 132,
+    "size": 20,
+    "current": 1,
     "pages": 7,
-    "list": [
-      { "transactionId": "T-1001", "amount": "125.50", "currency": "USDT" }
-    ]
+    "hasPrevious": false,
+    "hasNext": true
   }
 }
 ```

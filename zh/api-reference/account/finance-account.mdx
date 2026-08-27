@@ -52,7 +52,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "finance-withdraw-demo-001",
+  "productCode": "USDT_CURRENT",
+  "amount": 10
 }' 
 ```
 
@@ -85,7 +87,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "finance-fixed-withdraw-demo-001",
+  "positionId": 10001
 }' 
 ```
 
@@ -104,6 +107,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | trackingId | string | 是 | 用于跟踪请求的唯一标识 |
 | productCode | string | 是 | 理财产品代码，如 USDT_CURRENT |
 | amount | number | 是 | 存款金额 |
+| couponId | string | 否 | 加息券 ID；不传时按无券申购，不执行锁券 |
 
 ### 响应 `data` 字段
 
@@ -119,7 +123,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "finance-deposit-demo-001",
+  "productCode": "USDT_CURRENT",
+  "amount": 10
 }' 
 ```
 
@@ -147,11 +153,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | --- | --- | --- |
 | productCode | string | 产品代码 |
 | productName | string | 产品名称 |
-| type | string | 产品类型枚举：`CURRENT`（活期）或 `FIXED`（定期） |
+| type | string | 类型：活期/定期；可选值：`CURRENT`、`FIXED` |
 | currency | string | 币种 |
 | annualRate | number | 基础年化收益率% |
 | rewardAnnualRate | number | 超额奖励年化收益率%（配置档） |
-| maxAnnualRate | number | 最高年化%=基础+奖励 |
+| maxAnnualRate | number | 最高年化%=基础+（仅活期超额）+登录最高券面 |
 | periodDays | integer | 定期天数，活期为0 |
 | minDepositAmount | number | 最低起存金额 |
 | minRedeemAmount | number | 最小赎回金额 |
@@ -165,6 +171,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/a
 | dailyMaxRedeemAmount | number | 每日提取上限 |
 | subscriptionStartTimeTimestamp | integer | 申购开始时间毫秒时间戳 |
 | subscriptionEndTimeTimestamp | integer | 申购结束时间毫秒时间戳 |
+| couponSupported | boolean | 是否支持加息券 |
+| couponNominalAnnualRate | number | 最高可用券面年化% |
+| rewardMinHoldingDays | integer | 奖励需连续持有满（天）；定期为空或 0 |
+| rewardMinPosition | number | 超额奖励持仓本金门槛；定期为空或 0 |
 
 ```bash
 ACCESS_KEY="${MC_ACCESS_KEY:?请设置 MC_ACCESS_KEY}"
@@ -227,55 +237,42 @@ curl -sS -G "https://gateway.mcconnects.com${PATH_}" \
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
-| uid | string | 用户 UID |
-| transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
-| acSymbol | string | 币种名称；闪兑时为兑出币种 |
-| network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
-| exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因说明 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 链上交易哈希 |
-| feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户 ID |
-| targetAccountId | string | 目标账户 ID |
-| sourceWalletAddress | string | 来源链上钱包地址 |
-| targetWalletAddress | string | 目标链上钱包地址 |
-| extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| positionId | integer | 持仓明细ID；活期同一产品多笔汇总时为 null |
+| productName | string | 产品名称 |
+| productCode | string | 产品代码 |
+| currency | string | 资产币种 |
+| digit | integer | 币种精度（小数位） |
+| lockPeriodDays | integer | 锁仓天数（定期）；活期为 0 |
+| type | string | 类型：活期 / 定期；可选值：`CURRENT`、`FIXED` |
+| positionAmount | number | 持有中订单的本金：活期同产品多笔为本金合计；不含未结利息与冻结（利息见 currentRewardAmount） |
+| baseAnnualRate | number | 基础年利率%（定期/活期单笔取持仓快照，活期汇总取产品配置） |
+| rewardMinHoldingDays | integer | 奖励需连续持有满（天）后才享超额档；无分层规则时可为 null |
+| excessRewardAnnualRate | number | 超额奖励年化收益率%（产品配置） |
+| eligibleRewardAmount | number | 订单持有金额不低于：享受超额奖励档所需的持仓本金门槛；无超额分层时可为 null |
+| currentRewardAmount | number | 当前持有利息合计；单位为该产品资产币种（与 currency 一致），不折 USDC |
+| cumulativeRewardAmount | number | 历史利息总额；单位为该产品资产币种（与 currency 一致），不折 USDC |
+| status | string | 持仓状态：持有中 / 已到期（活期汇总时若任一为持有中则为持有中）；可选值：`HOLDING`、`REDEEMED`、`EXPIRED` |
+| subscribeTime | string | 定期：该笔持仓明细的申购时间；活期同产品汇总行为 null |
+| excessRewardAnnualRateDisplay | string | 超额奖励年化收益率展示值 |
+| eligibleRewardAmountDisplay | string | 奖励持仓本金门槛展示值 |
+| currentRewardAmountDisplay | string | 当前持有利息展示值 |
+| cumulativeRewardAmountDisplay | string | 历史利息总额展示值 |
+| positionAmountDisplay | string | 持有中订单本金展示值 |
+| subscribeTimeTimestamp | integer | 申购时间毫秒时间戳 |
+| baseAnnualRateDisplay | string | 基础年利率展示值 |
+| couponId | string | 绑定加息券 ID |
+| couponNominalAnnualRate | number | 券面年化% |
+| couponBoostAmountUsdc | number | 加息金额 USDC |
+| couponQuoteUsdcPerProduct | number | 锁定时产品币兑 USDC |
+| couponQuoteTimeMs | integer | 报价时刻毫秒 |
+| pauseRedeem | boolean | 是否暂停赎回 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/holding" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```
@@ -313,55 +310,29 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
-| uid | string | 用户 UID |
-| transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
-| acSymbol | string | 币种名称；闪兑时为兑出币种 |
-| network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
-| exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因说明 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 链上交易哈希 |
-| feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户 ID |
-| targetAccountId | string | 目标账户 ID |
-| sourceWalletAddress | string | 来源链上钱包地址 |
-| targetWalletAddress | string | 目标链上钱包地址 |
-| extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| productName | string | 产品名称 |
+| productCode | string | 产品代码 |
+| currency | string | 资产币种 |
+| digit | integer | 币种精度（小数位） |
+| lockPeriodDays | integer | 锁仓天数（定期）；活期为 0 |
+| type | string | 类型：活期/定期；可选值：`CURRENT`、`FIXED` |
+| redeemAmount | number | 本笔赎回金额 |
+| endTime | string | 本笔赎回时间 |
+| expireTime | string | 关联持仓到期日；无关联持仓时为 null |
+| expireTimeTimestamp | integer | 关联持仓到期日毫秒时间戳 |
+| endTimeTimestamp | integer | 本笔赎回时间毫秒时间戳 |
+| subscribeTimeTimestamp | integer | 申购时间毫秒；持仓 create_time / start_time |
+| subscribeTime | string | 关联持仓申购时间 |
+| currentRewardAmount | number | 当前持有利息（赎回后为 0 或持仓快照） |
+| cumulativeRewardAmount | number | 累计利息 |
+| status | string | 本列表固定 REDEEMED |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/history" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```
@@ -391,7 +362,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | productCode | string | 产品代码 |
-| type | string | 产品类型枚举：`CURRENT`（活期）或 `FIXED`（定期） |
+| type | string | 产品类型：活期 / 定期；可选值：`CURRENT`、`FIXED` |
 | currency | string | 币种 |
 | lockPeriodDays | integer | 锁仓天数（定期）；活期为 0 |
 | maxDepositAmount | number | 单用户申购上限（单户最高存入额；null 或 ≤0 表示不限制） |
@@ -399,7 +370,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | pauseRedeem | boolean | 是否暂停赎回（true 表示已暂停，不可发起赎回） |
 | annualRate | number | 基础年化收益率%（不含积分奖励） |
 | rewardAnnualRate | number | 奖励年利率：超额奖励档年化% |
-| totalAnnualRate | number | 总年化%=基础+奖励（展示用） |
+| totalAnnualRate | number | 总年化%=基础+奖励+登录券面（展示用） |
 | minDepositAmount | number | 最小存入金额 |
 | minRedeemAmount | number | 最小提取金额 |
 | subscriptionStartTime | string | 申购开始时间；与结束时间均为 null 表示不限制 |
@@ -437,6 +408,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | totalPrincipalDisplay | string | 平台当前留存本金展示值 |
 | subscribedAmountDisplay | string | 已申购金额展示值 |
 | fundPoolAmountDisplay | string | 池上限展示值 |
+| couponSupported | boolean | 是否支持加息券 |
+| couponNominalAnnualRate | number | 最高可用券面年化% |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview" \

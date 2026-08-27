@@ -19,6 +19,10 @@ description: "交易相关 OpenAPI 接口。"
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
 </Note>
 
+<Info>
+  交易记录筛选枚举：`transactionMethod` 可取 `CHAIN_TX`、`USER_TRANSFER`、`OTHER`；`transactionType` 可取 `RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`SAFEBOX_TRANSFER_OUT`、`ROLLBACK`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`。
+</Info>
+
 ---
 
 ## 根据transactionId查询交易记录详情
@@ -43,7 +47,7 @@ description: "交易相关 OpenAPI 接口。"
 | network | string | 链上网络协议 |
 | exchangeSymbolId | integer | 兑换后币种 ID |
 | exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
+| transactionType | string | 交易类型枚举；可选值：`RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`ROLLBACK`、`SAFEBOX_TRANSFER_OUT`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`、`RECHARGE - 充值`、`WITHDRAWAL - 提现`、`TRANSFER_IN - 划入`、`TRANSFER_OUT - 划出`、`EXCHANGE - 兑换`、`ROLLBACK - 回退`、`SAFEBOX_TRANSFER_IN - 转入保险箱`、`SAFEBOX_TRANSFER_OUT - 转出 |
 | status | string | 交易状态：SUCCESS / FAIL / PENDING |
 | amount | number | 交易金额 |
 | amountStr | string | 交易金额字符串 |
@@ -62,8 +66,8 @@ description: "交易相关 OpenAPI 接口。"
 | rateDisplay | string | 汇率展示值 |
 | txHash | string | 链上交易哈希 |
 | feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
+| sourceAccountType | string | 来源账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| targetAccountType | string | 目标账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
 | sourceAccountId | string | 来源账户 ID |
 | targetAccountId | string | 目标账户 ID |
 | sourceWalletAddress | string | 来源链上钱包地址 |
@@ -71,15 +75,15 @@ description: "交易相关 OpenAPI 接口。"
 | extParams | string | 扩展参数 JSON 字符串 |
 | sourceAccountBalance | number | 源账户动账后余额 |
 | targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
+| fundFlowType | string | 资金流向类型；可选值：`CRYPTO_ADDRESS`、`FIAT` |
+| transactionMethod | string | 交易方式枚举；可选值：`CHAIN_TX`、`USER_TRANSFER`、`OTHER`、`CHAIN_TX - 链交易`、`USER_TRANSFER - 用户间划转`、`OTHER - 其他` |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
 | finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
 | createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
 
 ```bash
-curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/{id}" \
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/TXN-20260827-0001" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
@@ -139,7 +143,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | network | string | 链上网络协议 |
 | exchangeSymbolId | integer | 兑换后币种 ID |
 | exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
+| transactionType | string | 交易类型枚举；可选值：`RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`ROLLBACK`、`SAFEBOX_TRANSFER_OUT`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`、`RECHARGE - 充值`、`WITHDRAWAL - 提现`、`TRANSFER_IN - 划入`、`TRANSFER_OUT - 划出`、`EXCHANGE - 兑换`、`ROLLBACK - 回退`、`SAFEBOX_TRANSFER_IN - 转入保险箱`、`SAFEBOX_TRANSFER_OUT - 转出 |
 | status | string | 交易状态：SUCCESS / FAIL / PENDING |
 | amount | number | 交易金额 |
 | amountStr | string | 交易金额字符串 |
@@ -158,8 +162,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | rateDisplay | string | 汇率展示值 |
 | txHash | string | 链上交易哈希 |
 | feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
+| sourceAccountType | string | 来源账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| targetAccountType | string | 目标账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
 | sourceAccountId | string | 来源账户 ID |
 | targetAccountId | string | 目标账户 ID |
 | sourceWalletAddress | string | 来源链上钱包地址 |
@@ -167,8 +171,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | extParams | string | 扩展参数 JSON 字符串 |
 | sourceAccountBalance | number | 源账户动账后余额 |
 | targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
+| fundFlowType | string | 资金流向类型；可选值：`CRYPTO_ADDRESS`、`FIAT` |
+| transactionMethod | string | 交易方式枚举；可选值：`CHAIN_TX`、`USER_TRANSFER`、`OTHER`、`CHAIN_TX - 链交易`、`USER_TRANSFER - 用户间划转`、`OTHER - 其他` |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
 | finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
@@ -182,7 +186,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "current": 1,
+  "size": 20
 }' 
 ```
 
@@ -218,7 +223,11 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "trackingId": "exchange-demo-001",
+  "symbol": "BTC",
+  "exchangeSymbol": "USDT",
+  "amount": 0.01,
+  "quoteSessionId": "QUOTE_DEMO_001"
 }' 
 ```
 
@@ -273,7 +282,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | network | string | 链上网络协议 |
 | exchangeSymbolId | integer | 兑换后币种 ID |
 | exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
+| transactionType | string | 交易类型枚举；可选值：`RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`ROLLBACK`、`SAFEBOX_TRANSFER_OUT`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`、`RECHARGE - 充值`、`WITHDRAWAL - 提现`、`TRANSFER_IN - 划入`、`TRANSFER_OUT - 划出`、`EXCHANGE - 兑换`、`ROLLBACK - 回退`、`SAFEBOX_TRANSFER_IN - 转入保险箱`、`SAFEBOX_TRANSFER_OUT - 转出 |
 | status | string | 交易状态：SUCCESS / FAIL / PENDING |
 | amount | number | 交易金额 |
 | amountStr | string | 交易金额字符串 |
@@ -292,8 +301,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | rateDisplay | string | 汇率展示值 |
 | txHash | string | 链上交易哈希 |
 | feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
+| sourceAccountType | string | 来源账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| targetAccountType | string | 目标账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
 | sourceAccountId | string | 来源账户 ID |
 | targetAccountId | string | 目标账户 ID |
 | sourceWalletAddress | string | 来源链上钱包地址 |
@@ -301,8 +310,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | extParams | string | 扩展参数 JSON 字符串 |
 | sourceAccountBalance | number | 源账户动账后余额 |
 | targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
+| fundFlowType | string | 资金流向类型；可选值：`CRYPTO_ADDRESS`、`FIAT` |
+| transactionMethod | string | 交易方式枚举；可选值：`CHAIN_TX`、`USER_TRANSFER`、`OTHER`、`CHAIN_TX - 链交易`、`USER_TRANSFER - 用户间划转`、`OTHER - 其他` |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
 | finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
@@ -316,6 +325,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   -H "X-Nonce: YOUR_NONCE" \
   -H "Content-Type: application/json" \
   -d '{
-  "example": "see fields above"
+  "current": 1,
+  "size": 20
 }' 
 ```

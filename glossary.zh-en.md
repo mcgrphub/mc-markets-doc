@@ -16,6 +16,8 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | API 网关 | API Gateway | |
 | 资金账户 | Fund account | Not finance account |
 | 理财账户 | Finance account | Prefer over Spec en “Wealth Management Account” |
+| 加息券 | Interest coupon | Use for coupon-related Finance fields; keep `coupon*` identifiers unchanged |
+| 券面年化 | Nominal annual rate | Used for `couponNominalAnnualRate`; retain the percent unit from the schema |
 | 金库账户 | Vault account | Reader-facing name for Spec tag MLP账户 / path segment `mlp`; keep `MLP_*` enums untranslated |
 | 闪兑 | Flash conversion | |
 | 储备金证明（PoR） | Proof of Reserves (PoR) | |

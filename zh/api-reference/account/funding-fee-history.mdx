@@ -53,55 +53,38 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
-| uid | string | 用户 UID |
-| transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
-| acSymbol | string | 币种名称；闪兑时为兑出币种 |
-| network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
-| exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
-| amountStr | string | 交易金额字符串 |
-| amountDisplay | string | 交易金额展示值 |
-| amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
-| exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
-| feeDisplay | string | 手续费展示值 |
-| createTime | string | 交易开始时间 |
-| finishTime | string | 交易完成时间 |
-| failureReason | string | 失败原因说明 |
-| errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
-| rateDisplay | string | 汇率展示值 |
-| txHash | string | 链上交易哈希 |
-| feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型 |
-| targetAccountType | string | 目标账户类型 |
-| sourceAccountId | string | 来源账户 ID |
-| targetAccountId | string | 目标账户 ID |
-| sourceWalletAddress | string | 来源链上钱包地址 |
-| targetWalletAddress | string | 目标链上钱包地址 |
-| extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型 |
-| transactionMethod | string | 交易方式枚举 |
-| recipientUid | string | WITHDRAWAL 用户间划转时有值 |
-| payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| relatedBizId | string | 关联业务ID |
+| userId | string | 用户ID |
+| login | string | 交易账户登录号 |
+| businessLineId | integer | 业务线ID |
+| businessLineName | string | 业务线名称 |
+| dealTime | string | 扣费时间 |
+| symbol | string | 结算币种 |
+| symbolPair | string | 交易对 |
+| amount | number | 金额汇总，负数表示扣除 |
+| remark | string | 备注 |
+| createTime | string | 记录创建时间 |
+| updateTime | string | 记录更新时间 |
+| feeRate | number | 费率 |
+| volume | number | 持仓数量 |
+| positionSide | string | 持仓方向 |
+| positionId | string | 持仓ID |
+| batchTime | string | 费用结算批次时间(整点时间) |
+| amountDisplay | string | 资金费金额展示值，向上保留8位小数 |
+| amountScale | integer | 资金费金额展示精度 |
+| createTimeTimestamp | integer | 记录创建时间毫秒时间戳 |
+| updateTimeTimestamp | integer | 记录更新时间毫秒时间戳 |
+| dealTimeTimestamp | integer | 扣费时间毫秒时间戳 |
+| feeRateDisplay | string | 资金费率展示值，ratio转百分比后四舍五入至4位小数 |
+| feeRateScale | integer | 资金费率展示精度 |
+| batchTimeTimestamp | integer | 费用结算批次时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/page/v2" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1"
 ```

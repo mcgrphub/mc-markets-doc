@@ -1,46 +1,41 @@
 ---
 title: "MC OpenAPI 频率限制"
 sidebarTitle: "频率限制"
-description: "MC OpenAPI 按 Access Key 施加频率限制、如何识别与如何实现指数退避。"
+description: "识别 MC OpenAPI 的 HTTP 429 响应，并使用带抖动的指数退避安全重试。"
 ---
 
-MC OpenAPI 在网关侧按 Access Key 施加请求频率限制,以保护平台并为每个集成提供公平容量。
+MC OpenAPI 在 API 网关执行频率保护。客户端应以 HTTP **`429 Too Many Requests`** 作为限流的权威信号。
 
 <Note>
-  具体接口限额因账号层级而异。需要更高吞吐量请联系 MC 支持。
+  限流维度取决于请求所处阶段和路由配置。鉴权前可能按 IP 或路径加 IP 计数；鉴权后可按可信 Access Key 或 UID 计数。不要假定所有接口只按 Access Key 限流。
 </Note>
 
-## 限制如何施加
-
-- 按 **Access Key** 计数,而非 IP。
-- 重型接口(分页历史查询、PoR 快照)下的限额严于轻量元数据接口。
+当前固定源码没有提供适用于所有公开接口的统一限额数字。调用频率应以具体路由配置和实际响应为准。
 
 ## 识别限流
 
-超过限额后,网关返回 HTTP **`429 Too Many Requests`** 与业务错误信封:
+AK/SK v2 保护层返回的典型响应为：
 
 ```json
 {
-  "code": "42901",
-  "msg": "Too many requests",
-  "success": false,
-  "data": null
+  "status": 429,
+  "code": 429,
+  "message": "请求过于频繁，请稍后重试"
 }
 ```
 
-同时检查两者:
+网关中的其他限流组件可能生成不同的响应体。因此客户端应：
 
-- HTTP 状态码—传输层信号。
-- 信封中 `code == "42901"`(或其他限流码)—表示限流。
+1. 首先检查 HTTP 状态是否为 `429`。
+2. 如果响应是 JSON，可记录 `message` 作为诊断信息。
+3. 不要依赖固定的 `42901`、`msg` 或 `success` 字段。
 
-## 推荐处理:带抖动的指数退避
-
-不要在遇到 `429` 后紧循环重试。等待 \+ 指数增长延时 \+ 少量随机抖动,避免同步重试风暴。
-
-### Python
+## 带抖动的指数退避
 
 ```python
-import time, random
+import random
+import time
+
 
 def call_with_backoff(send_request, *, max_retries=6, base=1.0, cap=30.0):
     for attempt in range(max_retries):
@@ -48,42 +43,33 @@ def call_with_backoff(send_request, *, max_retries=6, base=1.0, cap=30.0):
         if response.status_code != 429:
             return response
 
-        payload = {}
-        try:
-            payload = response.json()
-        except ValueError:
-            pass
-        if payload.get("code") not in {"42901", None}:
-            return response
-
-        delay = min(cap, base * (2 ** attempt)) + random.uniform(0, 0.5)
+        delay = min(cap, base * (2**attempt)) + random.uniform(0, 0.5)
         time.sleep(delay)
 
-    raise RuntimeError("Exceeded max retries after repeated 429 responses")
+    raise RuntimeError("Exceeded max retries after repeated HTTP 429 responses")
 ```
 
-### JavaScript
-
 ```javascript
-async function callWithBackoff(sendRequest, { maxRetries = 6, base = 1000, cap = 30_000 } = {}) {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const res = await sendRequest();
-    if (res.status !== 429) return res;
-    const delay = Math.min(cap, base * 2 ** attempt) + Math.floor(Math.random() * 500);
-    await new Promise((r) => setTimeout(r, delay));
+async function callWithBackoff(
+  sendRequest,
+  { maxRetries = 6, base = 1000, cap = 30_000 } = {},
+) {
+  for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+    const response = await sendRequest();
+    if (response.status !== 429) return response;
+
+    const delay = Math.min(cap, base * 2 ** attempt)
+      + Math.floor(Math.random() * 500);
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
-  throw new Error("Exceeded max retries after repeated 429 responses");
+  throw new Error("Exceeded max retries after repeated HTTP 429 responses");
 }
 ```
 
-## 最佳实践
+## 调用建议
 
-- **高效分页。** 使用接口允许的最大 `pageSize`—见 [分页](/zh/concepts/pagination)。
-- **缓存慢变数据。** 币种列表、兑换元数据、USD 汇率变化缓慢,可本地缓存数分钟。
-- **工作负载分开 Key。** 交互查询与后台任务使用不同 Key,避免后台任务挤占用户请求的流量。
-- **同步时钟。** 时钟偏离将产生签名失败 `401`,但重试依然消耗频率预算。使用 NTP。
-- **`5xx` 同样处理。** 对 `500`、`502`、`503` 采用相同指数退避。
-
-<Tip>
-  在每次 `429` 时记录 `code`、`msg` 与 correlation ID。若常规负载下仍频繁命中,带上日志联系支持以评估账号层级。
-</Tip>
+- 减少不必要的轮询，并缓存币种、汇率等慢变数据。
+- 分页读取时保存进度，失败后从未完成页继续。
+- 每次重试都重新生成时间戳、nonce 和签名。
+- 对瞬时 `500`、`502`、`503` 也可退避，但不要自动重试参数错误或权限错误。
+- 日志中记录请求时间、路径、HTTP 状态和 correlation ID；不要记录 Secret Key。

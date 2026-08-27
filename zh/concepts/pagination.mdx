@@ -1,143 +1,131 @@
 ---
 title: "分页 MC OpenAPI 列表接口"
 sidebarTitle: "分页"
-description: "MC OpenAPI 列表接口的 pageNum / pageSize 用法与大结果集遍历。"
+description: "MC OpenAPI 列表接口的 current / size 分页方式，以及排行榜接口的分页差异。"
 ---
 
-MC OpenAPI 所有列表接口采用基于页号的分页。你使用 `pageNum` 与 `pageSize` 请求单页,响应同时返回当页数据以及遍历下一页所需的元信息。
+MC OpenAPI 的列表接口主要使用 `current` 与 `size` 分页，响应列表位于 `data.records`。具体参数位置和可选过滤条件以各接口页为准。
+
+<Note>
+  行情排行榜接口使用另一种结构：请求参数为 `page` / `pageSize`，响应列表位于 `data.items`。不要在两种分页结构之间复用字段名。
+</Note>
 
 ## 请求参数
 
-分页接口支持以下参数(GET 在 query、POST 在 body,具体见各接口页):
+常规分页接口在 GET query 或 POST JSON body 中接收：
 
-<ParamField query="pageNum" default="1" type="integer">
-  要获取的页码,从 1 开始。
+<ParamField query="current" default="1" type="integer">
+  当前页码，从 1 开始。
 </ParamField>
 
-<ParamField query="pageSize" default="20" type="integer">
-  每页条数。典型上限 `100`,具体以接口为准。
+<ParamField query="size" type="integer">
+  每页条数。限制和默认值以具体接口 schema 为准。
 </ParamField>
-
-大多列表接口还支持额外过滤参数(如 `startTime`、`endTime`、`symbol`、`type`)。详见 [API 参考](/zh/api-reference/overview)。
 
 ## 响应形式
 
-分页对象位于业务响应的 `data` 中。下面的业务码和消息值仅用于展示结构；具体字段值及空字段是否序列化以接口响应为准。
+常规分页对象位于业务响应的 `data` 中：
 
 ```json
 {
   "status": 200,
-  "message": "success",
-  "code": "0",
-  "codeKey": "COMMON_OK",
+  "message": "ok",
+  "code": "200",
+  "codeKey": null,
   "params": {},
-  "localizedMessage": "success",
+  "localizedMessage": null,
   "success": true,
   "data": {
-    "pageNum": 1,
-    "pageSize": 20,
-    "total": 132,
-    "pages": 7,
-    "list": [
+    "records": [
       {
         "transactionId": "T-1001",
-        "amount": "125.50",
-        "currency": "USDT",
-        "createdTime": 1731657600000
+        "amount": 125.5,
+        "acSymbol": "USDT",
+        "createTimeTimestamp": 1731657600000
       }
-    ]
+    ],
+    "total": 132,
+    "size": 20,
+    "current": 1,
+    "pages": 7,
+    "hasPrevious": false,
+    "hasNext": true
   }
 }
 ```
 
-## 遍历全部页
+翻页时优先读取 `hasNext`；如果响应没有该字段，再使用 `current < pages` 判断。
 
-循环直到 `pageNum >= pages`,每次递增 `pageNum`。下面例子获取指定账户的全部交易记录。
+## Python：遍历交易记录
 
-### Python
+以下示例调用 `POST /openapi/v1/mc-account/transaction/transaction/record/page`。每一页都生成新的时间戳和 nonce，并对实际发送的 body 字节签名。
 
 ```python
-import time, hmac, hashlib, requests
+import base64
+import hashlib
+import hmac
+import json
+import os
+import time
+import uuid
+
+import requests
 
 BASE_URL = "https://gateway.mcconnects.com"
-ACCESS_KEY = "YOUR_ACCESS_KEY"
-SECRET_KEY = "YOUR_SECRET_KEY"
+ACCESS_KEY = os.environ["MC_ACCESS_KEY"]
+SECRET_KEY = os.environ["MC_SECRET_KEY"]
 
-def sign(method, path, query, body, ts):
-    canonical = f"{method}\n{path}\n{query}\n{body}\n{ts}"
-    return hmac.new(SECRET_KEY.encode(), canonical.encode(), hashlib.sha256).hexdigest()
 
-def fetch_all_transactions(page_size=100):
-    path = "/openapi/v1/transaction/account/record/page"
-    page_num = 1
-    all_items = []
-
-    while True:
-        body = f'{{"pageNum":{page_num},"pageSize":{page_size}}}'
-        ts = str(int(time.time() * 1000))
-        signature = sign("POST", path, "", body, ts)
-        headers = {
-            "X-Access-Key": ACCESS_KEY,
-            "X-Signature": signature,
-            "X-Timestamp": ts,
-            "Content-Type": "application/json",
-        }
-        r = requests.post(BASE_URL + path, headers=headers, data=body)
-        r.raise_for_status()
-        page = r.json()["data"]
-        all_items.extend(page["list"])
-
-        if page_num >= page["pages"]:
-            break
-        page_num += 1
-
-    return all_items
-```
-
-### Node.js
-
-```javascript
-import crypto from "crypto";
-
-const BASE_URL = "https://gateway.mcconnects.com";
-const ACCESS_KEY = process.env.MC_ACCESS_KEY;
-const SECRET_KEY = process.env.MC_SECRET_KEY;
-
-function sign(method, path, query, body, ts) {
-  const canonical = `${method}\n${path}\n${query}\n${body}\n${ts}`;
-  return crypto.createHmac("sha256", SECRET_KEY).update(canonical).digest("hex");
-}
-
-async function fetchAllTransactions(pageSize = 100) {
-  const path = "/openapi/v1/transaction/account/record/page";
-  let pageNum = 1;
-  const all = [];
-
-  while (true) {
-    const body = JSON.stringify({ pageNum, pageSize });
-    const ts = Date.now().toString();
-    const signature = sign("POST", path, "", body, ts);
-
-    const res = await fetch(BASE_URL + path, {
-      method: "POST",
-      headers: {
+def signed_headers(method: str, path: str, body: bytes) -> dict[str, str]:
+    timestamp = str(int(time.time() * 1000))
+    nonce = str(uuid.uuid4())
+    canonical_headers = (
+        f"x-access-key={ACCESS_KEY}&x-nonce={nonce}&x-timestamp={timestamp}"
+    )
+    body_hash = hashlib.sha256(body).hexdigest()
+    string_to_sign = "\n".join(
+        [method, path, canonical_headers, timestamp, nonce, body_hash]
+    ) + "\n"
+    signature = base64.b64encode(
+        hmac.new(
+            SECRET_KEY.encode(), string_to_sign.encode(), hashlib.sha256
+        ).digest()
+    ).decode()
+    return {
         "X-Access-Key": ACCESS_KEY,
         "X-Signature": signature,
-        "X-Timestamp": ts,
+        "X-Timestamp": timestamp,
+        "X-Nonce": nonce,
         "Content-Type": "application/json",
-      },
-      body,
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { data } = await res.json();
-    all.push(...data.list);
-    if (pageNum >= data.pages) break;
-    pageNum += 1;
-  }
-  return all;
-}
+    }
+
+
+def fetch_all_transactions(page_size: int = 20) -> list[dict]:
+    path = "/openapi/v1/mc-account/transaction/transaction/record/page"
+    current = 1
+    items = []
+
+    while True:
+        body = json.dumps(
+            {"current": current, "size": page_size},
+            separators=(",", ":"),
+        ).encode()
+        response = requests.post(
+            BASE_URL + path,
+            headers=signed_headers("POST", path, body),
+            data=body,
+            timeout=15,
+        )
+        response.raise_for_status()
+        page = response.json()["data"]
+        items.extend(page["records"])
+        if not page.get("hasNext", current < page["pages"]):
+            return items
+        current += 1
 ```
 
+完整签名规则、GET Query 排序和固定测试向量见 [认证](/zh/authentication)。
+
 <Tip>
-  尽量使用接口允许的最大 `pageSize`,以减少往返次数并降低命中 [频率限制](/zh/guides/rate-limits) 的风险。
+  使用满足业务需求的合理页大小，并对 `429` 与瞬时 `5xx` 执行带抖动的指数退避。
 </Tip>

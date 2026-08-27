@@ -57,69 +57,25 @@ Query the trading account fund movement list (collateral increase/decrease histo
 
 | Field | Type | Description |
 | --- | --- | --- |
-| order | integer | Order number, primary key |
-| login | integer | Login account, MT5 account login number |
-| dealer | integer | Dealer ID, the MT5 dealer code |
-| symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
-| digits | integer | Price precision, the number of decimal places for the trading symbol |
-| digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
-| contractSize | number | Contract size, the standard size per lot |
-| state | integer | Order Status |
-| reason | integer | Reason, the reason code for the order change |
-| timeSetup | integer | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
-| timeExpiration | integer | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
-| timeDone | integer | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
-| timeSetupMsc | integer | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
-| timeDoneMsc | integer | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
-| modifyFlags | integer | Modification flags, the flag bits for order modification |
-| type | integer | Order type, e.g., buy, sell, etc. |
-| typeFill | integer | Deal type, the fill type of the order |
-| typeTime | integer | Time validity type, the validity type of the order |
-| priceOrder | number | Order price, the execution price of the order |
-| priceOrderStr | string | Order price raw string |
-| priceOrderDisplay | string | Order price display value |
-| priceOrderScale | integer | Order price display decimal places |
-| priceTrigger | number | Trigger price, the trigger price of the order |
-| priceTriggerDisplay | string | Trigger price display value |
-| priceTriggerScale | integer | Trigger price display decimal places |
-| priceCurrent | number | Current price, the current market price of the order |
-| priceCurrentDisplay | string | Current price display value |
-| priceCurrentScale | integer | Current price display decimal places |
-| priceSlDisplay | string | Stop loss price display value |
-| priceSlScale | integer | Stop loss price display decimal places |
-| priceTpDisplay | string | Take profit price display value |
-| priceTpScale | integer | Take profit price display decimal places |
-| volumeInitialExt | number | Initial extended volume, the initial extended volume of the order (for large orders) |
-| quantity | number | User quantity, equals initial volumeInitialExt divided by 10^8 |
-| volumeInitialDisplay | string | Initial volume display value |
-| volumeInitialScale | integer | Initial volume display decimal places |
-| volumeCurrentExt | number | Current extended volume, the current extended volume of the order |
-| volumeCurrentDisplay | string | Current volume display value |
-| volumeCurrentScale | integer | Current volume display decimal places |
-| rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
-| activationMode | integer | Activation mode, the activation mode of the pending order |
-| activationTime | integer | Activation time, the activation timestamp of the pending order |
-| activationPrice | number | Activation price, the activation price of the pending order |
-| activationFlags | integer | Activation flag, the flag bit for pending order activation |
-| volumeInitial | number | Initial volume, the initial trading volume of the order |
-| volumeCurrent | number | Current volume, the current trading volume of the order |
-| externalID | string | External ID, the ID associated with the external system |
-| priceSL | number | Stop loss price, the set stop loss level |
-| priceTP | number | Take profit price, the set take profit level |
-| expertID | integer | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
-| positionID | integer | Position ID, the associated position ID |
-| positionByID | integer | Opposite position ID, the associated opposite position ID |
+| symbol | string | Product name |
+| volume | integer | Balance change; positive adds and negative deducts |
+| value | number | USDC value at the time of the balance change |
+| position | integer | Related position ID, when present |
+| reason | integer | Balance-change reason enum |
+| price | number | Price against USDC at the time of the change |
+| timestamp | integer | Timestamp |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "size=1" \
   --data-urlencode "current=1" \
-  --data-urlencode "login=VALUE" \
-  --data-urlencode "from=1755792000"
+  --data-urlencode "login=10000001" \
+  --data-urlencode "from=1755792000" \
+  --data-urlencode "to=1755878400"
 ```
 
 ---
@@ -199,8 +155,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "login=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "login=10000001"
 ```
 
 ---
@@ -233,8 +189,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-  --data-urlencode "login=VALUE"
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "login=10000001"
 ```
 
 ---
@@ -264,7 +220,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=BTCUSDT"
 ```
 
@@ -295,6 +251,6 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
+  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=BTCUSDT"
 ```

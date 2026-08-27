@@ -10,18 +10,120 @@ Path-level 200 schemas in this repo are often fully inlined and drop
 2. Reads field copy from `description` or `title`
 3. Splits pagination envelopes (`records` / `items` + page meta) into
    two tables
-4. Updates zh + en API Reference MDX pages in place
+4. Updates Chinese API Reference MDX pages in place; English pages are synced
+   from Chinese MDX through the project glossary workflow
 """
 
 from __future__ import annotations
 
 import json
 import re
+from copy import deepcopy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKIP = {"overview.mdx", "base-url.mdx", "versioning.mdx", "error-codes.mdx"}
 PAGE_META = {"total", "size", "current", "pages", "hasPrevious", "hasNext"}
+
+# Temporary response-schema supplements verified against mc-account
+# release/v3.9.0 at e3aa92d177aea72855e8a0a4c69e26ba4d987b77. Remove each
+# supplement after a newly exported Chinese Spec contains the same field.
+RESPONSE_FIELD_OVERRIDES = {
+    "/openapi/v1/mc-account/finance/products/catalog": {
+        "target": ("items", "properties"),
+        "fields": {
+            "maxAnnualRate": {
+                "type": "number",
+                "description": "最高年化%=基础+（仅活期超额）+登录最高券面",
+            },
+            "couponSupported": {
+                "type": "boolean",
+                "description": "是否支持加息券",
+            },
+            "couponNominalAnnualRate": {
+                "type": "number",
+                "description": "最高可用券面年化%",
+            },
+            "rewardMinHoldingDays": {
+                "type": "integer",
+                "format": "int32",
+                "description": "奖励需连续持有满（天）；定期为空或 0",
+            },
+            "rewardMinPosition": {
+                "type": "number",
+                "description": "超额奖励持仓本金门槛；定期为空或 0",
+            },
+        },
+    },
+    "/openapi/v1/mc-account/finance/account/positions/holding": {
+        "target": ("properties", "records", "items", "properties"),
+        "fields": {
+            "couponId": {"type": "string", "description": "绑定加息券 ID"},
+            "couponNominalAnnualRate": {
+                "type": "number",
+                "description": "券面年化%",
+            },
+            "couponBoostAmountUsdc": {
+                "type": "number",
+                "description": "加息金额 USDC",
+            },
+            "couponQuoteUsdcPerProduct": {
+                "type": "number",
+                "description": "锁定时产品币兑 USDC",
+            },
+            "couponQuoteTimeMs": {
+                "type": "integer",
+                "format": "int64",
+                "description": "报价时刻毫秒",
+            },
+            "pauseRedeem": {
+                "type": "boolean",
+                "description": "是否暂停赎回",
+            },
+        },
+    },
+    "/openapi/v1/mc-account/finance/account/positions/history": {
+        "target": ("properties", "records", "items", "properties"),
+        "fields": {
+            "subscribeTimeTimestamp": {
+                "type": "integer",
+                "format": "int64",
+                "description": "申购时间毫秒；持仓 create_time / start_time",
+            },
+            "subscribeTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "关联持仓申购时间",
+            },
+            "currentRewardAmount": {
+                "type": "number",
+                "description": "当前持有利息（赎回后为 0 或持仓快照）",
+            },
+            "cumulativeRewardAmount": {
+                "type": "number",
+                "description": "累计利息",
+            },
+            "status": {"type": "string", "description": "本列表固定 REDEEMED"},
+        },
+    },
+    "/openapi/v1/mc-account/finance/account/overview": {
+        "target": ("properties", "products", "items", "properties"),
+        "fields": {
+            "totalAnnualRate": {
+                "type": "number",
+                "description": "总年化%=基础+奖励+登录券面（展示用）",
+            },
+            "couponSupported": {
+                "type": "boolean",
+                "description": "是否支持加息券",
+            },
+            "couponNominalAnnualRate": {
+                "type": "number",
+                "description": "最高可用券面年化%",
+            },
+        },
+    },
+}
 
 PAGE_DESC = {
     "zh": {
@@ -61,14 +163,17 @@ RESP_START_RE = re.compile(
 )
 
 
-def load_specs(locale: str) -> list[dict]:
+def load_specs(locale: str = "zh") -> list[dict]:
     names = [
         "mc-account.json",
         "mc-trade.json",
         "mc-risk.json",
         "mc-aggregator.json",
     ]
-    base = ROOT / "openapi" if locale == "zh" else ROOT / "openapi" / "en"
+    # Chinese Specs are the only structural source of truth. `openapi/en/` is
+    # deprecated and must not introduce fields that do not exist in Chinese
+    # Specs. The locale argument remains for compatibility with older callers.
+    base = ROOT / "openapi"
     specs: list[dict] = []
     for name in names:
         path = base / name
@@ -160,20 +265,72 @@ def doc_score(spec: dict, sch: dict, depth: int = 0) -> int:
     return score
 
 
-def schema_fingerprint(spec: dict, sch: dict) -> tuple:
-    """Structural fingerprint so RetResult* envelopes are not cross-matched."""
-    sch = resolve(spec, sch)
-    keys = prop_keys(sch)
-    if "data" in keys:
-        data = resolve(spec, (sch.get("properties") or {}).get("data") or {})
-        t = data.get("type")
-        if isinstance(t, list):
-            t = next((x for x in t if x != "null"), t[0] if t else None)
-        if t == "array":
-            items = resolve(spec, data.get("items") or {})
-            return ("envelope", frozenset(keys), "array", prop_keys(items), norm_type(items))
-        return ("envelope", frozenset(keys), "object", prop_keys(data), norm_type(data))
-    return ("object", frozenset(keys), None, frozenset(), norm_type(sch))
+def schema_compatible(spec: dict, inline: dict, candidate: dict, depth: int = 0) -> bool:
+    """Whether a richer component can safely fill gaps in an inline schema.
+
+    Springdoc can inline an object while dropping nested ``$ref`` details. A
+    component may therefore be richer than the inline shape. Existing nested
+    properties, especially paginated ``records[]`` items, must still match.
+    """
+    if depth > 12:
+        return True
+    inline = resolve(spec, inline)
+    candidate = resolve(spec, candidate)
+    inline_type = norm_type(inline)
+    candidate_type = norm_type(candidate)
+    if inline_type != candidate_type:
+        return False
+
+    inline_props = inline.get("properties") or {}
+    candidate_props = candidate.get("properties") or {}
+    if inline_props:
+        if set(inline_props) != set(candidate_props):
+            return False
+        for key, inline_value in inline_props.items():
+            candidate_value = candidate_props[key]
+            if norm_type(resolve(spec, inline_value)) != norm_type(
+                resolve(spec, candidate_value)
+            ):
+                return False
+            resolved_inline = resolve(spec, inline_value)
+            has_known_children = bool(
+                resolved_inline.get("properties")
+                or isinstance(resolved_inline.get("additionalProperties"), dict)
+                or (
+                    norm_type(resolved_inline) == "array"
+                    and isinstance(resolved_inline.get("items"), dict)
+                    and (
+                        resolve(spec, resolved_inline["items"]).get("properties")
+                        or isinstance(
+                            resolve(spec, resolved_inline["items"]).get(
+                                "additionalProperties"
+                            ),
+                            dict,
+                        )
+                    )
+                )
+            )
+            if has_known_children and not schema_compatible(
+                spec, inline_value, candidate_value, depth + 1
+            ):
+                return False
+
+    if inline_type == "array":
+        inline_items = inline.get("items") or {}
+        candidate_items = candidate.get("items") or {}
+        resolved_items = resolve(spec, inline_items)
+        if resolved_items.get("properties") or isinstance(
+            resolved_items.get("additionalProperties"), dict
+        ):
+            return schema_compatible(spec, inline_items, candidate_items, depth + 1)
+
+    inline_addl = inline.get("additionalProperties")
+    if isinstance(inline_addl, dict):
+        candidate_addl = candidate.get("additionalProperties")
+        return isinstance(candidate_addl, dict) and schema_compatible(
+            spec, inline_addl, candidate_addl, depth + 1
+        )
+    return True
 
 
 def find_matching_component(spec: dict, inline: dict) -> dict | None:
@@ -187,7 +344,6 @@ def find_matching_component(spec: dict, inline: dict) -> dict | None:
     keys = prop_keys(inline)
     if len(keys) < 2:
         return None
-    inline_fp = schema_fingerprint(spec, inline)
     inline_score = doc_score(spec, inline)
     best_name = None
     best_score = inline_score
@@ -198,7 +354,7 @@ def find_matching_component(spec: dict, inline: dict) -> dict | None:
         resolved = resolve(spec, candidate)
         if prop_keys(resolved) != keys:
             continue
-        if schema_fingerprint(spec, candidate) != inline_fp:
+        if not schema_compatible(spec, inline, candidate):
             continue
         score = doc_score(spec, candidate)
         if score > best_score:
@@ -257,8 +413,19 @@ def esc(text: str) -> str:
 
 def field_copy(name: str, sch: dict, locale: str, *, page_context: bool = False) -> str:
     text = esc(sch.get("description") or sch.get("title") or "")
+    enum_values = sch.get("enum") or []
+    if norm_type(sch) == "string" and enum_values:
+        rendered_values = "、".join(f"`{value}`" for value in enum_values)
+        enum_copy = (
+            f"可选值：{rendered_values}"
+            if locale == "zh"
+            else f"Allowed values: {rendered_values}"
+        )
+        if not all(str(value) in text for value in enum_values):
+            separator = "；" if locale == "zh" else "; "
+            text = f"{text}{separator}{enum_copy}" if text else enum_copy
     if text:
-        return text[:240]
+        return text[:480]
     if page_context and name in PAGE_DESC[locale]:
         return PAGE_DESC[locale][name]
     if name in PAGE_DESC[locale]:
@@ -293,6 +460,8 @@ def render_table(headers: tuple[str, str, str], rows: list[tuple[str, str, str]]
     h1, h2, h3 = headers
     lines = [f"| {h1} | {h2} | {h3} |", "| --- | --- | --- |"]
     for name, typ, desc in rows:
+        if "<" in name or ">" in name:
+            name = f"`{name}`"
         lines.append(f"| {name} | {typ or '—'} | {desc} |")
     return "\n".join(lines)
 
@@ -546,6 +715,25 @@ def render_response_block(spec: dict, data_sch: dict, locale: str) -> str:
     return "\n".join(parts).rstrip() + "\n\n"
 
 
+def apply_response_field_overrides(path: str, data_sch: dict) -> dict:
+    override = RESPONSE_FIELD_OVERRIDES.get(path)
+    if not override:
+        return data_sch
+    out = deepcopy(data_sch)
+    target = out
+    try:
+        for key in override["target"]:
+            target = target[key]
+    except (KeyError, TypeError):
+        return out
+    for name, field in override["fields"].items():
+        if name not in target:
+            target[name] = deepcopy(field)
+        elif field.get("description"):
+            target[name]["description"] = field["description"]
+    return out
+
+
 def find_data_schema(specs: list[dict], method: str, path: str):
     method = method.lower()
     path = (
@@ -567,8 +755,10 @@ def find_data_schema(specs: list[dict], method: str, path: str):
             sch = resolve(spec, content.get("schema") or {})
             props = sch.get("properties") or {}
             if "data" in props:
-                return spec, enrich(spec, props["data"])
-            return spec, enrich(spec, sch)
+                data_sch = enrich(spec, props["data"])
+                return spec, apply_response_field_overrides(path, data_sch)
+            data_sch = enrich(spec, sch)
+            return spec, apply_response_field_overrides(path, data_sch)
     return None, None
 
 
@@ -656,8 +846,8 @@ def replace_response_sections(
 
 def main() -> None:
     stats: list[tuple[str, int]] = []
-    for locale, specs in (("zh", load_specs("zh")), ("en", load_specs("en"))):
-        root = ROOT / "zh" / "api-reference" if locale == "zh" else ROOT / "api-reference"
+    for locale, specs in (("zh", load_specs("zh")),):
+        root = ROOT / "zh" / "api-reference"
         for path in sorted(root.rglob("*.mdx")):
             if path.name in SKIP:
                 continue
