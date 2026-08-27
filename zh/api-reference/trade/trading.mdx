@@ -226,6 +226,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 `GET /openapi/v1/mc-trade/trade/symbol/staticConfig` — 权限 `公开访问`。
 
+不存在的 `symbol` 可能不出现在响应数组中；如果返回占位项，其 `mt5` 和 `risk` 为 `null`。客户端必须同时兼容这两种情况，并将其都视为未找到配置。
+
 ### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
@@ -438,10 +440,6 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbols=BTCUSDT"
 ```
 

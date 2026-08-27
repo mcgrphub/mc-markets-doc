@@ -226,6 +226,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 `GET /openapi/v1/mc-trade/trade/symbol/staticConfig` — permission `Public`.
 
+An unknown symbol may be omitted from the response array. If a placeholder item is returned, its `mt5` and `risk` are `null`. Handle both cases as configuration not found.
+
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
@@ -438,10 +440,6 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbols=BTCUSDT"
 ```
 

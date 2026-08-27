@@ -4,24 +4,24 @@ sidebarTitle: "Market data"
 description: "Query symbol rankings and candlestick (K-line) data."
 ---
 
-**Market data** endpoints return symbol rankings and candlestick data. All operations in this group require `READ`. Paths use the `/openapi/v1/mc-aggregator/` prefix.
+**Market data** endpoints return symbol rankings and candlestick data. Both endpoints are public and do not require AK/SK authentication. Paths use the `/openapi/v1/mc-aggregator/` prefix.
 
 ## Endpoints
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-aggregator/market-data/symbol-ranking | READ | Paginated symbol ranking by category and sort fields. |
-| GET | /openapi/v1/mc-aggregator/market-data/kline | READ | Candlestick data by symbol, period, and time range. |
+| GET | /openapi/v1/mc-aggregator/market-data/symbol-ranking | Public | Paginated symbol ranking by category and sort fields. |
+| GET | /openapi/v1/mc-aggregator/market-data/kline | Public | Candlestick data by symbol, period, and time range. |
 
 <Note>
-  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+  The interactive Playground is disabled. These endpoints can be called directly without AK/SK. See [Base URL](/api-reference/base-url) for the gateway host.
 </Note>
 
 ---
 
 ## Symbol ranking
 
-`GET /openapi/v1/mc-aggregator/market-data/symbol-ranking` — permission `READ`.
+`GET /openapi/v1/mc-aggregator/market-data/symbol-ranking` — permission `Public`.
 
 Paginated symbol ranking by category and sort dimensions.
 
@@ -35,7 +35,7 @@ Paginated symbol ranking by category and sort dimensions.
 | sortBy | string | No | Sort field: symbol / bid / change24hPct |
 | sortOrder | string | No | Sort direction: asc / desc |
 | page | integer | No | Page number, starting at 1 |
-| pageSize | integer | No | Page size |
+| pageSize | integer | No | Page size; maximum 100 |
 
 ### Response `data` fields
 
@@ -61,10 +61,6 @@ Paginated symbol ranking by category and sort dimensions.
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/symbol-ranking" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "category=SPOT" \
   --data-urlencode "sortBy=change24hPct" \
   --data-urlencode "sortOrder=desc" \
@@ -76,7 +72,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data
 
 ## Candlestick (K-line) data
 
-`GET /openapi/v1/mc-aggregator/market-data/kline` — permission `READ`.
+`GET /openapi/v1/mc-aggregator/market-data/kline` — permission `Public`.
 
 Query candlestick data by symbol, interval, and time range.
 
@@ -121,10 +117,6 @@ Query candlestick data by symbol, interval, and time range.
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/kline" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=EURUSD" \
   --data-urlencode "period=60" \
   --data-urlencode "startTime=1755792000" \

@@ -52,12 +52,16 @@ Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT
 
 `records[]` items:
 
+<Note>
+  `deal`, `order`, `positionID`, and `login` are JSON strings. Do not deserialize them as numbers, or 64-bit identifiers may lose precision.
+</Note>
+
 | Field | Type | Description |
 | --- | --- | --- |
-| deal | integer | Deal number and primary key |
-| login | integer | Trading account login |
+| deal | string | Deal number and primary key |
+| login | string | Trading account login |
 | dealer | integer | Dealer ID |
-| order | integer | Related order number |
+| order | string | Related order number |
 | action | integer | `0` buy, `1` sell |
 | entry | integer | `0` open, `1` close |
 | reason | integer | Deal-change reason code |
@@ -97,7 +101,7 @@ Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT
 | volumeClosed | integer | Closed standard-precision volume |
 | externalID | string | External-system ID |
 | expertID | integer | Expert advisor ID |
-| positionID | integer | Related position ID |
+| positionID | string | Related position ID |
 | priceSL | number | Stop-loss price |
 | priceTP | number | Take-profit price |
 | on_chain_status | string | On-chain status |
@@ -122,14 +126,14 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 
 `GET /openapi/v1/mc-trade/trade/deals/history/recent` — permission `Public`.
 
-Query recent deals by symbol; result count is controlled by `limit`.
+Query recent deals by `symbol`. The `limit` range is 1 to 100. If `symbol` does not exist, the endpoint returns an empty array.
 
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | symbol | string | Yes | Trading symbol |
-| limit | integer | Yes | Number of items to return |
+| limit | integer | Yes | Number of items to return; range is 1 to 100 |
 
 ### Response `data` fields
 
@@ -147,10 +151,6 @@ Query recent deals by symbol; result count is controlled by `limit`.
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
   --data-urlencode "symbol=BTCUSDT" \
   --data-urlencode "limit=1"
 ```

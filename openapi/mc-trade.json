@@ -6366,16 +6366,14 @@
                             "type": "object",
                             "properties": {
                               "deal": {
-                                "type": "integer",
+                                "type": "string",
                                 "description": "成交号，主键",
-                                "format": "int64",
-                                "example": 123456
+                                "example": "123456"
                               },
                               "login": {
-                                "type": "integer",
+                                "type": "string",
                                 "description": "交易账户登录号",
-                                "format": "int64",
-                                "example": 10001
+                                "example": "10001"
                               },
                               "dealer": {
                                 "type": "integer",
@@ -6384,10 +6382,9 @@
                                 "example": 1
                               },
                               "order": {
-                                "type": "integer",
+                                "type": "string",
                                 "description": "订单号，关联的订单号",
-                                "format": "int64",
-                                "example": 123456
+                                "example": "123456"
                               },
                               "action": {
                                 "type": "integer",
@@ -6598,10 +6595,9 @@
                                 "example": 0
                               },
                               "positionID": {
-                                "type": "integer",
+                                "type": "string",
                                 "description": "持仓ID，关联的持仓ID",
-                                "format": "int64",
-                                "example": 0
+                                "example": "0"
                               },
                               "priceSL": {
                                 "type": "number",
@@ -15606,16 +15602,14 @@
         "type": "object",
         "properties": {
           "deal": {
-            "type": "integer",
+            "type": "string",
             "description": "成交号，主键",
-            "format": "int64",
-            "example": 123456
+            "example": "123456"
           },
           "login": {
-            "type": "integer",
+            "type": "string",
             "description": "交易账户登录号",
-            "format": "int64",
-            "example": 10001
+            "example": "10001"
           },
           "dealer": {
             "type": "integer",
@@ -15624,10 +15618,9 @@
             "example": 1
           },
           "order": {
-            "type": "integer",
+            "type": "string",
             "description": "订单号，关联的订单号",
-            "format": "int64",
-            "example": 123456
+            "example": "123456"
           },
           "action": {
             "title": "操作类型，成交的操作类型",
@@ -15840,10 +15833,9 @@
             "example": 0
           },
           "positionID": {
-            "type": "integer",
+            "type": "string",
             "description": "持仓ID，关联的持仓ID",
-            "format": "int64",
-            "example": 0
+            "example": "0"
           },
           "priceSL": {
             "type": "number",

@@ -69,6 +69,40 @@ class ApiReferenceExamplesTest(unittest.TestCase):
                 )
                 self.assertIn('--data-urlencode "to=', section)
 
+    def test_public_market_data_examples_do_not_require_auth_headers(self):
+        pages = [
+            (
+                ROOT / "zh" / "api-reference" / "aggregator" / "market-data.mdx",
+                "公开访问",
+                "无需 AK/SK",
+            ),
+            (
+                ROOT / "api-reference" / "aggregator" / "market-data.mdx",
+                "Public",
+                "do not require AK/SK",
+            ),
+        ]
+        endpoints = [
+            "/openapi/v1/mc-aggregator/market-data/symbol-ranking",
+            "/openapi/v1/mc-aggregator/market-data/kline",
+        ]
+        auth_headers = ("X-Access-Key", "X-Signature", "X-Timestamp", "X-Nonce")
+
+        for path, permission, public_copy in pages:
+            text = path.read_text()
+            self.assertIn(public_copy, text)
+            for endpoint in endpoints:
+                table_row = next(line for line in text.splitlines() if f"| {endpoint} |" in line)
+                self.assertIn(f"| {permission} |", table_row)
+                section = next(
+                    part
+                    for part in re.split(r"(?=^## )", text, flags=re.M)
+                    if f"`GET {endpoint}`" in part
+                )
+                self.assertIn(permission, section.splitlines()[2])
+                for header in auth_headers:
+                    self.assertNotIn(header, section)
+
 
 if __name__ == "__main__":
     unittest.main()
