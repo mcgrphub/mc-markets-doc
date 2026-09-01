@@ -12,15 +12,27 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
 
 <Steps>
   <Step title="Create an API Key">
-    Log in to the MC platform, open **API Key Management**, and click **Create**. Give the key a descriptive name and select the permissions you need:
+    After signing in to the MC platform, open [User Center](https://www.mcmarkets.com/zh-Hans/uc/user-info), or select **User Center** from the account menu in the upper-right corner. In the **API Key** section, click **Create API**. Complete identity verification first if the page requires it.
+
+    <Frame>
+      ![Open the API Key section from User Center and click Create API](/images/guides/mcp/create-api-entry.png)
+    </Frame>
+
+    Enter an API name and select the permissions you need:
 
     - `READ` — read-only operations (balances, lists, queries)
     - `TRADE` — trading operations (place / cancel orders)
     - `WITHDRAW` — withdrawal and transfer operations
 
-    Optionally configure an IP whitelist (up to 15 IPv4 addresses). Copy the **Access Key** and **Secret Key** immediately — the Secret Key is shown only once.
+    Select the `TRADE` permission to use MCP for flash conversion, deposits, withdrawals, order placement, order modification, position closing, or order cancellation.
 
-    If two-factor verification is enabled for your business line, complete the GA and email verification prompts.
+    Configure an IP whitelist if needed (up to 15 IPv4 addresses, separated by commas).
+
+    <Frame>
+      ![Enter an API name and configure permissions and an IP whitelist](/images/guides/mcp/create-api-form.png)
+    </Frame>
+
+    Click **Confirm**. If two-factor verification is enabled for your business line, complete the GA and email verification prompts. After the key is created, immediately copy and securely store the **Access Key** and **Secret Key** — the Secret Key is shown only once.
 
     <Warning>
       Never commit the Secret Key to source control, and never expose it in client-side code.
@@ -121,6 +133,10 @@ This quickstart walks you through your first MC OpenAPI call: create an API Key,
 
       <Card title="First Request" icon="rocket" href="/guides/first-request">
         End-to-end signed request walkthrough.
+      </Card>
+
+      <Card title="MCP integration" icon="bot" href="/guides/mcp">
+        Use MCP tools in Claude, Cursor, VS Code, or Codex.
       </Card>
     </CardGroup>
   </Step>

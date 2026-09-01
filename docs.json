@@ -50,7 +50,8 @@
                   "guides/first-request",
                   "guides/webhooks",
                   "guides/rate-limits",
-                  "guides/sdks"
+                  "guides/sdks",
+                  "guides/mcp"
                 ]
               },
               {
@@ -138,7 +139,8 @@
                   "zh/guides/first-request",
                   "zh/guides/webhooks",
                   "zh/guides/rate-limits",
-                  "zh/guides/sdks"
+                  "zh/guides/sdks",
+                  "zh/guides/mcp"
                 ]
               },
               {

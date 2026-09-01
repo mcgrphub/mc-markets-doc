@@ -1,0 +1,216 @@
+---
+title: "使用 MCP 连接 MC OpenAPI"
+sidebarTitle: "MCP 集成"
+description: "下载 MC Markets OpenAPI MCP，并在 Claude、Cursor、VS Code 或 Codex 中完成配置。"
+---
+
+MC Markets OpenAPI MCP 将已审核的 C 端接口提供为 MCP Tool。stdio 模式共提供 55 个 Tool，包括 44 个查询 Tool 和 11 个写 Tool。你可以在支持 MCP 的 Agent 中调用这些 Tool，而不必为每个接口单独编写客户端代码。
+
+<Warning>
+  MCP 只注册已审核的接口。不要把 Access Key、Secret Key、Bearer、Cookie 或用户身份写入仓库或共享 Agent 配置。
+</Warning>
+
+## 写操作风险提示
+
+stdio 模式提供写 Tool，调用前需要 API Key 具备 `TRADE` 权限。写操作的参数定义和业务规则以对应的 API Reference 为准。
+
+<Warning>
+  写 Tool 会直接产生真实的资金或交易状态变更。调用前必须人工核对目标环境、账户、业务对象、方向、数量、价格及其他关键参数，使用最小权限凭证，并确认 Agent 即将执行的操作符合你的真实意图。验收和故障排查默认不要执行真实写操作。
+</Warning>
+
+## 准备环境
+
+本地 Agent 通过 stdio 启动 MCP，需要：
+
+- JRE 17 或 JDK 17
+- 支持本地 stdio MCP Server 的 Agent
+- 用于调用 MC OpenAPI 的 Access Key / Secret Key；使用写 Tool 时需要 `TRADE` 权限
+
+确认 Java 版本：
+
+```bash
+java -version
+```
+
+输出中的主版本应为 `17`。
+
+## 下载 MCP
+
+JAR 和校验文件必须放在同一目录，并保持下载时的文件名不变，因为校验文件同时记录了摘要和目标文件名。
+
+<Tabs>
+  <Tab title="macOS / Linux">
+    将可执行 JAR 和发布方提供的 SHA-256 校验文件下载到当前目录：
+
+    ```bash
+    curl -fL "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar" \
+      -o ./mc-markets-openapi-mcp-3.8.0-all.jar
+
+    curl -fL "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar.sha256" \
+      -o ./mc-markets-openapi-mcp-3.8.0-all.jar.sha256
+    ```
+
+    macOS，或安装了 Perl `shasum` 的 Linux：
+
+    ```bash
+    shasum -a 256 -c ./mc-markets-openapi-mcp-3.8.0-all.jar.sha256
+    ```
+
+    使用 GNU coreutils 的 Linux：
+
+    ```bash
+    sha256sum -c ./mc-markets-openapi-mcp-3.8.0-all.jar.sha256
+    ```
+  </Tab>
+
+  <Tab title="Windows PowerShell">
+    将可执行 JAR 和发布方提供的 SHA-256 校验文件下载到当前目录：
+
+    ```powershell
+    Invoke-WebRequest `
+      -Uri "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar" `
+      -OutFile ".\mc-markets-openapi-mcp-3.8.0-all.jar"
+
+    Invoke-WebRequest `
+      -Uri "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar.sha256" `
+      -OutFile ".\mc-markets-openapi-mcp-3.8.0-all.jar.sha256"
+    ```
+
+    读取发布方校验文件中的摘要并与下载的 JAR 对比：
+
+    ```powershell
+    $expected = ((Get-Content ".\mc-markets-openapi-mcp-3.8.0-all.jar.sha256" -Raw).Trim() -split '\s+')[0].ToLowerInvariant()
+    $actual = (Get-FileHash ".\mc-markets-openapi-mcp-3.8.0-all.jar" -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actual -ne $expected) { throw "SHA-256 校验失败：expected=$expected actual=$actual" }
+    Write-Host "mc-markets-openapi-mcp-3.8.0-all.jar: OK"
+    ```
+  </Tab>
+</Tabs>
+
+看到 `mc-markets-openapi-mcp-3.8.0-all.jar: OK` 后再配置 Agent。校验失败时删除 JAR 和校验文件后重新下载；仍然失败则停止使用并联系发布方确认。
+
+<Warning>
+  命令中的下载地址必须是以 `https://` 开头的纯 URL。不要复制 Markdown 链接形式 `[URL](URL)`，否则 Shell 会把括号和方括号也当作 URL 内容。
+</Warning>
+
+<Info>
+  请使用文件名以 `-all.jar` 结尾的分发包。它已经包含 MCP Server 的运行时依赖，无需执行额外安装命令。
+</Info>
+
+配置 Agent 前，将示例中的 `/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar` 替换为下载文件的绝对路径。
+
+## 配置本地 Agent
+
+<Tabs>
+  <Tab title="Claude">
+    Claude Desktop 可在 **Settings → Developer** 中打开 MCP 配置。Claude Code 可使用项目级 MCP 配置。添加：
+
+    ```json
+    {
+      "mcpServers": {
+        "mcMarketsOpenapi": {
+          "command": "java",
+          "args": [
+            "-jar",
+            "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Cursor">
+    在项目中创建 `.cursor/mcp.json`，或编辑全局 `~/.cursor/mcp.json`：
+
+    ```json
+    {
+      "mcpServers": {
+        "mcMarketsOpenapi": {
+          "command": "java",
+          "args": [
+            "-jar",
+            "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="VS Code">
+    在工作区创建 `.vscode/mcp.json`，或通过命令面板运行 **MCP: Add Server**。VS Code 使用顶层 `servers`：
+
+    ```json
+    {
+      "servers": {
+        "mcMarketsOpenapi": {
+          "type": "stdio",
+          "command": "java",
+          "args": [
+            "-jar",
+            "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Codex">
+    在 `~/.codex/config.toml` 中添加：
+
+    ```toml
+    [mcp_servers.mc_markets_openapi]
+    command = "java"
+    args = ["-jar", "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"]
+    startup_timeout_sec = 30
+    ```
+  </Tab>
+</Tabs>
+
+保存配置后，重启 Agent 或重新连接 MCP Server。Agent 应能发现名称以 `c_` 开头的 MC Markets OpenAPI Tool。
+
+## 配置本地调用凭证
+
+### 创建 Access Key 和 Secret Key
+
+如果还没有凭证，请先按照[快速开始](/zh/quickstart)中的“创建 API Key”步骤，在 MC 平台完成创建并保存 Access Key 和 Secret Key。完成后回到本节配置 MCP 进程环境。
+
+如需调用写 Tool，请在创建 API Key 时勾选 `TRADE` 权限。
+
+### 配置 MCP 进程环境
+
+本地 stdio 模式在实际调用 Tool 时从 MCP 进程环境读取：
+
+- `MC_C_OPENAPI_ACCESS_KEY`
+- `MC_C_OPENAPI_SECRET_KEY`
+
+使用操作系统的凭证管理工具或企业 Secret Manager，将这两个变量注入启动 Agent 的进程环境。不要把真实值放进 `.cursor/mcp.json`、`.vscode/mcp.json`、`~/.codex/config.toml` 或其他会同步、共享的配置文件。
+
+<Note>
+  Agent 能列出 Tool，只能证明 MCP 协议连接成功。只有一次真实的 Tool 调用返回 MC OpenAPI 业务响应，才能证明凭证和下游连接均可用。
+</Note>
+
+未设置凭证时，Tool 调用会报告缺少 `MC_C_OPENAPI_ACCESS_KEY` 或 `MC_C_OPENAPI_SECRET_KEY`。
+
+## 验证安装
+
+依次检查：
+
+1. Agent 的 MCP 状态显示 `mcMarketsOpenapi` 已连接。
+2. Agent 能列出 55 个 MC Markets OpenAPI Tool，包括查询 Tool 和写 Tool。
+3. 使用测试参数调用一个 Tool，并确认返回 MC OpenAPI 业务响应。
+4. 检查日志中没有 Access Key、Secret Key、Bearer 或用户身份明文。
+
+常见问题：
+
+| 现象 | 检查项 |
+| --- | --- |
+| `java: command not found` | 安装 JRE 17，并确保 `java` 位于 Agent 进程的 `PATH` 中 |
+| `Unable to access jarfile` | 将配置中的 JAR 路径改为真实绝对路径 |
+| MCP 启动后没有 Tool | 重启 Agent，并查看 MCP Server 启动日志 |
+| 只能看到 44 个查询 Tool | 当前 JAR 不包含新增写 Tool；重新下载已发布的最新分发包并重启 Agent |
+| Tool 可见但调用失败 | 检查两项凭证环境变量和网络连通性 |
+| 写 Tool 返回权限错误 | 确认 API Key 已开通 `TRADE` 权限 |
+| 启动超时 | 将 Codex 的 `startup_timeout_sec` 调高，并检查 Java 启动日志 |

@@ -11,6 +11,7 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | Chinese | English | Notes |
 | --- | --- | --- |
 | MC Markets OpenAPI / MC OpenAPI | MC Markets OpenAPI / MC OpenAPI | Prefer full name on first mention |
+| MCP 集成 | MCP integration | Guide for connecting MC OpenAPI tools to supported agents |
 | Access Key / Secret Key（AK/SK） | Access Key / Secret Key (AK/SK) | Not API token / Bearer (except warnings) |
 | `X-Nonce` | `X-Nonce` | New per request; **UUID v4** or ≥32 hex (`0-9a-fA-F`); replay-scoped per Access Key (~11 min default); must match string to sign exactly |
 | API 网关 | API Gateway | |

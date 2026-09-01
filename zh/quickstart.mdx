@@ -12,15 +12,27 @@ description: "创建 MC Access Key / Secret Key，使用 HMAC-SHA256 签名（�
 
 <Steps>
   <Step title="创建 API Key">
-    登录 MC 平台，进入 **API Key 管理**，点击 **创建**。为 Key 命名，并勾选需要的权限：
+    登录 MC 平台后，打开[用户中心](https://www.mcmarkets.com/zh-Hans/uc/user-info)，或点击右上角账号菜单中的 **用户中心**。在 **API Key** 区域点击 **创建 API**。如果页面提示需要身份认证，请先按提示完成。
+
+    <Frame>
+      ![从用户中心进入 API Key 区域并点击创建 API](/images/guides/mcp/create-api-entry.png)
+    </Frame>
+
+    输入 API 名称，并勾选需要的权限：
 
     - `READ` — 只读操作（余额、列表、查询）
     - `TRADE` — 交易操作（下单 / 撤单）
     - `WITHDRAW` — 提现与划转操作
 
-    可选配置 IP 白名单（最多 15 个 IPv4 地址）。立即复制 **Access Key** 和 **Secret Key** —— Secret Key 仅显示一次。
+    使用 MCP 执行闪兑、存取、下单、改单、平仓或撤单时，请勾选 `TRADE` 权限。
 
-    若当前业务线启用了二次验证策略，请按页面提示完成 GA 验证和邮箱验证码校验。
+    按需配置 IP 白名单（最多 15 个 IPv4 地址，多个地址用英文逗号分隔）。
+
+    <Frame>
+      ![填写 API 名称、权限和 IP 白名单](/images/guides/mcp/create-api-form.png)
+    </Frame>
+
+    点击 **确认**。若当前业务线启用了二次验证策略，请按页面提示完成 GA 验证和邮箱验证码校验。创建成功后，立即复制并妥善保存 **Access Key** 和 **Secret Key** —— Secret Key 仅显示一次。
 
     <Warning>
       切勿将 Secret Key 提交到源代码库，也不要在客户端代码中暴露。
@@ -121,6 +133,10 @@ description: "创建 MC Access Key / Secret Key，使用 HMAC-SHA256 签名（�
 
       <Card title="第一次请求" icon="rocket" href="/zh/guides/first-request">
         带签名的端到端请求示例。
+      </Card>
+
+      <Card title="MCP 集成" icon="bot" href="/zh/guides/mcp">
+        在 Claude、Cursor、VS Code 或 Codex 中使用 MCP Tool。
       </Card>
     </CardGroup>
   </Step>

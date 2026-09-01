@@ -1,0 +1,216 @@
+---
+title: "Connect MC OpenAPI with MCP"
+sidebarTitle: "MCP integration"
+description: "Download MC Markets OpenAPI MCP and configure it in Claude, Cursor, VS Code, or Codex."
+---
+
+MC Markets OpenAPI MCP exposes approved C-end endpoints as MCP tools. Stdio mode provides 55 tools: 44 query tools and 11 write tools. You can call these tools from an MCP-compatible agent without writing a separate client for each endpoint.
+
+<Warning>
+  MCP registers only approved endpoints. Never store an Access Key, Secret Key, Bearer token, cookie, or user identity in a repository or shared agent configuration.
+</Warning>
+
+## Write-operation risk notice
+
+Stdio mode provides write tools. Calling them requires an API Key with the `TRADE` permission. Refer to the relevant API Reference for parameter definitions and business rules.
+
+<Warning>
+  Write tools directly change real fund or trading state. Before each call, manually verify the target environment, account, business object, side, quantity, price, and other critical parameters. Use least-privilege credentials and confirm that the agent's proposed action matches your actual intent. Do not execute real write operations during installation verification or troubleshooting by default.
+</Warning>
+
+## Prerequisites
+
+Local agents start MCP over stdio. You need:
+
+- JRE 17 or JDK 17
+- An agent that supports local stdio MCP servers
+- An Access Key / Secret Key for calling MC OpenAPI; write tools require the `TRADE` permission
+
+Check your Java version:
+
+```bash
+java -version
+```
+
+The major version in the output must be `17`.
+
+## Download MCP
+
+Keep the JAR and checksum file in the same directory with their original downloaded names. The checksum file records both the digest and the target file name.
+
+<Tabs>
+  <Tab title="macOS / Linux">
+    Download the executable JAR and the publisher-provided SHA-256 checksum file to the current directory:
+
+    ```bash
+    curl -fL "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar" \
+      -o ./mc-markets-openapi-mcp-3.8.0-all.jar
+
+    curl -fL "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar.sha256" \
+      -o ./mc-markets-openapi-mcp-3.8.0-all.jar.sha256
+    ```
+
+    On macOS, or Linux with Perl `shasum` installed:
+
+    ```bash
+    shasum -a 256 -c ./mc-markets-openapi-mcp-3.8.0-all.jar.sha256
+    ```
+
+    On Linux with GNU coreutils:
+
+    ```bash
+    sha256sum -c ./mc-markets-openapi-mcp-3.8.0-all.jar.sha256
+    ```
+  </Tab>
+
+  <Tab title="Windows PowerShell">
+    Download the executable JAR and the publisher-provided SHA-256 checksum file to the current directory:
+
+    ```powershell
+    Invoke-WebRequest `
+      -Uri "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar" `
+      -OutFile ".\mc-markets-openapi-mcp-3.8.0-all.jar"
+
+    Invoke-WebRequest `
+      -Uri "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar.sha256" `
+      -OutFile ".\mc-markets-openapi-mcp-3.8.0-all.jar.sha256"
+    ```
+
+    Compare the downloaded JAR against the digest in the publisher-provided checksum file:
+
+    ```powershell
+    $expected = ((Get-Content ".\mc-markets-openapi-mcp-3.8.0-all.jar.sha256" -Raw).Trim() -split '\s+')[0].ToLowerInvariant()
+    $actual = (Get-FileHash ".\mc-markets-openapi-mcp-3.8.0-all.jar" -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actual -ne $expected) { throw "SHA-256 verification failed: expected=$expected actual=$actual" }
+    Write-Host "mc-markets-openapi-mcp-3.8.0-all.jar: OK"
+    ```
+  </Tab>
+</Tabs>
+
+Configure the agent only after seeing `mc-markets-openapi-mcp-3.8.0-all.jar: OK`. If verification fails, delete both files and download them again. If it still fails, stop and contact the publisher.
+
+<Warning>
+  The download address in the command must be a plain URL beginning with `https://`. Do not copy the Markdown form `[URL](URL)`, because the shell treats its brackets and parentheses as part of the URL.
+</Warning>
+
+<Info>
+  Use the distribution package whose name ends in `-all.jar`. It already includes the MCP Server runtime dependencies, so there is no separate installation command.
+</Info>
+
+Before configuring an agent, replace `/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar` in the examples with the downloaded file's absolute path.
+
+## Configure a local agent
+
+<Tabs>
+  <Tab title="Claude">
+    In Claude Desktop, open the MCP configuration from **Settings → Developer**. Claude Code can use a project-level MCP configuration. Add:
+
+    ```json
+    {
+      "mcpServers": {
+        "mcMarketsOpenapi": {
+          "command": "java",
+          "args": [
+            "-jar",
+            "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Cursor">
+    Create `.cursor/mcp.json` in your project, or edit the global `~/.cursor/mcp.json` file:
+
+    ```json
+    {
+      "mcpServers": {
+        "mcMarketsOpenapi": {
+          "command": "java",
+          "args": [
+            "-jar",
+            "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="VS Code">
+    Create `.vscode/mcp.json` in the workspace, or run **MCP: Add Server** from the command palette. VS Code uses the top-level `servers` key:
+
+    ```json
+    {
+      "servers": {
+        "mcMarketsOpenapi": {
+          "type": "stdio",
+          "command": "java",
+          "args": [
+            "-jar",
+            "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Codex">
+    Add the following to `~/.codex/config.toml`:
+
+    ```toml
+    [mcp_servers.mc_markets_openapi]
+    command = "java"
+    args = ["-jar", "/absolute/path/to/mc-markets-openapi-mcp-3.8.0-all.jar"]
+    startup_timeout_sec = 30
+    ```
+  </Tab>
+</Tabs>
+
+Save the configuration, then restart the agent or reconnect the MCP Server. The agent should discover MC Markets OpenAPI tools whose names start with `c_`.
+
+## Configure credentials for local calls
+
+### Create an Access Key and Secret Key
+
+If you do not have credentials, follow the "Create an API Key" step in the [Quickstart](/quickstart) to create and save an Access Key and Secret Key in the MC platform. Return here afterward to configure the MCP process environment.
+
+To call write tools, select the `TRADE` permission when creating the API Key.
+
+### Configure the MCP process environment
+
+When a local stdio tool is called, the MCP process reads:
+
+- `MC_C_OPENAPI_ACCESS_KEY`
+- `MC_C_OPENAPI_SECRET_KEY`
+
+Use your operating system's credential facility or an enterprise secret manager to inject these variables into the process environment that starts the agent. Do not put real values in `.cursor/mcp.json`, `.vscode/mcp.json`, `~/.codex/config.toml`, or any other configuration that may be shared or synchronized.
+
+<Note>
+  Listing tools proves only that the MCP protocol connection works. A real tool call that returns an MC OpenAPI business response is required to verify credentials and downstream connectivity.
+</Note>
+
+If credentials are missing, a tool call reports a missing `MC_C_OPENAPI_ACCESS_KEY` or `MC_C_OPENAPI_SECRET_KEY`.
+
+## Verify the installation
+
+Check each layer in order:
+
+1. The agent reports `mcMarketsOpenapi` as connected.
+2. The agent can list 55 MC Markets OpenAPI tools, including query and write tools.
+3. Call a tool with test parameters and confirm that it returns an MC OpenAPI business response.
+4. Confirm that logs do not contain an Access Key, Secret Key, Bearer token, or user identity in plain text.
+
+Common issues:
+
+| Symptom | Check |
+| --- | --- |
+| `java: command not found` | Install JRE 17 and make `java` available in the agent process `PATH` |
+| `Unable to access jarfile` | Replace the configured JAR path with the actual absolute path |
+| MCP starts but exposes no tools | Restart the agent and inspect the MCP Server startup log |
+| Only 44 query tools are visible | The current JAR does not include the new write tools; download the latest published distribution package again and restart the agent |
+| Tools are visible but calls fail | Check both credential environment variables and network connectivity |
+| A write tool returns a permission error | Confirm that the API Key has the `TRADE` permission |
+| Startup times out | Increase Codex `startup_timeout_sec` and inspect the Java startup log |
