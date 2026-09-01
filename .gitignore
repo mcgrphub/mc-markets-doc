@@ -1,2 +1,5 @@
 # IDE
 .idea/
+
+# Local git worktrees
+.worktrees/
