@@ -4,7 +4,7 @@ sidebarTitle: "MCP 集成"
 description: "下载 MC Markets OpenAPI MCP，并在 Claude、Cursor、VS Code 或 Codex 中完成配置。"
 ---
 
-MC Markets OpenAPI MCP 将已审核的 C 端接口提供为 MCP Tool。stdio 模式共提供 55 个 Tool，包括 44 个查询 Tool 和 11 个写 Tool。你可以在支持 MCP 的 Agent 中调用这些 Tool，而不必为每个接口单独编写客户端代码。
+MC Markets OpenAPI MCP 将已审核的 C 端接口提供为 MCP Tool。stdio 模式共提供 56 个 Tool，包括 45 个查询 Tool 和 11 个写 Tool。你可以在支持 MCP 的 Agent 中调用这些 Tool，而不必为每个接口单独编写客户端代码。
 
 <Warning>
   MCP 只注册已审核的接口。不要把 Access Key、Secret Key、Bearer、Cookie 或用户身份写入仓库或共享 Agent 配置。
@@ -36,11 +36,11 @@ java -version
 
 ## 下载 MCP
 
-JAR 和校验文件必须放在同一目录，并保持下载时的文件名不变，因为校验文件同时记录了摘要和目标文件名。
+JAR 和发布方提供的 SHA-256 校验文件必须放在同一目录，并保持下载时的文件名不变。校验文件记录了摘要和目标文件名，本文档不展示固定摘要值。
 
 <Tabs>
   <Tab title="macOS / Linux">
-    将可执行 JAR 和发布方提供的 SHA-256 校验文件下载到当前目录：
+    将可执行 JAR 和 SHA-256 校验文件下载到当前目录：
 
     ```bash
     curl -fL "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar" \
@@ -64,7 +64,7 @@ JAR 和校验文件必须放在同一目录，并保持下载时的文件名不�
   </Tab>
 
   <Tab title="Windows PowerShell">
-    将可执行 JAR 和发布方提供的 SHA-256 校验文件下载到当前目录：
+    将可执行 JAR 和 SHA-256 校验文件下载到当前目录：
 
     ```powershell
     Invoke-WebRequest `
@@ -81,7 +81,7 @@ JAR 和校验文件必须放在同一目录，并保持下载时的文件名不�
     ```powershell
     $expected = ((Get-Content ".\mc-markets-openapi-mcp-3.8.0-all.jar.sha256" -Raw).Trim() -split '\s+')[0].ToLowerInvariant()
     $actual = (Get-FileHash ".\mc-markets-openapi-mcp-3.8.0-all.jar" -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($actual -ne $expected) { throw "SHA-256 校验失败：expected=$expected actual=$actual" }
+    if ($actual -ne $expected) { throw "SHA-256 校验失败" }
     Write-Host "mc-markets-openapi-mcp-3.8.0-all.jar: OK"
     ```
   </Tab>
@@ -199,7 +199,7 @@ JAR 和校验文件必须放在同一目录，并保持下载时的文件名不�
 依次检查：
 
 1. Agent 的 MCP 状态显示 `mcMarketsOpenapi` 已连接。
-2. Agent 能列出 55 个 MC Markets OpenAPI Tool，包括查询 Tool 和写 Tool。
+2. Agent 能列出 56 个 MC Markets OpenAPI Tool，包括 45 个查询 Tool 和 11 个写 Tool。
 3. 使用测试参数调用一个 Tool，并确认返回 MC OpenAPI 业务响应。
 4. 检查日志中没有 Access Key、Secret Key、Bearer 或用户身份明文。
 
@@ -210,7 +210,7 @@ JAR 和校验文件必须放在同一目录，并保持下载时的文件名不�
 | `java: command not found` | 安装 JRE 17，并确保 `java` 位于 Agent 进程的 `PATH` 中 |
 | `Unable to access jarfile` | 将配置中的 JAR 路径改为真实绝对路径 |
 | MCP 启动后没有 Tool | 重启 Agent，并查看 MCP Server 启动日志 |
-| 只能看到 44 个查询 Tool | 当前 JAR 不包含新增写 Tool；重新下载已发布的最新分发包并重启 Agent |
+| Tool 数量少于 56 个 | 当前 JAR 不是最新分发包；重新下载已发布的最新分发包并重启 Agent |
 | Tool 可见但调用失败 | 检查两项凭证环境变量和网络连通性 |
 | 写 Tool 返回权限错误 | 确认 API Key 已开通 `TRADE` 权限 |
 | 启动超时 | 将 Codex 的 `startup_timeout_sec` 调高，并检查 Java 启动日志 |

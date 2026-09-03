@@ -4,7 +4,7 @@ sidebarTitle: "MCP integration"
 description: "Download MC Markets OpenAPI MCP and configure it in Claude, Cursor, VS Code, or Codex."
 ---
 
-MC Markets OpenAPI MCP exposes approved C-end endpoints as MCP tools. Stdio mode provides 55 tools: 44 query tools and 11 write tools. You can call these tools from an MCP-compatible agent without writing a separate client for each endpoint.
+MC Markets OpenAPI MCP exposes approved C-end endpoints as MCP tools. Stdio mode provides 56 tools: 45 query tools and 11 write tools. You can call these tools from an MCP-compatible agent without writing a separate client for each endpoint.
 
 <Warning>
   MCP registers only approved endpoints. Never store an Access Key, Secret Key, Bearer token, cookie, or user identity in a repository or shared agent configuration.
@@ -36,11 +36,11 @@ The major version in the output must be `17`.
 
 ## Download MCP
 
-Keep the JAR and checksum file in the same directory with their original downloaded names. The checksum file records both the digest and the target file name.
+Keep the JAR and publisher-provided SHA-256 checksum file in the same directory with their original downloaded names. The checksum file records the digest and target file name; this guide does not publish a fixed digest value.
 
 <Tabs>
   <Tab title="macOS / Linux">
-    Download the executable JAR and the publisher-provided SHA-256 checksum file to the current directory:
+    Download the executable JAR and SHA-256 checksum file to the current directory:
 
     ```bash
     curl -fL "https://assets.mcconnects.com/mc-openapi-mcp/c-end/3.8.0/mc-markets-openapi-mcp-3.8.0-all.jar" \
@@ -64,7 +64,7 @@ Keep the JAR and checksum file in the same directory with their original downloa
   </Tab>
 
   <Tab title="Windows PowerShell">
-    Download the executable JAR and the publisher-provided SHA-256 checksum file to the current directory:
+    Download the executable JAR and SHA-256 checksum file to the current directory:
 
     ```powershell
     Invoke-WebRequest `
@@ -81,7 +81,7 @@ Keep the JAR and checksum file in the same directory with their original downloa
     ```powershell
     $expected = ((Get-Content ".\mc-markets-openapi-mcp-3.8.0-all.jar.sha256" -Raw).Trim() -split '\s+')[0].ToLowerInvariant()
     $actual = (Get-FileHash ".\mc-markets-openapi-mcp-3.8.0-all.jar" -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($actual -ne $expected) { throw "SHA-256 verification failed: expected=$expected actual=$actual" }
+    if ($actual -ne $expected) { throw "SHA-256 verification failed" }
     Write-Host "mc-markets-openapi-mcp-3.8.0-all.jar: OK"
     ```
   </Tab>
@@ -199,7 +199,7 @@ If credentials are missing, a tool call reports a missing `MC_C_OPENAPI_ACCESS_K
 Check each layer in order:
 
 1. The agent reports `mcMarketsOpenapi` as connected.
-2. The agent can list 55 MC Markets OpenAPI tools, including query and write tools.
+2. The agent can list 56 MC Markets OpenAPI tools, including 45 query tools and 11 write tools.
 3. Call a tool with test parameters and confirm that it returns an MC OpenAPI business response.
 4. Confirm that logs do not contain an Access Key, Secret Key, Bearer token, or user identity in plain text.
 
@@ -210,7 +210,7 @@ Common issues:
 | `java: command not found` | Install JRE 17 and make `java` available in the agent process `PATH` |
 | `Unable to access jarfile` | Replace the configured JAR path with the actual absolute path |
 | MCP starts but exposes no tools | Restart the agent and inspect the MCP Server startup log |
-| Only 44 query tools are visible | The current JAR does not include the new write tools; download the latest published distribution package again and restart the agent |
+| Fewer than 56 tools are visible | The current JAR is not the latest distribution package; download the latest published package again and restart the agent |
 | Tools are visible but calls fail | Check both credential environment variables and network connectivity |
 | A write tool returns a permission error | Confirm that the API Key has the `TRADE` permission |
 | Startup times out | Increase Codex `startup_timeout_sec` and inspect the Java startup log |
