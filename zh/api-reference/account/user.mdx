@@ -1,0 +1,138 @@
+---
+title: "用户"
+sidebarTitle: "用户"
+description: "查询当前认证用户的主信息、资料、认证方式、邀请信息、KYC 状态和交易账号就绪状态。"
+---
+
+本组接口路径前缀为 `/openapi/v1/mc-account/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/user-v2/profile | READ | 查询当前认证用户信息 |
+
+<Note>
+  Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+<Warning>
+  响应可能包含邮箱、手机号、地址和证件信息等敏感个人资料。请限制日志记录、存储和转发范围。`uid` 必须与当前认证用户一致，不能用此接口查询其他用户。
+</Warning>
+
+---
+
+## 查询当前认证用户信息
+
+`GET /openapi/v1/mc-account/user-v2/profile` — 权限 `READ`。
+
+返回用户主信息、资料、Privy 认证方式、邀请与 KYC 兼容信息，以及现货和合约交易账号的就绪状态。
+
+### 查询参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| uid | string | 是 | 当前认证用户的 UID；必须与认证上下文中的 UID 一致 |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| user | object | 用户主信息 |
+| authList | array | 认证方式列表 |
+| profile | object | 用户扩展信息 |
+| legacy | object | 与旧版 GetUserInfoAndAccountInfo 对齐的兼容信息 |
+| boundLoginMethods | array | 已绑定的登录方式：email、google、wallet |
+| currentLoginMethod | string | 当前会话登录方式；OpenAPI Stateless JWT 场景可能为 null |
+| allTradingAccountsReady | boolean | 现货与合约交易账号是否均已生成 |
+
+`user` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| uid | string | 用户 UID |
+| email | string | 邮箱 |
+| walletAddress | string | 已绑定的登录钱包地址 |
+| spotAccount | integer | 现货交易账号 |
+| tradeAccount | integer | 合约交易账号 |
+| demoAccount | integer | 模拟账号 |
+| registerType | integer | 注册来源 |
+| appId | string | 渠道 ID |
+| clientId | string | 设备 ID |
+| version | string | 客户端版本号 |
+| ip | string | 注册 IP |
+| ipAddr | string | IP 归属地 |
+| imRef | string | 推广参数 IM_REF |
+
+`authList[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| authType | string | 认证类型 |
+| privyType | integer | Privy 三方类型 |
+
+`profile` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| nickname | string | 昵称 |
+| avatar | string | 头像 URL |
+| phone | string | 手机号 |
+| mobileAreaId | integer | 手机区号 |
+| country | string | 国家或地区 |
+| address | string | 地址 |
+| gender | integer | 性别：0 未知，1 男，2 女 |
+| birthday | string | 生日，格式为 yyyy-MM-dd |
+
+`legacy` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| uid | string | 用户 UID |
+| email | string | 邮箱 |
+| countryId | integer | 国家或地区 ID；无法转换为数字时为 0 |
+| mobileAreaId | integer | 手机区号 |
+| mobile | string | 手机号 |
+| credentialsType | integer | 证件类型：0 无，1 身份证，2 护照，3 驾照，99 其他 |
+| credentialsNum | string | 证件号码 |
+| credentialsCountryId | integer | 证件签发国家或地区 ID |
+| credentialsValidDateEnd | string | 证件有效期截止日期 |
+| isLongTime | boolean | 证件是否长期有效 |
+| cardStatus | integer | KYC 状态：0 无记录，1 待审，2 已通过，3 已拒绝，4 未提交 |
+| noCard | string | 无证说明或备注 |
+| createTime | string | 用户创建时间，格式为 yyyy-MM-dd HH:mm:ss |
+| spreadCode | string | 当前用户的邀请码 |
+| disseminatorCode | string | 注册时填写的邀请人邀请码 |
+| recommendedTime | string | 邀请关系绑定时间，格式为 yyyy-MM-dd HH:mm:ss |
+| nickName | string | 昵称 |
+| avatar | string | 头像 URL |
+| userLanguage | string | 用户语言偏好；未同步时为 null |
+| appId | string | 渠道 AppId |
+| cardSubmitTime | string | KYC 提交时间，格式为 yyyy-MM-dd HH:mm:ss |
+| accountInfos | array | 子账户或交易号列表 |
+| createTimeTimestamp | integer | 用户创建时间毫秒时间戳 |
+| recommendedTimeTimestamp | integer | 邀请关系绑定时间毫秒时间戳 |
+| cardSubmitTimeTimestamp | integer | KYC 提交时间毫秒时间戳 |
+
+`legacy.accountInfos[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| account | integer | 交易登录号或子账户号 |
+| accountType | integer | 账号类型：1 真实，2 模拟 |
+| accountGroup | integer | 账号组别：1 合约，2 现货 |
+| createTime | string | 创建时间，格式为 yyyy-MM-dd HH:mm:ss |
+| createTimeTimestamp | integer | 创建时间毫秒时间戳 |
+
+<Info>
+  `currentLoginMethod` 在 Stateless JWT 场景可能为 `null`。注册异步分配交易账号期间，`allTradingAccountsReady` 可能为 `false`；客户端可轮询本接口或延后读取用户信息。
+</Info>
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-v2/profile" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "uid=YOUR_UID"
+```

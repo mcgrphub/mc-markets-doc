@@ -16967,6 +16967,49 @@
           }
         }
       }
+    },
+    "/openapi/v1/mc-account/user-v2/profile": {
+      "get": {
+        "tags": [
+          "OpenAPI-用户"
+        ],
+        "summary": "查询用户信息",
+        "description": "查询当前认证用户的主信息、资料、认证方式、邀请与 KYC 等兼容信息。uid 必须与当前认证用户一致；currentLoginMethod 可能为 null，allTradingAccountsReady 在注册异步领号期间可能为 false\n所需权限: READ",
+        "operationId": "getProfile",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "当前认证用户的 UID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetResultObject"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetResultUserProfileQueryRsp"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -28411,6 +28454,321 @@
             "type": "object",
             "additionalProperties": {
               "type": "object"
+            }
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RetResultUserProfileQueryRsp": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "description": "当前认证用户的信息",
+            "properties": {
+              "user": {
+                "type": "object",
+                "description": "用户主信息",
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "description": "用户 UID"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "邮箱"
+                  },
+                  "walletAddress": {
+                    "type": "string",
+                    "description": "已绑定的登录钱包地址"
+                  },
+                  "spotAccount": {
+                    "type": "integer",
+                    "description": "现货交易账号",
+                    "format": "int64"
+                  },
+                  "tradeAccount": {
+                    "type": "integer",
+                    "description": "合约交易账号",
+                    "format": "int64"
+                  },
+                  "demoAccount": {
+                    "type": "integer",
+                    "description": "模拟账号",
+                    "format": "int64"
+                  },
+                  "registerType": {
+                    "type": "integer",
+                    "description": "注册来源",
+                    "format": "int32"
+                  },
+                  "appId": {
+                    "type": "string",
+                    "description": "渠道 ID"
+                  },
+                  "clientId": {
+                    "type": "string",
+                    "description": "设备 ID"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "客户端版本号"
+                  },
+                  "ip": {
+                    "type": "string",
+                    "description": "注册 IP"
+                  },
+                  "ipAddr": {
+                    "type": "string",
+                    "description": "IP 归属地"
+                  },
+                  "imRef": {
+                    "type": "string",
+                    "description": "推广参数 IM_REF"
+                  }
+                }
+              },
+              "authList": {
+                "type": "array",
+                "description": "认证方式列表",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "authType": {
+                      "type": "string",
+                      "description": "认证类型"
+                    },
+                    "privyType": {
+                      "type": "integer",
+                      "description": "Privy 三方类型",
+                      "format": "int32"
+                    }
+                  }
+                }
+              },
+              "profile": {
+                "type": "object",
+                "description": "用户扩展信息",
+                "properties": {
+                  "nickname": {
+                    "type": "string",
+                    "description": "昵称"
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "description": "头像 URL"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "手机号"
+                  },
+                  "mobileAreaId": {
+                    "type": "integer",
+                    "description": "手机区号",
+                    "format": "int32"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "国家或地区"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "地址"
+                  },
+                  "gender": {
+                    "type": "integer",
+                    "description": "性别：0 未知，1 男，2 女",
+                    "format": "int32"
+                  },
+                  "birthday": {
+                    "type": "string",
+                    "description": "生日，格式为 yyyy-MM-dd"
+                  }
+                }
+              },
+              "legacy": {
+                "type": "object",
+                "description": "与旧版 GetUserInfoAndAccountInfo 对齐的兼容信息",
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "description": "用户 UID"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "邮箱"
+                  },
+                  "countryId": {
+                    "type": "integer",
+                    "description": "国家或地区 ID；无法转换为数字时为 0",
+                    "format": "int32"
+                  },
+                  "mobileAreaId": {
+                    "type": "integer",
+                    "description": "手机区号",
+                    "format": "int32"
+                  },
+                  "mobile": {
+                    "type": "string",
+                    "description": "手机号"
+                  },
+                  "credentialsType": {
+                    "type": "integer",
+                    "description": "证件类型：0 无，1 身份证，2 护照，3 驾照，99 其他",
+                    "format": "int32"
+                  },
+                  "credentialsNum": {
+                    "type": "string",
+                    "description": "证件号码"
+                  },
+                  "credentialsCountryId": {
+                    "type": "integer",
+                    "description": "证件签发国家或地区 ID",
+                    "format": "int32"
+                  },
+                  "credentialsValidDateEnd": {
+                    "type": "string",
+                    "description": "证件有效期截止日期"
+                  },
+                  "isLongTime": {
+                    "type": "boolean",
+                    "description": "证件是否长期有效"
+                  },
+                  "cardStatus": {
+                    "type": "integer",
+                    "description": "KYC 状态：0 无记录，1 待审，2 已通过，3 已拒绝，4 未提交",
+                    "format": "int32"
+                  },
+                  "noCard": {
+                    "type": "string",
+                    "description": "无证说明或备注"
+                  },
+                  "createTime": {
+                    "type": "string",
+                    "description": "用户创建时间，格式为 yyyy-MM-dd HH:mm:ss"
+                  },
+                  "spreadCode": {
+                    "type": "string",
+                    "description": "当前用户的邀请码"
+                  },
+                  "disseminatorCode": {
+                    "type": "string",
+                    "description": "注册时填写的邀请人邀请码"
+                  },
+                  "recommendedTime": {
+                    "type": "string",
+                    "description": "邀请关系绑定时间，格式为 yyyy-MM-dd HH:mm:ss"
+                  },
+                  "nickName": {
+                    "type": "string",
+                    "description": "昵称"
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "description": "头像 URL"
+                  },
+                  "userLanguage": {
+                    "type": "string",
+                    "description": "用户语言偏好；未同步时为 null"
+                  },
+                  "appId": {
+                    "type": "string",
+                    "description": "渠道 AppId"
+                  },
+                  "cardSubmitTime": {
+                    "type": "string",
+                    "description": "KYC 提交时间，格式为 yyyy-MM-dd HH:mm:ss"
+                  },
+                  "accountInfos": {
+                    "type": "array",
+                    "description": "子账户或交易号列表",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "account": {
+                          "type": "integer",
+                          "description": "交易登录号或子账户号",
+                          "format": "int64"
+                        },
+                        "accountType": {
+                          "type": "integer",
+                          "description": "账号类型：1 真实，2 模拟",
+                          "format": "int32"
+                        },
+                        "accountGroup": {
+                          "type": "integer",
+                          "description": "账号组别：1 合约，2 现货",
+                          "format": "int32"
+                        },
+                        "createTime": {
+                          "type": "string",
+                          "description": "创建时间，格式为 yyyy-MM-dd HH:mm:ss"
+                        },
+                        "createTimeTimestamp": {
+                          "type": "integer",
+                          "description": "创建时间毫秒时间戳",
+                          "format": "int64"
+                        }
+                      }
+                    }
+                  },
+                  "createTimeTimestamp": {
+                    "type": "integer",
+                    "description": "用户创建时间毫秒时间戳",
+                    "format": "int64"
+                  },
+                  "recommendedTimeTimestamp": {
+                    "type": "integer",
+                    "description": "邀请关系绑定时间毫秒时间戳",
+                    "format": "int64"
+                  },
+                  "cardSubmitTimeTimestamp": {
+                    "type": "integer",
+                    "description": "KYC 提交时间毫秒时间戳",
+                    "format": "int64"
+                  }
+                }
+              },
+              "boundLoginMethods": {
+                "type": "array",
+                "description": "已绑定的登录方式：email、google、wallet",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "currentLoginMethod": {
+                "type": "string",
+                "description": "当前会话登录方式；OpenAPI Stateless JWT 场景可能为 null",
+                "nullable": true
+              },
+              "allTradingAccountsReady": {
+                "type": "boolean",
+                "description": "现货与合约交易账号是否均已生成"
+              }
             }
           },
           "success": {

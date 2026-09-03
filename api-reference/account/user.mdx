@@ -1,0 +1,138 @@
+---
+title: "User"
+sidebarTitle: "User"
+description: "Query the authenticated user's core details, profile, authentication methods, invitation data, KYC status, and trading-account readiness."
+---
+
+Paths in this group use the `/openapi/v1/mc-account/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/user-v2/profile | READ | Query the authenticated user's profile |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+<Warning>
+  The response may contain sensitive personal data, including email, phone, address, and identity-document details. Limit where this data is logged, stored, or forwarded. The `uid` must match the authenticated user; this endpoint cannot query another user.
+</Warning>
+
+---
+
+## Query the authenticated user's profile
+
+`GET /openapi/v1/mc-account/user-v2/profile` — permission `READ`.
+
+Returns core user details, profile data, Privy authentication methods, legacy-compatible invitation and KYC information, and spot and contract trading-account readiness.
+
+### Query parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| uid | string | Yes | Authenticated user's UID; must match the UID in the authentication context |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| user | object | Core user details |
+| authList | array | Authentication methods |
+| profile | object | Extended user profile |
+| legacy | object | Compatibility data aligned with the legacy GetUserInfoAndAccountInfo response |
+| boundLoginMethods | array | Bound login methods: email, google, wallet |
+| currentLoginMethod | string | Current session login method; may be null with an OpenAPI stateless JWT |
+| allTradingAccountsReady | boolean | Whether both spot and contract trading accounts have been created |
+
+`user` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| uid | string | User UID |
+| email | string | Email address |
+| walletAddress | string | Bound login wallet address |
+| spotAccount | integer | Spot trading account |
+| tradeAccount | integer | Contract trading account |
+| demoAccount | integer | Demo account |
+| registerType | integer | Registration source |
+| appId | string | Channel ID |
+| clientId | string | Device ID |
+| version | string | Client version |
+| ip | string | Registration IP address |
+| ipAddr | string | Registration IP location |
+| imRef | string | IM_REF promotion parameter |
+
+`authList[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| authType | string | Authentication type |
+| privyType | integer | Privy provider type |
+
+`profile` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| nickname | string | Nickname |
+| avatar | string | Avatar URL |
+| phone | string | Phone number |
+| mobileAreaId | integer | Calling code |
+| country | string | Country or region |
+| address | string | Address |
+| gender | integer | Gender: 0 unknown, 1 male, 2 female |
+| birthday | string | Birthday in yyyy-MM-dd format |
+
+`legacy` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| uid | string | User UID |
+| email | string | Email address |
+| countryId | integer | Country or region ID; 0 when the value cannot be converted to a number |
+| mobileAreaId | integer | Calling code |
+| mobile | string | Phone number |
+| credentialsType | integer | Identity-document type: 0 none, 1 ID card, 2 passport, 3 driver's license, 99 other |
+| credentialsNum | string | Identity-document number |
+| credentialsCountryId | integer | Identity-document issuing country or region ID |
+| credentialsValidDateEnd | string | Identity-document expiration date |
+| isLongTime | boolean | Whether the identity document has no expiration date |
+| cardStatus | integer | KYC status: 0 no record, 1 pending, 2 approved, 3 rejected, 4 not submitted |
+| noCard | string | Missing-document explanation or note |
+| createTime | string | User creation time in yyyy-MM-dd HH:mm:ss format |
+| spreadCode | string | Current user's invitation code |
+| disseminatorCode | string | Inviter code entered during registration |
+| recommendedTime | string | Invitation binding time in yyyy-MM-dd HH:mm:ss format |
+| nickName | string | Nickname |
+| avatar | string | Avatar URL |
+| userLanguage | string | User language preference; null when not synchronized |
+| appId | string | Channel AppId |
+| cardSubmitTime | string | KYC submission time in yyyy-MM-dd HH:mm:ss format |
+| accountInfos | array | Subaccount or trading-account list |
+| createTimeTimestamp | integer | User creation timestamp in milliseconds |
+| recommendedTimeTimestamp | integer | Invitation binding timestamp in milliseconds |
+| cardSubmitTimeTimestamp | integer | KYC submission timestamp in milliseconds |
+
+`legacy.accountInfos[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| account | integer | Trading login or subaccount number |
+| accountType | integer | Account type: 1 real, 2 demo |
+| accountGroup | integer | Account group: 1 contract, 2 spot |
+| createTime | string | Creation time in yyyy-MM-dd HH:mm:ss format |
+| createTimeTimestamp | integer | Creation timestamp in milliseconds |
+
+<Info>
+  `currentLoginMethod` may be `null` with a stateless JWT. While trading accounts are being assigned asynchronously during registration, `allTradingAccountsReady` may be `false`; clients can poll this endpoint or delay loading the profile.
+</Info>
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-v2/profile" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "uid=YOUR_UID"
+```
