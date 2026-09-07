@@ -486,7 +486,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| uid | string | 是 | 用户 UID |
+| uid | string | 是 | 当前用户的现货账户 ID 或合约账户 ID，不是客户 UID。可通过[查询当前认证用户信息](/zh/api-reference/account/user#查询当前认证用户信息)响应中的 `data.user.spotAccount` 或 `data.user.tradeAccount` 获取 |
 
 ### 响应 `data` 字段
 

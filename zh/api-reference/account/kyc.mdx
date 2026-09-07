@@ -1,0 +1,56 @@
+---
+title: "KYC"
+description: "查询当前认证用户的 KYC 基础资料。"
+---
+
+本组接口路径前缀为 `/openapi/v1/mc-account/`。
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/kyc/profile/base | READ | 查询 KYC 基础资料 |
+
+<Note>
+  Playground 已关闭。请按[认证](/zh/authentication)使用 AK/SK 签名后调用。Base URL 见[基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 查询 KYC 基础资料
+
+`GET /openapi/v1/mc-account/kyc/profile/base` — 权限 `READ`。
+
+查询当前认证用户在当前业务线下的 KYC 基础资料。用户身份由认证上下文确定，不接受 UID 查询参数。
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| applyNo | string | 当前业务线 KYC 主单号，无工单时为 null |
+| businessLineId | integer | 业务线 ID |
+| l0StepPassed | boolean | 基础认证（L0）步骤是否已审核通过 |
+| firstName | string | 名 |
+| lastName | string | 姓 |
+| nationality | string | 国籍 |
+| residenceCountry | string | 居住国家 |
+| residenceRegion | string | 居住地区 |
+| birthDate | string | 出生日期 |
+| kycType | string | 证件类型 |
+| certNo | string | 证件号码 |
+| certValidUntil | string | 证件有效期截止日期，格式为 yyyy-MM-dd |
+| certValidFrom | string | 证件有效期开始日期，格式为 yyyy-MM-dd |
+| certPermanentFlag | integer | 证件长期有效：1=是，0=否 |
+| certIssueRegion | string | 签发地区 |
+
+<Warning>
+  响应包含个人身份资料。仅在必要时读取，不要将响应写入日志、提示词、工单或其他共享位置。
+</Warning>
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/kyc/profile/base" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

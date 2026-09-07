@@ -486,7 +486,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| uid | string | Yes | User UID |
+| uid | string | Yes | The current user's spot or contract account ID, not the customer UID. Get it from `data.user.spotAccount` or `data.user.tradeAccount` in [Get the current authenticated user](/api-reference/account/user#get-the-current-authenticated-user) |
 
 ### Response `data` fields
 

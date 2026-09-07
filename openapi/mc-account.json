@@ -10633,13 +10633,15 @@
                 },
                 "dealTimeStart": {
                   "type": "string",
-                  "description": "开始扣费时间",
-                  "format": "date-time"
+                  "description": "开始扣费时间，格式为 yyyy-MM-dd HH:mm:ss",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+                  "example": "2026-09-01 00:00:00"
                 },
                 "dealTimeEnd": {
                   "type": "string",
-                  "description": "结束扣费时间",
-                  "format": "date-time"
+                  "description": "结束扣费时间，格式为 yyyy-MM-dd HH:mm:ss",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+                  "example": "2026-09-01 23:59:59"
                 }
               },
               "description": "费用扣除记录分页查询请求",
@@ -16968,6 +16970,38 @@
         }
       }
     },
+    "/openapi/v1/mc-account/kyc/profile/base": {
+      "get": {
+        "tags": [
+          "KYC"
+        ],
+        "summary": "查询 KYC 基础资料",
+        "description": "查询当前认证用户在当前业务线下的 KYC 基础资料。用户身份由认证上下文确定，不接受 UID 查询参数\n所需权限: READ",
+        "operationId": "getKycProfileBase",
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetResultObject"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetResultKycBaseProfileRsp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/openapi/v1/mc-account/user-v2/profile": {
       "get": {
         "tags": [
@@ -22704,13 +22738,15 @@
           },
           "dealTimeStart": {
             "type": "string",
-            "description": "开始扣费时间",
-            "format": "date-time"
+            "description": "开始扣费时间，格式为 yyyy-MM-dd HH:mm:ss",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+            "example": "2026-09-01 00:00:00"
           },
           "dealTimeEnd": {
             "type": "string",
-            "description": "结束扣费时间",
-            "format": "date-time"
+            "description": "结束扣费时间，格式为 yyyy-MM-dd HH:mm:ss",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+            "example": "2026-09-01 23:59:59"
           }
         },
         "description": "费用扣除记录分页查询请求"
@@ -28455,6 +28491,108 @@
             "additionalProperties": {
               "type": "object"
             }
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      },
+      "KycBaseProfileRsp": {
+        "type": "object",
+        "description": "当前认证用户在当前业务线下的 KYC 基础资料",
+        "properties": {
+          "applyNo": {
+            "type": "string",
+            "description": "当前业务线 KYC 主单号，无工单时为 null"
+          },
+          "businessLineId": {
+            "type": "integer",
+            "description": "业务线 ID",
+            "format": "int64"
+          },
+          "l0StepPassed": {
+            "type": "boolean",
+            "description": "基础认证（L0）步骤是否已审核通过"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "名"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "姓"
+          },
+          "nationality": {
+            "type": "string",
+            "description": "国籍"
+          },
+          "residenceCountry": {
+            "type": "string",
+            "description": "居住国家"
+          },
+          "residenceRegion": {
+            "type": "string",
+            "description": "居住地区"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "出生日期",
+            "format": "date-time"
+          },
+          "kycType": {
+            "type": "string",
+            "description": "证件类型"
+          },
+          "certNo": {
+            "type": "string",
+            "description": "证件号码"
+          },
+          "certValidUntil": {
+            "type": "string",
+            "description": "证件有效期截止日期，格式为 yyyy-MM-dd"
+          },
+          "certValidFrom": {
+            "type": "string",
+            "description": "证件有效期开始日期，格式为 yyyy-MM-dd"
+          },
+          "certPermanentFlag": {
+            "type": "integer",
+            "description": "证件长期有效：1=是，0=否",
+            "format": "int32"
+          },
+          "certIssueRegion": {
+            "type": "string",
+            "description": "签发地区"
+          }
+        }
+      },
+      "RetResultKycBaseProfileRsp": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeKey": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "localizedMessage": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/KycBaseProfileRsp"
           },
           "success": {
             "type": "boolean"

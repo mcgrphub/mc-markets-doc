@@ -1,0 +1,56 @@
+---
+title: "KYC"
+description: "Query KYC base profile data for the current authenticated user."
+---
+
+Paths in this group use the `/openapi/v1/mc-account/` prefix.
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/kyc/profile/base | READ | Get KYC base profile data |
+
+<Note>
+  The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## Get KYC base profile data
+
+`GET /openapi/v1/mc-account/kyc/profile/base` — permission `READ`.
+
+Query KYC base profile data for the current authenticated user in the current business line. The authenticated context determines the user identity; the endpoint does not accept a UID query parameter.
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| applyNo | string | KYC application number for the current business line; `null` when no application exists |
+| businessLineId | integer | Business line ID |
+| l0StepPassed | boolean | Whether the base verification (L0) step has passed review |
+| firstName | string | First name |
+| lastName | string | Last name |
+| nationality | string | Nationality |
+| residenceCountry | string | Country of residence |
+| residenceRegion | string | Region of residence |
+| birthDate | string | Date of birth |
+| kycType | string | Identity document type |
+| certNo | string | Identity document number |
+| certValidUntil | string | Identity document expiration date in `yyyy-MM-dd` format |
+| certValidFrom | string | Identity document start date in `yyyy-MM-dd` format |
+| certPermanentFlag | integer | Whether the document is permanent: `1` yes, `0` no |
+| certIssueRegion | string | Issuing region |
+
+<Warning>
+  The response contains personal identity data. Read it only when necessary, and do not write it to logs, prompts, tickets, or other shared locations.
+</Warning>
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/kyc/profile/base" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

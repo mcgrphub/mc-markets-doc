@@ -23,7 +23,7 @@ description: "成交相关 OpenAPI 接口。"
 
 `GET /openapi/v1/mc-trade/trade/deals/history/v3` — 权限 `READ`。
 
-根据 uid 和账户数据类型(SPOT/CONTRACT/SPOT_CONTRACT)查询历史成交列表
+查询当前认证用户的历史成交，并按账户数据类型（`SPOT`、`CONTRACT` 或 `SPOT_CONTRACT`）筛选。接口支持普通分页和游标分页；游标模式不执行 COUNT，`total` 和 `pages` 固定为 `0`，请使用 `hasNext` 判断是否继续翻页。
 
 ### 查询 / 路径参数
 
@@ -31,6 +31,8 @@ description: "成交相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | size | integer | 否 | 每页显示条数 |
 | current | integer | 否 | 当前页码 |
+| cursorTimeMsc | integer | 否 | 游标时间。取上一页最后一条 `records[].timeMsc`，Unix 毫秒时间戳；必须与 `cursorDealId` 同时传入 |
+| cursorDealId | string | 否 | 游标成交号。取上一页最后一条 `records[].deal`；必须与 `cursorTimeMsc` 同时传入 |
 | orderBy | string | 否 | 排序字段，多个用逗号分隔 |
 | sortOrder | string | 否 | 排序方向：ASC / DESC |
 | type | string | 是 | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并 |
@@ -39,7 +41,7 @@ description: "成交相关 OpenAPI 接口。"
 | symbol | string | 否 | 交易品种名 |
 
 <Note>
-  `deal`、`order`、`positionID` 和 `login` 在 JSON 响应中均为字符串。客户端不要按数字反序列化，以免 64 位标识符发生精度丢失。
+  推荐使用 `cursorTimeMsc` 和 `cursorDealId` 成对翻页。不传游标时，接口使用 `current` 和 `size` 分页。`deal`、`cursorDealId`、`order`、`positionID` 和 `login` 均应作为字符串处理，以免 64 位标识符发生精度丢失。
 </Note>
 
 ### 响应 `data` 字段
@@ -47,10 +49,10 @@ description: "成交相关 OpenAPI 接口。"
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
+| total | integer | 普通分页返回总记录数；游标模式固定为 `0` |
 | size | integer | 每页条数 |
 | current | integer | 当前页码 |
-| pages | integer | 总页数 |
+| pages | integer | 普通分页返回总页数；游标模式固定为 `0` |
 | hasPrevious | boolean | 是否有上一页 |
 | hasNext | boolean | 是否有下一页 |
 

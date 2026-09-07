@@ -50,6 +50,7 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | 资金费率 | 资金费率 | Funding rate | confirmed |
 | 行情数据 | 行情数据 | Market data | confirmed (prefer over Spec “Market Data API”) |
 | OpenAPI-用户 | 用户 | User | confirmed (reader-facing name; do not expose the internal `OpenAPI-` prefix) |
+| KYC | KYC | KYC | confirmed |
 
 ## Table 3 — Page title / slug registry
 
@@ -71,5 +72,6 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | 资金费率 | Funding rate | `funding-rate` | risk |
 | 行情数据 | Market data | `market-data` | aggregator |
 | 用户 | User | `user` | account |
+| KYC | KYC | `kyc` | account |
 
 **Note:** The slug `trading` appears under account, trade, and risk with the same value. That is OK — pages live at `zh/api-reference/{service}/trading.mdx` (and English mirrors). Do not flatten slugs across services.

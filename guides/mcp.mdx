@@ -4,7 +4,7 @@ sidebarTitle: "MCP integration"
 description: "Download MC Markets OpenAPI MCP and configure it in Claude, Cursor, VS Code, or Codex."
 ---
 
-MC Markets OpenAPI MCP exposes approved C-end endpoints as MCP tools. Stdio mode provides 56 tools: 45 query tools and 11 write tools. You can call these tools from an MCP-compatible agent without writing a separate client for each endpoint.
+MC Markets OpenAPI MCP exposes approved C-end endpoints as MCP tools. Stdio mode provides 57 tools: 46 query tools and 11 write tools. You can call these tools from an MCP-compatible agent without writing a separate client for each endpoint.
 
 <Warning>
   MCP registers only approved endpoints. Never store an Access Key, Secret Key, Bearer token, cookie, or user identity in a repository or shared agent configuration.
@@ -199,7 +199,7 @@ If credentials are missing, a tool call reports a missing `MC_C_OPENAPI_ACCESS_K
 Check each layer in order:
 
 1. The agent reports `mcMarketsOpenapi` as connected.
-2. The agent can list 56 MC Markets OpenAPI tools, including 45 query tools and 11 write tools.
+2. The agent can list 57 MC Markets OpenAPI tools, including 46 query tools and 11 write tools.
 3. Call a tool with test parameters and confirm that it returns an MC OpenAPI business response.
 4. Confirm that logs do not contain an Access Key, Secret Key, Bearer token, or user identity in plain text.
 
@@ -210,7 +210,7 @@ Common issues:
 | `java: command not found` | Install JRE 17 and make `java` available in the agent process `PATH` |
 | `Unable to access jarfile` | Replace the configured JAR path with the actual absolute path |
 | MCP starts but exposes no tools | Restart the agent and inspect the MCP Server startup log |
-| Fewer than 56 tools are visible | The current JAR is not the latest distribution package; download the latest published package again and restart the agent |
+| Fewer than 57 tools are visible | The current JAR is not the latest distribution package; download the latest published package again and restart the agent |
 | Tools are visible but calls fail | Check both credential environment variables and network connectivity |
 | A write tool returns a permission error | Confirm that the API Key has the `TRADE` permission |
 | Startup times out | Increase Codex `startup_timeout_sec` and inspect the Java startup log |

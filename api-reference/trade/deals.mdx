@@ -23,7 +23,7 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 `GET /openapi/v1/mc-trade/trade/deals/history/v3` — permission `READ`.
 
-Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT).
+Query historical deals for the current authenticated user and filter by account data type (`SPOT`, `CONTRACT`, or `SPOT_CONTRACT`). The endpoint supports standard and cursor pagination. Cursor mode does not run a COUNT query, so `total` and `pages` are `0`; use `hasNext` to decide whether to request another page.
 
 ### Query / path parameters
 
@@ -31,6 +31,8 @@ Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number |
+| cursorTimeMsc | integer | No | Cursor time from the last `records[].timeMsc` on the previous page, in Unix milliseconds; pass it together with `cursorDealId` |
+| cursorDealId | string | No | Cursor deal number from the last `records[].deal` on the previous page; pass it together with `cursorTimeMsc` |
 | orderBy | string | No | Sort fields, comma-separated |
 | sortOrder | string | No | Sort direction: ASC / DESC |
 | type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined |
@@ -43,17 +45,17 @@ Query historical deals by UID and account data type (SPOT/CONTRACT/SPOT_CONTRACT
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array | Records on the current page |
-| total | integer | Total number of records |
+| total | integer | Total record count in standard mode; `0` in cursor mode |
 | size | integer | Page size |
 | current | integer | Current page number |
-| pages | integer | Total number of pages |
+| pages | integer | Total page count in standard mode; `0` in cursor mode |
 | hasPrevious | boolean | Whether a previous page exists |
 | hasNext | boolean | Whether a next page exists |
 
 `records[]` items:
 
 <Note>
-  `deal`, `order`, `positionID`, and `login` are JSON strings. Do not deserialize them as numbers, or 64-bit identifiers may lose precision.
+  Use `cursorTimeMsc` and `cursorDealId` together for cursor pagination. Without a cursor, the endpoint uses `current` and `size`. Treat `deal`, `cursorDealId`, `order`, `positionID`, and `login` as strings to avoid precision loss for 64-bit identifiers.
 </Note>
 
 | Field | Type | Description |

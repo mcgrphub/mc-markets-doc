@@ -5262,13 +5262,13 @@
           "交易"
         ],
         "summary": "交易组静态信息",
-        "description": "查询账户组相关静态配置（手续费、杠杆、Margin Call 等）\n所需权限: READ",
+        "description": "查询当前用户的现货或合约账户所属交易组的静态配置（手续费、杠杆、Margin Call 等）。参数 uid 是账户 ID，不是客户 UID；可通过 getProfile 响应中的 data.user.spotAccount 或 data.user.tradeAccount 获取\n所需权限: READ",
         "operationId": "staticInfoByMt5Group",
         "parameters": [
           {
             "name": "uid",
             "in": "query",
-            "description": "用户 UID",
+            "description": "当前用户的现货账户 ID 或合约账户 ID，不是客户 UID。可通过 getProfile 响应中的 data.user.spotAccount 或 data.user.tradeAccount 获取",
             "required": true,
             "schema": {
               "type": "string"
@@ -5888,7 +5888,7 @@
           "成交"
         ],
         "summary": "查询历史成交列表V3",
-        "description": "查询当前用户的成交；可按账户数据类型（现货/合约/合并）筛选\n所需权限: READ",
+        "description": "查询当前用户的成交；可按账户数据类型（现货/合约/合并）筛选。接口支持普通分页和游标分页；游标模式不执行 COUNT，total/pages 固定为 0，请使用 hasNext 判断是否继续翻页。使用游标模式时需同时传 cursorTimeMsc 和 cursorDealId\n所需权限: READ",
         "operationId": "getHistoryDealsV3",
         "parameters": [
           {
@@ -5914,6 +5914,16 @@
                   "description": "当前页码",
                   "format": "int64",
                   "example": 1
+                },
+                "cursorTimeMsc": {
+                  "type": "integer",
+                  "description": "上一页最后一条成交的成交时间，取 records[].timeMsc，Unix 毫秒时间戳；必须与 cursorDealId 同时传入",
+                  "format": "int64"
+                },
+                "cursorDealId": {
+                  "type": "string",
+                  "description": "上一页最后一条成交 ID，取 records[].deal；必须与 cursorTimeMsc 同时传入",
+                  "pattern": "^[0-9]+$"
                 },
                 "orderBy": {
                   "type": "string"
