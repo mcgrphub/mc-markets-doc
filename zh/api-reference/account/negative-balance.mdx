@@ -1,0 +1,48 @@
+---
+title: "负结余账户"
+sidebarTitle: "负结余账户"
+description: "负结余账户公开接口。"
+---
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/negative-balance/accounts | READ | 查询本人负结余账户 |
+
+<Note>
+需认证的接口请按 [认证](/zh/authentication) 使用 AK/SK 签名。公开访问接口无需签名。网关地址见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 查询本人负结余账户
+
+`GET /openapi/v1/mc-account/negative-balance/accounts` — 权限 `READ`.
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| accounts | array | 负结余账户；完整查询且全部非负时才为空 |
+| snapshotAtMs | integer | 权威快照时刻，Unix毫秒UTC |
+
+`accounts[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| accountId | string | 本人合约账户ID |
+| asset | string | 结算币种 |
+| balance | string | 负数权威余额十进制字符串 |
+| amountToCover | string | 需补足的正数金额，USDC6位/其它币种8位向上取整 |
+| hourlyRate | string | 当前小时适用利率百分数字符串，最多6位小数 |
+| eventId | string | 可选已核实周期标识，未核实时不返回 |
+| negativeSinceMs | integer | 可选已核实周期开始，Unix毫秒UTC；未核实时不返回 |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/negative-balance/accounts" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

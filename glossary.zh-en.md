@@ -75,3 +75,15 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | KYC | KYC | `kyc` | account |
 
 **Note:** The slug `trading` appears under account, trade, and risk with the same value. That is OK — pages live at `zh/api-reference/{service}/trading.mdx` (and English mirrors). Do not flatten slugs across services.
+
+## 本次新增公开页面映射
+
+| Spec tag | 对外中文 | English | slug | service |
+| --- | --- | --- | --- | --- |
+| 用户金库 | 用户金库 | User vault | `user-vault` | account |
+| 司法管辖区门禁 | 地区访问检查 | Jurisdiction checks | `jurisdiction` | account |
+| negative-balance-controller | 负结余账户 | Negative balance accounts | `negative-balance` | account |
+| funding-fee-export-controller | 资金费导出 | Funding fee export | `funding-fee-export` | account |
+| 统一导出历史 | 导出历史 | Export history | `export-history` | trade |
+
+订单历史 CSV 导出 / Order history CSV export 归入 `trade/orders`；成交历史 CSV 导出 / Deal history CSV export 归入 `trade/deals`。

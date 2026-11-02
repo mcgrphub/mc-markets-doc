@@ -20,6 +20,13 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | GET | /openapi/v1/mc-account/mlp/core/stats | READ | Vault account statistics |
 | GET | /openapi/v1/mc-account/mlp/apr-data | READ | Vault account APR data |
 | GET | /openapi/v1/mc-account/mlp/account/assets | READ | Vault account asset details |
+| GET | /openapi/v1/mc-account/mlp/deposits | READ | List your vault deposits |
+| GET | /openapi/v1/mc-account/mlp/deposits/export | READ | Export your vault deposits as CSV |
+| GET | /openapi/v1/mc-account/mlp/overview | Public | Get the vault overview |
+| GET | /openapi/v1/mc-account/mlp/settlements | READ | List your vault settlements |
+| GET | /openapi/v1/mc-account/mlp/settlements/export | READ | Export your vault settlements as CSV |
+| GET | /openapi/v1/mc-account/mlp/withdrawals | READ | List your vault withdrawals |
+| GET | /openapi/v1/mc-account/mlp/withdrawals/export | READ | Export your vault withdrawals as CSV |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -341,6 +348,306 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## List your vault deposits
+
+`GET /openapi/v1/mc-account/mlp/deposits` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| current | integer | No | Page number; defaults to 1; Minimum: 1 |
+| size | integer | No | Page size from 1 to 100; defaults to 20; Minimum: 1; Maximum: 100 |
+| symbolId | string | No | Currently configured currency identifier; nullable |
+| fromMs | integer | No | Inclusive start time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| toMs | integer | No | Inclusive end time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| orderDirection | string | No | ASC or DESC; defaults to DESC; Allowed values: `ASC`, `DESC` |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array | Records on the current page |
+| current | integer | Page number |
+| size | integer | Page size |
+| total | integer | Total record count after filtering |
+| asOfMs | integer | Read time in Unix milliseconds (UTC) |
+
+`records[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| recordKey | string | Principal record identifier |
+| symbolId | string | Currency identifier |
+| symbol | string | Original currency symbol |
+| unlockAtMs | integer | Unlock time in Unix milliseconds (UTC) |
+| lockedPrincipal | string | Locked principal in the original currency |
+| withdrawablePrincipal | string | Unreserved matured principal in the original currency |
+| remainingPrincipal | string | Principal not yet successfully withdrawn, in the original currency |
+| withdrawnPrincipal | string | Successfully withdrawn principal in the original currency |
+| status | string | LOCKED or UNLOCKED |
+| isLegacy | boolean | Outstanding principal projection |
+| depositId | string | Original transaction identifier; null when unavailable; Nullable |
+| depositedAmount | string | Original successful deposit quantity; null when unknown; Nullable |
+| depositedAtMs | integer | Successful deposit time in Unix milliseconds (UTC); null when unknown; Nullable |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Export your vault deposits as CSV
+
+`GET /openapi/v1/mc-account/mlp/deposits/export` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| current | integer | No | Page number; defaults to 1; Minimum: 1 |
+| size | integer | No | Page size from 1 to 100; defaults to 20; Minimum: 1; Maximum: 100 |
+| symbolId | string | No | Currently configured currency identifier; nullable |
+| fromMs | integer | No | Inclusive start time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| toMs | integer | No | Inclusive end time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| orderDirection | string | No | ASC or DESC; defaults to DESC; Allowed values: `ASC`, `DESC` |
+
+### Response
+
+HTTP `200` with `Content-Type: text/csv; charset=utf-8`. `Content-Disposition` supplies the file name. Returns a CSV file rather than JSON `data`.
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits/export" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Get the vault overview
+
+`GET /openapi/v1/mc-account/mlp/overview` — permission `Public`.
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| asOfMs | integer | asOfMs in Unix milliseconds (UTC) |
+| valuationAtMs | integer | valuationAtMs in Unix milliseconds (UTC) |
+| viewVersion | string | viewVersion |
+| config | object | Vault configuration; quantities are in the original currency and Usdc-suffixed fields are USDC values |
+| platform | object | Vault platform data; quantities are in the original currency and Usdc-suffixed fields are USDC values |
+| account | object | Negative balance account entry |
+
+`config` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| annualYieldRatePct | string | annualYieldRatePct as an exact decimal string; Pct denotes a percentage. USDC values display 2 decimal places with HALF_UP rounding; original-currency quantities retain 6 or 8 decimal places. |
+| lockPeriodDays | integer | lockPeriodDays |
+| singleUserDepositLimitUsdc | string | singleUserDepositLimitUsdc as an exact decimal string; Pct denotes a percentage. USDC values display 2 decimal places with HALF_UP rounding; original-currency quantities retain 6 or 8 decimal places. |
+| tvlBaseAmountUsdc | string | tvlBaseAmountUsdc as an exact decimal string; Pct denotes a percentage. USDC values display 2 decimal places with HALF_UP rounding; original-currency quantities retain 6 or 8 decimal places. |
+| tiers | array | tiers |
+
+`config.tiers[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| minPoints | integer | minPoints |
+| depositLimitRatioPct | string | depositLimitRatioPct as an exact decimal string; Pct denotes a percentage. USDC values display 2 decimal places with HALF_UP rounding; original-currency quantities retain 6 or 8 decimal places. |
+
+`platform` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| cumulativeDepositUsdc | string | cumulativeDepositUsdc as an exact decimal string; Pct denotes a percentage. USDC values display 2 decimal places with HALF_UP rounding; original-currency quantities retain 6 or 8 decimal places. |
+| yesterdaySettledYieldUsdc | string | yesterdaySettledYieldUsdc as an exact decimal string; Pct denotes a percentage. USDC values display 2 decimal places with HALF_UP rounding; original-currency quantities retain 6 or 8 decimal places. |
+| nextSettlementCutoffMs | integer | nextSettlementCutoffMs in Unix milliseconds (UTC) |
+
+`account` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| accountId | string | Your contract account identifier |
+| asset | string | Settlement currency |
+| balance | string | Authoritative negative balance as a decimal string |
+| amountToCover | string | Positive amount required to cover the deficit; rounded up to 6 decimal places for USDC and 8 for other currencies |
+| hourlyRate | string | Applicable hourly rate as a percentage string, with at most 6 decimal places |
+| eventId | string | Optional verified period identifier; omitted when unverified |
+| negativeSinceMs | integer | Optional verified period start in Unix milliseconds (UTC); omitted when unverified |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/overview"
+```
+
+---
+
+## List your vault settlements
+
+`GET /openapi/v1/mc-account/mlp/settlements` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| current | integer | No | Page number; defaults to 1; Minimum: 1 |
+| size | integer | No | Page size from 1 to 100; defaults to 20; Minimum: 1; Maximum: 100 |
+| symbolId | string | No | Currently configured currency identifier; nullable |
+| fromMs | integer | No | Inclusive start time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| toMs | integer | No | Inclusive end time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| orderDirection | string | No | ASC or DESC; defaults to DESC; Allowed values: `ASC`, `DESC` |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array | Records on the current page |
+| current | integer | Page number |
+| size | integer | Page size |
+| total | integer | Total record count after filtering |
+| asOfMs | integer | Read time in Unix milliseconds (UTC) |
+
+`records[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| recordKey | string | Snapshot identifier |
+| settlementId | string | Unique settlement identifier |
+| symbolId | string | Principal currency identifier |
+| symbol | string | Principal in the original currency |
+| principalAmount | string | Fixed interest-bearing principal in the original currency |
+| annualYieldRatePct | string | Fixed annualized percentage rate |
+| fxRateUsdc | string | Positive exchange rate: USDC per unit of the original currency |
+| settledYieldUsdc | string | Posted yield in USDC, rounded down to 6 decimal places |
+| settlementCutoffMs | integer | Business cutoff in Unix milliseconds (UTC) |
+| creditedAtMs | integer | Actual posting time in Unix milliseconds (UTC) |
+| depositId | string | Original deposit identifier; null when unknown; Nullable |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Export your vault settlements as CSV
+
+`GET /openapi/v1/mc-account/mlp/settlements/export` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| current | integer | No | Page number; defaults to 1; Minimum: 1 |
+| size | integer | No | Page size from 1 to 100; defaults to 20; Minimum: 1; Maximum: 100 |
+| symbolId | string | No | Currently configured currency identifier; nullable |
+| fromMs | integer | No | Inclusive start time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| toMs | integer | No | Inclusive end time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| orderDirection | string | No | ASC or DESC; defaults to DESC; Allowed values: `ASC`, `DESC` |
+
+### Response
+
+HTTP `200` with `Content-Type: text/csv; charset=utf-8`. `Content-Disposition` supplies the file name. Returns a CSV file rather than JSON `data`.
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements/export" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## List your vault withdrawals
+
+`GET /openapi/v1/mc-account/mlp/withdrawals` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| current | integer | No | Page number; defaults to 1; Minimum: 1 |
+| size | integer | No | Page size from 1 to 100; defaults to 20; Minimum: 1; Maximum: 100 |
+| symbolId | string | No | Currently configured currency identifier; nullable |
+| fromMs | integer | No | Inclusive start time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| toMs | integer | No | Inclusive end time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| orderDirection | string | No | ASC or DESC; defaults to DESC; Allowed values: `ASC`, `DESC` |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| records | array | Records on the current page |
+| current | integer | Page number |
+| size | integer | Page size |
+| total | integer | Total record count after filtering |
+| asOfMs | integer | Read time in Unix milliseconds (UTC) |
+
+`records[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| recordKey | string | Request identifier |
+| withdrawalId | string | Original withdrawal transaction identifier |
+| symbolId | string | Currency identifier |
+| symbol | string | Original currency symbol |
+| status | string | Original transaction status: INIT, PROCESSING, SUCCESS, FAILED, or CANCELLED |
+| initiatedAtMs | integer | Submission time in Unix milliseconds (UTC); Nullable |
+| availableBefore | string | Withdrawable quantity in the original currency before success; null before success; Nullable |
+| withdrawnPrincipal | string | Principal withdrawn in the original currency; null before success; Nullable |
+| withdrawnYield | string | USDC yield withdrawn successfully; null before success; Nullable |
+| remainingPrincipal | string | Remaining principal in the original currency after success; null before success; Nullable |
+| remainingYield | string | Remaining USDC yield after success; null before success; Nullable |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Export your vault withdrawals as CSV
+
+`GET /openapi/v1/mc-account/mlp/withdrawals/export` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| current | integer | No | Page number; defaults to 1; Minimum: 1 |
+| size | integer | No | Page size from 1 to 100; defaults to 20; Minimum: 1; Maximum: 100 |
+| symbolId | string | No | Currently configured currency identifier; nullable |
+| fromMs | integer | No | Inclusive start time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| toMs | integer | No | Inclusive end time in Unix milliseconds (UTC); nullable; Minimum: 0 |
+| orderDirection | string | No | ASC or DESC; defaults to DESC; Allowed values: `ASC`, `DESC` |
+
+### Response
+
+HTTP `200` with `Content-Type: text/csv; charset=utf-8`. `Content-Disposition` supplies the file name. Returns a CSV file rather than JSON `data`.
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals/export" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \

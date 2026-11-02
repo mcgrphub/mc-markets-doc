@@ -1,0 +1,128 @@
+---
+title: "Funding fee export"
+sidebarTitle: "Funding fee export"
+description: "Public OpenAPI endpoints for funding fee export."
+---
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/mc-account/funding-fee-record/export-tasks/{taskId}` | READ | Get a funding fee export task |
+| GET | `/openapi/v1/mc-account/funding-fee-record/export-tasks/{taskId}/download` | READ | Download funding fee history CSV |
+| POST | /openapi/v1/mc-account/funding-fee-record/export-tasks | READ | Create a funding fee export task |
+
+<Note>
+Sign authenticated requests with AK/SK as described in [Authentication](/authentication). Public endpoints require no signature. See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## Get a funding fee export task
+
+`GET /openapi/v1/mc-account/funding-fee-record/export-tasks/{taskId}` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| taskId | string | Yes | Unique task identifier |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Unique task identifier |
+| dataset | string | Export dataset; Allowed values: `FUNDING_FEE_HISTORY` |
+| language | string | CSV language tag, normalized by the service |
+| status | string | Asynchronous task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | Failure reason; applies to failed tasks; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC), serialized as a JSON string |
+| updatedAt | string | Update time in Unix milliseconds (UTC), serialized as a JSON string |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC), serialized as a JSON string |
+| rowCount | integer | Exported record count |
+| fileName | string | Export file name |
+| downloadAvailable | boolean | Whether the file is available to download |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks/TASK_DEMO_001" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Download funding fee history CSV
+
+`GET /openapi/v1/mc-account/funding-fee-record/export-tasks/{taskId}/download` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| taskId | string | Yes | Unique task identifier |
+
+### Response
+
+HTTP `302 Found`. `Location` contains a temporary download URL; `Cache-Control: no-store`. The response has no JSON `data`.
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks/TASK_DEMO_001/download" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Create a funding fee export task
+
+`POST /openapi/v1/mc-account/funding-fee-record/export-tasks` — permission `READ`.
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| clientRequestId | string | Yes | Non-empty client idempotency identifier, at most 64 characters; Min length: 1; Max length: 64 |
+| from | integer | Yes | Start time in Unix seconds (UTC), non-negative |
+| to | integer | Yes | End time in Unix seconds (UTC), not earlier than from |
+| sort | string | Yes | Fixed descending order for funding fee records; Allowed values: `DEAL_TIME_DESC` |
+| language | string | No | CSV language tag, normalized by the service |
+| timeZone | string | Yes | IANA time zone identifier |
+
+### Response `data` fields
+
+HTTP `202 Accepted`. Generation is asynchronous; poll the task status afterward.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Unique task identifier |
+| dataset | string | Export dataset; Allowed values: `FUNDING_FEE_HISTORY` |
+| language | string | CSV language tag, normalized by the service |
+| status | string | Asynchronous task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | Failure reason; applies to failed tasks; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC), serialized as a JSON string |
+| updatedAt | string | Update time in Unix milliseconds (UTC), serialized as a JSON string |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC), serialized as a JSON string |
+| rowCount | integer | Exported record count |
+| fileName | string | Export file name |
+| downloadAvailable | boolean | Whether the file is available to download |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientRequestId": "export-demo-20261102-001",
+  "from": 1761955200,
+  "to": 1762041600,
+  "sort": "DEAL_TIME_DESC",
+  "timeZone": "Asia/Shanghai"
+}'
+```

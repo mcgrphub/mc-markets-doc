@@ -510,7 +510,8 @@
                         },
                         "params": {
                           "type": "object",
-                          "description": "交易引擎返回参数"
+                          "description": "交易引擎返回参数",
+                          "properties": {}
                         }
                       },
                       "description": "交易指令响应",
@@ -1041,7 +1042,8 @@
                         },
                         "params": {
                           "type": "object",
-                          "description": "交易引擎返回参数"
+                          "description": "交易引擎返回参数",
+                          "properties": {}
                         }
                       },
                       "description": "交易指令响应",
@@ -1581,7 +1583,8 @@
                         },
                         "params": {
                           "type": "object",
-                          "description": "交易引擎返回参数"
+                          "description": "交易引擎返回参数",
+                          "properties": {}
                         }
                       },
                       "description": "交易指令响应",
@@ -2117,7 +2120,8 @@
                         },
                         "params": {
                           "type": "object",
-                          "description": "交易引擎返回参数"
+                          "description": "交易引擎返回参数",
+                          "properties": {}
                         }
                       },
                       "description": "交易指令响应",
@@ -3066,11 +3070,13 @@
                                       "properties": {
                                         "startTime": {
                                           "type": "string",
-                                          "description": "交易成本配置-开始时间"
+                                          "description": "交易成本配置-开始时间",
+                                          "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                                         },
                                         "endTime": {
                                           "type": "string",
-                                          "description": "交易成本配置-结束时间"
+                                          "description": "交易成本配置-结束时间",
+                                          "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                                         },
                                         "transCostMode": {
                                           "type": "string",
@@ -3150,11 +3156,13 @@
                                       "properties": {
                                         "startTime": {
                                           "type": "string",
-                                          "description": "交易成本配置-开始时间"
+                                          "description": "交易成本配置-开始时间",
+                                          "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                                         },
                                         "endTime": {
                                           "type": "string",
-                                          "description": "交易成本配置-结束时间"
+                                          "description": "交易成本配置-结束时间",
+                                          "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                                         },
                                         "transCostMode": {
                                           "type": "string",
@@ -3215,6 +3223,97 @@
                                 },
                                 "description": "风控档位配置",
                                 "example": null
+                              },
+                              "tradingSymbolStatus": {
+                                "title": "交易品种状态",
+                                "type": "string",
+                                "description": "ONLINE=上架可交易，OFFLINE=下架仅平仓",
+                                "enum": [
+                                  "ONLINE",
+                                  "OFFLINE"
+                                ],
+                                "example": "OFFLINE"
+                              },
+                              "baseSlippagePct": {
+                                "title": "共用基础滑点%",
+                                "type": "number",
+                                "description": "共用基础滑点%"
+                              },
+                              "marketCoefficient": {
+                                "title": "市场系数（常规 + 指定时段）",
+                                "required": [
+                                  "regular"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                  "regular": {
+                                    "type": "array",
+                                    "description": "常规三档：SMALL/MEDIUM/LARGE",
+                                    "items": {
+                                      "required": [
+                                        "coefficient",
+                                        "key"
+                                      ],
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "description": "档位键：SMALL / MEDIUM / LARGE"
+                                        },
+                                        "label": {
+                                          "type": "string",
+                                          "description": "展示名称"
+                                        },
+                                        "coefficient": {
+                                          "type": "number",
+                                          "description": "市场系数"
+                                        }
+                                      },
+                                      "description": "常规三档：SMALL/MEDIUM/LARGE"
+                                    }
+                                  },
+                                  "scheduled": {
+                                    "type": "array",
+                                    "description": "指定时段多档，可为空数组",
+                                    "items": {
+                                      "required": [
+                                        "coefficient",
+                                        "endAt",
+                                        "startAt"
+                                      ],
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "description": "可选档位键：SMALL / MEDIUM / LARGE"
+                                        },
+                                        "label": {
+                                          "type": "string",
+                                          "description": "展示名称"
+                                        },
+                                        "startAt": {
+                                          "type": "string",
+                                          "description": "开始时间（建议 ISO-8601）"
+                                        },
+                                        "endAt": {
+                                          "type": "string",
+                                          "description": "结束时间（建议 ISO-8601）"
+                                        },
+                                        "coefficient": {
+                                          "type": "number",
+                                          "description": "市场系数"
+                                        }
+                                      },
+                                      "description": "指定时段多档，可为空数组"
+                                    }
+                                  }
+                                },
+                                "description": "市场系数（常规 + 指定时段）"
+                              },
+                              "quoteDiffTolerancePoints": {
+                                "title": "行情差异容忍点差（价格保护）",
+                                "type": "number",
+                                "description": "行情差异容忍点差（价格保护）"
                               }
                             },
                             "description": "风控侧品种静态配置",
@@ -3247,41 +3346,48 @@
         "operationId": "slippageEstimate",
         "parameters": [
           {
-            "name": "req",
+            "name": "login",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "login",
-                "symbol",
-                "type",
-                "volumeExt"
-              ],
-              "type": "object",
-              "properties": {
-                "login": {
-                  "type": "string",
-                  "description": "交易账户或现货账户登录号",
-                  "example": "60349871"
-                },
-                "type": {
-                  "type": "integer",
-                  "description": "订单类型\n\"0-OP_BUY: 市价买入\",\n\"1-OP_SELL: 市价卖出\",\n\"2-OP_BUY_LIMIT: 限价买入挂单\",\n\"3-OP_SELL_LIMIT: 限价卖出挂单\",\n\"4-OP_BUY_STOP: 止损买入挂单\",\n\"5-OP_SELL_STOP: 止损卖出挂单\",\n\"6-OP_BUY_STOP_LIMIT: 止损限价买入挂单\",\n\"7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单\",\n\"8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式\"\n",
-                  "format": "int32"
-                },
-                "volumeExt": {
-                  "type": "integer",
-                  "description": "下单数量（持仓量精度换算后），如用户下单量是 0.01，则传入 1000000",
-                  "format": "int64"
-                },
-                "symbol": {
-                  "type": "string",
-                  "description": "交易对/品种"
-                }
-              },
-              "description": "获取预估滑点请求",
-              "example": null
-            }
+              "type": "string",
+              "description": "交易账户或现货账户登录号",
+              "example": "60349871"
+            },
+            "description": "交易账户或现货账户登录号"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "订单类型\n\"0-OP_BUY: 市价买入\",\n\"1-OP_SELL: 市价卖出\",\n\"2-OP_BUY_LIMIT: 限价买入挂单\",\n\"3-OP_SELL_LIMIT: 限价卖出挂单\",\n\"4-OP_BUY_STOP: 止损买入挂单\",\n\"5-OP_SELL_STOP: 止损卖出挂单\",\n\"6-OP_BUY_STOP_LIMIT: 止损限价买入挂单\",\n\"7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单\",\n\"8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式\"\n",
+              "format": "int32"
+            },
+            "description": "订单类型\n\"0-OP_BUY: 市价买入\",\n\"1-OP_SELL: 市价卖出\",\n\"2-OP_BUY_LIMIT: 限价买入挂单\",\n\"3-OP_SELL_LIMIT: 限价卖出挂单\",\n\"4-OP_BUY_STOP: 止损买入挂单\",\n\"5-OP_SELL_STOP: 止损卖出挂单\",\n\"6-OP_BUY_STOP_LIMIT: 止损限价买入挂单\",\n\"7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单\",\n\"8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式\"\n"
+          },
+          {
+            "name": "volumeExt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "下单数量（持仓量精度换算后），如用户下单量是 0.01，则传入 1000000",
+              "format": "int64",
+              "minimum": 1
+            },
+            "description": "下单数量（持仓量精度换算后），如用户下单量是 0.01，则传入 1000000"
+          },
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "交易对/品种"
+            },
+            "description": "交易对/品种"
           }
         ],
         "responses": {
@@ -4457,64 +4563,120 @@
         "operationId": "getHistoryOrdersV3",
         "parameters": [
           {
-            "name": "req",
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "每页显示条数",
+              "format": "int64",
+              "example": 10
+            },
+            "description": "每页显示条数"
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "当前页码",
+              "format": "int64",
+              "example": 1
+            },
+            "description": "当前页码"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "type",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "from",
-                "to",
-                "type"
-              ],
-              "type": "object",
-              "properties": {
-                "size": {
-                  "type": "integer",
-                  "description": "每页显示条数",
-                  "format": "int64",
-                  "example": 10
-                },
-                "current": {
-                  "type": "integer",
-                  "description": "当前页码",
-                  "format": "int64",
-                  "example": 1
-                },
-                "orderBy": {
-                  "type": "string"
-                },
-                "sortOrder": {
-                  "type": "string"
-                },
-                "type": {
-                  "type": "string",
-                  "description": "账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并",
-                  "enum": [
-                    "SPOT",
-                    "CONTRACT",
-                    "SPOT_CONTRACT"
-                  ]
-                },
-                "from": {
-                  "type": "integer",
-                  "description": "开始时间戳（Unix时间戳，秒）",
-                  "format": "int64",
-                  "example": 1704067200
-                },
-                "to": {
-                  "type": "integer",
-                  "description": "结束时间戳（Unix时间戳，秒）",
-                  "format": "int64",
-                  "example": 1735689600
-                },
-                "symbol": {
-                  "type": "string",
-                  "description": "交易品种名",
-                  "example": "ETHUSD"
-                }
-              },
-              "example": null
-            }
+              "type": "string",
+              "description": "账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并",
+              "enum": [
+                "SPOT",
+                "CONTRACT",
+                "SPOT_CONTRACT"
+              ]
+            },
+            "description": "账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "开始时间戳（Unix时间戳，秒）",
+              "format": "int64",
+              "example": 1704067200
+            },
+            "description": "开始时间戳（Unix时间戳，秒）"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "结束时间戳（Unix时间戳，秒）",
+              "format": "int64",
+              "example": 1735689600
+            },
+            "description": "结束时间戳（Unix时间戳，秒）"
+          },
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "交易品种名",
+              "example": "ETHUSD"
+            },
+            "description": "交易品种名"
+          },
+          {
+            "name": "cursorTimeSetupMsc",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "CURSOR 模式游标时间，取上一页最后一条 records.timeSetupMsc，毫秒时间戳；与 cursorOrderId 成对传入时走游标分页",
+              "format": "int64",
+              "example": 1784532890796
+            },
+            "description": "CURSOR 模式游标时间，取上一页最后一条 records.timeSetupMsc，毫秒时间戳；与 cursorOrderId 成对传入时走游标分页"
+          },
+          {
+            "name": "cursorOrderId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "CURSOR 模式游标订单号，取上一页最后一条 records.order；与 cursorTimeSetupMsc 成对传入时走游标分页",
+              "format": "int64",
+              "example": 1082572
+            },
+            "description": "CURSOR 模式游标订单号，取上一页最后一条 records.order；与 cursorTimeSetupMsc 成对传入时走游标分页"
           }
         ],
         "responses": {
@@ -5865,6 +6027,11 @@
                         "marginCall": {
                           "type": "string",
                           "description": "Margin Call"
+                        },
+                        "marginStopOut": {
+                          "title": "强制平仓阈值",
+                          "type": "string",
+                          "description": "MT5 交易组的原始 Stop Out 值；百分比模式下 30 表示 30%"
                         }
                       },
                       "description": "用户组信息响应",
@@ -5892,74 +6059,118 @@
         "operationId": "getHistoryDealsV3",
         "parameters": [
           {
-            "name": "req",
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "每页显示条数",
+              "format": "int64",
+              "example": 10
+            },
+            "description": "每页显示条数"
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "当前页码",
+              "format": "int64",
+              "example": 1
+            },
+            "description": "当前页码"
+          },
+          {
+            "name": "cursorTimeMsc",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "上一页最后一条成交的成交时间，取 records[].timeMsc，Unix 毫秒时间戳；必须与 cursorDealId 同时传入",
+              "format": "int64"
+            },
+            "description": "上一页最后一条成交的成交时间，取 records[].timeMsc，Unix 毫秒时间戳；必须与 cursorDealId 同时传入"
+          },
+          {
+            "name": "cursorDealId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "上一页最后一条成交 ID，取 records[].deal；必须与 cursorTimeMsc 同时传入",
+              "pattern": "^[0-9]+$"
+            },
+            "description": "上一页最后一条成交 ID，取 records[].deal；必须与 cursorTimeMsc 同时传入"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          {
+            "name": "type",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "from",
-                "to",
-                "type"
-              ],
-              "type": "object",
-              "properties": {
-                "size": {
-                  "type": "integer",
-                  "description": "每页显示条数",
-                  "format": "int64",
-                  "example": 10
-                },
-                "current": {
-                  "type": "integer",
-                  "description": "当前页码",
-                  "format": "int64",
-                  "example": 1
-                },
-                "cursorTimeMsc": {
-                  "type": "integer",
-                  "description": "上一页最后一条成交的成交时间，取 records[].timeMsc，Unix 毫秒时间戳；必须与 cursorDealId 同时传入",
-                  "format": "int64"
-                },
-                "cursorDealId": {
-                  "type": "string",
-                  "description": "上一页最后一条成交 ID，取 records[].deal；必须与 cursorTimeMsc 同时传入",
-                  "pattern": "^[0-9]+$"
-                },
-                "orderBy": {
-                  "type": "string"
-                },
-                "sortOrder": {
-                  "type": "string"
-                },
-                "type": {
-                  "type": "string",
-                  "description": "账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并",
-                  "enum": [
-                    "SPOT",
-                    "CONTRACT",
-                    "SPOT_CONTRACT"
-                  ]
-                },
-                "from": {
-                  "type": "integer",
-                  "description": "开始时间戳（Unix时间戳，秒）",
-                  "format": "int64",
-                  "example": 1704067200
-                },
-                "to": {
-                  "type": "integer",
-                  "description": "结束时间戳（Unix时间戳，秒）",
-                  "format": "int64",
-                  "example": 1735689600
-                },
-                "symbol": {
-                  "type": "string",
-                  "description": "交易品种名",
-                  "example": "ETHUSD"
-                }
-              },
-              "example": null
-            }
+              "type": "string",
+              "description": "账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并",
+              "enum": [
+                "SPOT",
+                "CONTRACT",
+                "SPOT_CONTRACT"
+              ]
+            },
+            "description": "账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "开始时间戳（Unix时间戳，秒）",
+              "format": "int64",
+              "example": 1704067200
+            },
+            "description": "开始时间戳（Unix时间戳，秒）"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "结束时间戳（Unix时间戳，秒）",
+              "format": "int64",
+              "example": 1735689600
+            },
+            "description": "结束时间戳（Unix时间戳，秒）"
+          },
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "交易品种名",
+              "example": "ETHUSD"
+            },
+            "description": "交易品种名"
           }
         ],
         "responses": {
@@ -6378,12 +6589,14 @@
                               "deal": {
                                 "type": "string",
                                 "description": "成交号，主键",
-                                "example": "123456"
+                                "example": "123456",
+                                "format": "int64"
                               },
                               "login": {
                                 "type": "string",
                                 "description": "交易账户登录号",
-                                "example": "10001"
+                                "example": "10001",
+                                "format": "int64"
                               },
                               "dealer": {
                                 "type": "integer",
@@ -6394,7 +6607,8 @@
                               "order": {
                                 "type": "string",
                                 "description": "订单号，关联的订单号",
-                                "example": "123456"
+                                "example": "123456",
+                                "format": "int64"
                               },
                               "action": {
                                 "type": "integer",
@@ -6607,7 +6821,8 @@
                               "positionID": {
                                 "type": "string",
                                 "description": "持仓ID，关联的持仓ID",
-                                "example": "0"
+                                "example": "0",
+                                "format": "int64"
                               },
                               "priceSL": {
                                 "type": "number",
@@ -8319,31 +8534,35 @@
         "operationId": "getPositionsCurrentV2",
         "parameters": [
           {
-            "name": "req",
+            "name": "login",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "login"
-              ],
-              "type": "object",
-              "properties": {
-                "login": {
-                  "type": "string",
-                  "description": "交易账户或现货账户登录号",
-                  "example": "60349871"
-                },
-                "symbol": {
-                  "type": "string",
-                  "description": "交易品种，可选"
-                },
-                "positionType": {
-                  "type": "string",
-                  "description": "不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓"
-                }
-              },
-              "example": null
-            }
+              "type": "string",
+              "description": "交易账户或现货账户登录号",
+              "example": "60349871"
+            },
+            "description": "交易账户或现货账户登录号"
+          },
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "交易品种，可选"
+            },
+            "description": "交易品种，可选"
+          },
+          {
+            "name": "positionType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓"
+            },
+            "description": "不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓"
           }
         ],
         "responses": {
@@ -10894,7 +11113,8 @@
                         },
                         "params": {
                           "type": "object",
-                          "description": "交易引擎返回参数"
+                          "description": "交易引擎返回参数",
+                          "properties": {}
                         }
                       },
                       "description": "交易指令响应",
@@ -10910,6 +11130,3610 @@
             }
           }
         }
+      }
+    },
+    "/openapi/v1/mc-trade/export-tasks": {
+      "get": {
+        "summary": "查询当前用户三类 CSV 导出历史",
+        "deprecated": false,
+        "description": "",
+        "operationId": "page",
+        "tags": [
+          "统一导出历史"
+        ],
+        "parameters": [
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "description": "每页条数，范围 1 到 100；首次请求默认 20",
+              "format": "int32"
+            },
+            "description": "每页条数，范围 1 到 100；首次请求默认 20"
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "隔离查询的数据集，必须和 sourceView 同时提供",
+              "enum": [
+                "DEAL_HISTORY",
+                "ORDER_HISTORY",
+                "FUNDING_FEE_HISTORY",
+                "POSITION_CURRENT",
+                "ORDER_CURRENT"
+              ]
+            },
+            "description": "隔离查询的数据集，必须和 sourceView 同时提供"
+          },
+          {
+            "name": "sourceView",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "隔离查询的来源：SPOT、CONTRACT、PORTFOLIO",
+              "enum": [
+                "SPOT",
+                "CONTRACT",
+                "PORTFOLIO"
+              ]
+            },
+            "description": "隔离查询的来源：SPOT、CONTRACT、PORTFOLIO"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "maxLength": 2048,
+              "minLength": 0,
+              "type": "string",
+              "description": "服务端签名的不可变快照游标"
+            },
+            "description": "服务端签名的不可变快照游标"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "enum": [
+                        "DEFAULT",
+                        "SIGN_ERROR",
+                        "NOT_EXIST",
+                        "ALREADY_EXIST",
+                        "REPEAT_OPERATION",
+                        "PARAM_ERROR",
+                        "PERMISSION_DENIED",
+                        "OPERATION_FAILED",
+                        "DATA_FORMAT_ERROR",
+                        "NETWORK_ERROR",
+                        "TIMEOUT_ERROR",
+                        "CONFIG_ERROR",
+                        "STATUS_ERROR",
+                        "VERSION_INCOMPATIBLE",
+                        "SERVICE_UNAVAILABLE",
+                        "DATA_INTEGRITY_ERROR",
+                        "CONCURRENT_CONFLICT",
+                        "RESOURCE_LOCKED",
+                        "QUOTA_EXCEEDED",
+                        "DEPENDENCY_ERROR",
+                        "BUSINESS_RULE_CONFLICT",
+                        "AUTH_CREDENTIAL_MISSING",
+                        "ROLE_PERMISSION_INVALID",
+                        "ROLE_ALREADY_EXIST",
+                        "ROLE_NOT_EXIST",
+                        "ROLE_ADMIN_CANNOT_MODIFY",
+                        "ROLE_ADMIN_CANNOT_DELETE",
+                        "BUSINESS_LINE_NAME_EXIST",
+                        "BUSINESS_LINE_NOT_EXIST",
+                        "BUSINESS_LINE_NOT_PERMITTED",
+                        "TRANSFER_FAILED",
+                        "TRANSFER_AMOUNT_INVALID",
+                        "TRANSFER_ACCOUNT_NOT_EXIST",
+                        "TRANSFER_ACCOUNT_FROZEN",
+                        "TRANSFER_LIMIT_EXCEEDED",
+                        "EXCHANGE_RATE_NOT_FOUND",
+                        "EXCHANGE_RATE_INVALID",
+                        "EXCHANGE_RATE_SERVICE_ERROR",
+                        "EXCHANGE_RATE_QUOTE_INVALID",
+                        "EXCHANGE_SYMBOL_ERROR",
+                        "ACCOUNT_NOT_EXIST",
+                        "ACCOUNT_FROZEN",
+                        "ACCOUNT_BALANCE_INSUFFICIENT",
+                        "ACCOUNT_OPERATION_FAILED",
+                        "ACCOUNT_PARAM_INVALID",
+                        "ACCOUNT_PASSWORD_INVALID",
+                        "ACCOUNT_TOKEN_GENERATE_FAILED",
+                        "NICKNAME_LENGTH_EXCEEDED",
+                        "TWO_FA_NOT_BOUND",
+                        "TWO_FA_ALREADY_BOUND",
+                        "TWO_FA_VERIFY_FAILED",
+                        "TWO_FA_CODE_INVALID",
+                        "TWO_FA_SESSION_EXPIRED",
+                        "TWO_FA_TYPE_NOT_SUPPORTED",
+                        "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
+                        "TWO_FA_RESET_WITHIN_24H",
+                        "TWO_FA_ADDRESS_LOCK_PERIOD",
+                        "TWO_FA_FUND_PASSWORD_INVALID",
+                        "TWO_FA_TICKET_INVALID",
+                        "TWO_FA_TICKET_USER_MISMATCH",
+                        "TWO_FA_TICKET_SCENE_MISMATCH",
+                        "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
+                        "TWO_FA_SEND_TOO_FREQUENT",
+                        "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
+                        "TWO_FA_CODE_SEND_FAILED",
+                        "TWO_FA_FUND_PASSWORD_NOT_SET",
+                        "TWO_FA_FUND_PASSWORD_WRONG",
+                        "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
+                        "TWO_FA_FUND_PASSWORD_ALREADY_SET",
+                        "SAFE_BOX_NOT_EXIST",
+                        "SAFE_BOX_LOCK_FAILED",
+                        "SAFE_BOX_BALANCE_INSUFFICIENT",
+                        "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
+                        "SAFE_BOX_FREEZE_FAILED",
+                        "SAFE_BOX_UNFREEZE_FAILED",
+                        "SAFE_BOX_TRANSFER_IN_FAILED",
+                        "SAFE_BOX_TRANSFER_OUT_FAILED",
+                        "SAFE_BOX_PASSWORD_INVALID",
+                        "SAFE_BOX_OPERATION_FAILED",
+                        "WITHDRAWAL_AMOUNT_INVALID",
+                        "WITHDRAWAL_ADDRESS_INVALID",
+                        "WITHDRAWAL_WHITELIST_REQUIRED",
+                        "WITHDRAWAL_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_SERVICE_ERROR",
+                        "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
+                        "WITHDRAWAL_PENDING_RECORD_EXISTS",
+                        "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
+                        "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_PENDING_RECHARGE_EXISTS",
+                        "CURRENCY_NOT_EXIST",
+                        "CURRENCY_NOT_ENABLED",
+                        "CURRENCY_NETWORK_NOT_EXIST",
+                        "CURRENCY_BALANCE_INSUFFICIENT",
+                        "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
+                        "CURRENCY_ADDRESS_EXIST",
+                        "CURRENCY_ADDRESS_LABEL_EXIST",
+                        "BLACKLIST_UID_REQUIRED",
+                        "BLACKLIST_WALLET_REQUIRED",
+                        "BLACKLIST_ALREADY_EXIST",
+                        "BLACKLIST_NOT_EXIST",
+                        "KYC_LEVEL_QUERY_FAILED",
+                        "KYC_CFG_ALREADY_EXIST",
+                        "KYC_LEVEL_INVALID",
+                        "KYC_USER_NOT_VERIFIED",
+                        "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
+                        "KYC_RWA_DEAL_QUERY_FAILED",
+                        "KYC_L0_NOT_PASSED",
+                        "KYC_CERT_NO_DUPLICATE",
+                        "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
+                        "KYC_CERT_VALID_UNTIL_EXPIRED",
+                        "KYC_CERT_VALID_FROM_FORMAT_ERROR",
+                        "KYC_CERT_VALID_DATE_RANGE_ERROR",
+                        "KYC_CERT_PERMANENT_FLAG_INVALID",
+                        "KYC_FLOW_NOT_CONFIGURED",
+                        "KYC_FLOW_STEP_NOT_CONFIGURED",
+                        "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
+                        "KYC_APPLY_ALREADY_EXISTS",
+                        "KYC_APPLY_NOT_EXIST",
+                        "KYC_APPLY_DETAIL_NOT_EXIST",
+                        "KYC_APPLY_FLOW_NOT_EXIST",
+                        "KYC_SUB_FLOW_NOT_EXIST",
+                        "KYC_APPLY_STATUS_CANCELED",
+                        "KYC_APPLY_STATUS_PASSED",
+                        "KYC_APPLY_STATUS_SUBMITTED",
+                        "KYC_STEP_PREREQUISITE_NOT_MET",
+                        "KYC_AUDIT_LEVEL_NOT_L0",
+                        "KYC_AUDIT_STATUS_NOT_PENDING",
+                        "KYC_USER_INFO_NOT_EXIST",
+                        "KYC_NO_FIELD_TO_UPDATE",
+                        "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
+                        "KYC_AUDIT_NO_SUBMIT_DATA",
+                        "KYC_AUDIT_ALREADY_REJECTED",
+                        "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
+                        "KYC_AUDIT_FLOW_NOT_FOUND",
+                        "KYC_FLOW_CONFIG_NOT_EXIST",
+                        "KYC_STEP_CODE_NOT_FOUND",
+                        "KYC_STEP_LEVEL_NOT_CONFIGURED",
+                        "KYC_PROOF_REQUIRED",
+                        "KYC_IMAGE_OBJECT_KEY_INVALID",
+                        "KYC_IMAGE_ACCESS_DENIED",
+                        "KYC_PRESIGN_TYPE_INVALID",
+                        "KYC_QUOTA_INVALID",
+                        "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
+                        "KYC_BUSINESS_LINE_CONTEXT_MISSING",
+                        "KYC_SYNC_FUND_ACCOUNT_FAILED",
+                        "KYC_STATE_MACHINE_INIT_FAILED",
+                        "KYC_REJECT_NEED_APPLY_NO",
+                        "KYC_CFG_NOT_EXIST",
+                        "KYC_APPLY_NO_OR_UID_REQUIRED",
+                        "KYC_SUB_FLOW_NO_REQUIRED",
+                        "KYC_UID_REQUIRED",
+                        "KYC_BUSINESS_LINE_ID_REQUIRED",
+                        "KYC_REQUEST_BODY_REQUIRED",
+                        "KYC_USER_OR_BUSINESS_LINE_MISSING",
+                        "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
+                        "KYC_OSS_NOT_ENABLED",
+                        "KYC_OSS_CLIENT_NOT_INITIALIZED",
+                        "KYC_OSS_CONFIG_MISSING",
+                        "KYC_USER_NOT_LOGGED_IN",
+                        "KYC_FACE_MIME_INVALID",
+                        "KYC_IMAGE_MIME_INVALID",
+                        "KYC_REQUIRED_FIELD_MISSING",
+                        "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
+                        "KYC_AUDIT_COMMENT_REQUIRED",
+                        "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
+                        "ASSET_ACCOUNT_NOT_EXIST",
+                        "ASSET_LOCK_FAILED",
+                        "ASSET_NOT_EXIST",
+                        "ASSET_ADD_FAILED",
+                        "ASSET_UNFREEZE_FAILED",
+                        "ASSET_CREATE_LOCK_FAILED",
+                        "ASSET_CREATE_FAILED",
+                        "ASSET_BALANCE_INSUFFICIENT",
+                        "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
+                        "ASSET_FREEZE_FAILED",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
+                        "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
+                        "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "FUND_ACCOUNT_NOT_EXIST",
+                        "FUND_ACCOUNT_ALREADY_EXIST",
+                        "FUND_ACCOUNT_CREATE_FAILED",
+                        "FUND_ACCOUNT_UPDATE_FAILED",
+                        "FUND_ACCOUNT_DELETE_FAILED",
+                        "FUND_ACCOUNT_PARAM_INVALID",
+                        "FUND_ACCOUNT_LOCK_FAILED",
+                        "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
+                        "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
+                        "FUND_ACCOUNT_CONTACT_REQUIRED",
+                        "FUND_ACCOUNT_MOBILE_ALREADY_USED",
+                        "FUND_ACCOUNT_EMAIL_ALREADY_USED",
+                        "TRANSACTION_RECORD_NOT_EXIST",
+                        "TRANSACTION_FORBIDDEN",
+                        "TRANSACTION_IN_PROGRESS",
+                        "TRANSACTION_AMOUNT_TOO_LOW",
+                        "TRANSACTION_REQUEST_FREQUENTLY",
+                        "TRANSACTION_BALANCE_INSUFFICIENT",
+                        "WEBHOOK_SIGNATURE_INVALID",
+                        "WEBHOOK_EVENT_TYPE_INVALID",
+                        "WEBHOOK_PAYLOAD_INVALID",
+                        "WEBHOOK_DEPOSIT_DETAIL_INVALID",
+                        "WEBHOOK_DEPOSIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_NOT_EXIST",
+                        "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
+                        "WITHDRAWAL_AUDIT_CREATE_FAILED",
+                        "WITHDRAWAL_AUDIT_UPDATE_FAILED",
+                        "WITHDRAWAL_AUDIT_DELETE_FAILED",
+                        "WITHDRAWAL_AUDIT_PARAM_INVALID",
+                        "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
+                        "WITHDRAWAL_AUDIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_REJECT_ERROR",
+                        "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
+                        "WITHDRAW_LOCK_PERIOD_ERROR",
+                        "PAYMENT_OPERATION_FAILED",
+                        "MT_GROUP_NOT_FOUND",
+                        "MT_MEM",
+                        "MT_DEALER_SEND",
+                        "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
+                        "MT_POSITION_GET_BY_LOGIN",
+                        "MT_POSITION_VOLUME_NOT_ENOUGH",
+                        "MT_DEDUCT_COLLATERAL_FAILED",
+                        "MT_DEALER_RESULT_FAILED",
+                        "MT_INPUT_SERIALIZE_FAILED",
+                        "MT_AMOUNT_DECIMAL",
+                        "MT_MTRISK_NOT_FOUND",
+                        "PROOF_FUND_ALREADY_EXIST",
+                        "PROOF_FUND_NOT_EXIST",
+                        "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
+                        "USER_WALLET_CONFIG_ALREADY_EXIST",
+                        "USER_WALLET_CONFIG_DELETE_FAILED",
+                        "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
+                        "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
+                        "MLP_CONFIG_NOT_FOUND",
+                        "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
+                        "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
+                        "MLP_INTEGRAL_TIER_CONFIG_INVALID",
+                        "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
+                        "TICKET_NOT_EXIST",
+                        "TICKET_PENDING_EXISTS",
+                        "TICKET_CLOSED_CANNOT_SEND",
+                        "TICKET_EVALUATE_FAILED",
+                        "TICKET_STATUS_INVALID",
+                        "POINTS_CLAIM_WINDOW_CLOSED",
+                        "POINTS_PENDING_NOT_FOUND",
+                        "POINTS_CLAIM_FORBIDDEN",
+                        "POINTS_BALANCE_INSUFFICIENT",
+                        "POINTS_VALIDITY_DAYS_INVALID",
+                        "POINTS_INDICATOR_DUPLICATE",
+                        "POINTS_INDICATOR_NOT_ALLOWED_FOR_LEVEL",
+                        "POINTS_BUSINESS_LINE_REQUIRED",
+                        "POINTS_RANK_PERIOD_INVALID",
+                        "USER_VAULT_NOT_FOUND",
+                        "USER_VAULT_STATUS_INVALID",
+                        "USER_VAULT_NOT_OWNER",
+                        "USER_VAULT_NAV_NOT_PUBLISHED",
+                        "USER_VAULT_CONTRACT_POOL_INSUFFICIENT",
+                        "USER_VAULT_TRANSFER_TO_PERSONAL_FORBIDDEN",
+                        "USER_VAULT_FROZEN",
+                        "USER_VAULT_ALREADY_EXISTS",
+                        "USER_VAULT_SEED_INVALID",
+                        "USER_VAULT_SEED_TRANSFER_FAILED",
+                        "USER_VAULT_FEE_INVALID",
+                        "USER_VAULT_HOLDING_INSUFFICIENT",
+                        "USER_VAULT_AUM_CAP_EXCEEDED",
+                        "USER_VAULT_OPEN_POSITION_EXISTS",
+                        "USER_VAULT_SUBSCRIBE_EXCEEDS_POOL_CAP",
+                        "USER_VAULT_MANAGER_DILUTION_TOO_LOW",
+                        "USER_VAULT_MANAGER_REDEEM_FORBIDDEN",
+                        "USER_VAULT_MANAGER_SUBSCRIBE_FORBIDDEN",
+                        "USER_VAULT_CAPITAL_INJECTION_FAILED",
+                        "FINANCE_COUPON_QUOTE_UNAVAILABLE",
+                        "ORDER_OPERATION_FAILED",
+                        "ORDER_SELL_NOT_SUPPORTED",
+                        "TP_SL_NOT_SUPPORTED",
+                        "SYMBOL_NOT_EXIST",
+                        "ORDER_VALUE_VOLUME_LIMIT_ERROR",
+                        "SYMBOL_NOT_SUPPORTED_ERROR",
+                        "SLIPPAGE_PARAM_ERROR",
+                        "SLIPPAGE_ESTIMATE_ERROR",
+                        "COMMON_ERROR",
+                        "COMMON_PARAMS_ERROR",
+                        "COMMON_MEM_ERROR",
+                        "ORDER_REQUEST_REJECT",
+                        "ORDER_REQUEST_CANCEL",
+                        "ORDER_REQUEST_PLACED",
+                        "ORDER_REQUEST_DONE",
+                        "ORDER_REQUEST_ERROR",
+                        "ORDER_REQUEST_TIMEOUT",
+                        "ORDER_REQUEST_INVALID",
+                        "ORDER_REQUEST_INVALID_VOLUME",
+                        "ORDER_REQUEST_INVALID_PRICE",
+                        "ORDER_REQUEST_INVALID_STOPS",
+                        "ORDER_REQUEST_TRADE_DISABLED",
+                        "ORDER_REQUEST_MARKET_CLOSED",
+                        "ORDER_REQUEST_NO_MONEY",
+                        "ORDER_REQUEST_TOO_MANY",
+                        "ORDER_REQUEST_INVALID_ORDER",
+                        "COMMON_OK",
+                        "ORDER_REQUEST_PRICE_OFF",
+                        "POSITION_OBTAIN_ERROR",
+                        "POSITION_VALUE_LIMIT_EXCEEDED",
+                        "POSITION_MARGIN_INSUFFICIENT",
+                        "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
+                        "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
+                        "FATIGUE_LIMIT",
+                        "TEMPLATE_DISABLED",
+                        "CHANNEL_NOT_SUPPORT",
+                        "TEMPLATE_PARAM_MISMATCH",
+                        "TEMPLATE_CONTENT_NOT_FOUND",
+                        "TEMPLATE_CONTENT_INCONSISTENT",
+                        "PREFERENCE_LIMIT",
+                        "BUSINESS_CONFLICT",
+                        "UNSUBSCRIBE_TOKEN_INVALID",
+                        "UNSUBSCRIBE_TOKEN_EXPIRED",
+                        "UNSUBSCRIBE_ACCOUNT_NOT_FOUND",
+                        "UNSUBSCRIBE_TEMPORARILY_UNAVAILABLE",
+                        "USER_NOT_FOUND",
+                        "USERNAME_EXISTS",
+                        "EMAIL_EXISTS",
+                        "PASSWORD_ERROR",
+                        "USER_DATA_VALIDATION_FAILED",
+                        "USER_BATCH_OPERATION_FAILED",
+                        "OLD_PASSWORD_SAME",
+                        "NEW_PASSWORD_NOT_MATCH",
+                        "ACCOUNT_TIER_OPERATION_FAILED",
+                        "BUSINESS_LINE_NOT_FOUND",
+                        "BUSINESS_LINE_NAME_EXISTS",
+                        "BUSINESS_LINE_SAVE_FAILED",
+                        "BUSINESS_LINE_UPDATE_FAILED",
+                        "BUSINESS_LINE_DELETE_FAILED",
+                        "BUSINESS_LINE_EMAIL_EXISTS",
+                        "BUSINESS_LINE_STATUS_ERROR",
+                        "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
+                        "BUSINESS_TYPE_EXCEPTION",
+                        "BUSINESS_TYPE_INVALID",
+                        "ROLE_NOT_FOUND",
+                        "ROLE_CODE_EXISTS",
+                        "ROLE_ADMIN_OPERATION_DENIED",
+                        "ROLE_STATUS_ERROR",
+                        "ROLE_BATCH_OPERATION_FAILED",
+                        "PERMISSION_NOT_FOUND",
+                        "PERMISSION_CODE_EXISTS",
+                        "PERMISSION_IN_USE",
+                        "PERMISSION_HAS_CHILDREN",
+                        "PERMISSION_CIRCULAR_REFERENCE",
+                        "SYMBOL_STATUS_CLOSED",
+                        "SYMBOL_SOURCE_DISABLED",
+                        "SYMBOL_SOURCE_SYMBOL_DISABLED",
+                        "SYMBOL_SOURCE_NAME_EXISTS",
+                        "TRADE_SYMBOL_NAME_EXISTS",
+                        "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
+                        "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
+                        "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
+                        "TRADE_SYMBOL_BOOK_NULL",
+                        "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
+                        "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
+                        "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
+                        "ALARM_NOTIFICATION_TYPE_INVALID",
+                        "RULE_MAPPING_NOT_CONFIGURED",
+                        "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_GET_FAILED",
+                        "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
+                        "PROMOTION_PARAM_ERROR",
+                        "PROMOTION_CAMPAIGN_NOT_FOUND",
+                        "PROMOTION_CAMPAIGN_OFFLINE",
+                        "PROMOTION_CAMPAIGN_NOT_STARTED",
+                        "PROMOTION_CAMPAIGN_ENDED",
+                        "PROMOTION_USER_SCOPE_MISMATCH",
+                        "PROMOTION_USER_NOT_ENROLLED",
+                        "PROMOTION_TASK_NOT_FOUND",
+                        "PROMOTION_TASK_NOT_CLAIMABLE",
+                        "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
+                        "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
+                        "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
+                        "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
+                        "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
+                        "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
+                        "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
+                        "PROMOTION_POOL_SUMMARY_FROZEN",
+                        "PROMOTION_DISPATCH_DUPLICATE_PENDING",
+                        "PROMOTION_WEALTH_PRODUCT_INVALID",
+                        "PROMOTION_RELEASE_SYMBOL_INVALID",
+                        "PROMOTION_TRADE_SYMBOL_INVALID",
+                        "PROMOTION_INTEREST_COUPON_NOT_USABLE",
+                        "PROMOTION_INTEREST_COUPON_ALREADY_BOUND",
+                        "PROMOTION_SCHEME_BUDGET_RESERVED_CONFLICT",
+                        "PROMOTION_SCHEME_BUDGET_BELOW_COMMITTED",
+                        "REWARD_VAULT_PARAM_ERROR",
+                        "REWARD_VAULT_IDEMPOTENCY_KEY_REQUIRED",
+                        "REWARD_VAULT_POCKET_INVALID",
+                        "REWARD_VAULT_REWARD_IN_USE",
+                        "REWARD_VAULT_PERIOD_NOT_FOUND",
+                        "REWARD_VAULT_CLAIM_NOT_AVAILABLE",
+                        "REWARD_VAULT_PERIOD_SETTLED",
+                        "REWARD_VAULT_ONLINE_CONFLICT",
+                        "RISK_CONFIG_API_DEPRECATED",
+                        "CONFIG_APPROVAL_NO_CHANGE",
+                        "CONFIG_APPROVAL_IN_PROGRESS",
+                        "CONFIG_APPROVAL_CHECKER_UNAVAILABLE",
+                        "CONFIG_APPROVAL_CHECKER_QUERY_FAILED",
+                        "CONFIG_APPROVAL_SELF_APPROVAL_FORBIDDEN",
+                        "CONFIG_APPROVAL_IDEMPOTENCY_CONFLICT",
+                        "CONFIG_APPROVAL_REQUEST_PROCESSING",
+                        "CONFIG_APPROVAL_STATE_INVALID",
+                        "DUPLICATE_IMPORT_ROW",
+                        "ROBOT_TAG_SNAPSHOT_CHANGED",
+                        "ROBOT_TAG_SNAPSHOT_CAPACITY_EXCEEDED",
+                        "ROBOT_TAG_SNAPSHOT_UNAVAILABLE",
+                        "ROBOT_TAG_SNAPSHOT_INVALID",
+                        "ROBOT_TAG_SELECTOR_CONFIG_INVALID",
+                        "EXPORT_INVALID_FILTER",
+                        "EXPORT_ACTIVE_LIMIT_EXCEEDED",
+                        "EXPORT_BUSY",
+                        "EXPORT_TASK_UNAVAILABLE",
+                        "EXPORT_TASK_NOT_READY",
+                        "EXPORT_ROUTE_VERSION_MISMATCH",
+                        "EXPORT_PERMISSION_DENIED",
+                        "EXPORT_DISPATCH_REJECTED",
+                        "EXPORT_BUSINESS_TYPE_UNSUPPORTED",
+                        "EXPORT_IDEMPOTENCY_CONFLICT",
+                        "EXPORT_ACTIVE_CONFLICT",
+                        "EXPORT_CREATE_UNAVAILABLE",
+                        "EXPORT_FILE_EXPIRED",
+                        "DOWNLOAD_TICKET_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_STALE",
+                        "EXPORT_HISTORY_EXPIRED",
+                        "FIAT_RAMP_REGION_REQUIRED",
+                        "FIAT_RAMP_DEPENDENCY_UNAVAILABLE",
+                        "FIAT_RAMP_SELECTION_CONFLICT",
+                        "FIAT_RAMP_QUOTE_EXPIRED",
+                        "FIAT_RAMP_CHANNEL_UNAVAILABLE",
+                        "FIAT_RAMP_LAUNCH_FAILED"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "properties": {}
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "description": "当前页任务摘要",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "taskId": {
+                                "type": "string",
+                                "description": "任务的不透明唯一标识"
+                              },
+                              "dataset": {
+                                "type": "string",
+                                "description": "任务数据集",
+                                "enum": [
+                                  "DEAL_HISTORY",
+                                  "ORDER_HISTORY",
+                                  "FUNDING_FEE_HISTORY",
+                                  "POSITION_CURRENT",
+                                  "ORDER_CURRENT"
+                                ]
+                              },
+                              "language": {
+                                "type": "string",
+                                "description": "创建时冻结的规范语言码"
+                              },
+                              "sourceView": {
+                                "type": "string",
+                                "description": "原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空",
+                                "enum": [
+                                  "SPOT",
+                                  "CONTRACT",
+                                  "PORTFOLIO"
+                                ],
+                                "nullable": true
+                              },
+                              "retryOfTaskId": {
+                                "type": "string",
+                                "description": "当前列表重试关联的原任务；非重试为空",
+                                "nullable": true
+                              },
+                              "retryContext": {
+                                "type": "object",
+                                "properties": {
+                                  "originalTaskId": {
+                                    "type": "string",
+                                    "description": "原失败任务标识"
+                                  },
+                                  "createRequest": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                      "type": "object",
+                                      "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键"
+                                    },
+                                    "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键",
+                                    "properties": {}
+                                  }
+                                },
+                                "description": "失败任务的安全重试条件；客户端必须生成新的 clientRequestId",
+                                "nullable": true
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "任务状态",
+                                "enum": [
+                                  "QUEUED",
+                                  "RUNNING",
+                                  "SUCCEEDED",
+                                  "EMPTY",
+                                  "OVER_LIMIT",
+                                  "FAILED"
+                                ]
+                              },
+                              "failureReason": {
+                                "type": "string",
+                                "description": "失败原因；仅 FAILED 状态非空",
+                                "enum": [
+                                  "GENERATION",
+                                  "UPLOAD",
+                                  "RESTART",
+                                  "TIMEOUT"
+                                ],
+                                "nullable": true
+                              },
+                              "createdAt": {
+                                "type": "integer",
+                                "description": "创建时间，Unix 毫秒，UTC epoch",
+                                "format": "int64"
+                              },
+                              "updatedAt": {
+                                "type": "integer",
+                                "description": "更新时间，Unix 毫秒，UTC epoch",
+                                "format": "int64"
+                              },
+                              "expiresAt": {
+                                "type": "integer",
+                                "description": "绝对过期时间，Unix 毫秒，UTC epoch",
+                                "format": "int64"
+                              },
+                              "rowCount": {
+                                "type": "integer",
+                                "description": "导出行数；未完成或超过上限时为空",
+                                "format": "int32",
+                                "nullable": true
+                              },
+                              "fileName": {
+                                "type": "string",
+                                "description": "下载文件名；仅成功任务非空",
+                                "nullable": true
+                              },
+                              "downloadAvailable": {
+                                "type": "boolean",
+                                "description": "服务端确认对象完整且未过期时为 true"
+                              }
+                            },
+                            "description": "历史 CSV 导出任务"
+                          }
+                        },
+                        "pageSize": {
+                          "type": "integer",
+                          "description": "本页请求条数",
+                          "format": "int32"
+                        },
+                        "snapshotAt": {
+                          "type": "integer",
+                          "description": "本次游标快照时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "hasMore": {
+                          "type": "boolean",
+                          "description": "是否还有下一页"
+                        },
+                        "nextCursor": {
+                          "type": "string",
+                          "description": "下一页游标；无下一页时为空",
+                          "nullable": true
+                        },
+                        "pollAfterMs": {
+                          "type": "integer",
+                          "description": "当前页有活动任务时建议轮询间隔，毫秒",
+                          "format": "int64",
+                          "nullable": true
+                        }
+                      },
+                      "description": "当前用户统一导出历史页"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "x-openapi-permission": "READ"
+      }
+    },
+    "/openapi/v1/mc-trade/trade/deals/history/export-tasks/{taskId}": {
+      "get": {
+        "summary": "查询成交历史 CSV 导出任务",
+        "deprecated": false,
+        "description": "",
+        "operationId": "get_1",
+        "tags": [
+          "成交历史 CSV 导出"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "enum": [
+                        "DEFAULT",
+                        "SIGN_ERROR",
+                        "NOT_EXIST",
+                        "ALREADY_EXIST",
+                        "REPEAT_OPERATION",
+                        "PARAM_ERROR",
+                        "PERMISSION_DENIED",
+                        "OPERATION_FAILED",
+                        "DATA_FORMAT_ERROR",
+                        "NETWORK_ERROR",
+                        "TIMEOUT_ERROR",
+                        "CONFIG_ERROR",
+                        "STATUS_ERROR",
+                        "VERSION_INCOMPATIBLE",
+                        "SERVICE_UNAVAILABLE",
+                        "DATA_INTEGRITY_ERROR",
+                        "CONCURRENT_CONFLICT",
+                        "RESOURCE_LOCKED",
+                        "QUOTA_EXCEEDED",
+                        "DEPENDENCY_ERROR",
+                        "BUSINESS_RULE_CONFLICT",
+                        "AUTH_CREDENTIAL_MISSING",
+                        "ROLE_PERMISSION_INVALID",
+                        "ROLE_ALREADY_EXIST",
+                        "ROLE_NOT_EXIST",
+                        "ROLE_ADMIN_CANNOT_MODIFY",
+                        "ROLE_ADMIN_CANNOT_DELETE",
+                        "BUSINESS_LINE_NAME_EXIST",
+                        "BUSINESS_LINE_NOT_EXIST",
+                        "BUSINESS_LINE_NOT_PERMITTED",
+                        "TRANSFER_FAILED",
+                        "TRANSFER_AMOUNT_INVALID",
+                        "TRANSFER_ACCOUNT_NOT_EXIST",
+                        "TRANSFER_ACCOUNT_FROZEN",
+                        "TRANSFER_LIMIT_EXCEEDED",
+                        "EXCHANGE_RATE_NOT_FOUND",
+                        "EXCHANGE_RATE_INVALID",
+                        "EXCHANGE_RATE_SERVICE_ERROR",
+                        "EXCHANGE_RATE_QUOTE_INVALID",
+                        "EXCHANGE_SYMBOL_ERROR",
+                        "ACCOUNT_NOT_EXIST",
+                        "ACCOUNT_FROZEN",
+                        "ACCOUNT_BALANCE_INSUFFICIENT",
+                        "ACCOUNT_OPERATION_FAILED",
+                        "ACCOUNT_PARAM_INVALID",
+                        "ACCOUNT_PASSWORD_INVALID",
+                        "ACCOUNT_TOKEN_GENERATE_FAILED",
+                        "NICKNAME_LENGTH_EXCEEDED",
+                        "TWO_FA_NOT_BOUND",
+                        "TWO_FA_ALREADY_BOUND",
+                        "TWO_FA_VERIFY_FAILED",
+                        "TWO_FA_CODE_INVALID",
+                        "TWO_FA_SESSION_EXPIRED",
+                        "TWO_FA_TYPE_NOT_SUPPORTED",
+                        "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
+                        "TWO_FA_RESET_WITHIN_24H",
+                        "TWO_FA_ADDRESS_LOCK_PERIOD",
+                        "TWO_FA_FUND_PASSWORD_INVALID",
+                        "TWO_FA_TICKET_INVALID",
+                        "TWO_FA_TICKET_USER_MISMATCH",
+                        "TWO_FA_TICKET_SCENE_MISMATCH",
+                        "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
+                        "TWO_FA_SEND_TOO_FREQUENT",
+                        "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
+                        "TWO_FA_CODE_SEND_FAILED",
+                        "TWO_FA_FUND_PASSWORD_NOT_SET",
+                        "TWO_FA_FUND_PASSWORD_WRONG",
+                        "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
+                        "TWO_FA_FUND_PASSWORD_ALREADY_SET",
+                        "SAFE_BOX_NOT_EXIST",
+                        "SAFE_BOX_LOCK_FAILED",
+                        "SAFE_BOX_BALANCE_INSUFFICIENT",
+                        "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
+                        "SAFE_BOX_FREEZE_FAILED",
+                        "SAFE_BOX_UNFREEZE_FAILED",
+                        "SAFE_BOX_TRANSFER_IN_FAILED",
+                        "SAFE_BOX_TRANSFER_OUT_FAILED",
+                        "SAFE_BOX_PASSWORD_INVALID",
+                        "SAFE_BOX_OPERATION_FAILED",
+                        "WITHDRAWAL_AMOUNT_INVALID",
+                        "WITHDRAWAL_ADDRESS_INVALID",
+                        "WITHDRAWAL_WHITELIST_REQUIRED",
+                        "WITHDRAWAL_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_SERVICE_ERROR",
+                        "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
+                        "WITHDRAWAL_PENDING_RECORD_EXISTS",
+                        "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
+                        "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_PENDING_RECHARGE_EXISTS",
+                        "CURRENCY_NOT_EXIST",
+                        "CURRENCY_NOT_ENABLED",
+                        "CURRENCY_NETWORK_NOT_EXIST",
+                        "CURRENCY_BALANCE_INSUFFICIENT",
+                        "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
+                        "CURRENCY_ADDRESS_EXIST",
+                        "CURRENCY_ADDRESS_LABEL_EXIST",
+                        "BLACKLIST_UID_REQUIRED",
+                        "BLACKLIST_WALLET_REQUIRED",
+                        "BLACKLIST_ALREADY_EXIST",
+                        "BLACKLIST_NOT_EXIST",
+                        "KYC_LEVEL_QUERY_FAILED",
+                        "KYC_CFG_ALREADY_EXIST",
+                        "KYC_LEVEL_INVALID",
+                        "KYC_USER_NOT_VERIFIED",
+                        "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
+                        "KYC_RWA_DEAL_QUERY_FAILED",
+                        "KYC_L0_NOT_PASSED",
+                        "KYC_CERT_NO_DUPLICATE",
+                        "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
+                        "KYC_CERT_VALID_UNTIL_EXPIRED",
+                        "KYC_CERT_VALID_FROM_FORMAT_ERROR",
+                        "KYC_CERT_VALID_DATE_RANGE_ERROR",
+                        "KYC_CERT_PERMANENT_FLAG_INVALID",
+                        "KYC_FLOW_NOT_CONFIGURED",
+                        "KYC_FLOW_STEP_NOT_CONFIGURED",
+                        "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
+                        "KYC_APPLY_ALREADY_EXISTS",
+                        "KYC_APPLY_NOT_EXIST",
+                        "KYC_APPLY_DETAIL_NOT_EXIST",
+                        "KYC_APPLY_FLOW_NOT_EXIST",
+                        "KYC_SUB_FLOW_NOT_EXIST",
+                        "KYC_APPLY_STATUS_CANCELED",
+                        "KYC_APPLY_STATUS_PASSED",
+                        "KYC_APPLY_STATUS_SUBMITTED",
+                        "KYC_STEP_PREREQUISITE_NOT_MET",
+                        "KYC_AUDIT_LEVEL_NOT_L0",
+                        "KYC_AUDIT_STATUS_NOT_PENDING",
+                        "KYC_USER_INFO_NOT_EXIST",
+                        "KYC_NO_FIELD_TO_UPDATE",
+                        "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
+                        "KYC_AUDIT_NO_SUBMIT_DATA",
+                        "KYC_AUDIT_ALREADY_REJECTED",
+                        "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
+                        "KYC_AUDIT_FLOW_NOT_FOUND",
+                        "KYC_FLOW_CONFIG_NOT_EXIST",
+                        "KYC_STEP_CODE_NOT_FOUND",
+                        "KYC_STEP_LEVEL_NOT_CONFIGURED",
+                        "KYC_PROOF_REQUIRED",
+                        "KYC_IMAGE_OBJECT_KEY_INVALID",
+                        "KYC_IMAGE_ACCESS_DENIED",
+                        "KYC_PRESIGN_TYPE_INVALID",
+                        "KYC_QUOTA_INVALID",
+                        "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
+                        "KYC_BUSINESS_LINE_CONTEXT_MISSING",
+                        "KYC_SYNC_FUND_ACCOUNT_FAILED",
+                        "KYC_STATE_MACHINE_INIT_FAILED",
+                        "KYC_REJECT_NEED_APPLY_NO",
+                        "KYC_CFG_NOT_EXIST",
+                        "KYC_APPLY_NO_OR_UID_REQUIRED",
+                        "KYC_SUB_FLOW_NO_REQUIRED",
+                        "KYC_UID_REQUIRED",
+                        "KYC_BUSINESS_LINE_ID_REQUIRED",
+                        "KYC_REQUEST_BODY_REQUIRED",
+                        "KYC_USER_OR_BUSINESS_LINE_MISSING",
+                        "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
+                        "KYC_OSS_NOT_ENABLED",
+                        "KYC_OSS_CLIENT_NOT_INITIALIZED",
+                        "KYC_OSS_CONFIG_MISSING",
+                        "KYC_USER_NOT_LOGGED_IN",
+                        "KYC_FACE_MIME_INVALID",
+                        "KYC_IMAGE_MIME_INVALID",
+                        "KYC_REQUIRED_FIELD_MISSING",
+                        "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
+                        "KYC_AUDIT_COMMENT_REQUIRED",
+                        "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
+                        "ASSET_ACCOUNT_NOT_EXIST",
+                        "ASSET_LOCK_FAILED",
+                        "ASSET_NOT_EXIST",
+                        "ASSET_ADD_FAILED",
+                        "ASSET_UNFREEZE_FAILED",
+                        "ASSET_CREATE_LOCK_FAILED",
+                        "ASSET_CREATE_FAILED",
+                        "ASSET_BALANCE_INSUFFICIENT",
+                        "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
+                        "ASSET_FREEZE_FAILED",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
+                        "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
+                        "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "FUND_ACCOUNT_NOT_EXIST",
+                        "FUND_ACCOUNT_ALREADY_EXIST",
+                        "FUND_ACCOUNT_CREATE_FAILED",
+                        "FUND_ACCOUNT_UPDATE_FAILED",
+                        "FUND_ACCOUNT_DELETE_FAILED",
+                        "FUND_ACCOUNT_PARAM_INVALID",
+                        "FUND_ACCOUNT_LOCK_FAILED",
+                        "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
+                        "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
+                        "FUND_ACCOUNT_CONTACT_REQUIRED",
+                        "FUND_ACCOUNT_MOBILE_ALREADY_USED",
+                        "FUND_ACCOUNT_EMAIL_ALREADY_USED",
+                        "TRANSACTION_RECORD_NOT_EXIST",
+                        "TRANSACTION_FORBIDDEN",
+                        "TRANSACTION_IN_PROGRESS",
+                        "TRANSACTION_AMOUNT_TOO_LOW",
+                        "TRANSACTION_REQUEST_FREQUENTLY",
+                        "TRANSACTION_BALANCE_INSUFFICIENT",
+                        "WEBHOOK_SIGNATURE_INVALID",
+                        "WEBHOOK_EVENT_TYPE_INVALID",
+                        "WEBHOOK_PAYLOAD_INVALID",
+                        "WEBHOOK_DEPOSIT_DETAIL_INVALID",
+                        "WEBHOOK_DEPOSIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_NOT_EXIST",
+                        "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
+                        "WITHDRAWAL_AUDIT_CREATE_FAILED",
+                        "WITHDRAWAL_AUDIT_UPDATE_FAILED",
+                        "WITHDRAWAL_AUDIT_DELETE_FAILED",
+                        "WITHDRAWAL_AUDIT_PARAM_INVALID",
+                        "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
+                        "WITHDRAWAL_AUDIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_REJECT_ERROR",
+                        "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
+                        "WITHDRAW_LOCK_PERIOD_ERROR",
+                        "PAYMENT_OPERATION_FAILED",
+                        "MT_GROUP_NOT_FOUND",
+                        "MT_MEM",
+                        "MT_DEALER_SEND",
+                        "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
+                        "MT_POSITION_GET_BY_LOGIN",
+                        "MT_POSITION_VOLUME_NOT_ENOUGH",
+                        "MT_DEDUCT_COLLATERAL_FAILED",
+                        "MT_DEALER_RESULT_FAILED",
+                        "MT_INPUT_SERIALIZE_FAILED",
+                        "MT_AMOUNT_DECIMAL",
+                        "MT_MTRISK_NOT_FOUND",
+                        "PROOF_FUND_ALREADY_EXIST",
+                        "PROOF_FUND_NOT_EXIST",
+                        "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
+                        "USER_WALLET_CONFIG_ALREADY_EXIST",
+                        "USER_WALLET_CONFIG_DELETE_FAILED",
+                        "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
+                        "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
+                        "MLP_CONFIG_NOT_FOUND",
+                        "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
+                        "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
+                        "MLP_INTEGRAL_TIER_CONFIG_INVALID",
+                        "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
+                        "TICKET_NOT_EXIST",
+                        "TICKET_PENDING_EXISTS",
+                        "TICKET_CLOSED_CANNOT_SEND",
+                        "TICKET_EVALUATE_FAILED",
+                        "TICKET_STATUS_INVALID",
+                        "POINTS_CLAIM_WINDOW_CLOSED",
+                        "POINTS_PENDING_NOT_FOUND",
+                        "POINTS_CLAIM_FORBIDDEN",
+                        "POINTS_BALANCE_INSUFFICIENT",
+                        "POINTS_VALIDITY_DAYS_INVALID",
+                        "POINTS_INDICATOR_DUPLICATE",
+                        "POINTS_INDICATOR_NOT_ALLOWED_FOR_LEVEL",
+                        "POINTS_BUSINESS_LINE_REQUIRED",
+                        "POINTS_RANK_PERIOD_INVALID",
+                        "USER_VAULT_NOT_FOUND",
+                        "USER_VAULT_STATUS_INVALID",
+                        "USER_VAULT_NOT_OWNER",
+                        "USER_VAULT_NAV_NOT_PUBLISHED",
+                        "USER_VAULT_CONTRACT_POOL_INSUFFICIENT",
+                        "USER_VAULT_TRANSFER_TO_PERSONAL_FORBIDDEN",
+                        "USER_VAULT_FROZEN",
+                        "USER_VAULT_ALREADY_EXISTS",
+                        "USER_VAULT_SEED_INVALID",
+                        "USER_VAULT_SEED_TRANSFER_FAILED",
+                        "USER_VAULT_FEE_INVALID",
+                        "USER_VAULT_HOLDING_INSUFFICIENT",
+                        "USER_VAULT_AUM_CAP_EXCEEDED",
+                        "USER_VAULT_OPEN_POSITION_EXISTS",
+                        "USER_VAULT_SUBSCRIBE_EXCEEDS_POOL_CAP",
+                        "USER_VAULT_MANAGER_DILUTION_TOO_LOW",
+                        "USER_VAULT_MANAGER_REDEEM_FORBIDDEN",
+                        "USER_VAULT_MANAGER_SUBSCRIBE_FORBIDDEN",
+                        "USER_VAULT_CAPITAL_INJECTION_FAILED",
+                        "FINANCE_COUPON_QUOTE_UNAVAILABLE",
+                        "ORDER_OPERATION_FAILED",
+                        "ORDER_SELL_NOT_SUPPORTED",
+                        "TP_SL_NOT_SUPPORTED",
+                        "SYMBOL_NOT_EXIST",
+                        "ORDER_VALUE_VOLUME_LIMIT_ERROR",
+                        "SYMBOL_NOT_SUPPORTED_ERROR",
+                        "SLIPPAGE_PARAM_ERROR",
+                        "SLIPPAGE_ESTIMATE_ERROR",
+                        "COMMON_ERROR",
+                        "COMMON_PARAMS_ERROR",
+                        "COMMON_MEM_ERROR",
+                        "ORDER_REQUEST_REJECT",
+                        "ORDER_REQUEST_CANCEL",
+                        "ORDER_REQUEST_PLACED",
+                        "ORDER_REQUEST_DONE",
+                        "ORDER_REQUEST_ERROR",
+                        "ORDER_REQUEST_TIMEOUT",
+                        "ORDER_REQUEST_INVALID",
+                        "ORDER_REQUEST_INVALID_VOLUME",
+                        "ORDER_REQUEST_INVALID_PRICE",
+                        "ORDER_REQUEST_INVALID_STOPS",
+                        "ORDER_REQUEST_TRADE_DISABLED",
+                        "ORDER_REQUEST_MARKET_CLOSED",
+                        "ORDER_REQUEST_NO_MONEY",
+                        "ORDER_REQUEST_TOO_MANY",
+                        "ORDER_REQUEST_INVALID_ORDER",
+                        "COMMON_OK",
+                        "ORDER_REQUEST_PRICE_OFF",
+                        "POSITION_OBTAIN_ERROR",
+                        "POSITION_VALUE_LIMIT_EXCEEDED",
+                        "POSITION_MARGIN_INSUFFICIENT",
+                        "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
+                        "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
+                        "FATIGUE_LIMIT",
+                        "TEMPLATE_DISABLED",
+                        "CHANNEL_NOT_SUPPORT",
+                        "TEMPLATE_PARAM_MISMATCH",
+                        "TEMPLATE_CONTENT_NOT_FOUND",
+                        "TEMPLATE_CONTENT_INCONSISTENT",
+                        "PREFERENCE_LIMIT",
+                        "BUSINESS_CONFLICT",
+                        "UNSUBSCRIBE_TOKEN_INVALID",
+                        "UNSUBSCRIBE_TOKEN_EXPIRED",
+                        "UNSUBSCRIBE_ACCOUNT_NOT_FOUND",
+                        "UNSUBSCRIBE_TEMPORARILY_UNAVAILABLE",
+                        "USER_NOT_FOUND",
+                        "USERNAME_EXISTS",
+                        "EMAIL_EXISTS",
+                        "PASSWORD_ERROR",
+                        "USER_DATA_VALIDATION_FAILED",
+                        "USER_BATCH_OPERATION_FAILED",
+                        "OLD_PASSWORD_SAME",
+                        "NEW_PASSWORD_NOT_MATCH",
+                        "ACCOUNT_TIER_OPERATION_FAILED",
+                        "BUSINESS_LINE_NOT_FOUND",
+                        "BUSINESS_LINE_NAME_EXISTS",
+                        "BUSINESS_LINE_SAVE_FAILED",
+                        "BUSINESS_LINE_UPDATE_FAILED",
+                        "BUSINESS_LINE_DELETE_FAILED",
+                        "BUSINESS_LINE_EMAIL_EXISTS",
+                        "BUSINESS_LINE_STATUS_ERROR",
+                        "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
+                        "BUSINESS_TYPE_EXCEPTION",
+                        "BUSINESS_TYPE_INVALID",
+                        "ROLE_NOT_FOUND",
+                        "ROLE_CODE_EXISTS",
+                        "ROLE_ADMIN_OPERATION_DENIED",
+                        "ROLE_STATUS_ERROR",
+                        "ROLE_BATCH_OPERATION_FAILED",
+                        "PERMISSION_NOT_FOUND",
+                        "PERMISSION_CODE_EXISTS",
+                        "PERMISSION_IN_USE",
+                        "PERMISSION_HAS_CHILDREN",
+                        "PERMISSION_CIRCULAR_REFERENCE",
+                        "SYMBOL_STATUS_CLOSED",
+                        "SYMBOL_SOURCE_DISABLED",
+                        "SYMBOL_SOURCE_SYMBOL_DISABLED",
+                        "SYMBOL_SOURCE_NAME_EXISTS",
+                        "TRADE_SYMBOL_NAME_EXISTS",
+                        "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
+                        "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
+                        "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
+                        "TRADE_SYMBOL_BOOK_NULL",
+                        "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
+                        "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
+                        "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
+                        "ALARM_NOTIFICATION_TYPE_INVALID",
+                        "RULE_MAPPING_NOT_CONFIGURED",
+                        "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_GET_FAILED",
+                        "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
+                        "PROMOTION_PARAM_ERROR",
+                        "PROMOTION_CAMPAIGN_NOT_FOUND",
+                        "PROMOTION_CAMPAIGN_OFFLINE",
+                        "PROMOTION_CAMPAIGN_NOT_STARTED",
+                        "PROMOTION_CAMPAIGN_ENDED",
+                        "PROMOTION_USER_SCOPE_MISMATCH",
+                        "PROMOTION_USER_NOT_ENROLLED",
+                        "PROMOTION_TASK_NOT_FOUND",
+                        "PROMOTION_TASK_NOT_CLAIMABLE",
+                        "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
+                        "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
+                        "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
+                        "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
+                        "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
+                        "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
+                        "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
+                        "PROMOTION_POOL_SUMMARY_FROZEN",
+                        "PROMOTION_DISPATCH_DUPLICATE_PENDING",
+                        "PROMOTION_WEALTH_PRODUCT_INVALID",
+                        "PROMOTION_RELEASE_SYMBOL_INVALID",
+                        "PROMOTION_TRADE_SYMBOL_INVALID",
+                        "PROMOTION_INTEREST_COUPON_NOT_USABLE",
+                        "PROMOTION_INTEREST_COUPON_ALREADY_BOUND",
+                        "PROMOTION_SCHEME_BUDGET_RESERVED_CONFLICT",
+                        "PROMOTION_SCHEME_BUDGET_BELOW_COMMITTED",
+                        "REWARD_VAULT_PARAM_ERROR",
+                        "REWARD_VAULT_IDEMPOTENCY_KEY_REQUIRED",
+                        "REWARD_VAULT_POCKET_INVALID",
+                        "REWARD_VAULT_REWARD_IN_USE",
+                        "REWARD_VAULT_PERIOD_NOT_FOUND",
+                        "REWARD_VAULT_CLAIM_NOT_AVAILABLE",
+                        "REWARD_VAULT_PERIOD_SETTLED",
+                        "REWARD_VAULT_ONLINE_CONFLICT",
+                        "RISK_CONFIG_API_DEPRECATED",
+                        "CONFIG_APPROVAL_NO_CHANGE",
+                        "CONFIG_APPROVAL_IN_PROGRESS",
+                        "CONFIG_APPROVAL_CHECKER_UNAVAILABLE",
+                        "CONFIG_APPROVAL_CHECKER_QUERY_FAILED",
+                        "CONFIG_APPROVAL_SELF_APPROVAL_FORBIDDEN",
+                        "CONFIG_APPROVAL_IDEMPOTENCY_CONFLICT",
+                        "CONFIG_APPROVAL_REQUEST_PROCESSING",
+                        "CONFIG_APPROVAL_STATE_INVALID",
+                        "DUPLICATE_IMPORT_ROW",
+                        "ROBOT_TAG_SNAPSHOT_CHANGED",
+                        "ROBOT_TAG_SNAPSHOT_CAPACITY_EXCEEDED",
+                        "ROBOT_TAG_SNAPSHOT_UNAVAILABLE",
+                        "ROBOT_TAG_SNAPSHOT_INVALID",
+                        "ROBOT_TAG_SELECTOR_CONFIG_INVALID",
+                        "EXPORT_INVALID_FILTER",
+                        "EXPORT_ACTIVE_LIMIT_EXCEEDED",
+                        "EXPORT_BUSY",
+                        "EXPORT_TASK_UNAVAILABLE",
+                        "EXPORT_TASK_NOT_READY",
+                        "EXPORT_ROUTE_VERSION_MISMATCH",
+                        "EXPORT_PERMISSION_DENIED",
+                        "EXPORT_DISPATCH_REJECTED",
+                        "EXPORT_BUSINESS_TYPE_UNSUPPORTED",
+                        "EXPORT_IDEMPOTENCY_CONFLICT",
+                        "EXPORT_ACTIVE_CONFLICT",
+                        "EXPORT_CREATE_UNAVAILABLE",
+                        "EXPORT_FILE_EXPIRED",
+                        "DOWNLOAD_TICKET_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_STALE",
+                        "EXPORT_HISTORY_EXPIRED",
+                        "FIAT_RAMP_REGION_REQUIRED",
+                        "FIAT_RAMP_DEPENDENCY_UNAVAILABLE",
+                        "FIAT_RAMP_SELECTION_CONFLICT",
+                        "FIAT_RAMP_QUOTE_EXPIRED",
+                        "FIAT_RAMP_CHANNEL_UNAVAILABLE",
+                        "FIAT_RAMP_LAUNCH_FAILED"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "properties": {}
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "taskId": {
+                          "type": "string",
+                          "description": "任务的不透明唯一标识"
+                        },
+                        "dataset": {
+                          "type": "string",
+                          "description": "任务数据集",
+                          "enum": [
+                            "DEAL_HISTORY",
+                            "ORDER_HISTORY",
+                            "FUNDING_FEE_HISTORY",
+                            "POSITION_CURRENT",
+                            "ORDER_CURRENT"
+                          ]
+                        },
+                        "language": {
+                          "type": "string",
+                          "description": "创建时冻结的规范语言码"
+                        },
+                        "sourceView": {
+                          "type": "string",
+                          "description": "原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空",
+                          "enum": [
+                            "SPOT",
+                            "CONTRACT",
+                            "PORTFOLIO"
+                          ],
+                          "nullable": true
+                        },
+                        "retryOfTaskId": {
+                          "type": "string",
+                          "description": "当前列表重试关联的原任务；非重试为空",
+                          "nullable": true
+                        },
+                        "retryContext": {
+                          "type": "object",
+                          "properties": {
+                            "originalTaskId": {
+                              "type": "string",
+                              "description": "原失败任务标识"
+                            },
+                            "createRequest": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "object",
+                                "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键"
+                              },
+                              "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键",
+                              "properties": {}
+                            }
+                          },
+                          "description": "失败任务的安全重试条件；客户端必须生成新的 clientRequestId",
+                          "nullable": true
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "任务状态",
+                          "enum": [
+                            "QUEUED",
+                            "RUNNING",
+                            "SUCCEEDED",
+                            "EMPTY",
+                            "OVER_LIMIT",
+                            "FAILED"
+                          ]
+                        },
+                        "failureReason": {
+                          "type": "string",
+                          "description": "失败原因；仅 FAILED 状态非空",
+                          "enum": [
+                            "GENERATION",
+                            "UPLOAD",
+                            "RESTART",
+                            "TIMEOUT"
+                          ],
+                          "nullable": true
+                        },
+                        "createdAt": {
+                          "type": "integer",
+                          "description": "创建时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "updatedAt": {
+                          "type": "integer",
+                          "description": "更新时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "expiresAt": {
+                          "type": "integer",
+                          "description": "绝对过期时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "rowCount": {
+                          "type": "integer",
+                          "description": "导出行数；未完成或超过上限时为空",
+                          "format": "int32",
+                          "nullable": true
+                        },
+                        "fileName": {
+                          "type": "string",
+                          "description": "下载文件名；仅成功任务非空",
+                          "nullable": true
+                        },
+                        "downloadAvailable": {
+                          "type": "boolean",
+                          "description": "服务端确认对象完整且未过期时为 true"
+                        }
+                      },
+                      "description": "历史 CSV 导出任务"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "x-openapi-permission": "READ"
+      }
+    },
+    "/openapi/v1/mc-trade/trade/deals/history/export-tasks/{taskId}/download": {
+      "get": {
+        "summary": "下载成交历史 CSV",
+        "deprecated": false,
+        "description": "",
+        "operationId": "download_1",
+        "tags": [
+          "成交历史 CSV 导出"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "302": {
+            "description": "Found",
+            "headers": {
+              "Location": {
+                "description": "限时下载地址",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-store"
+                }
+              }
+            }
+          }
+        },
+        "x-openapi-permission": "READ"
+      }
+    },
+    "/openapi/v1/mc-trade/trade/orders/history/export-tasks/{taskId}": {
+      "get": {
+        "summary": "查询订单历史 CSV 导出任务",
+        "deprecated": false,
+        "description": "",
+        "operationId": "get",
+        "tags": [
+          "订单历史 CSV 导出"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "enum": [
+                        "DEFAULT",
+                        "SIGN_ERROR",
+                        "NOT_EXIST",
+                        "ALREADY_EXIST",
+                        "REPEAT_OPERATION",
+                        "PARAM_ERROR",
+                        "PERMISSION_DENIED",
+                        "OPERATION_FAILED",
+                        "DATA_FORMAT_ERROR",
+                        "NETWORK_ERROR",
+                        "TIMEOUT_ERROR",
+                        "CONFIG_ERROR",
+                        "STATUS_ERROR",
+                        "VERSION_INCOMPATIBLE",
+                        "SERVICE_UNAVAILABLE",
+                        "DATA_INTEGRITY_ERROR",
+                        "CONCURRENT_CONFLICT",
+                        "RESOURCE_LOCKED",
+                        "QUOTA_EXCEEDED",
+                        "DEPENDENCY_ERROR",
+                        "BUSINESS_RULE_CONFLICT",
+                        "AUTH_CREDENTIAL_MISSING",
+                        "ROLE_PERMISSION_INVALID",
+                        "ROLE_ALREADY_EXIST",
+                        "ROLE_NOT_EXIST",
+                        "ROLE_ADMIN_CANNOT_MODIFY",
+                        "ROLE_ADMIN_CANNOT_DELETE",
+                        "BUSINESS_LINE_NAME_EXIST",
+                        "BUSINESS_LINE_NOT_EXIST",
+                        "BUSINESS_LINE_NOT_PERMITTED",
+                        "TRANSFER_FAILED",
+                        "TRANSFER_AMOUNT_INVALID",
+                        "TRANSFER_ACCOUNT_NOT_EXIST",
+                        "TRANSFER_ACCOUNT_FROZEN",
+                        "TRANSFER_LIMIT_EXCEEDED",
+                        "EXCHANGE_RATE_NOT_FOUND",
+                        "EXCHANGE_RATE_INVALID",
+                        "EXCHANGE_RATE_SERVICE_ERROR",
+                        "EXCHANGE_RATE_QUOTE_INVALID",
+                        "EXCHANGE_SYMBOL_ERROR",
+                        "ACCOUNT_NOT_EXIST",
+                        "ACCOUNT_FROZEN",
+                        "ACCOUNT_BALANCE_INSUFFICIENT",
+                        "ACCOUNT_OPERATION_FAILED",
+                        "ACCOUNT_PARAM_INVALID",
+                        "ACCOUNT_PASSWORD_INVALID",
+                        "ACCOUNT_TOKEN_GENERATE_FAILED",
+                        "NICKNAME_LENGTH_EXCEEDED",
+                        "TWO_FA_NOT_BOUND",
+                        "TWO_FA_ALREADY_BOUND",
+                        "TWO_FA_VERIFY_FAILED",
+                        "TWO_FA_CODE_INVALID",
+                        "TWO_FA_SESSION_EXPIRED",
+                        "TWO_FA_TYPE_NOT_SUPPORTED",
+                        "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
+                        "TWO_FA_RESET_WITHIN_24H",
+                        "TWO_FA_ADDRESS_LOCK_PERIOD",
+                        "TWO_FA_FUND_PASSWORD_INVALID",
+                        "TWO_FA_TICKET_INVALID",
+                        "TWO_FA_TICKET_USER_MISMATCH",
+                        "TWO_FA_TICKET_SCENE_MISMATCH",
+                        "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
+                        "TWO_FA_SEND_TOO_FREQUENT",
+                        "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
+                        "TWO_FA_CODE_SEND_FAILED",
+                        "TWO_FA_FUND_PASSWORD_NOT_SET",
+                        "TWO_FA_FUND_PASSWORD_WRONG",
+                        "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
+                        "TWO_FA_FUND_PASSWORD_ALREADY_SET",
+                        "SAFE_BOX_NOT_EXIST",
+                        "SAFE_BOX_LOCK_FAILED",
+                        "SAFE_BOX_BALANCE_INSUFFICIENT",
+                        "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
+                        "SAFE_BOX_FREEZE_FAILED",
+                        "SAFE_BOX_UNFREEZE_FAILED",
+                        "SAFE_BOX_TRANSFER_IN_FAILED",
+                        "SAFE_BOX_TRANSFER_OUT_FAILED",
+                        "SAFE_BOX_PASSWORD_INVALID",
+                        "SAFE_BOX_OPERATION_FAILED",
+                        "WITHDRAWAL_AMOUNT_INVALID",
+                        "WITHDRAWAL_ADDRESS_INVALID",
+                        "WITHDRAWAL_WHITELIST_REQUIRED",
+                        "WITHDRAWAL_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_SERVICE_ERROR",
+                        "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
+                        "WITHDRAWAL_PENDING_RECORD_EXISTS",
+                        "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
+                        "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_PENDING_RECHARGE_EXISTS",
+                        "CURRENCY_NOT_EXIST",
+                        "CURRENCY_NOT_ENABLED",
+                        "CURRENCY_NETWORK_NOT_EXIST",
+                        "CURRENCY_BALANCE_INSUFFICIENT",
+                        "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
+                        "CURRENCY_ADDRESS_EXIST",
+                        "CURRENCY_ADDRESS_LABEL_EXIST",
+                        "BLACKLIST_UID_REQUIRED",
+                        "BLACKLIST_WALLET_REQUIRED",
+                        "BLACKLIST_ALREADY_EXIST",
+                        "BLACKLIST_NOT_EXIST",
+                        "KYC_LEVEL_QUERY_FAILED",
+                        "KYC_CFG_ALREADY_EXIST",
+                        "KYC_LEVEL_INVALID",
+                        "KYC_USER_NOT_VERIFIED",
+                        "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
+                        "KYC_RWA_DEAL_QUERY_FAILED",
+                        "KYC_L0_NOT_PASSED",
+                        "KYC_CERT_NO_DUPLICATE",
+                        "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
+                        "KYC_CERT_VALID_UNTIL_EXPIRED",
+                        "KYC_CERT_VALID_FROM_FORMAT_ERROR",
+                        "KYC_CERT_VALID_DATE_RANGE_ERROR",
+                        "KYC_CERT_PERMANENT_FLAG_INVALID",
+                        "KYC_FLOW_NOT_CONFIGURED",
+                        "KYC_FLOW_STEP_NOT_CONFIGURED",
+                        "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
+                        "KYC_APPLY_ALREADY_EXISTS",
+                        "KYC_APPLY_NOT_EXIST",
+                        "KYC_APPLY_DETAIL_NOT_EXIST",
+                        "KYC_APPLY_FLOW_NOT_EXIST",
+                        "KYC_SUB_FLOW_NOT_EXIST",
+                        "KYC_APPLY_STATUS_CANCELED",
+                        "KYC_APPLY_STATUS_PASSED",
+                        "KYC_APPLY_STATUS_SUBMITTED",
+                        "KYC_STEP_PREREQUISITE_NOT_MET",
+                        "KYC_AUDIT_LEVEL_NOT_L0",
+                        "KYC_AUDIT_STATUS_NOT_PENDING",
+                        "KYC_USER_INFO_NOT_EXIST",
+                        "KYC_NO_FIELD_TO_UPDATE",
+                        "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
+                        "KYC_AUDIT_NO_SUBMIT_DATA",
+                        "KYC_AUDIT_ALREADY_REJECTED",
+                        "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
+                        "KYC_AUDIT_FLOW_NOT_FOUND",
+                        "KYC_FLOW_CONFIG_NOT_EXIST",
+                        "KYC_STEP_CODE_NOT_FOUND",
+                        "KYC_STEP_LEVEL_NOT_CONFIGURED",
+                        "KYC_PROOF_REQUIRED",
+                        "KYC_IMAGE_OBJECT_KEY_INVALID",
+                        "KYC_IMAGE_ACCESS_DENIED",
+                        "KYC_PRESIGN_TYPE_INVALID",
+                        "KYC_QUOTA_INVALID",
+                        "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
+                        "KYC_BUSINESS_LINE_CONTEXT_MISSING",
+                        "KYC_SYNC_FUND_ACCOUNT_FAILED",
+                        "KYC_STATE_MACHINE_INIT_FAILED",
+                        "KYC_REJECT_NEED_APPLY_NO",
+                        "KYC_CFG_NOT_EXIST",
+                        "KYC_APPLY_NO_OR_UID_REQUIRED",
+                        "KYC_SUB_FLOW_NO_REQUIRED",
+                        "KYC_UID_REQUIRED",
+                        "KYC_BUSINESS_LINE_ID_REQUIRED",
+                        "KYC_REQUEST_BODY_REQUIRED",
+                        "KYC_USER_OR_BUSINESS_LINE_MISSING",
+                        "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
+                        "KYC_OSS_NOT_ENABLED",
+                        "KYC_OSS_CLIENT_NOT_INITIALIZED",
+                        "KYC_OSS_CONFIG_MISSING",
+                        "KYC_USER_NOT_LOGGED_IN",
+                        "KYC_FACE_MIME_INVALID",
+                        "KYC_IMAGE_MIME_INVALID",
+                        "KYC_REQUIRED_FIELD_MISSING",
+                        "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
+                        "KYC_AUDIT_COMMENT_REQUIRED",
+                        "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
+                        "ASSET_ACCOUNT_NOT_EXIST",
+                        "ASSET_LOCK_FAILED",
+                        "ASSET_NOT_EXIST",
+                        "ASSET_ADD_FAILED",
+                        "ASSET_UNFREEZE_FAILED",
+                        "ASSET_CREATE_LOCK_FAILED",
+                        "ASSET_CREATE_FAILED",
+                        "ASSET_BALANCE_INSUFFICIENT",
+                        "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
+                        "ASSET_FREEZE_FAILED",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
+                        "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
+                        "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "FUND_ACCOUNT_NOT_EXIST",
+                        "FUND_ACCOUNT_ALREADY_EXIST",
+                        "FUND_ACCOUNT_CREATE_FAILED",
+                        "FUND_ACCOUNT_UPDATE_FAILED",
+                        "FUND_ACCOUNT_DELETE_FAILED",
+                        "FUND_ACCOUNT_PARAM_INVALID",
+                        "FUND_ACCOUNT_LOCK_FAILED",
+                        "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
+                        "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
+                        "FUND_ACCOUNT_CONTACT_REQUIRED",
+                        "FUND_ACCOUNT_MOBILE_ALREADY_USED",
+                        "FUND_ACCOUNT_EMAIL_ALREADY_USED",
+                        "TRANSACTION_RECORD_NOT_EXIST",
+                        "TRANSACTION_FORBIDDEN",
+                        "TRANSACTION_IN_PROGRESS",
+                        "TRANSACTION_AMOUNT_TOO_LOW",
+                        "TRANSACTION_REQUEST_FREQUENTLY",
+                        "TRANSACTION_BALANCE_INSUFFICIENT",
+                        "WEBHOOK_SIGNATURE_INVALID",
+                        "WEBHOOK_EVENT_TYPE_INVALID",
+                        "WEBHOOK_PAYLOAD_INVALID",
+                        "WEBHOOK_DEPOSIT_DETAIL_INVALID",
+                        "WEBHOOK_DEPOSIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_NOT_EXIST",
+                        "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
+                        "WITHDRAWAL_AUDIT_CREATE_FAILED",
+                        "WITHDRAWAL_AUDIT_UPDATE_FAILED",
+                        "WITHDRAWAL_AUDIT_DELETE_FAILED",
+                        "WITHDRAWAL_AUDIT_PARAM_INVALID",
+                        "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
+                        "WITHDRAWAL_AUDIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_REJECT_ERROR",
+                        "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
+                        "WITHDRAW_LOCK_PERIOD_ERROR",
+                        "PAYMENT_OPERATION_FAILED",
+                        "MT_GROUP_NOT_FOUND",
+                        "MT_MEM",
+                        "MT_DEALER_SEND",
+                        "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
+                        "MT_POSITION_GET_BY_LOGIN",
+                        "MT_POSITION_VOLUME_NOT_ENOUGH",
+                        "MT_DEDUCT_COLLATERAL_FAILED",
+                        "MT_DEALER_RESULT_FAILED",
+                        "MT_INPUT_SERIALIZE_FAILED",
+                        "MT_AMOUNT_DECIMAL",
+                        "MT_MTRISK_NOT_FOUND",
+                        "PROOF_FUND_ALREADY_EXIST",
+                        "PROOF_FUND_NOT_EXIST",
+                        "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
+                        "USER_WALLET_CONFIG_ALREADY_EXIST",
+                        "USER_WALLET_CONFIG_DELETE_FAILED",
+                        "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
+                        "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
+                        "MLP_CONFIG_NOT_FOUND",
+                        "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
+                        "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
+                        "MLP_INTEGRAL_TIER_CONFIG_INVALID",
+                        "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
+                        "TICKET_NOT_EXIST",
+                        "TICKET_PENDING_EXISTS",
+                        "TICKET_CLOSED_CANNOT_SEND",
+                        "TICKET_EVALUATE_FAILED",
+                        "TICKET_STATUS_INVALID",
+                        "POINTS_CLAIM_WINDOW_CLOSED",
+                        "POINTS_PENDING_NOT_FOUND",
+                        "POINTS_CLAIM_FORBIDDEN",
+                        "POINTS_BALANCE_INSUFFICIENT",
+                        "POINTS_VALIDITY_DAYS_INVALID",
+                        "POINTS_INDICATOR_DUPLICATE",
+                        "POINTS_INDICATOR_NOT_ALLOWED_FOR_LEVEL",
+                        "POINTS_BUSINESS_LINE_REQUIRED",
+                        "POINTS_RANK_PERIOD_INVALID",
+                        "USER_VAULT_NOT_FOUND",
+                        "USER_VAULT_STATUS_INVALID",
+                        "USER_VAULT_NOT_OWNER",
+                        "USER_VAULT_NAV_NOT_PUBLISHED",
+                        "USER_VAULT_CONTRACT_POOL_INSUFFICIENT",
+                        "USER_VAULT_TRANSFER_TO_PERSONAL_FORBIDDEN",
+                        "USER_VAULT_FROZEN",
+                        "USER_VAULT_ALREADY_EXISTS",
+                        "USER_VAULT_SEED_INVALID",
+                        "USER_VAULT_SEED_TRANSFER_FAILED",
+                        "USER_VAULT_FEE_INVALID",
+                        "USER_VAULT_HOLDING_INSUFFICIENT",
+                        "USER_VAULT_AUM_CAP_EXCEEDED",
+                        "USER_VAULT_OPEN_POSITION_EXISTS",
+                        "USER_VAULT_SUBSCRIBE_EXCEEDS_POOL_CAP",
+                        "USER_VAULT_MANAGER_DILUTION_TOO_LOW",
+                        "USER_VAULT_MANAGER_REDEEM_FORBIDDEN",
+                        "USER_VAULT_MANAGER_SUBSCRIBE_FORBIDDEN",
+                        "USER_VAULT_CAPITAL_INJECTION_FAILED",
+                        "FINANCE_COUPON_QUOTE_UNAVAILABLE",
+                        "ORDER_OPERATION_FAILED",
+                        "ORDER_SELL_NOT_SUPPORTED",
+                        "TP_SL_NOT_SUPPORTED",
+                        "SYMBOL_NOT_EXIST",
+                        "ORDER_VALUE_VOLUME_LIMIT_ERROR",
+                        "SYMBOL_NOT_SUPPORTED_ERROR",
+                        "SLIPPAGE_PARAM_ERROR",
+                        "SLIPPAGE_ESTIMATE_ERROR",
+                        "COMMON_ERROR",
+                        "COMMON_PARAMS_ERROR",
+                        "COMMON_MEM_ERROR",
+                        "ORDER_REQUEST_REJECT",
+                        "ORDER_REQUEST_CANCEL",
+                        "ORDER_REQUEST_PLACED",
+                        "ORDER_REQUEST_DONE",
+                        "ORDER_REQUEST_ERROR",
+                        "ORDER_REQUEST_TIMEOUT",
+                        "ORDER_REQUEST_INVALID",
+                        "ORDER_REQUEST_INVALID_VOLUME",
+                        "ORDER_REQUEST_INVALID_PRICE",
+                        "ORDER_REQUEST_INVALID_STOPS",
+                        "ORDER_REQUEST_TRADE_DISABLED",
+                        "ORDER_REQUEST_MARKET_CLOSED",
+                        "ORDER_REQUEST_NO_MONEY",
+                        "ORDER_REQUEST_TOO_MANY",
+                        "ORDER_REQUEST_INVALID_ORDER",
+                        "COMMON_OK",
+                        "ORDER_REQUEST_PRICE_OFF",
+                        "POSITION_OBTAIN_ERROR",
+                        "POSITION_VALUE_LIMIT_EXCEEDED",
+                        "POSITION_MARGIN_INSUFFICIENT",
+                        "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
+                        "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
+                        "FATIGUE_LIMIT",
+                        "TEMPLATE_DISABLED",
+                        "CHANNEL_NOT_SUPPORT",
+                        "TEMPLATE_PARAM_MISMATCH",
+                        "TEMPLATE_CONTENT_NOT_FOUND",
+                        "TEMPLATE_CONTENT_INCONSISTENT",
+                        "PREFERENCE_LIMIT",
+                        "BUSINESS_CONFLICT",
+                        "UNSUBSCRIBE_TOKEN_INVALID",
+                        "UNSUBSCRIBE_TOKEN_EXPIRED",
+                        "UNSUBSCRIBE_ACCOUNT_NOT_FOUND",
+                        "UNSUBSCRIBE_TEMPORARILY_UNAVAILABLE",
+                        "USER_NOT_FOUND",
+                        "USERNAME_EXISTS",
+                        "EMAIL_EXISTS",
+                        "PASSWORD_ERROR",
+                        "USER_DATA_VALIDATION_FAILED",
+                        "USER_BATCH_OPERATION_FAILED",
+                        "OLD_PASSWORD_SAME",
+                        "NEW_PASSWORD_NOT_MATCH",
+                        "ACCOUNT_TIER_OPERATION_FAILED",
+                        "BUSINESS_LINE_NOT_FOUND",
+                        "BUSINESS_LINE_NAME_EXISTS",
+                        "BUSINESS_LINE_SAVE_FAILED",
+                        "BUSINESS_LINE_UPDATE_FAILED",
+                        "BUSINESS_LINE_DELETE_FAILED",
+                        "BUSINESS_LINE_EMAIL_EXISTS",
+                        "BUSINESS_LINE_STATUS_ERROR",
+                        "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
+                        "BUSINESS_TYPE_EXCEPTION",
+                        "BUSINESS_TYPE_INVALID",
+                        "ROLE_NOT_FOUND",
+                        "ROLE_CODE_EXISTS",
+                        "ROLE_ADMIN_OPERATION_DENIED",
+                        "ROLE_STATUS_ERROR",
+                        "ROLE_BATCH_OPERATION_FAILED",
+                        "PERMISSION_NOT_FOUND",
+                        "PERMISSION_CODE_EXISTS",
+                        "PERMISSION_IN_USE",
+                        "PERMISSION_HAS_CHILDREN",
+                        "PERMISSION_CIRCULAR_REFERENCE",
+                        "SYMBOL_STATUS_CLOSED",
+                        "SYMBOL_SOURCE_DISABLED",
+                        "SYMBOL_SOURCE_SYMBOL_DISABLED",
+                        "SYMBOL_SOURCE_NAME_EXISTS",
+                        "TRADE_SYMBOL_NAME_EXISTS",
+                        "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
+                        "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
+                        "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
+                        "TRADE_SYMBOL_BOOK_NULL",
+                        "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
+                        "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
+                        "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
+                        "ALARM_NOTIFICATION_TYPE_INVALID",
+                        "RULE_MAPPING_NOT_CONFIGURED",
+                        "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_GET_FAILED",
+                        "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
+                        "PROMOTION_PARAM_ERROR",
+                        "PROMOTION_CAMPAIGN_NOT_FOUND",
+                        "PROMOTION_CAMPAIGN_OFFLINE",
+                        "PROMOTION_CAMPAIGN_NOT_STARTED",
+                        "PROMOTION_CAMPAIGN_ENDED",
+                        "PROMOTION_USER_SCOPE_MISMATCH",
+                        "PROMOTION_USER_NOT_ENROLLED",
+                        "PROMOTION_TASK_NOT_FOUND",
+                        "PROMOTION_TASK_NOT_CLAIMABLE",
+                        "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
+                        "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
+                        "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
+                        "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
+                        "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
+                        "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
+                        "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
+                        "PROMOTION_POOL_SUMMARY_FROZEN",
+                        "PROMOTION_DISPATCH_DUPLICATE_PENDING",
+                        "PROMOTION_WEALTH_PRODUCT_INVALID",
+                        "PROMOTION_RELEASE_SYMBOL_INVALID",
+                        "PROMOTION_TRADE_SYMBOL_INVALID",
+                        "PROMOTION_INTEREST_COUPON_NOT_USABLE",
+                        "PROMOTION_INTEREST_COUPON_ALREADY_BOUND",
+                        "PROMOTION_SCHEME_BUDGET_RESERVED_CONFLICT",
+                        "PROMOTION_SCHEME_BUDGET_BELOW_COMMITTED",
+                        "REWARD_VAULT_PARAM_ERROR",
+                        "REWARD_VAULT_IDEMPOTENCY_KEY_REQUIRED",
+                        "REWARD_VAULT_POCKET_INVALID",
+                        "REWARD_VAULT_REWARD_IN_USE",
+                        "REWARD_VAULT_PERIOD_NOT_FOUND",
+                        "REWARD_VAULT_CLAIM_NOT_AVAILABLE",
+                        "REWARD_VAULT_PERIOD_SETTLED",
+                        "REWARD_VAULT_ONLINE_CONFLICT",
+                        "RISK_CONFIG_API_DEPRECATED",
+                        "CONFIG_APPROVAL_NO_CHANGE",
+                        "CONFIG_APPROVAL_IN_PROGRESS",
+                        "CONFIG_APPROVAL_CHECKER_UNAVAILABLE",
+                        "CONFIG_APPROVAL_CHECKER_QUERY_FAILED",
+                        "CONFIG_APPROVAL_SELF_APPROVAL_FORBIDDEN",
+                        "CONFIG_APPROVAL_IDEMPOTENCY_CONFLICT",
+                        "CONFIG_APPROVAL_REQUEST_PROCESSING",
+                        "CONFIG_APPROVAL_STATE_INVALID",
+                        "DUPLICATE_IMPORT_ROW",
+                        "ROBOT_TAG_SNAPSHOT_CHANGED",
+                        "ROBOT_TAG_SNAPSHOT_CAPACITY_EXCEEDED",
+                        "ROBOT_TAG_SNAPSHOT_UNAVAILABLE",
+                        "ROBOT_TAG_SNAPSHOT_INVALID",
+                        "ROBOT_TAG_SELECTOR_CONFIG_INVALID",
+                        "EXPORT_INVALID_FILTER",
+                        "EXPORT_ACTIVE_LIMIT_EXCEEDED",
+                        "EXPORT_BUSY",
+                        "EXPORT_TASK_UNAVAILABLE",
+                        "EXPORT_TASK_NOT_READY",
+                        "EXPORT_ROUTE_VERSION_MISMATCH",
+                        "EXPORT_PERMISSION_DENIED",
+                        "EXPORT_DISPATCH_REJECTED",
+                        "EXPORT_BUSINESS_TYPE_UNSUPPORTED",
+                        "EXPORT_IDEMPOTENCY_CONFLICT",
+                        "EXPORT_ACTIVE_CONFLICT",
+                        "EXPORT_CREATE_UNAVAILABLE",
+                        "EXPORT_FILE_EXPIRED",
+                        "DOWNLOAD_TICKET_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_STALE",
+                        "EXPORT_HISTORY_EXPIRED",
+                        "FIAT_RAMP_REGION_REQUIRED",
+                        "FIAT_RAMP_DEPENDENCY_UNAVAILABLE",
+                        "FIAT_RAMP_SELECTION_CONFLICT",
+                        "FIAT_RAMP_QUOTE_EXPIRED",
+                        "FIAT_RAMP_CHANNEL_UNAVAILABLE",
+                        "FIAT_RAMP_LAUNCH_FAILED"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "properties": {}
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "taskId": {
+                          "type": "string",
+                          "description": "任务的不透明唯一标识"
+                        },
+                        "dataset": {
+                          "type": "string",
+                          "description": "任务数据集",
+                          "enum": [
+                            "DEAL_HISTORY",
+                            "ORDER_HISTORY",
+                            "FUNDING_FEE_HISTORY",
+                            "POSITION_CURRENT",
+                            "ORDER_CURRENT"
+                          ]
+                        },
+                        "language": {
+                          "type": "string",
+                          "description": "创建时冻结的规范语言码"
+                        },
+                        "sourceView": {
+                          "type": "string",
+                          "description": "原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空",
+                          "enum": [
+                            "SPOT",
+                            "CONTRACT",
+                            "PORTFOLIO"
+                          ],
+                          "nullable": true
+                        },
+                        "retryOfTaskId": {
+                          "type": "string",
+                          "description": "当前列表重试关联的原任务；非重试为空",
+                          "nullable": true
+                        },
+                        "retryContext": {
+                          "type": "object",
+                          "properties": {
+                            "originalTaskId": {
+                              "type": "string",
+                              "description": "原失败任务标识"
+                            },
+                            "createRequest": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "object",
+                                "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键"
+                              },
+                              "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键",
+                              "properties": {}
+                            }
+                          },
+                          "description": "失败任务的安全重试条件；客户端必须生成新的 clientRequestId",
+                          "nullable": true
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "任务状态",
+                          "enum": [
+                            "QUEUED",
+                            "RUNNING",
+                            "SUCCEEDED",
+                            "EMPTY",
+                            "OVER_LIMIT",
+                            "FAILED"
+                          ]
+                        },
+                        "failureReason": {
+                          "type": "string",
+                          "description": "失败原因；仅 FAILED 状态非空",
+                          "enum": [
+                            "GENERATION",
+                            "UPLOAD",
+                            "RESTART",
+                            "TIMEOUT"
+                          ],
+                          "nullable": true
+                        },
+                        "createdAt": {
+                          "type": "integer",
+                          "description": "创建时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "updatedAt": {
+                          "type": "integer",
+                          "description": "更新时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "expiresAt": {
+                          "type": "integer",
+                          "description": "绝对过期时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "rowCount": {
+                          "type": "integer",
+                          "description": "导出行数；未完成或超过上限时为空",
+                          "format": "int32",
+                          "nullable": true
+                        },
+                        "fileName": {
+                          "type": "string",
+                          "description": "下载文件名；仅成功任务非空",
+                          "nullable": true
+                        },
+                        "downloadAvailable": {
+                          "type": "boolean",
+                          "description": "服务端确认对象完整且未过期时为 true"
+                        }
+                      },
+                      "description": "历史 CSV 导出任务"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "x-openapi-permission": "READ"
+      }
+    },
+    "/openapi/v1/mc-trade/trade/orders/history/export-tasks/{taskId}/download": {
+      "get": {
+        "summary": "下载订单历史 CSV",
+        "deprecated": false,
+        "description": "",
+        "operationId": "download",
+        "tags": [
+          "订单历史 CSV 导出"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "302": {
+            "description": "Found",
+            "headers": {
+              "Location": {
+                "description": "限时下载地址",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-store"
+                }
+              }
+            }
+          }
+        },
+        "x-openapi-permission": "READ"
+      }
+    },
+    "/openapi/v1/mc-trade/trade/deals/history/export-tasks": {
+      "post": {
+        "summary": "创建成交历史 CSV 导出任务",
+        "deprecated": false,
+        "description": "",
+        "operationId": "create_1",
+        "tags": [
+          "成交历史 CSV 导出"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "clientRequestId",
+                  "from",
+                  "sort",
+                  "timeZone",
+                  "to",
+                  "type"
+                ],
+                "type": "object",
+                "properties": {
+                  "clientRequestId": {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string",
+                    "description": "客户端幂等请求标识，去除首尾空白后为 1 到 64 个可打印字符"
+                  },
+                  "sourceView": {
+                    "type": "string",
+                    "description": "来源列表：SPOT、CONTRACT、PORTFOLIO；旧调用可不传",
+                    "enum": [
+                      "SPOT",
+                      "CONTRACT",
+                      "PORTFOLIO"
+                    ],
+                    "nullable": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "账户数据类型：SPOT、CONTRACT 或 SPOT_CONTRACT",
+                    "enum": [
+                      "SPOT",
+                      "CONTRACT",
+                      "SPOT_CONTRACT"
+                    ]
+                  },
+                  "from": {
+                    "type": "integer",
+                    "description": "查询开始时间，Unix 秒，UTC epoch",
+                    "format": "int64"
+                  },
+                  "to": {
+                    "type": "integer",
+                    "description": "查询结束时间，Unix 秒，UTC epoch；必须不早于 from",
+                    "format": "int64"
+                  },
+                  "symbol": {
+                    "maxLength": 64,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "可选交易品种；空值表示全部品种"
+                  },
+                  "sort": {
+                    "type": "string",
+                    "description": "固定倒序规则；成交与订单使用各自的排序枚举",
+                    "enum": [
+                      "DEAL_TIME_DESC",
+                      "ORDER_TIME_DESC"
+                    ]
+                  },
+                  "language": {
+                    "type": "string",
+                    "description": "CSV 语言标签；别名、空值与未知标签由共享目录规范化"
+                  },
+                  "timeZone": {
+                    "type": "string",
+                    "description": "IANA 时区标识"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "enum": [
+                        "DEFAULT",
+                        "SIGN_ERROR",
+                        "NOT_EXIST",
+                        "ALREADY_EXIST",
+                        "REPEAT_OPERATION",
+                        "PARAM_ERROR",
+                        "PERMISSION_DENIED",
+                        "OPERATION_FAILED",
+                        "DATA_FORMAT_ERROR",
+                        "NETWORK_ERROR",
+                        "TIMEOUT_ERROR",
+                        "CONFIG_ERROR",
+                        "STATUS_ERROR",
+                        "VERSION_INCOMPATIBLE",
+                        "SERVICE_UNAVAILABLE",
+                        "DATA_INTEGRITY_ERROR",
+                        "CONCURRENT_CONFLICT",
+                        "RESOURCE_LOCKED",
+                        "QUOTA_EXCEEDED",
+                        "DEPENDENCY_ERROR",
+                        "BUSINESS_RULE_CONFLICT",
+                        "AUTH_CREDENTIAL_MISSING",
+                        "ROLE_PERMISSION_INVALID",
+                        "ROLE_ALREADY_EXIST",
+                        "ROLE_NOT_EXIST",
+                        "ROLE_ADMIN_CANNOT_MODIFY",
+                        "ROLE_ADMIN_CANNOT_DELETE",
+                        "BUSINESS_LINE_NAME_EXIST",
+                        "BUSINESS_LINE_NOT_EXIST",
+                        "BUSINESS_LINE_NOT_PERMITTED",
+                        "TRANSFER_FAILED",
+                        "TRANSFER_AMOUNT_INVALID",
+                        "TRANSFER_ACCOUNT_NOT_EXIST",
+                        "TRANSFER_ACCOUNT_FROZEN",
+                        "TRANSFER_LIMIT_EXCEEDED",
+                        "EXCHANGE_RATE_NOT_FOUND",
+                        "EXCHANGE_RATE_INVALID",
+                        "EXCHANGE_RATE_SERVICE_ERROR",
+                        "EXCHANGE_RATE_QUOTE_INVALID",
+                        "EXCHANGE_SYMBOL_ERROR",
+                        "ACCOUNT_NOT_EXIST",
+                        "ACCOUNT_FROZEN",
+                        "ACCOUNT_BALANCE_INSUFFICIENT",
+                        "ACCOUNT_OPERATION_FAILED",
+                        "ACCOUNT_PARAM_INVALID",
+                        "ACCOUNT_PASSWORD_INVALID",
+                        "ACCOUNT_TOKEN_GENERATE_FAILED",
+                        "NICKNAME_LENGTH_EXCEEDED",
+                        "TWO_FA_NOT_BOUND",
+                        "TWO_FA_ALREADY_BOUND",
+                        "TWO_FA_VERIFY_FAILED",
+                        "TWO_FA_CODE_INVALID",
+                        "TWO_FA_SESSION_EXPIRED",
+                        "TWO_FA_TYPE_NOT_SUPPORTED",
+                        "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
+                        "TWO_FA_RESET_WITHIN_24H",
+                        "TWO_FA_ADDRESS_LOCK_PERIOD",
+                        "TWO_FA_FUND_PASSWORD_INVALID",
+                        "TWO_FA_TICKET_INVALID",
+                        "TWO_FA_TICKET_USER_MISMATCH",
+                        "TWO_FA_TICKET_SCENE_MISMATCH",
+                        "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
+                        "TWO_FA_SEND_TOO_FREQUENT",
+                        "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
+                        "TWO_FA_CODE_SEND_FAILED",
+                        "TWO_FA_FUND_PASSWORD_NOT_SET",
+                        "TWO_FA_FUND_PASSWORD_WRONG",
+                        "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
+                        "TWO_FA_FUND_PASSWORD_ALREADY_SET",
+                        "SAFE_BOX_NOT_EXIST",
+                        "SAFE_BOX_LOCK_FAILED",
+                        "SAFE_BOX_BALANCE_INSUFFICIENT",
+                        "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
+                        "SAFE_BOX_FREEZE_FAILED",
+                        "SAFE_BOX_UNFREEZE_FAILED",
+                        "SAFE_BOX_TRANSFER_IN_FAILED",
+                        "SAFE_BOX_TRANSFER_OUT_FAILED",
+                        "SAFE_BOX_PASSWORD_INVALID",
+                        "SAFE_BOX_OPERATION_FAILED",
+                        "WITHDRAWAL_AMOUNT_INVALID",
+                        "WITHDRAWAL_ADDRESS_INVALID",
+                        "WITHDRAWAL_WHITELIST_REQUIRED",
+                        "WITHDRAWAL_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_SERVICE_ERROR",
+                        "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
+                        "WITHDRAWAL_PENDING_RECORD_EXISTS",
+                        "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
+                        "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_PENDING_RECHARGE_EXISTS",
+                        "CURRENCY_NOT_EXIST",
+                        "CURRENCY_NOT_ENABLED",
+                        "CURRENCY_NETWORK_NOT_EXIST",
+                        "CURRENCY_BALANCE_INSUFFICIENT",
+                        "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
+                        "CURRENCY_ADDRESS_EXIST",
+                        "CURRENCY_ADDRESS_LABEL_EXIST",
+                        "BLACKLIST_UID_REQUIRED",
+                        "BLACKLIST_WALLET_REQUIRED",
+                        "BLACKLIST_ALREADY_EXIST",
+                        "BLACKLIST_NOT_EXIST",
+                        "KYC_LEVEL_QUERY_FAILED",
+                        "KYC_CFG_ALREADY_EXIST",
+                        "KYC_LEVEL_INVALID",
+                        "KYC_USER_NOT_VERIFIED",
+                        "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
+                        "KYC_RWA_DEAL_QUERY_FAILED",
+                        "KYC_L0_NOT_PASSED",
+                        "KYC_CERT_NO_DUPLICATE",
+                        "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
+                        "KYC_CERT_VALID_UNTIL_EXPIRED",
+                        "KYC_CERT_VALID_FROM_FORMAT_ERROR",
+                        "KYC_CERT_VALID_DATE_RANGE_ERROR",
+                        "KYC_CERT_PERMANENT_FLAG_INVALID",
+                        "KYC_FLOW_NOT_CONFIGURED",
+                        "KYC_FLOW_STEP_NOT_CONFIGURED",
+                        "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
+                        "KYC_APPLY_ALREADY_EXISTS",
+                        "KYC_APPLY_NOT_EXIST",
+                        "KYC_APPLY_DETAIL_NOT_EXIST",
+                        "KYC_APPLY_FLOW_NOT_EXIST",
+                        "KYC_SUB_FLOW_NOT_EXIST",
+                        "KYC_APPLY_STATUS_CANCELED",
+                        "KYC_APPLY_STATUS_PASSED",
+                        "KYC_APPLY_STATUS_SUBMITTED",
+                        "KYC_STEP_PREREQUISITE_NOT_MET",
+                        "KYC_AUDIT_LEVEL_NOT_L0",
+                        "KYC_AUDIT_STATUS_NOT_PENDING",
+                        "KYC_USER_INFO_NOT_EXIST",
+                        "KYC_NO_FIELD_TO_UPDATE",
+                        "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
+                        "KYC_AUDIT_NO_SUBMIT_DATA",
+                        "KYC_AUDIT_ALREADY_REJECTED",
+                        "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
+                        "KYC_AUDIT_FLOW_NOT_FOUND",
+                        "KYC_FLOW_CONFIG_NOT_EXIST",
+                        "KYC_STEP_CODE_NOT_FOUND",
+                        "KYC_STEP_LEVEL_NOT_CONFIGURED",
+                        "KYC_PROOF_REQUIRED",
+                        "KYC_IMAGE_OBJECT_KEY_INVALID",
+                        "KYC_IMAGE_ACCESS_DENIED",
+                        "KYC_PRESIGN_TYPE_INVALID",
+                        "KYC_QUOTA_INVALID",
+                        "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
+                        "KYC_BUSINESS_LINE_CONTEXT_MISSING",
+                        "KYC_SYNC_FUND_ACCOUNT_FAILED",
+                        "KYC_STATE_MACHINE_INIT_FAILED",
+                        "KYC_REJECT_NEED_APPLY_NO",
+                        "KYC_CFG_NOT_EXIST",
+                        "KYC_APPLY_NO_OR_UID_REQUIRED",
+                        "KYC_SUB_FLOW_NO_REQUIRED",
+                        "KYC_UID_REQUIRED",
+                        "KYC_BUSINESS_LINE_ID_REQUIRED",
+                        "KYC_REQUEST_BODY_REQUIRED",
+                        "KYC_USER_OR_BUSINESS_LINE_MISSING",
+                        "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
+                        "KYC_OSS_NOT_ENABLED",
+                        "KYC_OSS_CLIENT_NOT_INITIALIZED",
+                        "KYC_OSS_CONFIG_MISSING",
+                        "KYC_USER_NOT_LOGGED_IN",
+                        "KYC_FACE_MIME_INVALID",
+                        "KYC_IMAGE_MIME_INVALID",
+                        "KYC_REQUIRED_FIELD_MISSING",
+                        "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
+                        "KYC_AUDIT_COMMENT_REQUIRED",
+                        "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
+                        "ASSET_ACCOUNT_NOT_EXIST",
+                        "ASSET_LOCK_FAILED",
+                        "ASSET_NOT_EXIST",
+                        "ASSET_ADD_FAILED",
+                        "ASSET_UNFREEZE_FAILED",
+                        "ASSET_CREATE_LOCK_FAILED",
+                        "ASSET_CREATE_FAILED",
+                        "ASSET_BALANCE_INSUFFICIENT",
+                        "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
+                        "ASSET_FREEZE_FAILED",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
+                        "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
+                        "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "FUND_ACCOUNT_NOT_EXIST",
+                        "FUND_ACCOUNT_ALREADY_EXIST",
+                        "FUND_ACCOUNT_CREATE_FAILED",
+                        "FUND_ACCOUNT_UPDATE_FAILED",
+                        "FUND_ACCOUNT_DELETE_FAILED",
+                        "FUND_ACCOUNT_PARAM_INVALID",
+                        "FUND_ACCOUNT_LOCK_FAILED",
+                        "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
+                        "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
+                        "FUND_ACCOUNT_CONTACT_REQUIRED",
+                        "FUND_ACCOUNT_MOBILE_ALREADY_USED",
+                        "FUND_ACCOUNT_EMAIL_ALREADY_USED",
+                        "TRANSACTION_RECORD_NOT_EXIST",
+                        "TRANSACTION_FORBIDDEN",
+                        "TRANSACTION_IN_PROGRESS",
+                        "TRANSACTION_AMOUNT_TOO_LOW",
+                        "TRANSACTION_REQUEST_FREQUENTLY",
+                        "TRANSACTION_BALANCE_INSUFFICIENT",
+                        "WEBHOOK_SIGNATURE_INVALID",
+                        "WEBHOOK_EVENT_TYPE_INVALID",
+                        "WEBHOOK_PAYLOAD_INVALID",
+                        "WEBHOOK_DEPOSIT_DETAIL_INVALID",
+                        "WEBHOOK_DEPOSIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_NOT_EXIST",
+                        "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
+                        "WITHDRAWAL_AUDIT_CREATE_FAILED",
+                        "WITHDRAWAL_AUDIT_UPDATE_FAILED",
+                        "WITHDRAWAL_AUDIT_DELETE_FAILED",
+                        "WITHDRAWAL_AUDIT_PARAM_INVALID",
+                        "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
+                        "WITHDRAWAL_AUDIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_REJECT_ERROR",
+                        "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
+                        "WITHDRAW_LOCK_PERIOD_ERROR",
+                        "PAYMENT_OPERATION_FAILED",
+                        "MT_GROUP_NOT_FOUND",
+                        "MT_MEM",
+                        "MT_DEALER_SEND",
+                        "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
+                        "MT_POSITION_GET_BY_LOGIN",
+                        "MT_POSITION_VOLUME_NOT_ENOUGH",
+                        "MT_DEDUCT_COLLATERAL_FAILED",
+                        "MT_DEALER_RESULT_FAILED",
+                        "MT_INPUT_SERIALIZE_FAILED",
+                        "MT_AMOUNT_DECIMAL",
+                        "MT_MTRISK_NOT_FOUND",
+                        "PROOF_FUND_ALREADY_EXIST",
+                        "PROOF_FUND_NOT_EXIST",
+                        "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
+                        "USER_WALLET_CONFIG_ALREADY_EXIST",
+                        "USER_WALLET_CONFIG_DELETE_FAILED",
+                        "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
+                        "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
+                        "MLP_CONFIG_NOT_FOUND",
+                        "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
+                        "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
+                        "MLP_INTEGRAL_TIER_CONFIG_INVALID",
+                        "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
+                        "TICKET_NOT_EXIST",
+                        "TICKET_PENDING_EXISTS",
+                        "TICKET_CLOSED_CANNOT_SEND",
+                        "TICKET_EVALUATE_FAILED",
+                        "TICKET_STATUS_INVALID",
+                        "POINTS_CLAIM_WINDOW_CLOSED",
+                        "POINTS_PENDING_NOT_FOUND",
+                        "POINTS_CLAIM_FORBIDDEN",
+                        "POINTS_BALANCE_INSUFFICIENT",
+                        "POINTS_VALIDITY_DAYS_INVALID",
+                        "POINTS_INDICATOR_DUPLICATE",
+                        "POINTS_INDICATOR_NOT_ALLOWED_FOR_LEVEL",
+                        "POINTS_BUSINESS_LINE_REQUIRED",
+                        "POINTS_RANK_PERIOD_INVALID",
+                        "USER_VAULT_NOT_FOUND",
+                        "USER_VAULT_STATUS_INVALID",
+                        "USER_VAULT_NOT_OWNER",
+                        "USER_VAULT_NAV_NOT_PUBLISHED",
+                        "USER_VAULT_CONTRACT_POOL_INSUFFICIENT",
+                        "USER_VAULT_TRANSFER_TO_PERSONAL_FORBIDDEN",
+                        "USER_VAULT_FROZEN",
+                        "USER_VAULT_ALREADY_EXISTS",
+                        "USER_VAULT_SEED_INVALID",
+                        "USER_VAULT_SEED_TRANSFER_FAILED",
+                        "USER_VAULT_FEE_INVALID",
+                        "USER_VAULT_HOLDING_INSUFFICIENT",
+                        "USER_VAULT_AUM_CAP_EXCEEDED",
+                        "USER_VAULT_OPEN_POSITION_EXISTS",
+                        "USER_VAULT_SUBSCRIBE_EXCEEDS_POOL_CAP",
+                        "USER_VAULT_MANAGER_DILUTION_TOO_LOW",
+                        "USER_VAULT_MANAGER_REDEEM_FORBIDDEN",
+                        "USER_VAULT_MANAGER_SUBSCRIBE_FORBIDDEN",
+                        "USER_VAULT_CAPITAL_INJECTION_FAILED",
+                        "FINANCE_COUPON_QUOTE_UNAVAILABLE",
+                        "ORDER_OPERATION_FAILED",
+                        "ORDER_SELL_NOT_SUPPORTED",
+                        "TP_SL_NOT_SUPPORTED",
+                        "SYMBOL_NOT_EXIST",
+                        "ORDER_VALUE_VOLUME_LIMIT_ERROR",
+                        "SYMBOL_NOT_SUPPORTED_ERROR",
+                        "SLIPPAGE_PARAM_ERROR",
+                        "SLIPPAGE_ESTIMATE_ERROR",
+                        "COMMON_ERROR",
+                        "COMMON_PARAMS_ERROR",
+                        "COMMON_MEM_ERROR",
+                        "ORDER_REQUEST_REJECT",
+                        "ORDER_REQUEST_CANCEL",
+                        "ORDER_REQUEST_PLACED",
+                        "ORDER_REQUEST_DONE",
+                        "ORDER_REQUEST_ERROR",
+                        "ORDER_REQUEST_TIMEOUT",
+                        "ORDER_REQUEST_INVALID",
+                        "ORDER_REQUEST_INVALID_VOLUME",
+                        "ORDER_REQUEST_INVALID_PRICE",
+                        "ORDER_REQUEST_INVALID_STOPS",
+                        "ORDER_REQUEST_TRADE_DISABLED",
+                        "ORDER_REQUEST_MARKET_CLOSED",
+                        "ORDER_REQUEST_NO_MONEY",
+                        "ORDER_REQUEST_TOO_MANY",
+                        "ORDER_REQUEST_INVALID_ORDER",
+                        "COMMON_OK",
+                        "ORDER_REQUEST_PRICE_OFF",
+                        "POSITION_OBTAIN_ERROR",
+                        "POSITION_VALUE_LIMIT_EXCEEDED",
+                        "POSITION_MARGIN_INSUFFICIENT",
+                        "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
+                        "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
+                        "FATIGUE_LIMIT",
+                        "TEMPLATE_DISABLED",
+                        "CHANNEL_NOT_SUPPORT",
+                        "TEMPLATE_PARAM_MISMATCH",
+                        "TEMPLATE_CONTENT_NOT_FOUND",
+                        "TEMPLATE_CONTENT_INCONSISTENT",
+                        "PREFERENCE_LIMIT",
+                        "BUSINESS_CONFLICT",
+                        "UNSUBSCRIBE_TOKEN_INVALID",
+                        "UNSUBSCRIBE_TOKEN_EXPIRED",
+                        "UNSUBSCRIBE_ACCOUNT_NOT_FOUND",
+                        "UNSUBSCRIBE_TEMPORARILY_UNAVAILABLE",
+                        "USER_NOT_FOUND",
+                        "USERNAME_EXISTS",
+                        "EMAIL_EXISTS",
+                        "PASSWORD_ERROR",
+                        "USER_DATA_VALIDATION_FAILED",
+                        "USER_BATCH_OPERATION_FAILED",
+                        "OLD_PASSWORD_SAME",
+                        "NEW_PASSWORD_NOT_MATCH",
+                        "ACCOUNT_TIER_OPERATION_FAILED",
+                        "BUSINESS_LINE_NOT_FOUND",
+                        "BUSINESS_LINE_NAME_EXISTS",
+                        "BUSINESS_LINE_SAVE_FAILED",
+                        "BUSINESS_LINE_UPDATE_FAILED",
+                        "BUSINESS_LINE_DELETE_FAILED",
+                        "BUSINESS_LINE_EMAIL_EXISTS",
+                        "BUSINESS_LINE_STATUS_ERROR",
+                        "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
+                        "BUSINESS_TYPE_EXCEPTION",
+                        "BUSINESS_TYPE_INVALID",
+                        "ROLE_NOT_FOUND",
+                        "ROLE_CODE_EXISTS",
+                        "ROLE_ADMIN_OPERATION_DENIED",
+                        "ROLE_STATUS_ERROR",
+                        "ROLE_BATCH_OPERATION_FAILED",
+                        "PERMISSION_NOT_FOUND",
+                        "PERMISSION_CODE_EXISTS",
+                        "PERMISSION_IN_USE",
+                        "PERMISSION_HAS_CHILDREN",
+                        "PERMISSION_CIRCULAR_REFERENCE",
+                        "SYMBOL_STATUS_CLOSED",
+                        "SYMBOL_SOURCE_DISABLED",
+                        "SYMBOL_SOURCE_SYMBOL_DISABLED",
+                        "SYMBOL_SOURCE_NAME_EXISTS",
+                        "TRADE_SYMBOL_NAME_EXISTS",
+                        "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
+                        "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
+                        "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
+                        "TRADE_SYMBOL_BOOK_NULL",
+                        "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
+                        "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
+                        "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
+                        "ALARM_NOTIFICATION_TYPE_INVALID",
+                        "RULE_MAPPING_NOT_CONFIGURED",
+                        "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_GET_FAILED",
+                        "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
+                        "PROMOTION_PARAM_ERROR",
+                        "PROMOTION_CAMPAIGN_NOT_FOUND",
+                        "PROMOTION_CAMPAIGN_OFFLINE",
+                        "PROMOTION_CAMPAIGN_NOT_STARTED",
+                        "PROMOTION_CAMPAIGN_ENDED",
+                        "PROMOTION_USER_SCOPE_MISMATCH",
+                        "PROMOTION_USER_NOT_ENROLLED",
+                        "PROMOTION_TASK_NOT_FOUND",
+                        "PROMOTION_TASK_NOT_CLAIMABLE",
+                        "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
+                        "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
+                        "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
+                        "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
+                        "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
+                        "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
+                        "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
+                        "PROMOTION_POOL_SUMMARY_FROZEN",
+                        "PROMOTION_DISPATCH_DUPLICATE_PENDING",
+                        "PROMOTION_WEALTH_PRODUCT_INVALID",
+                        "PROMOTION_RELEASE_SYMBOL_INVALID",
+                        "PROMOTION_TRADE_SYMBOL_INVALID",
+                        "PROMOTION_INTEREST_COUPON_NOT_USABLE",
+                        "PROMOTION_INTEREST_COUPON_ALREADY_BOUND",
+                        "PROMOTION_SCHEME_BUDGET_RESERVED_CONFLICT",
+                        "PROMOTION_SCHEME_BUDGET_BELOW_COMMITTED",
+                        "REWARD_VAULT_PARAM_ERROR",
+                        "REWARD_VAULT_IDEMPOTENCY_KEY_REQUIRED",
+                        "REWARD_VAULT_POCKET_INVALID",
+                        "REWARD_VAULT_REWARD_IN_USE",
+                        "REWARD_VAULT_PERIOD_NOT_FOUND",
+                        "REWARD_VAULT_CLAIM_NOT_AVAILABLE",
+                        "REWARD_VAULT_PERIOD_SETTLED",
+                        "REWARD_VAULT_ONLINE_CONFLICT",
+                        "RISK_CONFIG_API_DEPRECATED",
+                        "CONFIG_APPROVAL_NO_CHANGE",
+                        "CONFIG_APPROVAL_IN_PROGRESS",
+                        "CONFIG_APPROVAL_CHECKER_UNAVAILABLE",
+                        "CONFIG_APPROVAL_CHECKER_QUERY_FAILED",
+                        "CONFIG_APPROVAL_SELF_APPROVAL_FORBIDDEN",
+                        "CONFIG_APPROVAL_IDEMPOTENCY_CONFLICT",
+                        "CONFIG_APPROVAL_REQUEST_PROCESSING",
+                        "CONFIG_APPROVAL_STATE_INVALID",
+                        "DUPLICATE_IMPORT_ROW",
+                        "ROBOT_TAG_SNAPSHOT_CHANGED",
+                        "ROBOT_TAG_SNAPSHOT_CAPACITY_EXCEEDED",
+                        "ROBOT_TAG_SNAPSHOT_UNAVAILABLE",
+                        "ROBOT_TAG_SNAPSHOT_INVALID",
+                        "ROBOT_TAG_SELECTOR_CONFIG_INVALID",
+                        "EXPORT_INVALID_FILTER",
+                        "EXPORT_ACTIVE_LIMIT_EXCEEDED",
+                        "EXPORT_BUSY",
+                        "EXPORT_TASK_UNAVAILABLE",
+                        "EXPORT_TASK_NOT_READY",
+                        "EXPORT_ROUTE_VERSION_MISMATCH",
+                        "EXPORT_PERMISSION_DENIED",
+                        "EXPORT_DISPATCH_REJECTED",
+                        "EXPORT_BUSINESS_TYPE_UNSUPPORTED",
+                        "EXPORT_IDEMPOTENCY_CONFLICT",
+                        "EXPORT_ACTIVE_CONFLICT",
+                        "EXPORT_CREATE_UNAVAILABLE",
+                        "EXPORT_FILE_EXPIRED",
+                        "DOWNLOAD_TICKET_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_STALE",
+                        "EXPORT_HISTORY_EXPIRED",
+                        "FIAT_RAMP_REGION_REQUIRED",
+                        "FIAT_RAMP_DEPENDENCY_UNAVAILABLE",
+                        "FIAT_RAMP_SELECTION_CONFLICT",
+                        "FIAT_RAMP_QUOTE_EXPIRED",
+                        "FIAT_RAMP_CHANNEL_UNAVAILABLE",
+                        "FIAT_RAMP_LAUNCH_FAILED"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "properties": {}
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "taskId": {
+                          "type": "string",
+                          "description": "任务的不透明唯一标识"
+                        },
+                        "dataset": {
+                          "type": "string",
+                          "description": "任务数据集",
+                          "enum": [
+                            "DEAL_HISTORY",
+                            "ORDER_HISTORY",
+                            "FUNDING_FEE_HISTORY",
+                            "POSITION_CURRENT",
+                            "ORDER_CURRENT"
+                          ]
+                        },
+                        "language": {
+                          "type": "string",
+                          "description": "创建时冻结的规范语言码"
+                        },
+                        "sourceView": {
+                          "type": "string",
+                          "description": "原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空",
+                          "enum": [
+                            "SPOT",
+                            "CONTRACT",
+                            "PORTFOLIO"
+                          ],
+                          "nullable": true
+                        },
+                        "retryOfTaskId": {
+                          "type": "string",
+                          "description": "当前列表重试关联的原任务；非重试为空",
+                          "nullable": true
+                        },
+                        "retryContext": {
+                          "type": "object",
+                          "properties": {
+                            "originalTaskId": {
+                              "type": "string",
+                              "description": "原失败任务标识"
+                            },
+                            "createRequest": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "object",
+                                "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键"
+                              },
+                              "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键",
+                              "properties": {}
+                            }
+                          },
+                          "description": "失败任务的安全重试条件；客户端必须生成新的 clientRequestId",
+                          "nullable": true
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "任务状态",
+                          "enum": [
+                            "QUEUED",
+                            "RUNNING",
+                            "SUCCEEDED",
+                            "EMPTY",
+                            "OVER_LIMIT",
+                            "FAILED"
+                          ]
+                        },
+                        "failureReason": {
+                          "type": "string",
+                          "description": "失败原因；仅 FAILED 状态非空",
+                          "enum": [
+                            "GENERATION",
+                            "UPLOAD",
+                            "RESTART",
+                            "TIMEOUT"
+                          ],
+                          "nullable": true
+                        },
+                        "createdAt": {
+                          "type": "integer",
+                          "description": "创建时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "updatedAt": {
+                          "type": "integer",
+                          "description": "更新时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "expiresAt": {
+                          "type": "integer",
+                          "description": "绝对过期时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "rowCount": {
+                          "type": "integer",
+                          "description": "导出行数；未完成或超过上限时为空",
+                          "format": "int32",
+                          "nullable": true
+                        },
+                        "fileName": {
+                          "type": "string",
+                          "description": "下载文件名；仅成功任务非空",
+                          "nullable": true
+                        },
+                        "downloadAvailable": {
+                          "type": "boolean",
+                          "description": "服务端确认对象完整且未过期时为 true"
+                        }
+                      },
+                      "description": "历史 CSV 导出任务"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "x-openapi-permission": "READ"
+      }
+    },
+    "/openapi/v1/mc-trade/trade/orders/history/export-tasks": {
+      "post": {
+        "summary": "创建订单历史 CSV 导出任务",
+        "deprecated": false,
+        "description": "",
+        "operationId": "create",
+        "tags": [
+          "订单历史 CSV 导出"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "clientRequestId",
+                  "from",
+                  "sort",
+                  "timeZone",
+                  "to",
+                  "type"
+                ],
+                "type": "object",
+                "properties": {
+                  "clientRequestId": {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string",
+                    "description": "客户端幂等请求标识，去除首尾空白后为 1 到 64 个可打印字符"
+                  },
+                  "sourceView": {
+                    "type": "string",
+                    "description": "来源列表：SPOT、CONTRACT、PORTFOLIO；旧调用可不传",
+                    "enum": [
+                      "SPOT",
+                      "CONTRACT",
+                      "PORTFOLIO"
+                    ],
+                    "nullable": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "账户数据类型：SPOT、CONTRACT 或 SPOT_CONTRACT",
+                    "enum": [
+                      "SPOT",
+                      "CONTRACT",
+                      "SPOT_CONTRACT"
+                    ]
+                  },
+                  "from": {
+                    "type": "integer",
+                    "description": "查询开始时间，Unix 秒，UTC epoch",
+                    "format": "int64"
+                  },
+                  "to": {
+                    "type": "integer",
+                    "description": "查询结束时间，Unix 秒，UTC epoch；必须不早于 from",
+                    "format": "int64"
+                  },
+                  "symbol": {
+                    "maxLength": 64,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "可选交易品种；空值表示全部品种"
+                  },
+                  "sort": {
+                    "type": "string",
+                    "description": "固定倒序规则；成交与订单使用各自的排序枚举",
+                    "enum": [
+                      "DEAL_TIME_DESC",
+                      "ORDER_TIME_DESC"
+                    ]
+                  },
+                  "language": {
+                    "type": "string",
+                    "description": "CSV 语言标签；别名、空值与未知标签由共享目录规范化"
+                  },
+                  "timeZone": {
+                    "type": "string",
+                    "description": "IANA 时区标识"
+                  },
+                  "direction": {
+                    "type": "string",
+                    "description": "ALL 全部、BUY 买、SELL 卖；缺省为 ALL",
+                    "enum": [
+                      "ALL",
+                      "BUY",
+                      "SELL"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "codeKey": {
+                      "type": "string",
+                      "enum": [
+                        "DEFAULT",
+                        "SIGN_ERROR",
+                        "NOT_EXIST",
+                        "ALREADY_EXIST",
+                        "REPEAT_OPERATION",
+                        "PARAM_ERROR",
+                        "PERMISSION_DENIED",
+                        "OPERATION_FAILED",
+                        "DATA_FORMAT_ERROR",
+                        "NETWORK_ERROR",
+                        "TIMEOUT_ERROR",
+                        "CONFIG_ERROR",
+                        "STATUS_ERROR",
+                        "VERSION_INCOMPATIBLE",
+                        "SERVICE_UNAVAILABLE",
+                        "DATA_INTEGRITY_ERROR",
+                        "CONCURRENT_CONFLICT",
+                        "RESOURCE_LOCKED",
+                        "QUOTA_EXCEEDED",
+                        "DEPENDENCY_ERROR",
+                        "BUSINESS_RULE_CONFLICT",
+                        "AUTH_CREDENTIAL_MISSING",
+                        "ROLE_PERMISSION_INVALID",
+                        "ROLE_ALREADY_EXIST",
+                        "ROLE_NOT_EXIST",
+                        "ROLE_ADMIN_CANNOT_MODIFY",
+                        "ROLE_ADMIN_CANNOT_DELETE",
+                        "BUSINESS_LINE_NAME_EXIST",
+                        "BUSINESS_LINE_NOT_EXIST",
+                        "BUSINESS_LINE_NOT_PERMITTED",
+                        "TRANSFER_FAILED",
+                        "TRANSFER_AMOUNT_INVALID",
+                        "TRANSFER_ACCOUNT_NOT_EXIST",
+                        "TRANSFER_ACCOUNT_FROZEN",
+                        "TRANSFER_LIMIT_EXCEEDED",
+                        "EXCHANGE_RATE_NOT_FOUND",
+                        "EXCHANGE_RATE_INVALID",
+                        "EXCHANGE_RATE_SERVICE_ERROR",
+                        "EXCHANGE_RATE_QUOTE_INVALID",
+                        "EXCHANGE_SYMBOL_ERROR",
+                        "ACCOUNT_NOT_EXIST",
+                        "ACCOUNT_FROZEN",
+                        "ACCOUNT_BALANCE_INSUFFICIENT",
+                        "ACCOUNT_OPERATION_FAILED",
+                        "ACCOUNT_PARAM_INVALID",
+                        "ACCOUNT_PASSWORD_INVALID",
+                        "ACCOUNT_TOKEN_GENERATE_FAILED",
+                        "NICKNAME_LENGTH_EXCEEDED",
+                        "TWO_FA_NOT_BOUND",
+                        "TWO_FA_ALREADY_BOUND",
+                        "TWO_FA_VERIFY_FAILED",
+                        "TWO_FA_CODE_INVALID",
+                        "TWO_FA_SESSION_EXPIRED",
+                        "TWO_FA_TYPE_NOT_SUPPORTED",
+                        "TWO_FA_ATTEMPT_TIMES_ABNORMAL",
+                        "TWO_FA_RESET_WITHIN_24H",
+                        "TWO_FA_ADDRESS_LOCK_PERIOD",
+                        "TWO_FA_FUND_PASSWORD_INVALID",
+                        "TWO_FA_TICKET_INVALID",
+                        "TWO_FA_TICKET_USER_MISMATCH",
+                        "TWO_FA_TICKET_SCENE_MISMATCH",
+                        "TWO_FA_CHALLENGE_METHOD_NOT_SUPPORTED",
+                        "TWO_FA_SEND_TOO_FREQUENT",
+                        "TWO_FA_SEND_DAILY_LIMIT_EXCEEDED",
+                        "TWO_FA_CODE_SEND_FAILED",
+                        "TWO_FA_FUND_PASSWORD_NOT_SET",
+                        "TWO_FA_FUND_PASSWORD_WRONG",
+                        "TWO_FA_FUND_PASSWORD_CONFIRM_MISMATCH",
+                        "TWO_FA_FUND_PASSWORD_ALREADY_SET",
+                        "SAFE_BOX_NOT_EXIST",
+                        "SAFE_BOX_LOCK_FAILED",
+                        "SAFE_BOX_BALANCE_INSUFFICIENT",
+                        "SAFE_BOX_DAILY_LIMIT_EXCEEDED",
+                        "SAFE_BOX_FREEZE_FAILED",
+                        "SAFE_BOX_UNFREEZE_FAILED",
+                        "SAFE_BOX_TRANSFER_IN_FAILED",
+                        "SAFE_BOX_TRANSFER_OUT_FAILED",
+                        "SAFE_BOX_PASSWORD_INVALID",
+                        "SAFE_BOX_OPERATION_FAILED",
+                        "WITHDRAWAL_AMOUNT_INVALID",
+                        "WITHDRAWAL_ADDRESS_INVALID",
+                        "WITHDRAWAL_WHITELIST_REQUIRED",
+                        "WITHDRAWAL_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_SERVICE_ERROR",
+                        "WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "WITHDRAWAL_RECHARGE_IN_24H_LIMIT",
+                        "WITHDRAWAL_PENDING_RECORD_EXISTS",
+                        "WITHDRAWAL_GET_ESTIMATE_FEE_FAILED",
+                        "WITHDRAWAL_TIMES_LIMIT_EXCEEDED",
+                        "WITHDRAWAL_PENDING_RECHARGE_EXISTS",
+                        "CURRENCY_NOT_EXIST",
+                        "CURRENCY_NOT_ENABLED",
+                        "CURRENCY_NETWORK_NOT_EXIST",
+                        "CURRENCY_BALANCE_INSUFFICIENT",
+                        "CURRENCY_ADDRESS_LIMIT_EXCEEDED",
+                        "CURRENCY_ADDRESS_EXIST",
+                        "CURRENCY_ADDRESS_LABEL_EXIST",
+                        "BLACKLIST_UID_REQUIRED",
+                        "BLACKLIST_WALLET_REQUIRED",
+                        "BLACKLIST_ALREADY_EXIST",
+                        "BLACKLIST_NOT_EXIST",
+                        "KYC_LEVEL_QUERY_FAILED",
+                        "KYC_CFG_ALREADY_EXIST",
+                        "KYC_LEVEL_INVALID",
+                        "KYC_USER_NOT_VERIFIED",
+                        "KYC_WITHDRAW_LEVEL_INSUFFICIENT",
+                        "KYC_RWA_DEAL_QUERY_FAILED",
+                        "KYC_L0_NOT_PASSED",
+                        "KYC_CERT_NO_DUPLICATE",
+                        "KYC_CERT_VALID_UNTIL_FORMAT_ERROR",
+                        "KYC_CERT_VALID_UNTIL_EXPIRED",
+                        "KYC_CERT_VALID_FROM_FORMAT_ERROR",
+                        "KYC_CERT_VALID_DATE_RANGE_ERROR",
+                        "KYC_CERT_PERMANENT_FLAG_INVALID",
+                        "KYC_FLOW_NOT_CONFIGURED",
+                        "KYC_FLOW_STEP_NOT_CONFIGURED",
+                        "KYC_FLOW_FIRST_STEP_LEVEL_MISSING",
+                        "KYC_APPLY_ALREADY_EXISTS",
+                        "KYC_APPLY_NOT_EXIST",
+                        "KYC_APPLY_DETAIL_NOT_EXIST",
+                        "KYC_APPLY_FLOW_NOT_EXIST",
+                        "KYC_SUB_FLOW_NOT_EXIST",
+                        "KYC_APPLY_STATUS_CANCELED",
+                        "KYC_APPLY_STATUS_PASSED",
+                        "KYC_APPLY_STATUS_SUBMITTED",
+                        "KYC_STEP_PREREQUISITE_NOT_MET",
+                        "KYC_AUDIT_LEVEL_NOT_L0",
+                        "KYC_AUDIT_STATUS_NOT_PENDING",
+                        "KYC_USER_INFO_NOT_EXIST",
+                        "KYC_NO_FIELD_TO_UPDATE",
+                        "KYC_WORK_ORDER_BUSINESS_LINE_MISMATCH",
+                        "KYC_AUDIT_NO_SUBMIT_DATA",
+                        "KYC_AUDIT_ALREADY_REJECTED",
+                        "KYC_AUDIT_NOT_PENDING_FOR_APPROVE",
+                        "KYC_AUDIT_FLOW_NOT_FOUND",
+                        "KYC_FLOW_CONFIG_NOT_EXIST",
+                        "KYC_STEP_CODE_NOT_FOUND",
+                        "KYC_STEP_LEVEL_NOT_CONFIGURED",
+                        "KYC_PROOF_REQUIRED",
+                        "KYC_IMAGE_OBJECT_KEY_INVALID",
+                        "KYC_IMAGE_ACCESS_DENIED",
+                        "KYC_PRESIGN_TYPE_INVALID",
+                        "KYC_QUOTA_INVALID",
+                        "KYC_ALL_BUSINESS_LINE_NOT_SUPPORTED",
+                        "KYC_BUSINESS_LINE_CONTEXT_MISSING",
+                        "KYC_SYNC_FUND_ACCOUNT_FAILED",
+                        "KYC_STATE_MACHINE_INIT_FAILED",
+                        "KYC_REJECT_NEED_APPLY_NO",
+                        "KYC_CFG_NOT_EXIST",
+                        "KYC_APPLY_NO_OR_UID_REQUIRED",
+                        "KYC_SUB_FLOW_NO_REQUIRED",
+                        "KYC_UID_REQUIRED",
+                        "KYC_BUSINESS_LINE_ID_REQUIRED",
+                        "KYC_REQUEST_BODY_REQUIRED",
+                        "KYC_USER_OR_BUSINESS_LINE_MISSING",
+                        "KYC_APPLY_NO_AND_SUB_FLOW_NO_REQUIRED",
+                        "KYC_OSS_NOT_ENABLED",
+                        "KYC_OSS_CLIENT_NOT_INITIALIZED",
+                        "KYC_OSS_CONFIG_MISSING",
+                        "KYC_USER_NOT_LOGGED_IN",
+                        "KYC_FACE_MIME_INVALID",
+                        "KYC_IMAGE_MIME_INVALID",
+                        "KYC_REQUIRED_FIELD_MISSING",
+                        "KYC_WITHDRAW_LARGE_NEED_L2_MANUAL",
+                        "KYC_AUDIT_COMMENT_REQUIRED",
+                        "KYC_AUDIT_REJECT_LEVEL_EXCEEDED",
+                        "ASSET_ACCOUNT_NOT_EXIST",
+                        "ASSET_LOCK_FAILED",
+                        "ASSET_NOT_EXIST",
+                        "ASSET_ADD_FAILED",
+                        "ASSET_UNFREEZE_FAILED",
+                        "ASSET_CREATE_LOCK_FAILED",
+                        "ASSET_CREATE_FAILED",
+                        "ASSET_BALANCE_INSUFFICIENT",
+                        "ASSET_FROZEN_AMOUNT_INSUFFICIENT",
+                        "ASSET_FREEZE_FAILED",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_EXCEEDED",
+                        "ASSET_FUND_POOL_MIN_AMOUNT_ERROR",
+                        "ASSET_FUND_POOL_MAX_AMOUNT_ERROR",
+                        "ASSET_WITHDRAWAL_MIN_AMOUNT_LIMIT_ERROR",
+                        "FUND_ACCOUNT_NOT_EXIST",
+                        "FUND_ACCOUNT_ALREADY_EXIST",
+                        "FUND_ACCOUNT_CREATE_FAILED",
+                        "FUND_ACCOUNT_UPDATE_FAILED",
+                        "FUND_ACCOUNT_DELETE_FAILED",
+                        "FUND_ACCOUNT_PARAM_INVALID",
+                        "FUND_ACCOUNT_LOCK_FAILED",
+                        "FUND_ACCOUNT_SAFE_BOX_PWD_UPDATE_FAILED",
+                        "FUND_ACCOUNT_MOBILE_COUNTRY_CODE_REQUIRED",
+                        "FUND_ACCOUNT_CONTACT_REQUIRED",
+                        "FUND_ACCOUNT_MOBILE_ALREADY_USED",
+                        "FUND_ACCOUNT_EMAIL_ALREADY_USED",
+                        "TRANSACTION_RECORD_NOT_EXIST",
+                        "TRANSACTION_FORBIDDEN",
+                        "TRANSACTION_IN_PROGRESS",
+                        "TRANSACTION_AMOUNT_TOO_LOW",
+                        "TRANSACTION_REQUEST_FREQUENTLY",
+                        "TRANSACTION_BALANCE_INSUFFICIENT",
+                        "WEBHOOK_SIGNATURE_INVALID",
+                        "WEBHOOK_EVENT_TYPE_INVALID",
+                        "WEBHOOK_PAYLOAD_INVALID",
+                        "WEBHOOK_DEPOSIT_DETAIL_INVALID",
+                        "WEBHOOK_DEPOSIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_NOT_EXIST",
+                        "WITHDRAWAL_AUDIT_ALREADY_PROCESSED",
+                        "WITHDRAWAL_AUDIT_CREATE_FAILED",
+                        "WITHDRAWAL_AUDIT_UPDATE_FAILED",
+                        "WITHDRAWAL_AUDIT_DELETE_FAILED",
+                        "WITHDRAWAL_AUDIT_PARAM_INVALID",
+                        "WITHDRAWAL_AUDIT_RISK_LEVEL_INVALID",
+                        "WITHDRAWAL_AUDIT_STATUS_INVALID",
+                        "WITHDRAWAL_AUDIT_REJECT_ERROR",
+                        "WITHDRAWAL_AUDIT_PENDING_RECORD_EXISTS_ERROR",
+                        "WITHDRAW_LOCK_PERIOD_ERROR",
+                        "PAYMENT_OPERATION_FAILED",
+                        "MT_GROUP_NOT_FOUND",
+                        "MT_MEM",
+                        "MT_DEALER_SEND",
+                        "MT_SYMBOL_NOT_SUPPORT_DEPOSIT",
+                        "MT_POSITION_GET_BY_LOGIN",
+                        "MT_POSITION_VOLUME_NOT_ENOUGH",
+                        "MT_DEDUCT_COLLATERAL_FAILED",
+                        "MT_DEALER_RESULT_FAILED",
+                        "MT_INPUT_SERIALIZE_FAILED",
+                        "MT_AMOUNT_DECIMAL",
+                        "MT_MTRISK_NOT_FOUND",
+                        "PROOF_FUND_ALREADY_EXIST",
+                        "PROOF_FUND_NOT_EXIST",
+                        "PROOF_FUND_PLATFORM_ASSETS_NOT_COVER_USER_ASSETS",
+                        "USER_WALLET_CONFIG_ALREADY_EXIST",
+                        "USER_WALLET_CONFIG_DELETE_FAILED",
+                        "BACK_OFFICE_CONFIG_INVALID_SYMBOL",
+                        "BACK_OFFICE_CHAIN_CONFIG_ALREADY_EXIST",
+                        "MLP_CONFIG_NOT_FOUND",
+                        "MLP_INTEGRAL_TIER_CONFIG_DUPLICATE",
+                        "MLP_INTEGRAL_TIER_CONFIG_EMPTY",
+                        "MLP_INTEGRAL_TIER_CONFIG_INVALID",
+                        "MLP_INTEGRAL_TIER_CONFIG_FORMAT_ERROR",
+                        "TICKET_NOT_EXIST",
+                        "TICKET_PENDING_EXISTS",
+                        "TICKET_CLOSED_CANNOT_SEND",
+                        "TICKET_EVALUATE_FAILED",
+                        "TICKET_STATUS_INVALID",
+                        "POINTS_CLAIM_WINDOW_CLOSED",
+                        "POINTS_PENDING_NOT_FOUND",
+                        "POINTS_CLAIM_FORBIDDEN",
+                        "POINTS_BALANCE_INSUFFICIENT",
+                        "POINTS_VALIDITY_DAYS_INVALID",
+                        "POINTS_INDICATOR_DUPLICATE",
+                        "POINTS_INDICATOR_NOT_ALLOWED_FOR_LEVEL",
+                        "POINTS_BUSINESS_LINE_REQUIRED",
+                        "POINTS_RANK_PERIOD_INVALID",
+                        "USER_VAULT_NOT_FOUND",
+                        "USER_VAULT_STATUS_INVALID",
+                        "USER_VAULT_NOT_OWNER",
+                        "USER_VAULT_NAV_NOT_PUBLISHED",
+                        "USER_VAULT_CONTRACT_POOL_INSUFFICIENT",
+                        "USER_VAULT_TRANSFER_TO_PERSONAL_FORBIDDEN",
+                        "USER_VAULT_FROZEN",
+                        "USER_VAULT_ALREADY_EXISTS",
+                        "USER_VAULT_SEED_INVALID",
+                        "USER_VAULT_SEED_TRANSFER_FAILED",
+                        "USER_VAULT_FEE_INVALID",
+                        "USER_VAULT_HOLDING_INSUFFICIENT",
+                        "USER_VAULT_AUM_CAP_EXCEEDED",
+                        "USER_VAULT_OPEN_POSITION_EXISTS",
+                        "USER_VAULT_SUBSCRIBE_EXCEEDS_POOL_CAP",
+                        "USER_VAULT_MANAGER_DILUTION_TOO_LOW",
+                        "USER_VAULT_MANAGER_REDEEM_FORBIDDEN",
+                        "USER_VAULT_MANAGER_SUBSCRIBE_FORBIDDEN",
+                        "USER_VAULT_CAPITAL_INJECTION_FAILED",
+                        "FINANCE_COUPON_QUOTE_UNAVAILABLE",
+                        "ORDER_OPERATION_FAILED",
+                        "ORDER_SELL_NOT_SUPPORTED",
+                        "TP_SL_NOT_SUPPORTED",
+                        "SYMBOL_NOT_EXIST",
+                        "ORDER_VALUE_VOLUME_LIMIT_ERROR",
+                        "SYMBOL_NOT_SUPPORTED_ERROR",
+                        "SLIPPAGE_PARAM_ERROR",
+                        "SLIPPAGE_ESTIMATE_ERROR",
+                        "COMMON_ERROR",
+                        "COMMON_PARAMS_ERROR",
+                        "COMMON_MEM_ERROR",
+                        "ORDER_REQUEST_REJECT",
+                        "ORDER_REQUEST_CANCEL",
+                        "ORDER_REQUEST_PLACED",
+                        "ORDER_REQUEST_DONE",
+                        "ORDER_REQUEST_ERROR",
+                        "ORDER_REQUEST_TIMEOUT",
+                        "ORDER_REQUEST_INVALID",
+                        "ORDER_REQUEST_INVALID_VOLUME",
+                        "ORDER_REQUEST_INVALID_PRICE",
+                        "ORDER_REQUEST_INVALID_STOPS",
+                        "ORDER_REQUEST_TRADE_DISABLED",
+                        "ORDER_REQUEST_MARKET_CLOSED",
+                        "ORDER_REQUEST_NO_MONEY",
+                        "ORDER_REQUEST_TOO_MANY",
+                        "ORDER_REQUEST_INVALID_ORDER",
+                        "COMMON_OK",
+                        "ORDER_REQUEST_PRICE_OFF",
+                        "POSITION_OBTAIN_ERROR",
+                        "POSITION_VALUE_LIMIT_EXCEEDED",
+                        "POSITION_MARGIN_INSUFFICIENT",
+                        "PLATFORM_POSITION_VALUE_LIMIT_EXCEEDED",
+                        "TEMPLATE_RICH_TEXT_ILLEGAL_TAG",
+                        "FATIGUE_LIMIT",
+                        "TEMPLATE_DISABLED",
+                        "CHANNEL_NOT_SUPPORT",
+                        "TEMPLATE_PARAM_MISMATCH",
+                        "TEMPLATE_CONTENT_NOT_FOUND",
+                        "TEMPLATE_CONTENT_INCONSISTENT",
+                        "PREFERENCE_LIMIT",
+                        "BUSINESS_CONFLICT",
+                        "UNSUBSCRIBE_TOKEN_INVALID",
+                        "UNSUBSCRIBE_TOKEN_EXPIRED",
+                        "UNSUBSCRIBE_ACCOUNT_NOT_FOUND",
+                        "UNSUBSCRIBE_TEMPORARILY_UNAVAILABLE",
+                        "USER_NOT_FOUND",
+                        "USERNAME_EXISTS",
+                        "EMAIL_EXISTS",
+                        "PASSWORD_ERROR",
+                        "USER_DATA_VALIDATION_FAILED",
+                        "USER_BATCH_OPERATION_FAILED",
+                        "OLD_PASSWORD_SAME",
+                        "NEW_PASSWORD_NOT_MATCH",
+                        "ACCOUNT_TIER_OPERATION_FAILED",
+                        "BUSINESS_LINE_NOT_FOUND",
+                        "BUSINESS_LINE_NAME_EXISTS",
+                        "BUSINESS_LINE_SAVE_FAILED",
+                        "BUSINESS_LINE_UPDATE_FAILED",
+                        "BUSINESS_LINE_DELETE_FAILED",
+                        "BUSINESS_LINE_EMAIL_EXISTS",
+                        "BUSINESS_LINE_STATUS_ERROR",
+                        "BUSINESS_LINE_EXIST_BINDING_USER_DELETE_FAILED",
+                        "BUSINESS_TYPE_EXCEPTION",
+                        "BUSINESS_TYPE_INVALID",
+                        "ROLE_NOT_FOUND",
+                        "ROLE_CODE_EXISTS",
+                        "ROLE_ADMIN_OPERATION_DENIED",
+                        "ROLE_STATUS_ERROR",
+                        "ROLE_BATCH_OPERATION_FAILED",
+                        "PERMISSION_NOT_FOUND",
+                        "PERMISSION_CODE_EXISTS",
+                        "PERMISSION_IN_USE",
+                        "PERMISSION_HAS_CHILDREN",
+                        "PERMISSION_CIRCULAR_REFERENCE",
+                        "SYMBOL_STATUS_CLOSED",
+                        "SYMBOL_SOURCE_DISABLED",
+                        "SYMBOL_SOURCE_SYMBOL_DISABLED",
+                        "SYMBOL_SOURCE_NAME_EXISTS",
+                        "TRADE_SYMBOL_NAME_EXISTS",
+                        "TRADE_SYMBOL_SUB_TYPE_NAME_EXISTS",
+                        "TRADE_SYMBOL_SYMBOL_IDS_NOT_EMPTY",
+                        "TRADE_SYMBOL_CONTRACT_UNIT_NULL",
+                        "TRADE_SYMBOL_BOOK_NULL",
+                        "TRADE_SYMBOL_MASTER_SOURCE_NUM_ERROR",
+                        "TRADE_SYMBOL_CURRENCY_NOT_EXIST",
+                        "TRADE_SYMBOL_UPSTREAM_SYMBOL_NAME_EXISTS",
+                        "ALARM_NOTIFICATION_TYPE_INVALID",
+                        "RULE_MAPPING_NOT_CONFIGURED",
+                        "RULE_MAPPING_MIDDLE_PRICE_DIFFERENCE_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_GET_FAILED",
+                        "KLINE_DATA_SOURCE_REQUEST_TOO_LARGE",
+                        "KLINE_DATA_SOURCE_SYNC_MT5_FAILED",
+                        "PROMOTION_PARAM_ERROR",
+                        "PROMOTION_CAMPAIGN_NOT_FOUND",
+                        "PROMOTION_CAMPAIGN_OFFLINE",
+                        "PROMOTION_CAMPAIGN_NOT_STARTED",
+                        "PROMOTION_CAMPAIGN_ENDED",
+                        "PROMOTION_USER_SCOPE_MISMATCH",
+                        "PROMOTION_USER_NOT_ENROLLED",
+                        "PROMOTION_TASK_NOT_FOUND",
+                        "PROMOTION_TASK_NOT_CLAIMABLE",
+                        "PROMOTION_BLIND_BOX_NOT_UNLOCKED",
+                        "PROMOTION_BLIND_BOX_NO_DRAWS_LEFT",
+                        "PROMOTION_BLIND_BOX_NOT_CONFIGURED",
+                        "PROMOTION_BLIND_BOX_TIER_NOT_CONFIGURED",
+                        "PROMOTION_LOTTERY_NO_AVAILABLE_TIER",
+                        "PROMOTION_IDEMPOTENCY_KEY_REQUIRED",
+                        "PROMOTION_SCHEME_INVENTORY_INSUFFICIENT",
+                        "PROMOTION_POOL_SUMMARY_FROZEN",
+                        "PROMOTION_DISPATCH_DUPLICATE_PENDING",
+                        "PROMOTION_WEALTH_PRODUCT_INVALID",
+                        "PROMOTION_RELEASE_SYMBOL_INVALID",
+                        "PROMOTION_TRADE_SYMBOL_INVALID",
+                        "PROMOTION_INTEREST_COUPON_NOT_USABLE",
+                        "PROMOTION_INTEREST_COUPON_ALREADY_BOUND",
+                        "PROMOTION_SCHEME_BUDGET_RESERVED_CONFLICT",
+                        "PROMOTION_SCHEME_BUDGET_BELOW_COMMITTED",
+                        "REWARD_VAULT_PARAM_ERROR",
+                        "REWARD_VAULT_IDEMPOTENCY_KEY_REQUIRED",
+                        "REWARD_VAULT_POCKET_INVALID",
+                        "REWARD_VAULT_REWARD_IN_USE",
+                        "REWARD_VAULT_PERIOD_NOT_FOUND",
+                        "REWARD_VAULT_CLAIM_NOT_AVAILABLE",
+                        "REWARD_VAULT_PERIOD_SETTLED",
+                        "REWARD_VAULT_ONLINE_CONFLICT",
+                        "RISK_CONFIG_API_DEPRECATED",
+                        "CONFIG_APPROVAL_NO_CHANGE",
+                        "CONFIG_APPROVAL_IN_PROGRESS",
+                        "CONFIG_APPROVAL_CHECKER_UNAVAILABLE",
+                        "CONFIG_APPROVAL_CHECKER_QUERY_FAILED",
+                        "CONFIG_APPROVAL_SELF_APPROVAL_FORBIDDEN",
+                        "CONFIG_APPROVAL_IDEMPOTENCY_CONFLICT",
+                        "CONFIG_APPROVAL_REQUEST_PROCESSING",
+                        "CONFIG_APPROVAL_STATE_INVALID",
+                        "DUPLICATE_IMPORT_ROW",
+                        "ROBOT_TAG_SNAPSHOT_CHANGED",
+                        "ROBOT_TAG_SNAPSHOT_CAPACITY_EXCEEDED",
+                        "ROBOT_TAG_SNAPSHOT_UNAVAILABLE",
+                        "ROBOT_TAG_SNAPSHOT_INVALID",
+                        "ROBOT_TAG_SELECTOR_CONFIG_INVALID",
+                        "EXPORT_INVALID_FILTER",
+                        "EXPORT_ACTIVE_LIMIT_EXCEEDED",
+                        "EXPORT_BUSY",
+                        "EXPORT_TASK_UNAVAILABLE",
+                        "EXPORT_TASK_NOT_READY",
+                        "EXPORT_ROUTE_VERSION_MISMATCH",
+                        "EXPORT_PERMISSION_DENIED",
+                        "EXPORT_DISPATCH_REJECTED",
+                        "EXPORT_BUSINESS_TYPE_UNSUPPORTED",
+                        "EXPORT_IDEMPOTENCY_CONFLICT",
+                        "EXPORT_ACTIVE_CONFLICT",
+                        "EXPORT_CREATE_UNAVAILABLE",
+                        "EXPORT_FILE_EXPIRED",
+                        "DOWNLOAD_TICKET_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_UNAVAILABLE",
+                        "EXPORT_CAPABILITY_STALE",
+                        "EXPORT_HISTORY_EXPIRED",
+                        "FIAT_RAMP_REGION_REQUIRED",
+                        "FIAT_RAMP_DEPENDENCY_UNAVAILABLE",
+                        "FIAT_RAMP_SELECTION_CONFLICT",
+                        "FIAT_RAMP_QUOTE_EXPIRED",
+                        "FIAT_RAMP_CHANNEL_UNAVAILABLE",
+                        "FIAT_RAMP_LAUNCH_FAILED"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "properties": {}
+                    },
+                    "localizedMessage": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "taskId": {
+                          "type": "string",
+                          "description": "任务的不透明唯一标识"
+                        },
+                        "dataset": {
+                          "type": "string",
+                          "description": "任务数据集",
+                          "enum": [
+                            "DEAL_HISTORY",
+                            "ORDER_HISTORY",
+                            "FUNDING_FEE_HISTORY",
+                            "POSITION_CURRENT",
+                            "ORDER_CURRENT"
+                          ]
+                        },
+                        "language": {
+                          "type": "string",
+                          "description": "创建时冻结的规范语言码"
+                        },
+                        "sourceView": {
+                          "type": "string",
+                          "description": "原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空",
+                          "enum": [
+                            "SPOT",
+                            "CONTRACT",
+                            "PORTFOLIO"
+                          ],
+                          "nullable": true
+                        },
+                        "retryOfTaskId": {
+                          "type": "string",
+                          "description": "当前列表重试关联的原任务；非重试为空",
+                          "nullable": true
+                        },
+                        "retryContext": {
+                          "type": "object",
+                          "properties": {
+                            "originalTaskId": {
+                              "type": "string",
+                              "description": "原失败任务标识"
+                            },
+                            "createRequest": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "object",
+                                "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键"
+                              },
+                              "description": "原公开创建参数；不含 owner、内部账户集合或旧幂等键",
+                              "properties": {}
+                            }
+                          },
+                          "description": "失败任务的安全重试条件；客户端必须生成新的 clientRequestId",
+                          "nullable": true
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "任务状态",
+                          "enum": [
+                            "QUEUED",
+                            "RUNNING",
+                            "SUCCEEDED",
+                            "EMPTY",
+                            "OVER_LIMIT",
+                            "FAILED"
+                          ]
+                        },
+                        "failureReason": {
+                          "type": "string",
+                          "description": "失败原因；仅 FAILED 状态非空",
+                          "enum": [
+                            "GENERATION",
+                            "UPLOAD",
+                            "RESTART",
+                            "TIMEOUT"
+                          ],
+                          "nullable": true
+                        },
+                        "createdAt": {
+                          "type": "integer",
+                          "description": "创建时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "updatedAt": {
+                          "type": "integer",
+                          "description": "更新时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "expiresAt": {
+                          "type": "integer",
+                          "description": "绝对过期时间，Unix 毫秒，UTC epoch",
+                          "format": "int64"
+                        },
+                        "rowCount": {
+                          "type": "integer",
+                          "description": "导出行数；未完成或超过上限时为空",
+                          "format": "int32",
+                          "nullable": true
+                        },
+                        "fileName": {
+                          "type": "string",
+                          "description": "下载文件名；仅成功任务非空",
+                          "nullable": true
+                        },
+                        "downloadAvailable": {
+                          "type": "boolean",
+                          "description": "服务端确认对象完整且未过期时为 true"
+                        }
+                      },
+                      "description": "历史 CSV 导出任务"
+                    },
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "x-openapi-permission": "READ"
       }
     }
   },

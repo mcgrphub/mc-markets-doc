@@ -67,6 +67,7 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 | nextSettlementTime | integer | Next settlement time Unix timestamp |
 | timestamp | integer | Funding rate generation time Unix timestamp |
 | settlementCycle | integer | Settlement cycle (unit: seconds) |
+| businessLineId | integer | Business line ID |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/funding-rate" \

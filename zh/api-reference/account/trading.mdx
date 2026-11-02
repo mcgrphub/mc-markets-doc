@@ -81,6 +81,10 @@ description: "交易相关 OpenAPI 接口。"
 | payerUid | string | RECHARGE 用户间划转时有值 |
 | finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
 | createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用既有错误键，未知码为空 |
+| hourBucketSeconds | integer | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
+| hourlyRate | number | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
+| basisBalance | number | 负结余利息计息基数，结算币种单位；其它类型为空 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/TXN-20260827-0001" \
@@ -177,6 +181,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | payerUid | string | RECHARGE 用户间划转时有值 |
 | finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
 | createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用既有错误键，未知码为空 |
+| hourBucketSeconds | integer | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
+| hourlyRate | number | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
+| basisBalance | number | 负结余利息计息基数，结算币种单位；其它类型为空 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/page" \
@@ -316,6 +324,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | payerUid | string | RECHARGE 用户间划转时有值 |
 | finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
 | createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
+| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用既有错误键，未知码为空 |
+| hourBucketSeconds | integer | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
+| hourlyRate | number | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
+| basisBalance | number | 负结余利息计息基数，结算币种单位；其它类型为空 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/account/record/page" \

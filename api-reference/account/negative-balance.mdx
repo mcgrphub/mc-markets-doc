@@ -1,0 +1,48 @@
+---
+title: "Negative balance accounts"
+sidebarTitle: "Negative balance accounts"
+description: "Public OpenAPI endpoints for negative balance accounts."
+---
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-account/negative-balance/accounts | READ | List your negative balance accounts |
+
+<Note>
+Sign authenticated requests with AK/SK as described in [Authentication](/authentication). Public endpoints require no signature. See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## List your negative balance accounts
+
+`GET /openapi/v1/mc-account/negative-balance/accounts` — permission `READ`.
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| accounts | array | Negative balance accounts; empty only after a complete query confirms all balances are non-negative |
+| snapshotAtMs | integer | Authoritative snapshot time in Unix milliseconds (UTC) |
+
+`accounts[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| accountId | string | Your contract account identifier |
+| asset | string | Settlement currency |
+| balance | string | Authoritative negative balance as a decimal string |
+| amountToCover | string | Positive amount required to cover the deficit; rounded up to 6 decimal places for USDC and 8 for other currencies |
+| hourlyRate | string | Applicable hourly rate as a percentage string, with at most 6 decimal places |
+| eventId | string | Optional verified period identifier; omitted when unverified |
+| negativeSinceMs | integer | Optional verified period start in Unix milliseconds (UTC); omitted when unverified |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/negative-balance/accounts" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

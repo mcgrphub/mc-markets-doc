@@ -20,6 +20,13 @@ description: "金库账户相关 OpenAPI 接口。"
 | GET | /openapi/v1/mc-account/mlp/core/stats | READ | 获取金库账户统计信息 |
 | GET | /openapi/v1/mc-account/mlp/apr-data | READ | 获取金库账户 APR 数据 |
 | GET | /openapi/v1/mc-account/mlp/account/assets | READ | 查询金库账户资产详情 |
+| GET | /openapi/v1/mc-account/mlp/deposits | READ | 本人金库存款记录 |
+| GET | /openapi/v1/mc-account/mlp/deposits/export | READ | 导出本人金库存款CSV |
+| GET | /openapi/v1/mc-account/mlp/overview | 公开访问 | 金库完整概览 |
+| GET | /openapi/v1/mc-account/mlp/settlements | READ | 本人金库收益结算记录 |
+| GET | /openapi/v1/mc-account/mlp/settlements/export | READ | 导出本人金库收益CSV |
+| GET | /openapi/v1/mc-account/mlp/withdrawals | READ | 本人金库提款记录 |
+| GET | /openapi/v1/mc-account/mlp/withdrawals/export | READ | 导出本人金库提款CSV |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -341,6 +348,306 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 本人金库存款记录
+
+`GET /openapi/v1/mc-account/mlp/deposits` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| current | integer | 否 | 页码，默认1; 最小值: 1 |
+| size | integer | 否 | 页大小，1到100，默认20; 最小值: 1; 最大值: 100 |
+| symbolId | string | 否 | 当前配置币种ID，可空 |
+| fromMs | integer | 否 | 包含的开始时间，UTC epoch毫秒，可空; 最小值: 0 |
+| toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
+| orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array | 当前页记录 |
+| current | integer | 页码 |
+| size | integer | 页大小 |
+| total | integer | 过滤后的总条数 |
+| asOfMs | integer | 本次读取时间，UTC epoch毫秒 |
+
+`records[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| recordKey | string | 内部本金记录标识 |
+| symbolId | string | 币种ID |
+| symbol | string | 原币符号 |
+| unlockAtMs | integer | 解锁时间，UTC epoch毫秒 |
+| lockedPrincipal | string | 锁定本金，原币 |
+| withdrawablePrincipal | string | 未占用到期本金，原币 |
+| remainingPrincipal | string | 未成功取出本金，原币 |
+| withdrawnPrincipal | string | 成功取出本金，原币 |
+| status | string | LOCKED或UNLOCKED |
+| isLegacy | boolean | 存量本金投影 |
+| depositId | string | 原交易编号，无法还原为null |
+| depositedAmount | string | 原成功存入数量，未知为null |
+| depositedAtMs | integer | 成功存入时间，UTC epoch毫秒，未知为null |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 导出本人金库存款CSV
+
+`GET /openapi/v1/mc-account/mlp/deposits/export` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| current | integer | 否 | 页码，默认1; 最小值: 1 |
+| size | integer | 否 | 页大小，1到100，默认20; 最小值: 1; 最大值: 100 |
+| symbolId | string | 否 | 当前配置币种ID，可空 |
+| fromMs | integer | 否 | 包含的开始时间，UTC epoch毫秒，可空; 最小值: 0 |
+| toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
+| orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
+
+### 响应
+
+HTTP `200`，`Content-Type: text/csv; charset=utf-8`；通过 `Content-Disposition` 提供文件名。直接返回 CSV 文件，不含 JSON `data`。
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits/export" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 金库完整概览
+
+`GET /openapi/v1/mc-account/mlp/overview` — 权限 `公开访问`.
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| asOfMs | integer | asOfMs，UTC epoch毫秒 |
+| valuationAtMs | integer | valuationAtMs，UTC epoch毫秒 |
+| viewVersion | string | viewVersion |
+| config | object | 金库Config，数量为原币，Usdc后缀为USDC价值 |
+| platform | object | 金库Platform，数量为原币，Usdc后缀为USDC价值 |
+| account | object | 负结余账户展示项 |
+
+`config` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| annualYieldRatePct | string | annualYieldRatePct，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| lockPeriodDays | integer | lockPeriodDays |
+| singleUserDepositLimitUsdc | string | singleUserDepositLimitUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| tvlBaseAmountUsdc | string | tvlBaseAmountUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| tiers | array | tiers |
+
+`config.tiers[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| minPoints | integer | minPoints |
+| depositLimitRatioPct | string | depositLimitRatioPct，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+
+`platform` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| cumulativeDepositUsdc | string | cumulativeDepositUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| yesterdaySettledYieldUsdc | string | yesterdaySettledYieldUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| nextSettlementCutoffMs | integer | nextSettlementCutoffMs，UTC epoch毫秒 |
+
+`account` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| accountId | string | 本人合约账户ID |
+| asset | string | 结算币种 |
+| balance | string | 负数权威余额十进制字符串 |
+| amountToCover | string | 需补足的正数金额，USDC6位/其它币种8位向上取整 |
+| hourlyRate | string | 当前小时适用利率百分数字符串，最多6位小数 |
+| eventId | string | 可选已核实周期标识，未核实时不返回 |
+| negativeSinceMs | integer | 可选已核实周期开始，Unix毫秒UTC；未核实时不返回 |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/overview"
+```
+
+---
+
+## 本人金库收益结算记录
+
+`GET /openapi/v1/mc-account/mlp/settlements` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| current | integer | 否 | 页码，默认1; 最小值: 1 |
+| size | integer | 否 | 页大小，1到100，默认20; 最小值: 1; 最大值: 100 |
+| symbolId | string | 否 | 当前配置币种ID，可空 |
+| fromMs | integer | 否 | 包含的开始时间，UTC epoch毫秒，可空; 最小值: 0 |
+| toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
+| orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array | 当前页记录 |
+| current | integer | 页码 |
+| size | integer | 页大小 |
+| total | integer | 过滤后的总条数 |
+| asOfMs | integer | 本次读取时间，UTC epoch毫秒 |
+
+`records[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| recordKey | string | 快照标识 |
+| settlementId | string | 唯一结算编号 |
+| symbolId | string | 本金币种ID |
+| symbol | string | 本金原币 |
+| principalAmount | string | 固定计息本金，原币 |
+| annualYieldRatePct | string | 固定年化百分比 |
+| fxRateUsdc | string | 原始正汇率，1原币对应USDC |
+| settledYieldUsdc | string | 本笔入账收益USDC，最终向下6位 |
+| settlementCutoffMs | integer | 业务截止，UTC epoch毫秒 |
+| creditedAtMs | integer | 实际入账，UTC epoch毫秒 |
+| depositId | string | 原存款编号，未知为null |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 导出本人金库收益CSV
+
+`GET /openapi/v1/mc-account/mlp/settlements/export` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| current | integer | 否 | 页码，默认1; 最小值: 1 |
+| size | integer | 否 | 页大小，1到100，默认20; 最小值: 1; 最大值: 100 |
+| symbolId | string | 否 | 当前配置币种ID，可空 |
+| fromMs | integer | 否 | 包含的开始时间，UTC epoch毫秒，可空; 最小值: 0 |
+| toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
+| orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
+
+### 响应
+
+HTTP `200`，`Content-Type: text/csv; charset=utf-8`；通过 `Content-Disposition` 提供文件名。直接返回 CSV 文件，不含 JSON `data`。
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements/export" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 本人金库提款记录
+
+`GET /openapi/v1/mc-account/mlp/withdrawals` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| current | integer | 否 | 页码，默认1; 最小值: 1 |
+| size | integer | 否 | 页大小，1到100，默认20; 最小值: 1; 最大值: 100 |
+| symbolId | string | 否 | 当前配置币种ID，可空 |
+| fromMs | integer | 否 | 包含的开始时间，UTC epoch毫秒，可空; 最小值: 0 |
+| toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
+| orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| records | array | 当前页记录 |
+| current | integer | 页码 |
+| size | integer | 页大小 |
+| total | integer | 过滤后的总条数 |
+| asOfMs | integer | 本次读取时间，UTC epoch毫秒 |
+
+`records[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| recordKey | string | 请求标识 |
+| withdrawalId | string | 原提款交易编号 |
+| symbolId | string | 币种ID |
+| symbol | string | 原币符号 |
+| status | string | 原交易状态INIT/PROCESSING/SUCCESS/FAILED/CANCELLED |
+| initiatedAtMs | integer | 发起时间，UTC epoch毫秒 |
+| availableBefore | string | 成功提款前可提原币，未成功为null |
+| withdrawnPrincipal | string | 成功提款本金，原币，未成功为null |
+| withdrawnYield | string | 成功提款USDC收益，未成功为null |
+| remainingPrincipal | string | 成功后剩余原币本金，未成功为null |
+| remainingYield | string | 成功后剩余USDC收益，未成功为null |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 导出本人金库提款CSV
+
+`GET /openapi/v1/mc-account/mlp/withdrawals/export` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| current | integer | 否 | 页码，默认1; 最小值: 1 |
+| size | integer | 否 | 页大小，1到100，默认20; 最小值: 1; 最大值: 100 |
+| symbolId | string | 否 | 当前配置币种ID，可空 |
+| fromMs | integer | 否 | 包含的开始时间，UTC epoch毫秒，可空; 最小值: 0 |
+| toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
+| orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
+
+### 响应
+
+HTTP `200`，`Content-Type: text/csv; charset=utf-8`；通过 `Content-Disposition` 提供文件名。直接返回 CSV 文件，不含 JSON `data`。
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals/export" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \

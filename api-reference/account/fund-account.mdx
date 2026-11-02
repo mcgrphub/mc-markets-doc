@@ -103,9 +103,9 @@ Query spot account positions.
 | volumeExt | number | Actual Position Quantity |
 | openPrice | number | Current Price |
 | freeAmount | number | Available (excluding portion locked by pending orders). This field is non-zero only for USDC |
+| volumeExtDec | number | Actual position volume (readable value after volumeExt precision conversion) |
 | volumeDisplay | string | Total balance display value |
 | volumeScale | integer | Total balance display precision |
-| volumeExtDec | number | Actual position volume (readable value after volumeExt precision conversion) |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \

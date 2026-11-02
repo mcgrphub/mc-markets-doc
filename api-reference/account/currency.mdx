@@ -45,6 +45,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | iconData | string | Network Protocol Icon |
 | depositStatus | integer | Whether deposit is available, [0: No, 1: Yes] |
 | withdrawalStatus | integer | Whether withdrawal is available, [0: No, 1: Yes] |
+| subscriptionCurrencyPair | string | Subscribed market-data pair, such as ETHUSD.c; null without a subscription |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
@@ -115,6 +116,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 | iconData | string | Network Protocol Icon |
 | depositStatus | integer | Whether deposit is available, [0: No, 1: Yes] |
 | withdrawalStatus | integer | Whether withdrawal is available, [0: No, 1: Yes] |
+| subscriptionCurrencyPair | string | Subscribed market-data pair, such as ETHUSD.c; null without a subscription |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/detail/1" \

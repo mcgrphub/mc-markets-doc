@@ -266,6 +266,26 @@ curl -sS -G "https://gateway.mcconnects.com${PATH_}" \
 | couponQuoteUsdcPerProduct | number | 锁定时产品币兑 USDC |
 | couponQuoteTimeMs | integer | 报价时刻毫秒 |
 | pauseRedeem | boolean | 是否暂停赎回 |
+| subOrders | array | 活期子申购列表；定期为 null。子行待提利息为对应持仓的可提利息，父行 currentRewardAmount/positionAmount 为子行累加 |
+
+`records[].subOrders[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| positionId | integer | 持仓明细ID |
+| currency | string | 资产币种 |
+| type | string | 类型：活期 / 定期；可选值：`CURRENT`、`FIXED` |
+| positionAmount | number | 本笔订单本金；不含未结利息与冻结 |
+| currentRewardAmount | number | 本笔待提利息 |
+| couponNominalAnnualRate | number | 加息券年化%；无券时为 null |
+| couponBoostAmountUsdc | number | 加息金额 USDC；无券时为 null |
+| endTime | string | 到期时间；活期为 null |
+| status | string | 持仓状态：持有中 / 已到期；可选值：`HOLDING`、`REDEEMED`、`EXPIRED` |
+| currentRewardAmountDisplay | string | 待提利息展示值 |
+| couponNominalAnnualRateDisplay | string | 加息券年化展示值 |
+| couponBoostAmountUsdcDisplay | string | 加息金额 USDC 展示值 |
+| endTimeTimestamp | integer | 到期时间毫秒时间戳 |
+| positionAmountDisplay | string | 订单本金展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/holding" \
@@ -321,11 +341,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 | expireTime | string | 关联持仓到期日；无关联持仓时为 null |
 | expireTimeTimestamp | integer | 关联持仓到期日毫秒时间戳 |
 | endTimeTimestamp | integer | 本笔赎回时间毫秒时间戳 |
-| subscribeTimeTimestamp | integer | 申购时间毫秒；持仓 create_time / start_time |
 | subscribeTime | string | 关联持仓申购时间 |
 | currentRewardAmount | number | 当前持有利息（赎回后为 0 或持仓快照） |
 | cumulativeRewardAmount | number | 累计利息 |
 | status | string | 本列表固定 REDEEMED |
+| subscribeTimeTimestamp | integer | 申购时间毫秒；持仓 create_time / start_time |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/history" \

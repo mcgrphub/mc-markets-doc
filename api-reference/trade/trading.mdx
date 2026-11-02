@@ -383,6 +383,10 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
 | free | object | Premium Tier Configuration |
 | premium | object | Premium Tier Configuration |
+| tradingSymbolStatus | string | ONLINE means available for trading; OFFLINE means delisted and close-only |
+| baseSlippagePct | number | Shared base slippage percentage |
+| marketCoefficient | object | Market coefficients for regular and scheduled periods |
+| quoteDiffTolerancePoints | number | Quote difference tolerance in points for price protection |
 
 `data[].risk.free` fields:
 
@@ -437,6 +441,31 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
 | valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
 | slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+
+`data[].risk.marketCoefficient` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| regular | array | Three regular tiers: SMALL, MEDIUM, and LARGE |
+| scheduled | array | Scheduled tiers; may be an empty array |
+
+`data[].risk.marketCoefficient.regular[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| key | string | Tier key: SMALL, MEDIUM, or LARGE |
+| label | string | Display name |
+| coefficient | number | Market coefficient |
+
+`data[].risk.marketCoefficient.scheduled[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| key | string | Optional tier key: SMALL, MEDIUM, or LARGE |
+| label | string | Display name |
+| startAt | string | Start time; ISO-8601 is recommended |
+| endAt | string | End time; ISO-8601 is recommended |
+| coefficient | number | Market coefficient |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
@@ -496,6 +525,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 | commissionCfg | array | Fee Configuration |
 | leverageCfg | array | Leverage Configuration |
 | marginCall | string | Margin Call |
+| marginStopOut | string | Raw Stop Out value for the MT5 group; in percentage mode, 30 means 30% |
 
 `commissionCfg[]` items:
 

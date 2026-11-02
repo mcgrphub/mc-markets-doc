@@ -42,49 +42,85 @@
         "operationId": "symbolRanking",
         "parameters": [
           {
-            "name": "req",
+            "name": "category",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "category"
-              ],
-              "type": "object",
-              "properties": {
-                "category": {
-                  "type": "string",
-                  "description": "分类：CONTRACT/SPOT/CRYPTO/TRADFI"
-                },
-                "subGroup": {
-                  "type": "string",
-                  "description": "传统金融二级分类：ALL/FOREX/METALS/INDICES/ENERGY/STOCKS"
-                },
-                "hotOnly": {
-                  "type": "boolean",
-                  "description": "是否仅返回热门品种"
-                },
-                "sortBy": {
-                  "type": "string",
-                  "description": "排序字段：symbol/bid/change24hPct"
-                },
-                "sortOrder": {
-                  "type": "string",
-                  "description": "排序方向：asc/desc"
-                },
-                "page": {
-                  "type": "integer",
-                  "description": "页码，从 1 开始",
-                  "format": "int32"
-                },
-                "pageSize": {
-                  "type": "integer",
-                  "description": "每页条数",
-                  "format": "int32"
-                }
-              },
-              "description": "币种行情排行查询请求",
-              "example": null
-            }
+              "type": "string",
+              "description": "分类：CONTRACT/SPOT/CRYPTO/TRADFI"
+            },
+            "description": "分类：CONTRACT/SPOT/CRYPTO/TRADFI"
+          },
+          {
+            "name": "subGroup",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "传统金融二级分类：ALL/FOREX/METALS/INDICES/ENERGY/STOCKS",
+              "default": "ALL"
+            },
+            "description": "传统金融二级分类：ALL/FOREX/METALS/INDICES/ENERGY/STOCKS"
+          },
+          {
+            "name": "hotOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "是否仅返回热门品种",
+              "default": false
+            },
+            "description": "是否仅返回热门品种"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "排序字段：symbol/bid/change24hPct",
+              "default": "change24hPct"
+            },
+            "description": "排序字段：symbol/bid/change24hPct"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "排序方向：asc/desc",
+              "default": "desc"
+            },
+            "description": "排序方向：asc/desc"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "页码，从 1 开始",
+              "format": "int32",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "页码，从 1 开始"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "每页条数",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20
+            },
+            "description": "每页条数"
           }
         ],
         "responses": {
@@ -940,50 +976,63 @@
         "operationId": "klineList",
         "parameters": [
           {
-            "name": "req",
+            "name": "symbol",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "endTime",
-                "period",
-                "symbol"
-              ],
-              "type": "object",
-              "properties": {
-                "symbol": {
-                  "type": "string",
-                  "description": "交易品种代码",
-                  "example": "EURUSD"
-                },
-                "period": {
-                  "type": "integer",
-                  "description": "1分钟-1, 5分钟-5, 15分钟-15, 1小时-60, 4小时-240, 1天-1440, 1周-1440*7, 1月-1440*30",
-                  "format": "int32",
-                  "example": 60
-                },
-                "startTime": {
-                  "type": "integer",
-                  "description": "开始时间, 秒级时间戳",
-                  "format": "int64",
-                  "example": 1755792000
-                },
-                "endTime": {
-                  "type": "integer",
-                  "description": "结束时间, 秒级时间戳",
-                  "format": "int64",
-                  "example": 1755878400
-                },
-                "limit": {
-                  "type": "integer",
-                  "description": "单次最大返回条数, 允许传入最大值500",
-                  "format": "int32",
-                  "example": 500
-                }
-              },
-              "description": "K线数据查询请求",
-              "example": null
-            }
+              "type": "string",
+              "description": "交易品种代码",
+              "example": "EURUSD"
+            },
+            "description": "交易品种代码"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "1分钟-1, 5分钟-5, 15分钟-15, 1小时-60, 4小时-240, 1天-1440, 1周-1440*7, 1月-1440*30",
+              "format": "int32",
+              "example": 60
+            },
+            "description": "1分钟-1, 5分钟-5, 15分钟-15, 1小时-60, 4小时-240, 1天-1440, 1周-1440*7, 1月-1440*30"
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "开始时间, 秒级时间戳",
+              "format": "int64",
+              "example": 1755792000
+            },
+            "description": "开始时间, 秒级时间戳"
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "结束时间, 秒级时间戳",
+              "format": "int64",
+              "example": 1755878400
+            },
+            "description": "结束时间, 秒级时间戳"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "单次最大返回条数, 允许传入最大值500",
+              "format": "int32",
+              "example": 500
+            },
+            "description": "单次最大返回条数, 允许传入最大值500"
           }
         ],
         "responses": {
