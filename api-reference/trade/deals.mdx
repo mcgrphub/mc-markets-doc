@@ -12,6 +12,9 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-trade/trade/deals/history/v3 | READ | Query historical deals V3 |
 | GET | /openapi/v1/mc-trade/trade/deals/history/recent | Public | Query recent deals by symbol |
+| GET | `/openapi/v1/mc-trade/trade/deals/history/export-tasks/{taskId}` | READ | Get a deal history CSV export task |
+| GET | `/openapi/v1/mc-trade/trade/deals/history/export-tasks/{taskId}/download` | READ | Download deal history CSV |
+| POST | /openapi/v1/mc-trade/trade/deals/history/export-tasks | READ | Create a deal history CSV export task |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -53,10 +56,6 @@ Query historical deals for the current authenticated user and filter by account 
 | hasNext | boolean | Whether a next page exists |
 
 `records[]` items:
-
-<Note>
-  Use `cursorTimeMsc` and `cursorDealId` together for cursor pagination. Without a cursor, the endpoint uses `current` and `size`. Treat `deal`, `cursorDealId`, `order`, `positionID`, and `login` as strings to avoid precision loss for 64-bit identifiers.
-</Note>
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -109,6 +108,10 @@ Query historical deals for the current authenticated user and filter by account 
 | on_chain_status | string | On-chain status |
 | tx_hash | string | On-chain transaction hash |
 
+<Note>
+  Use `cursorTimeMsc` and `cursorDealId` together for cursor pagination. Without a cursor, the endpoint uses `current` and `size`. Treat `deal`, `cursorDealId`, `order`, `positionID`, and `login` as strings to avoid precision loss for 64-bit identifiers.
+</Note>
+
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/v3" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
@@ -155,4 +158,151 @@ Query recent deals by `symbol`. The `limit` range is 1 to 100. If `symbol` does 
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \
   --data-urlencode "symbol=BTCUSDT" \
   --data-urlencode "limit=1"
+```
+
+---
+
+## Get a deal history CSV export task
+
+`GET /openapi/v1/mc-trade/trade/deals/history/export-tasks/{taskId}` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| taskId | string | Yes | Min length: 1; Max length: 64 |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Opaque unique task identifier |
+| dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
+| language | string | Normalized language code fixed at creation |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
+| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
+| createdAt | integer | Creation time in Unix milliseconds (UTC) |
+| updatedAt | integer | Update time in Unix milliseconds (UTC) |
+| expiresAt | integer | Absolute expiration time in Unix milliseconds (UTC) |
+| rowCount | integer | Exported row count; empty before completion or when the limit is exceeded; Nullable |
+| fileName | string | Download file name; populated only for successful tasks; Nullable |
+| downloadAvailable | boolean | True when the service confirms the file is complete and unexpired |
+
+`retryContext` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| originalTaskId | string | Original failed task identifier |
+| createRequest | object | Original public creation parameters; excludes ownership context, internal account sets, and the previous idempotency key |
+
+`retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Original public creation parameters; excludes ownership context, internal account sets, and the previous idempotency key |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/export-tasks/TASK_DEMO_001" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Download deal history CSV
+
+`GET /openapi/v1/mc-trade/trade/deals/history/export-tasks/{taskId}/download` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| taskId | string | Yes | Min length: 1; Max length: 64 |
+
+### Response
+
+HTTP `302 Found`. `Location` contains a temporary download URL; `Cache-Control: no-store`. The response has no JSON `data`.
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/export-tasks/TASK_DEMO_001/download" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Create a deal history CSV export task
+
+`POST /openapi/v1/mc-trade/trade/deals/history/export-tasks` — permission `READ`.
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| clientRequestId | string | Yes | Client idempotency identifier; 1 to 64 printable characters after trimming; Min length: 1; Max length: 64 |
+| sourceView | string | No | Source list: SPOT, CONTRACT, or PORTFOLIO; optional for legacy calls; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| type | string | Yes | Account data type: SPOT, CONTRACT, or SPOT_CONTRACT; Allowed values: `SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
+| from | integer | Yes | Query start time in Unix seconds (UTC) |
+| to | integer | Yes | Query end time in Unix seconds (UTC); must not precede from |
+| symbol | string | No | Optional trading symbol; empty means all symbols; Min length: 1; Max length: 64 |
+| sort | string | Yes | Fixed descending ordering; deal and order datasets use their respective sort enums; Allowed values: `DEAL_TIME_DESC`, `ORDER_TIME_DESC` |
+| language | string | No | CSV language tag; aliases, empty values, and unknown tags are normalized by the service |
+| timeZone | string | Yes | IANA time zone identifier |
+
+### Response `data` fields
+
+HTTP `202 Accepted`. Generation is asynchronous; poll the task status afterward.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Opaque unique task identifier |
+| dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
+| language | string | Normalized language code fixed at creation |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
+| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
+| createdAt | integer | Creation time in Unix milliseconds (UTC) |
+| updatedAt | integer | Update time in Unix milliseconds (UTC) |
+| expiresAt | integer | Absolute expiration time in Unix milliseconds (UTC) |
+| rowCount | integer | Exported row count; empty before completion or when the limit is exceeded; Nullable |
+| fileName | string | Download file name; populated only for successful tasks; Nullable |
+| downloadAvailable | boolean | True when the service confirms the file is complete and unexpired |
+
+`retryContext` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| originalTaskId | string | Original failed task identifier |
+| createRequest | object | Original public creation parameters; excludes ownership context, internal account sets, and the previous idempotency key |
+
+`retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Original public creation parameters; excludes ownership context, internal account sets, and the previous idempotency key |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/export-tasks" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientRequestId": "export-demo-20261102-001",
+  "type": "SPOT",
+  "from": 1761955200,
+  "to": 1762041600,
+  "sort": "DEAL_TIME_DESC",
+  "timeZone": "Asia/Shanghai"
+}'
 ```

@@ -81,6 +81,10 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | payerUid | string | RECHARGE Has value during user-to-user transfers |
 | finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
 | createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
+| hourBucketSeconds | integer | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
+| hourlyRate | number | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
+| basisBalance | number | Negative balance interest principal in the settlement currency; empty for other record types |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/TXN-20260827-0001" \
@@ -177,6 +181,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | payerUid | string | RECHARGE Has value during user-to-user transfers |
 | finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
 | createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
+| hourBucketSeconds | integer | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
+| hourlyRate | number | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
+| basisBalance | number | Negative balance interest principal in the settlement currency; empty for other record types |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/page" \
@@ -316,6 +324,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | payerUid | string | RECHARGE Has value during user-to-user transfers |
 | finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
 | createTimeTimestamp | integer | Trade start time millisecond timestamp |
+| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
+| hourBucketSeconds | integer | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
+| hourlyRate | number | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
+| basisBalance | number | Negative balance interest principal in the settlement currency; empty for other record types |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/account/record/page" \

@@ -12,6 +12,9 @@ description: "订单相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-trade/trade/orders/pending/v2 | READ | 查询未成交订单列表（挂单）V2 |
 | GET | /openapi/v1/mc-trade/trade/orders/history/v3 | READ | 查询历史订单列表V3 |
+| GET | `/openapi/v1/mc-trade/trade/orders/history/export-tasks/{taskId}` | READ | 查询订单历史 CSV 导出任务 |
+| GET | `/openapi/v1/mc-trade/trade/orders/history/export-tasks/{taskId}/download` | READ | 下载订单历史 CSV |
+| POST | /openapi/v1/mc-trade/trade/orders/history/export-tasks | READ | 创建订单历史 CSV 导出任务 |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -202,4 +205,152 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/his
   --data-urlencode "type=CONTRACT" \
   --data-urlencode "from=1755792000" \
   --data-urlencode "to=1755878400"
+```
+
+---
+
+## 查询订单历史 CSV 导出任务
+
+`GET /openapi/v1/mc-trade/trade/orders/history/export-tasks/{taskId}` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| taskId | string | 是 | 最短长度: 1; 最长长度: 64 |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| taskId | string | 任务的不透明唯一标识 |
+| dataset | string | 任务数据集；可选值：`DEAL_HISTORY`、`ORDER_HISTORY`、`FUNDING_FEE_HISTORY`、`POSITION_CURRENT`、`ORDER_CURRENT` |
+| language | string | 创建时冻结的规范语言码 |
+| sourceView | string | 原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空 |
+| retryOfTaskId | string | 当前列表重试关联的原任务；非重试为空 |
+| retryContext | object | 失败任务的安全重试条件；客户端必须生成新的 clientRequestId |
+| status | string | 任务状态；可选值：`QUEUED`、`RUNNING`、`SUCCEEDED`、`EMPTY`、`OVER_LIMIT`、`FAILED` |
+| failureReason | string | 失败原因；仅 FAILED 状态非空；可选值：`GENERATION`、`UPLOAD`、`RESTART`、`TIMEOUT` |
+| createdAt | integer | 创建时间，Unix 毫秒，UTC epoch |
+| updatedAt | integer | 更新时间，Unix 毫秒，UTC epoch |
+| expiresAt | integer | 绝对过期时间，Unix 毫秒，UTC epoch |
+| rowCount | integer | 导出行数；未完成或超过上限时为空 |
+| fileName | string | 下载文件名；仅成功任务非空 |
+| downloadAvailable | boolean | 服务端确认对象完整且未过期时为 true |
+
+`retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 原失败任务标识 |
+| createRequest | object | 原公开创建参数；不含 owner、内部账户集合或旧幂等键 |
+
+`retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原公开创建参数；不含 owner、内部账户集合或旧幂等键 |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/history/export-tasks/TASK_DEMO_001" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 下载订单历史 CSV
+
+`GET /openapi/v1/mc-trade/trade/orders/history/export-tasks/{taskId}/download` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| taskId | string | 是 | 最短长度: 1; 最长长度: 64 |
+
+### 响应
+
+HTTP `302 Found`；`Location` 为限时下载地址，`Cache-Control: no-store`。响应不含 JSON `data`。
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/history/export-tasks/TASK_DEMO_001/download" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 创建订单历史 CSV 导出任务
+
+`POST /openapi/v1/mc-trade/trade/orders/history/export-tasks` — 权限 `READ`.
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| clientRequestId | string | 是 | 客户端幂等请求标识，去除首尾空白后为 1 到 64 个可打印字符; 最短长度: 1; 最长长度: 64 |
+| sourceView | string | 否 | 来源列表：SPOT、CONTRACT、PORTFOLIO；旧调用可不传; 可选值：`SPOT`, `CONTRACT`, `PORTFOLIO`; 可为空 |
+| type | string | 是 | 账户数据类型：SPOT、CONTRACT 或 SPOT_CONTRACT; 可选值：`SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
+| from | integer | 是 | 查询开始时间，Unix 秒，UTC epoch |
+| to | integer | 是 | 查询结束时间，Unix 秒，UTC epoch；必须不早于 from |
+| symbol | string | 否 | 可选交易品种；空值表示全部品种; 最短长度: 1; 最长长度: 64 |
+| sort | string | 是 | 固定倒序规则；成交与订单使用各自的排序枚举; 可选值：`DEAL_TIME_DESC`, `ORDER_TIME_DESC` |
+| language | string | 否 | CSV 语言标签；别名、空值与未知标签由共享目录规范化 |
+| timeZone | string | 是 | IANA 时区标识 |
+| direction | string | 否 | ALL 全部、BUY 买、SELL 卖；缺省为 ALL; 可选值：`ALL`, `BUY`, `SELL` |
+
+### 响应 `data` 字段
+
+HTTP `202 Accepted`；任务异步生成，随后查询任务状态。
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| taskId | string | 任务的不透明唯一标识 |
+| dataset | string | 任务数据集；可选值：`DEAL_HISTORY`、`ORDER_HISTORY`、`FUNDING_FEE_HISTORY`、`POSITION_CURRENT`、`ORDER_CURRENT` |
+| language | string | 创建时冻结的规范语言码 |
+| sourceView | string | 原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空 |
+| retryOfTaskId | string | 当前列表重试关联的原任务；非重试为空 |
+| retryContext | object | 失败任务的安全重试条件；客户端必须生成新的 clientRequestId |
+| status | string | 任务状态；可选值：`QUEUED`、`RUNNING`、`SUCCEEDED`、`EMPTY`、`OVER_LIMIT`、`FAILED` |
+| failureReason | string | 失败原因；仅 FAILED 状态非空；可选值：`GENERATION`、`UPLOAD`、`RESTART`、`TIMEOUT` |
+| createdAt | integer | 创建时间，Unix 毫秒，UTC epoch |
+| updatedAt | integer | 更新时间，Unix 毫秒，UTC epoch |
+| expiresAt | integer | 绝对过期时间，Unix 毫秒，UTC epoch |
+| rowCount | integer | 导出行数；未完成或超过上限时为空 |
+| fileName | string | 下载文件名；仅成功任务非空 |
+| downloadAvailable | boolean | 服务端确认对象完整且未过期时为 true |
+
+`retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 原失败任务标识 |
+| createRequest | object | 原公开创建参数；不含 owner、内部账户集合或旧幂等键 |
+
+`retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原公开创建参数；不含 owner、内部账户集合或旧幂等键 |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/history/export-tasks" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientRequestId": "export-demo-20261102-001",
+  "type": "SPOT",
+  "from": 1761955200,
+  "to": 1762041600,
+  "sort": "DEAL_TIME_DESC",
+  "timeZone": "Asia/Shanghai"
+}'
 ```

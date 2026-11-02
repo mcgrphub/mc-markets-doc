@@ -97,7 +97,11 @@
                   "api-reference/account/deal-orders",
                   "api-reference/account/funding-fee-history",
                   "api-reference/risk/trading",
-                  "api-reference/risk/funding-rate"
+                  "api-reference/risk/funding-rate",
+                  "api-reference/account/jurisdiction",
+                  "api-reference/account/negative-balance",
+                  "api-reference/account/funding-fee-export",
+                  "api-reference/trade/export-history"
                 ]
               },
               {
@@ -105,7 +109,8 @@
                 "pages": [
                   "api-reference/account/finance-account",
                   "api-reference/account/vault-account",
-                  "api-reference/account/fund-account"
+                  "api-reference/account/fund-account",
+                  "api-reference/account/user-vault"
                 ]
               }
             ]
@@ -188,7 +193,11 @@
                   "zh/api-reference/account/deal-orders",
                   "zh/api-reference/account/funding-fee-history",
                   "zh/api-reference/risk/trading",
-                  "zh/api-reference/risk/funding-rate"
+                  "zh/api-reference/risk/funding-rate",
+                  "zh/api-reference/account/jurisdiction",
+                  "zh/api-reference/account/negative-balance",
+                  "zh/api-reference/account/funding-fee-export",
+                  "zh/api-reference/trade/export-history"
                 ]
               },
               {
@@ -196,7 +205,8 @@
                 "pages": [
                   "zh/api-reference/account/finance-account",
                   "zh/api-reference/account/vault-account",
-                  "zh/api-reference/account/fund-account"
+                  "zh/api-reference/account/fund-account",
+                  "zh/api-reference/account/user-vault"
                 ]
               }
             ]
@@ -207,7 +217,10 @@
   },
   "navbar": {
     "links": [
-      { "label": "Support", "href": "mailto:cs@mcmarkets.com" }
+      {
+        "label": "Support",
+        "href": "mailto:cs@mcmarkets.com"
+      }
     ],
     "primary": {
       "type": "button",

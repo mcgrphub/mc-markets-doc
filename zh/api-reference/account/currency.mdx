@@ -45,6 +45,7 @@ description: "币种相关 OpenAPI 接口。"
 | iconData | string | 网络协议图标（Base64 或 URL） |
 | depositStatus | integer | 入金是否可用：0 否，1 是 |
 | withdrawalStatus | integer | 出金是否可用：0 否，1 是 |
+| subscriptionCurrencyPair | string | 行情订阅币对，如 ETHUSD.c；无订阅时为 null |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
@@ -115,6 +116,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 | iconData | string | 网络协议图标（Base64 或 URL） |
 | depositStatus | integer | 入金是否可用：0 否，1 是 |
 | withdrawalStatus | integer | 出金是否可用：0 否，1 是 |
+| subscriptionCurrencyPair | string | 行情订阅币对，如 ETHUSD.c；无订阅时为 null |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/detail/1" \

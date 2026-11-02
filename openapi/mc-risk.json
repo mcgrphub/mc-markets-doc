@@ -42,46 +42,64 @@
         "operationId": "list",
         "parameters": [
           {
-            "name": "req",
+            "name": "size",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": "object",
-              "properties": {
-                "size": {
-                  "type": "integer",
-                  "description": "每页显示条数",
-                  "format": "int64",
-                  "example": 10
-                },
-                "current": {
-                  "type": "integer",
-                  "description": "当前页码",
-                  "format": "int64",
-                  "example": 1
-                },
-                "orderBy": {
-                  "type": "string",
-                  "description": "支持多字段排序，用逗号分隔",
-                  "example": "id,createTime"
-                },
-                "orderDirection": {
-                  "type": "string",
-                  "description": "ASC升序/DESC降序，多字段时用逗号分隔",
-                  "example": "DESC,ASC",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ]
-                },
-                "group": {
-                  "type": "string",
-                  "description": "产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种"
-                }
-              },
-              "description": "交易品种分页查询请求",
-              "example": null
-            }
+              "type": "integer",
+              "description": "每页显示条数",
+              "format": "int64",
+              "example": 10
+            },
+            "description": "每页显示条数"
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "当前页码",
+              "format": "int64",
+              "example": 1
+            },
+            "description": "当前页码"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "支持多字段排序，用逗号分隔",
+              "example": "id,createTime"
+            },
+            "description": "支持多字段排序，用逗号分隔"
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "ASC升序/DESC降序，多字段时用逗号分隔",
+              "example": "DESC,ASC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "description": "ASC升序/DESC降序，多字段时用逗号分隔"
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种"
+            },
+            "description": "产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种"
           }
         ],
         "responses": {
@@ -125,9 +143,6 @@
                                 "enum": [
                                   "MORTGAGE",
                                   "TRADE",
-                                  "SPOT",
-                                  "TRADE",
-                                  "MORTGAGE",
                                   "SPOT"
                                 ]
                               }
@@ -189,57 +204,78 @@
         "operationId": "page",
         "parameters": [
           {
-            "name": "req",
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "每页显示条数",
+              "format": "int64",
+              "example": 10
+            },
+            "description": "每页显示条数"
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "当前页码",
+              "format": "int64",
+              "example": 1
+            },
+            "description": "当前页码"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "支持多字段排序，用逗号分隔",
+              "example": "id,createTime"
+            },
+            "description": "支持多字段排序，用逗号分隔"
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "ASC升序/DESC降序，多字段时用逗号分隔",
+              "example": "DESC,ASC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "description": "ASC升序/DESC降序，多字段时用逗号分隔"
+          },
+          {
+            "name": "symbol",
             "in": "query",
             "required": true,
             "schema": {
-              "required": [
-                "symbol"
-              ],
-              "type": "object",
-              "properties": {
-                "size": {
-                  "type": "integer",
-                  "description": "每页显示条数",
-                  "format": "int64",
-                  "example": 10
-                },
-                "current": {
-                  "type": "integer",
-                  "description": "当前页码",
-                  "format": "int64",
-                  "example": 1
-                },
-                "orderBy": {
-                  "type": "string",
-                  "description": "支持多字段排序，用逗号分隔",
-                  "example": "id,createTime"
-                },
-                "orderDirection": {
-                  "type": "string",
-                  "description": "ASC升序/DESC降序，多字段时用逗号分隔",
-                  "example": "DESC,ASC",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ]
-                },
-                "symbol": {
-                  "type": "string",
-                  "description": "交易币种"
-                },
-                "isSettlementRate": {
-                  "type": "boolean",
-                  "description": "是否是结算价",
-                  "enum": [
-                    true,
-                    false
-                  ]
-                }
-              },
-              "description": "资金费率历史分页查询请求",
-              "example": null
-            }
+              "type": "string",
+              "description": "交易币种"
+            },
+            "description": "交易币种"
+          },
+          {
+            "name": "isSettlementRate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "是否是结算价",
+              "enum": [
+                true,
+                false
+              ]
+            },
+            "description": "是否是结算价"
           }
         ],
         "responses": {
@@ -272,7 +308,8 @@
                               "symbol": {
                                 "type": "string",
                                 "description": "交易品种",
-                                "example": "BTCUSDT"
+                                "example": "BTCUSDT",
+                                "title": "币种"
                               },
                               "fundingRate": {
                                 "type": "number",
@@ -363,6 +400,13 @@
                                 "description": "结算周期（秒）",
                                 "format": "int64",
                                 "example": 3600
+                              },
+                              "businessLineId": {
+                                "title": "业务线 ID",
+                                "type": "integer",
+                                "description": "业务线 ID",
+                                "format": "int64",
+                                "example": 1
                               }
                             },
                             "description": "当前页记录列表",
@@ -542,9 +586,6 @@
             "enum": [
               "MORTGAGE",
               "TRADE",
-              "SPOT",
-              "TRADE",
-              "MORTGAGE",
               "SPOT"
             ]
           }

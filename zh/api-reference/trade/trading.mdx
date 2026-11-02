@@ -383,6 +383,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
 | free | object | 风控档位配置 |
 | premium | object | 风控档位配置 |
+| tradingSymbolStatus | string | ONLINE=上架可交易，OFFLINE=下架仅平仓 |
+| baseSlippagePct | number | 共用基础滑点% |
+| marketCoefficient | object | 市场系数（常规 + 指定时段） |
+| quoteDiffTolerancePoints | number | 行情差异容忍点差（价格保护） |
 
 `data[].risk.free` 字段：
 
@@ -437,6 +441,31 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
 | valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
 | slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+
+`data[].risk.marketCoefficient` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| regular | array | 常规三档：SMALL/MEDIUM/LARGE |
+| scheduled | array | 指定时段多档，可为空数组 |
+
+`data[].risk.marketCoefficient.regular[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| key | string | 档位键：SMALL / MEDIUM / LARGE |
+| label | string | 展示名称 |
+| coefficient | number | 市场系数 |
+
+`data[].risk.marketCoefficient.scheduled[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| key | string | 可选档位键：SMALL / MEDIUM / LARGE |
+| label | string | 展示名称 |
+| startAt | string | 开始时间（建议 ISO-8601） |
+| endAt | string | 结束时间（建议 ISO-8601） |
+| coefficient | number | 市场系数 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
@@ -496,6 +525,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 | commissionCfg | array | 手续费配置 |
 | leverageCfg | array | 杠杆配置 |
 | marginCall | string | Margin Call |
+| marginStopOut | string | MT5 交易组的原始 Stop Out 值；百分比模式下 30 表示 30% |
 
 `commissionCfg[]` 元素：
 

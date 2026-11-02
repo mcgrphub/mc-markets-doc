@@ -1,0 +1,81 @@
+---
+title: "Export history"
+sidebarTitle: "Export history"
+description: "Public OpenAPI endpoints for export history."
+---
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | /openapi/v1/mc-trade/export-tasks | READ | List your CSV export history |
+
+<Note>
+Sign authenticated requests with AK/SK as described in [Authentication](/authentication). Public endpoints require no signature. See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## List your CSV export history
+
+`GET /openapi/v1/mc-trade/export-tasks` — permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pageSize | integer | No | Page size from 1 to 100; defaults to 20 on the first request; Minimum: 1; Maximum: 100 |
+| dataset | string | No | Dataset filter; must be supplied together with sourceView; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
+| sourceView | string | No | Source filter: SPOT, CONTRACT, or PORTFOLIO; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO` |
+| cursor | string | No | Server-signed cursor for an immutable snapshot; Min length: 1; Max length: 2048 |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| items | array | Task summaries on the current page |
+| pageSize | integer | Requested page size |
+| snapshotAt | integer | Cursor snapshot time in Unix milliseconds (UTC) |
+| hasMore | boolean | Whether another page exists |
+| nextCursor | string | Cursor for the next page; empty when no next page exists; Nullable |
+| pollAfterMs | integer | Suggested polling interval in milliseconds when the page includes active tasks; Nullable |
+
+`items[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Opaque unique task identifier |
+| dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
+| language | string | Normalized language code fixed at creation |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
+| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
+| createdAt | integer | Creation time in Unix milliseconds (UTC) |
+| updatedAt | integer | Update time in Unix milliseconds (UTC) |
+| expiresAt | integer | Absolute expiration time in Unix milliseconds (UTC) |
+| rowCount | integer | Exported row count; empty before completion or when the limit is exceeded; Nullable |
+| fileName | string | Download file name; populated only for successful tasks; Nullable |
+| downloadAvailable | boolean | True when the service confirms the file is complete and unexpired |
+
+`items[].retryContext` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| originalTaskId | string | Original failed task identifier |
+| createRequest | object | Original public creation parameters; excludes ownership context, internal account sets, and the previous idempotency key |
+
+`items[].retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Original public creation parameters; excludes ownership context, internal account sets, and the previous idempotency key |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/export-tasks" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

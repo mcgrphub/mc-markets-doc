@@ -158,10 +158,6 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 | annualRate | number | Base APY% |
 | rewardAnnualRate | number | Excess reward APY% (config tier) |
 | maxAnnualRate | number | Maximum APY% = base + flexible-product excess reward + the signed-in user's highest eligible coupon rate |
-| couponSupported | boolean | Whether the product supports interest coupons |
-| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
-| rewardMinHoldingDays | integer | Minimum continuous holding days required for the excess reward tier; null or 0 for fixed-term products |
-| rewardMinPosition | number | Principal threshold required for the excess reward tier; null or 0 for fixed-term products |
 | periodDays | integer | Term days, 0 for demand products |
 | minDepositAmount | number | Minimum Deposit Amount |
 | minRedeemAmount | number | Minimum Redemption Amount |
@@ -175,6 +171,10 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 | dailyMaxRedeemAmount | number | Daily Withdrawal Limit |
 | subscriptionStartTimeTimestamp | integer | Subscription start time millisecond timestamp |
 | subscriptionEndTimeTimestamp | integer | Subscription end time millisecond timestamp |
+| couponSupported | boolean | Whether the product supports interest coupons |
+| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
+| rewardMinHoldingDays | integer | Minimum continuous holding days required for the excess reward tier; null or 0 for fixed-term products |
+| rewardMinPosition | number | Principal threshold required for the excess reward tier; null or 0 for fixed-term products |
 
 ```bash
 ACCESS_KEY="${MC_ACCESS_KEY:?Set MC_ACCESS_KEY}"
@@ -253,12 +253,6 @@ Paginated query of active and matured positions for the context user ID. Multipl
 | cumulativeRewardAmount | number | Historical interest total in the product currency |
 | status | string | Position status: `HOLDING`, `REDEEMED`, or `EXPIRED` |
 | subscribeTime | string | Subscription time for a fixed-term detail; null for an aggregated flexible row |
-| couponId | string | Bound interest coupon ID |
-| couponNominalAnnualRate | number | Coupon nominal annual rate percentage |
-| couponBoostAmountUsdc | number | Coupon boost amount in USDC |
-| couponQuoteUsdcPerProduct | number | Product-currency-to-USDC quote captured when the coupon was locked |
-| couponQuoteTimeMs | integer | Quote time as a Unix timestamp in milliseconds |
-| pauseRedeem | boolean | Whether redemption is suspended; `true` means redemption cannot currently be initiated |
 | excessRewardAnnualRateDisplay | string | Excess reward annual rate display value |
 | eligibleRewardAmountDisplay | string | Reward principal threshold display value |
 | currentRewardAmountDisplay | string | Current unsettled interest display value |
@@ -266,6 +260,32 @@ Paginated query of active and matured positions for the context user ID. Multipl
 | positionAmountDisplay | string | Position principal display value |
 | subscribeTimeTimestamp | integer | Subscription time as a Unix timestamp in milliseconds |
 | baseAnnualRateDisplay | string | Base annual rate display value |
+| couponId | string | Bound interest coupon ID |
+| couponNominalAnnualRate | number | Coupon nominal annual rate percentage |
+| couponBoostAmountUsdc | number | Coupon boost amount in USDC |
+| couponQuoteUsdcPerProduct | number | Product-currency-to-USDC quote captured when the coupon was locked |
+| couponQuoteTimeMs | integer | Quote time as a Unix timestamp in milliseconds |
+| pauseRedeem | boolean | Whether redemption is suspended; `true` means redemption cannot currently be initiated |
+| subOrders | array | Flexible-product subscription details; null for fixed-term products. Each child contains the holding's withdrawable interest; parent currentRewardAmount and positionAmount sum the child values |
+
+`records[].subOrders[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| positionId | integer | Holding detail identifier |
+| currency | string | Asset currency |
+| type | string | Product type: `CURRENT` or `FIXED` |
+| positionAmount | number | Principal for this order; excludes unsettled interest and frozen amounts |
+| currentRewardAmount | number | Withdrawable interest for this holding |
+| couponNominalAnnualRate | number | Interest coupon annual rate as a percentage; null without a coupon |
+| couponBoostAmountUsdc | number | Coupon interest amount in USDC; null without a coupon |
+| endTime | string | Expiration time; null for flexible products |
+| status | string | Holding status: active or matured; Allowed values: `HOLDING`, `REDEEMED`, `EXPIRED` |
+| currentRewardAmountDisplay | string | Withdrawable interest display value |
+| couponNominalAnnualRateDisplay | string | Interest coupon annual rate display value |
+| couponBoostAmountUsdcDisplay | string | Coupon interest amount display value in USDC |
+| endTimeTimestamp | integer | Expiration time in Unix milliseconds |
+| positionAmountDisplay | string | Order principal display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/holding" \
@@ -321,11 +341,11 @@ Aligns with admin redemption history: main table `ac_transaction_history` (`EARN
 | expireTime | string | Related position maturity date; null when no position is linked |
 | expireTimeTimestamp | integer | Related position maturity time as a Unix timestamp in milliseconds |
 | endTimeTimestamp | integer | Redemption time as a Unix timestamp in milliseconds |
-| subscribeTimeTimestamp | integer | Related position subscription time as a Unix timestamp in milliseconds |
 | subscribeTime | string | Related position subscription time |
 | currentRewardAmount | number | Current interest; 0 after redemption or the stored position snapshot value |
 | cumulativeRewardAmount | number | Cumulative interest |
 | status | string | Always `REDEEMED` in this list |
+| subscribeTimeTimestamp | integer | Related position subscription time as a Unix timestamp in milliseconds |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/history" \
@@ -371,8 +391,6 @@ Returns `products` by product dimension, ordered by `product_code` ascending, th
 | annualRate | number | Base APY% (excluding point rewards) |
 | rewardAnnualRate | number | Reward annual rate: excess reward tier APY% (config excess_reward_annual_rate) |
 | totalAnnualRate | number | Total APY% = base + reward + the signed-in user's highest eligible coupon rate |
-| couponSupported | boolean | Whether the product supports interest coupons |
-| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
 | minDepositAmount | number | Minimum Deposit Amount |
 | minRedeemAmount | number | Minimum Withdrawal Amount |
 | subscriptionStartTime | string | Subscription start time; if both start and end are null, no restriction applies |
@@ -396,6 +414,9 @@ Returns `products` by product dimension, ordered by `product_code` ascending, th
 | userInterestAmountDisplay | string | User unsettled interest total display value |
 | userSpotAvailableBalanceDisplay | string | User spot available balance display value |
 | availableSubscriptionBalanceDisplay | string | Available subscription balance display value |
+| subscriptionStartTimeTimestamp | integer | Subscription start time millisecond timestamp |
+| subscriptionEndTimeTimestamp | integer | Subscription end time millisecond timestamp |
+| maxDepositAmountDisplay | string | Per-user subscription cap display value |
 | annualRateDisplay | string | Base APY display value |
 | rewardAnnualRateDisplay | string | Reward annual rate display value |
 | totalAnnualRateDisplay | string | Total APY display value |
@@ -407,9 +428,8 @@ Returns `products` by product dimension, ordered by `product_code` ascending, th
 | totalPrincipalDisplay | string | Platform current retained principal display value |
 | subscribedAmountDisplay | string | Subscribed amount display value |
 | fundPoolAmountDisplay | string | Pool cap display value |
-| maxDepositAmountDisplay | string | Per-user subscription cap display value |
-| subscriptionStartTimeTimestamp | integer | Subscription start time millisecond timestamp |
-| subscriptionEndTimeTimestamp | integer | Subscription end time millisecond timestamp |
+| couponSupported | boolean | Whether the product supports interest coupons |
+| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview" \
