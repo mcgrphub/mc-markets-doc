@@ -10,73 +10,12 @@ description: "交易账户相关 OpenAPI 接口。"
 
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-trade/account/positions | READ | 资金动账列表 |
 | GET | /openapi/v1/mc-trade/account/positions/current/v2 | READ | 当前持仓查询V2 |
-| GET | /openapi/v1/mc-trade/account/pnl | READ | 一段时间总盈亏统计 |
 | GET | /openapi/v1/mc-trade/account/contract-volume-by-symbol | 公开访问 | 按交易品种 symbol 查询合约多空总持仓手数 |
-| GET | /openapi/v1/mc-trade/account/contract-notional-by-symbol | 公开访问 | 按交易品种 symbol 查询合约多空总持仓名义价值 |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
 </Note>
-
----
-
-## 资金动账列表
-
-`GET /openapi/v1/mc-trade/account/positions` — 权限 `READ`。
-
-根据当前用户的UID查询交易账户的资金动账列表，即抵押品的增减历史，UID从请求头X-UID中获取
-
-### 查询 / 路径参数
-
-| 参数 | 类型 | 必填 | 说明 |
-| --- | --- | --- | --- |
-| size | integer | 否 | 每页显示条数 |
-| current | integer | 否 | 当前页码 |
-| orderBy | string | 否 | 排序字段，多个用逗号分隔 |
-| sortOrder | string | 否 | 排序方向：ASC / DESC |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
-| from | integer | 是 | 开始时间戳（Unix 时间戳，秒） |
-| to | integer | 是 | 结束时间戳（Unix 时间戳，秒） |
-| symbol | string | 否 | 交易品种名，可选筛选 |
-
-### 响应 `data` 字段
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
-| size | integer | 每页条数 |
-| current | integer | 当前页码 |
-| pages | integer | 总页数 |
-| hasPrevious | boolean | 是否有上一页 |
-| hasNext | boolean | 是否有下一页 |
-
-`records[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| symbol | string | 产品名称 |
-| volume | integer | 动账量，正为增加，负为扣减 |
-| value | number | 折合USDC价值（动账时刻） |
-| position | integer | 关联持仓ID，若有 |
-| reason | integer | 动账原因-枚举 |
-| price | number | 对USDC价格（动账时刻） |
-| timestamp | integer | 时间戳 |
-
-```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
-  --data-urlencode "size=1" \
-  --data-urlencode "current=1" \
-  --data-urlencode "login=10000001" \
-  --data-urlencode "from=1755792000" \
-  --data-urlencode "to=1755878400"
-```
 
 ---
 
@@ -90,8 +29,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
-| symbol | string | 否 | 交易品种 |
+| login | string | 是 | 交易账户或现货账户登录号 |
+| symbol | string | 否 | 交易品种，可选 |
 | positionType | string | 否 | 不传或传ALL-全部，COLLATERAL-仅抵押品，SYMBOL-仅交易持仓 |
 
 ### 响应 `data` 字段
@@ -102,90 +41,56 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/position
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| position | integer | 持仓编号，持仓唯一标识 |
-| login | integer | 交易账户登录号 |
-| dealer | integer | 交易商ID |
+| position | string | 持仓编号，持仓唯一标识 |
+| externalID | string | 外部ID，外部系统关联的ID |
+| login | string | 交易账户登录号 |
+| dealer | string | 交易商ID |
 | symbol | string | 交易品种，如EURUSD、GBPUSD等 |
 | action | integer | 操作类型，0-买入，1-卖出 |
 | digits | integer | 价格精度，交易品种的价格小数位数 |
 | digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
 | profitCurrencyDigits | integer | 盈亏货币展示精度，优先取持仓货币精度，其次品种盈亏货币精度，最后回退 2 |
 | reason | integer | 原因，持仓变更的原因代码 |
-| contractSize | number | 合约大小，每手合约的标准大小 |
-| timeCreate | integer | 创建时间，持仓创建的时间戳，毫秒级，长度13位 |
-| timeUpdate | integer | 更新时间，持仓最后更新的时间戳，毫秒级，长度13位 |
-| timeCreateMsc | integer | 创建时间（毫秒），持仓创建的时间戳（毫秒），长度13位 |
-| timeUpdateMsc | integer | 更新时间（毫秒），持仓最后更新的时间戳（毫秒），长度13位 |
-| priceOpen | number | 开仓价格，持仓的开仓价格 |
+| contractSize | string | 合约大小，每手合约的标准大小 |
+| timeCreate | string | 创建时间，持仓创建的时间戳，毫秒级，长度13位 |
+| timeUpdate | string | 更新时间，持仓最后更新的时间戳，毫秒级，长度13位 |
+| timeCreateMsc | string | 创建时间（毫秒），持仓创建的时间戳（毫秒），长度13位 |
+| timeUpdateMsc | string | 更新时间（毫秒），持仓最后更新的时间戳（毫秒），长度13位 |
+| priceOpen | string | 开仓价格，持仓的开仓价格 |
 | priceOpenDisplay | string | 开仓价格展示值 |
 | priceOpenScale | integer | 开仓价格展示小数位 |
-| priceCurrent | number | 当前价格，持仓的当前市场价格 |
+| priceCurrent | string | 当前价格，持仓的当前市场价格 |
 | priceCurrentDisplay | string | 当前价格展示值 |
 | priceCurrentScale | integer | 当前价格展示小数位 |
+| priceSL | string | 止损价格，设置的止损价位 |
 | priceSlDisplay | string | 止损价格展示值 |
 | priceSlScale | integer | 止损价格展示小数位 |
+| priceTP | string | 止盈价格，设置的止盈价位 |
 | priceTpDisplay | string | 止盈价格展示值 |
 | priceTpScale | integer | 止盈价格展示小数位 |
-| volumeExt | integer | 持仓量（扩展精度），需按持仓量精度换算 |
+| volumeExt | string | 持仓量（扩展精度），需按持仓量精度换算 |
 | volumeDisplay | string | 持仓手数展示值 |
 | volumeScale | integer | 持仓手数展示小数位 |
 | positionValueDisplay | string | 持仓价值展示值 |
 | positionValueScale | integer | 持仓价值展示小数位 |
-| profit | number | 盈亏，当前持仓的浮动盈亏金额 |
+| profit | string | 盈亏，当前持仓的浮动盈亏金额 |
 | profitDisplay | string | 盈亏展示值 |
 | profitScale | integer | 盈亏展示小数位 |
-| storage | number | 库存费，持仓的隔夜利息/库存费 |
-| rateProfit | number | 盈亏汇率，计算盈亏时使用的汇率 |
-| rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
+| storage | string | 库存费，持仓的隔夜利息/库存费 |
+| rateProfit | string | 盈亏汇率，计算盈亏时使用的汇率 |
+| rateMargin | string | 保证金汇率，计算保证金时使用的汇率 |
+| expertID | string | 专家顾问ID，如果持仓由 EA 创建，则记录 EA 的 ID |
+| expertPositionID | string | 专家顾问持仓ID，EA创建的持仓关联ID |
 | activationMode | integer | 激活模式，挂单的激活模式（如挂单激活方式） |
-| activationTime | integer | 激活时间，挂单的激活时间戳 |
-| activationPrice | number | 激活价格，挂单的激活价格 |
+| activationTime | string | 激活时间，挂单的激活时间戳 |
+| activationPrice | string | 激活价格，挂单的激活价格 |
 | activationFlags | integer | 激活标志，挂单激活的标志位 |
-| volume | integer | 手数（标准精度），需按持仓量精度换算 |
-| fundingRate | number | 资金费 |
-| interest | number | 利息 |
-| externalID | string | 外部ID，外部系统关联的ID |
-| priceSL | number | 止损价格，设置的止损价位 |
-| priceTP | number | 止盈价格，设置的止盈价位 |
-| expertID | integer | 专家顾问ID，如果持仓由 EA 创建，则记录 EA 的 ID |
-| expertPositionID | integer | 专家顾问持仓ID，EA创建的持仓关联ID |
+| volume | string | 手数（标准精度），需按持仓量精度换算 |
+| fundingRate | string | 资金费 |
+| interest | string | 利息 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/positions/current/v2" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
-  --data-urlencode "login=10000001"
-```
-
----
-
-## 一段时间总盈亏统计
-
-`GET /openapi/v1/mc-trade/account/pnl` — 权限 `READ`。
-
-根据当前用户的 UID 查询一段时间区间内的盈亏统计（如近一周盈亏）。UID 从请求头 `X-UID` 获取；`from` 与 `to` 不传时默认查询最近七天。
-
-### 查询 / 路径参数
-
-| 参数 | 类型 | 必填 | 说明 |
-| --- | --- | --- | --- |
-| from | integer | 否 | 开始时间戳（秒），可选 |
-| to | integer | 否 | 结束时间戳（秒），可选 |
-| login | string | 是 | 交易账户登录号 |
-
-### 响应 `data` 字段
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| uid | integer | 账户登录号 |
-| totalProfit | number | 区间总盈利 |
-| totalLoss | number | 区间总亏损（为负数） |
-| netPnl | number | 区间净盈亏 |
-
-```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/pnl" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
@@ -214,8 +119,8 @@ symbol 对应 mt5_positions.Symbol；仅统计 Path 以 CFD 开头的品种；�
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | symbol | string | 交易品种 |
-| longVolume | number | 多头持仓手数合计 |
-| shortVolume | number | 空头持仓手数合计 |
+| longVolume | string | 多头持仓手数合计 |
+| shortVolume | string | 空头持仓手数合计 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract-volume-by-symbol" \
@@ -223,30 +128,3 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract
 ```
 
 ---
-
-## 按交易品种 symbol 查询合约多空总持仓名义价值
-
-`GET /openapi/v1/mc-trade/account/contract-notional-by-symbol` — 权限 `公开访问`。
-
-symbol 对应 mt5_positions.Symbol；仅统计 Path 以 CFD 开头的品种；名义 = VolumeExt/1e8 * PriceCurrent * RateProfit * ContractSize（不按 Symbol 区分）。
-
-没有匹配持仓时，`longNotional` 和 `shortNotional` 均返回 `0`；这不表示资源不存在。
-
-### 查询 / 路径参数
-
-| 参数 | 类型 | 必填 | 说明 |
-| --- | --- | --- | --- |
-| symbol | string | 是 | 交易品种 |
-
-### 响应 `data` 字段
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| symbol | string | 交易品种 |
-| longNotional | number | 多头持仓名义价值合计（保留 2 位小数，向下舍弃） |
-| shortNotional | number | 空头持仓名义价值合计（保留 2 位小数，向下舍弃） |
-
-```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/account/contract-notional-by-symbol" \
-  --data-urlencode "symbol=BTCUSDT"
-```

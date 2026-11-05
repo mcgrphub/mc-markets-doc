@@ -18,7 +18,6 @@ description: "金库账户相关 OpenAPI 接口。"
 | GET | /openapi/v1/mc-account/mlp/treasury-info | READ | 获取金库账户相关信息 |
 | GET | /openapi/v1/mc-account/mlp/deposit-info | READ | 获取金库账户存款信息 |
 | GET | /openapi/v1/mc-account/mlp/core/stats | READ | 获取金库账户统计信息 |
-| GET | /openapi/v1/mc-account/mlp/apr-data | READ | 获取金库账户 APR 数据 |
 | GET | /openapi/v1/mc-account/mlp/account/assets | READ | 查询金库账户资产详情 |
 | GET | /openapi/v1/mc-account/mlp/deposits | READ | 本人金库存款记录 |
 | GET | /openapi/v1/mc-account/mlp/deposits/export | READ | 导出本人金库存款CSV |
@@ -44,9 +43,9 @@ description: "金库账户相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
-| symbolId | string | 是 | 币种ID |
-| amount | number | 是 | 提现金额 |
+| trackingId | string | 否 | 用于跟踪请求的唯一标识 |
+| symbolId | string | 是 | 币种 ID |
+| amount | number | 是 | 大于0，整数最多32位；USDC最多6位小数，其余配置币种最多8位；超精度返回PRECISION_INVALID |
 
 ### 响应 `data` 字段
 
@@ -80,9 +79,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
-| symbolId | string | 是 | 币种ID |
-| amount | number | 是 | 存款金额 |
+| trackingId | string | 否 | 用于跟踪请求的唯一标识 |
+| symbolId | string | 是 | 币种 ID |
+| amount | number | 是 | 大于0，整数最多32位；USDC最多6位小数，其余配置币种最多8位；超精度返回PRECISION_INVALID |
 
 ### 响应 `data` 字段
 
@@ -126,7 +125,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/accou
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | data | string | 日期 |
-| value | number | 收益率 |
+| value | string | 收益率 |
 | valueDisplay | string | 收益率展示值 |
 
 ```bash
@@ -143,16 +142,17 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/yesterday-
 
 `GET /openapi/v1/mc-account/mlp/withdraw-info` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| maxWithdrawAmount | number | 最大可提款金额（可提金额） |
-| withdrawablePrincipal | number | 可提本金 |
-| withdrawableEarnings | number | 可提收益 |
-| withdrawableEarningsDisplay | string | 可提收益展示值 |
+| maxWithdrawAmount | string | 最大可提款金额（可提金额） |
+| withdrawablePrincipal | string | 可提本金 |
+| withdrawableEarnings | string | 可提收益 |
 | maxWithdrawAmountDisplay | string | 最大可提款金额展示值 |
 | withdrawablePrincipalDisplay | string | 可提本金展示值 |
+| withdrawableEarningsDisplay | string | 可提收益展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-info" \
@@ -184,7 +184,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdraw-i
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | data | string | 日期 |
-| value | number | 收益率 |
+| value | string | 收益率 |
 | valueDisplay | string | 收益率展示值 |
 
 ```bash
@@ -201,27 +201,28 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/tvl-data" 
 
 `GET /openapi/v1/mc-account/mlp/treasury-info` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | treasuryIntroduction | string | 金库介绍 |
-| treasuryYield | number | 统计数据-金库收益 |
-| currentAnnualYieldRate | number | 统计数据-当前年化收益率 |
-| currentDailyYieldRate | number | 统计数据-当前每日回报率 |
-| treasuryBalance | number | 我的表现-金库余额 |
-| withdrawableEarnings | number | 我的表现-可提收益 |
-| yesterdayEarnings | number | 我的表现-昨日收益 |
-| lockedDeposit | number | 我的表现-锁定存款 |
-| withdrawableAmount | number | 我的表现-可提金额 |
+| treasuryYield | string | 统计数据-金库收益 |
+| currentAnnualYieldRate | string | 统计数据-当前年化收益率 |
+| currentDailyYieldRate | string | 统计数据-当前每日回报率 |
+| treasuryBalance | string | 我的表现-金库余额 |
+| withdrawableEarnings | string | 我的表现-可提收益 |
+| yesterdayEarnings | string | 我的表现-昨日收益 |
+| lockedDeposit | string | 我的表现-锁定存款 |
+| withdrawableAmount | string | 我的表现-可提金额 |
+| treasuryYieldDisplay | string | 统计数据-金库收益展示值 |
 | currentAnnualYieldRateDisplay | string | 统计数据-当前年化收益率展示值 |
 | currentDailyYieldRateDisplay | string | 统计数据-当前每日回报率展示值 |
+| treasuryBalanceDisplay | string | 我的表现-金库余额展示值 |
 | withdrawableEarningsDisplay | string | 我的表现-可提收益展示值 |
 | yesterdayEarningsDisplay | string | 我的表现-昨日收益展示值 |
-| withdrawableAmountDisplay | string | 我的表现-可提金额展示值 |
-| treasuryYieldDisplay | string | 统计数据-金库收益展示值 |
-| treasuryBalanceDisplay | string | 我的表现-金库余额展示值 |
 | lockedDepositDisplay | string | 我的表现-锁定存款展示值 |
+| withdrawableAmountDisplay | string | 我的表现-可提金额展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-info" \
@@ -237,22 +238,23 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/treasury-i
 
 `GET /openapi/v1/mc-account/mlp/deposit-info` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| maxDepositAmount | number | 最大可存款金额 |
-| availableMargin | number | 合约账户可用保证金 |
-| maxDepositLimitPercentage | number | 最大存款限额百分比 |
-| userPoints | integer | 用户当前积分 |
-| depositedAmount | number | 已存入金额 |
-| remainingDepositAmount | number | 剩余可存金额 |
+| maxDepositAmount | string | 最大可存款金额 |
+| availableMargin | string | 合约账户可用保证金 |
+| maxDepositLimitPercentage | string | 最大存款限额百分比 |
+| userPoints | string | 用户当前积分 |
+| depositedAmount | string | 已存入金额 |
+| remainingDepositAmount | string | 剩余可存金额 |
 | hasPosition | boolean | 是否有持仓 |
-| maxDepositLimitPercentageDisplay | string | 最大存款限额百分比展示值 |
-| remainingDepositAmountDisplay | string | 剩余可存金额展示值 |
 | maxDepositAmountDisplay | string | 最大可存款金额展示值 |
 | availableMarginDisplay | string | 合约账户可用保证金展示值 |
+| maxDepositLimitPercentageDisplay | string | 最大存款限额百分比展示值 |
 | depositedAmountDisplay | string | 已存入金额展示值 |
+| remainingDepositAmountDisplay | string | 剩余可存金额展示值 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-info" \
@@ -268,60 +270,28 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposit-in
 
 `GET /openapi/v1/mc-account/mlp/core/stats` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| totalLockedAmount | number | 总锁仓量 = 存入金库总金额 + TVL 金额基准值 |
-| annualYieldRate | number | 年化收益率 |
-| myTotalDeposit | number | 我的总存款 |
-| totalHistoricalEarnings | number | 历史总收益 |
+| totalLockedAmount | string | 总锁仓量 = 存入金库总金额 + TVL 金额基准值 |
+| annualYieldRate | string | 年化收益率 |
+| myTotalDeposit | string | 我的总存款 |
+| totalHistoricalEarnings | string | 历史总收益 |
 | totalLockedAmountDisplay | string | 总锁仓量展示值 |
-| portfolioVaultBalanceDisplay | string | 投资组合金库余额展示值 |
-| portfolioVaultBalanceScale | integer | 投资组合金库余额展示精度 |
-| totalHistoricalEarningsDisplay | string | 历史总收益展示值 |
-| totalHistoricalEarningsScale | integer | 历史总收益展示精度 |
 | totalLockedAmountScale | integer | 总锁仓量展示精度 |
 | annualYieldRateDisplay | string | 年化收益率展示值 |
 | annualYieldRateScale | integer | 年化收益率展示精度 |
 | myTotalDepositDisplay | string | 我的总存款展示值 |
 | myTotalDepositScale | integer | 我的总存款展示精度 |
+| portfolioVaultBalanceDisplay | string | 投资组合金库余额展示值 |
+| portfolioVaultBalanceScale | integer | 投资组合金库余额展示精度 |
+| totalHistoricalEarningsDisplay | string | 历史总收益展示值 |
+| totalHistoricalEarningsScale | integer | 历史总收益展示精度 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/core/stats" \
-  -H "X-Access-Key: YOUR_ACCESS_KEY" \
-  -H "X-Signature: YOUR_SIGNATURE" \
-  -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE"
-```
-
----
-
-## 获取金库账户 APR 数据
-
-`GET /openapi/v1/mc-account/mlp/apr-data` — 权限 `READ`。
-
-### 查询 / 路径参数
-
-| 参数 | 类型 | 必填 | 说明 |
-| --- | --- | --- | --- |
-| from | string | 否 | 开始日期 |
-| to | string | 否 | 结束日期 |
-
-### 响应 `data` 字段
-
-`data` 为对象数组。元素字段见下表。
-
-`data[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| data | string | 日期 |
-| value | number | 收益率 |
-| valueDisplay | string | 收益率展示值 |
-
-```bash
-curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
@@ -334,6 +304,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 
 `GET /openapi/v1/mc-account/mlp/account/assets` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 `data` 为对象数组。元素字段见下表。
@@ -343,8 +314,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/apr-data" 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | symbol | string | 币种名称 |
-| principalAvailable | number | 可用本金 |
-| interestAvailable | number | 可用收益 |
+| principalAvailable | string | 可用本金 |
+| interestAvailable | string | 可用收益 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/assets" \
@@ -378,8 +349,8 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/as
 | records | array | 当前页记录 |
 | current | integer | 页码 |
 | size | integer | 页大小 |
-| total | integer | 过滤后的总条数 |
-| asOfMs | integer | 本次读取时间，UTC epoch毫秒 |
+| total | string | 过滤后的总条数 |
+| asOfMs | string | 本次读取时间，UTC epoch毫秒 |
 
 `records[]` 元素：
 
@@ -388,16 +359,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/account/as
 | recordKey | string | 内部本金记录标识 |
 | symbolId | string | 币种ID |
 | symbol | string | 原币符号 |
-| unlockAtMs | integer | 解锁时间，UTC epoch毫秒 |
+| unlockAtMs | string | 解锁时间，UTC epoch毫秒 |
 | lockedPrincipal | string | 锁定本金，原币 |
 | withdrawablePrincipal | string | 未占用到期本金，原币 |
 | remainingPrincipal | string | 未成功取出本金，原币 |
 | withdrawnPrincipal | string | 成功取出本金，原币 |
 | status | string | LOCKED或UNLOCKED |
 | isLegacy | boolean | 存量本金投影 |
-| depositId | string | 原交易编号，无法还原为null |
-| depositedAmount | string | 原成功存入数量，未知为null |
-| depositedAtMs | integer | 成功存入时间，UTC epoch毫秒，未知为null |
+| depositId | string | 原交易编号，无法还原为null; 可为空 |
+| depositedAmount | string | 原成功存入数量，未知为null; 可为空 |
+| depositedAtMs | string | 成功存入时间，UTC epoch毫秒，未知为null; 可为空 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits" \
@@ -424,9 +395,11 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits" \
 | toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
 | orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
 
-### 响应
+### 响应 `data` 字段
 
-HTTP `200`，`Content-Type: text/csv; charset=utf-8`；通过 `Content-Disposition` 提供文件名。直接返回 CSV 文件，不含 JSON `data`。
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | — | `data` 为该类型标量 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits/export" \
@@ -442,16 +415,17 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits/expo
 
 `GET /openapi/v1/mc-account/mlp/overview` — 权限 `公开访问`.
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| asOfMs | integer | asOfMs，UTC epoch毫秒 |
-| valuationAtMs | integer | valuationAtMs，UTC epoch毫秒 |
+| asOfMs | string | asOfMs，UTC epoch毫秒 |
+| valuationAtMs | string | valuationAtMs，UTC epoch毫秒 |
 | viewVersion | string | viewVersion |
-| config | object | 金库Config，数量为原币，Usdc后缀为USDC价值 |
-| platform | object | 金库Platform，数量为原币，Usdc后缀为USDC价值 |
-| account | object | 负结余账户展示项 |
+| config | object | config |
+| platform | object | platform |
+| account | object | account; 可为空 |
 
 `config` 字段：
 
@@ -467,7 +441,7 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits/expo
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| minPoints | integer | minPoints |
+| minPoints | string | minPoints |
 | depositLimitRatioPct | string | depositLimitRatioPct，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
 
 `platform` 字段：
@@ -476,19 +450,54 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/deposits/expo
 | --- | --- | --- |
 | cumulativeDepositUsdc | string | cumulativeDepositUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
 | yesterdaySettledYieldUsdc | string | yesterdaySettledYieldUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
-| nextSettlementCutoffMs | integer | nextSettlementCutoffMs，UTC epoch毫秒 |
+| nextSettlementCutoffMs | string | nextSettlementCutoffMs，UTC epoch毫秒 |
 
 `account` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| accountId | string | 本人合约账户ID |
-| asset | string | 结算币种 |
-| balance | string | 负数权威余额十进制字符串 |
-| amountToCover | string | 需补足的正数金额，USDC6位/其它币种8位向上取整 |
-| hourlyRate | string | 当前小时适用利率百分数字符串，最多6位小数 |
-| eventId | string | 可选已核实周期标识，未核实时不返回 |
-| negativeSinceMs | integer | 可选已核实周期开始，Unix毫秒UTC；未核实时不返回 |
+| status | string | status |
+| firstDepositTimeMs | string | firstDepositTimeMs，UTC epoch毫秒; 可为空 |
+| currentPoints | string | currentPoints |
+| currentTierMinPoints | string | currentTierMinPoints |
+| currentTierRatioPct | string | currentTierRatioPct，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| limitUsdc | string | limitUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| occupiedUsdc | string | occupiedUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| remainingQuotaUsdc | string | remainingQuotaUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| summary | object | summary |
+| assets | array | assets |
+
+`account.summary` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| totalDepositUsdc | string | totalDepositUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| lockedPrincipalUsdc | string | lockedPrincipalUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawablePrincipalUsdc | string | withdrawablePrincipalUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawnPrincipalUsdc | string | withdrawnPrincipalUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| remainingPrincipalUsdc | string | remainingPrincipalUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| historicalYieldUsdc | string | historicalYieldUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawableYieldUsdc | string | withdrawableYieldUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawnYieldUsdc | string | withdrawnYieldUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+
+`account.assets[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| symbolId | string | symbolId |
+| symbol | string | symbol |
+| fxRateUsdc | string | fxRateUsdc，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| totalDeposited | string | totalDeposited，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| lockedPrincipal | string | lockedPrincipal，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawablePrincipal | string | withdrawablePrincipal，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawnPrincipal | string | withdrawnPrincipal，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| remainingPrincipal | string | remainingPrincipal，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawableYield | string | withdrawableYield，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| historicalYield | string | historicalYield，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| withdrawnYield | string | withdrawnYield，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| spotAvailable | string | spotAvailable，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| maxDeposit | string | maxDeposit，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
+| maxWithdraw | string | maxWithdraw，精确十进制字符串；Pct为百分比，USDC价值显示两位HALF_UP，原币数量保留6/8位 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/overview"
@@ -518,8 +527,8 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/overview"
 | records | array | 当前页记录 |
 | current | integer | 页码 |
 | size | integer | 页大小 |
-| total | integer | 过滤后的总条数 |
-| asOfMs | integer | 本次读取时间，UTC epoch毫秒 |
+| total | string | 过滤后的总条数 |
+| asOfMs | string | 本次读取时间，UTC epoch毫秒 |
 
 `records[]` 元素：
 
@@ -533,9 +542,9 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/overview"
 | annualYieldRatePct | string | 固定年化百分比 |
 | fxRateUsdc | string | 原始正汇率，1原币对应USDC |
 | settledYieldUsdc | string | 本笔入账收益USDC，最终向下6位 |
-| settlementCutoffMs | integer | 业务截止，UTC epoch毫秒 |
-| creditedAtMs | integer | 实际入账，UTC epoch毫秒 |
-| depositId | string | 原存款编号，未知为null |
+| settlementCutoffMs | string | 业务截止，UTC epoch毫秒 |
+| creditedAtMs | string | 实际入账，UTC epoch毫秒 |
+| depositId | string | 原存款编号，未知为null; 可为空 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements" \
@@ -562,9 +571,11 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements" 
 | toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
 | orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
 
-### 响应
+### 响应 `data` 字段
 
-HTTP `200`，`Content-Type: text/csv; charset=utf-8`；通过 `Content-Disposition` 提供文件名。直接返回 CSV 文件，不含 JSON `data`。
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | — | `data` 为该类型标量 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements/export" \
@@ -598,8 +609,8 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements/e
 | records | array | 当前页记录 |
 | current | integer | 页码 |
 | size | integer | 页大小 |
-| total | integer | 过滤后的总条数 |
-| asOfMs | integer | 本次读取时间，UTC epoch毫秒 |
+| total | string | 过滤后的总条数 |
+| asOfMs | string | 本次读取时间，UTC epoch毫秒 |
 
 `records[]` 元素：
 
@@ -610,12 +621,12 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/settlements/e
 | symbolId | string | 币种ID |
 | symbol | string | 原币符号 |
 | status | string | 原交易状态INIT/PROCESSING/SUCCESS/FAILED/CANCELLED |
-| initiatedAtMs | integer | 发起时间，UTC epoch毫秒 |
-| availableBefore | string | 成功提款前可提原币，未成功为null |
-| withdrawnPrincipal | string | 成功提款本金，原币，未成功为null |
-| withdrawnYield | string | 成功提款USDC收益，未成功为null |
-| remainingPrincipal | string | 成功后剩余原币本金，未成功为null |
-| remainingYield | string | 成功后剩余USDC收益，未成功为null |
+| initiatedAtMs | string | 发起时间，UTC epoch毫秒; 可为空 |
+| availableBefore | string | 成功提款前可提原币，未成功为null; 可为空 |
+| withdrawnPrincipal | string | 成功提款本金，原币，未成功为null; 可为空 |
+| withdrawnYield | string | 成功提款USDC收益，未成功为null; 可为空 |
+| remainingPrincipal | string | 成功后剩余原币本金，未成功为null; 可为空 |
+| remainingYield | string | 成功后剩余USDC收益，未成功为null; 可为空 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals" \
@@ -642,9 +653,11 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals" 
 | toMs | integer | 否 | 包含的结束时间，UTC epoch毫秒，可空; 最小值: 0 |
 | orderDirection | string | 否 | ASC或DESC，默认DESC; 可选值：`ASC`, `DESC` |
 
-### 响应
+### 响应 `data` 字段
 
-HTTP `200`，`Content-Type: text/csv; charset=utf-8`；通过 `Content-Disposition` 提供文件名。直接返回 CSV 文件，不含 JSON `data`。
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| data | — | `data` 为该类型标量 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/mlp/withdrawals/export" \

@@ -10,10 +10,11 @@ description: "交易相关 OpenAPI 接口。"
 
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
-| POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | 根据transactionId查询交易记录详情 |
 | POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | 分页查询交易记录 |
 | POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | 闪兑（支持询价） |
 | POST | /openapi/v1/mc-account/transaction/account/record/page | READ | 分页查询资金流水记录 |
+| GET | `/openapi/v1/mc-account/transaction/user-transfer/recipients/{recipientUid}/validation` | READ | 校验转账收款用户 |
+
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -39,61 +40,59 @@ description: "交易相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
+| id | string | 交易记录主键 ID |
 | uid | string | 用户 UID |
 | transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
+| symbolId | string | 币种 ID |
 | acSymbol | string | 币种名称；闪兑时为兑出币种 |
 | network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
+| exchangeSymbolId | string | 兑换后币种 ID |
 | exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举；可选值：`RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`ROLLBACK`、`SAFEBOX_TRANSFER_OUT`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`、`RECHARGE - 充值`、`WITHDRAWAL - 提现`、`TRANSFER_IN - 划入`、`TRANSFER_OUT - 划出`、`EXCHANGE - 兑换`、`ROLLBACK - 回退`、`SAFEBOX_TRANSFER_IN - 转入保险箱`、`SAFEBOX_TRANSFER_OUT - 转出 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
+| transactionType | string | 交易类型; 可选值：`NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
+| status | string | 交易状态：SUCCESS / FAIL / PENDING; 可选值：`SUCCESS`, `FAIL`, `PENDING` |
+| amount | string | 交易金额 |
 | amountStr | string | 交易金额字符串 |
 | amountDisplay | string | 交易金额展示值 |
 | amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
+| exchangeAmount | string | 兑换后到账金额 |
 | exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
+| fee | string | 交易手续费 |
 | feeDisplay | string | 手续费展示值 |
 | createTime | string | 交易开始时间 |
 | finishTime | string | 交易完成时间 |
 | failureReason | string | 失败原因说明 |
 | errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
+| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用ExceptionTypeEnum名称，未知码为空 |
+| hourBucketSeconds | string | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
+| hourlyRate | string | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
+| basisBalance | string | 负结余利息计息基数，结算币种单位；其它类型为空 |
+| exchangeRate | string | 汇率 |
+| convertExchangeRate | string | 闪兑汇率（兑入/兑出） |
 | rateDisplay | string | 汇率展示值 |
 | txHash | string | 链上交易哈希 |
 | feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
-| targetAccountType | string | 目标账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| sourceAccountType | string | 来源账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
+| targetAccountType | string | 目标账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 | sourceAccountId | string | 来源账户 ID |
 | targetAccountId | string | 目标账户 ID |
 | sourceWalletAddress | string | 来源链上钱包地址 |
 | targetWalletAddress | string | 目标链上钱包地址 |
 | extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型；可选值：`CRYPTO_ADDRESS`、`FIAT` |
-| transactionMethod | string | 交易方式枚举；可选值：`CHAIN_TX`、`USER_TRANSFER`、`OTHER`、`CHAIN_TX - 链交易`、`USER_TRANSFER - 用户间划转`、`OTHER - 其他` |
+| sourceAccountBalance | string | 源账户动账后余额 |
+| targetAccountBalance | string | 目标账户动账后余额 |
+| fundFlowType | string | 资金流向类型; 可选值：`CRYPTO_ADDRESS`, `FIAT` |
+| transactionMethod | string | 交易方式; 可选值：`CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
-| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用既有错误键，未知码为空 |
-| hourBucketSeconds | integer | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
-| hourlyRate | number | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
-| basisBalance | number | 负结余利息计息基数，结算币种单位；其它类型为空 |
+| createTimeTimestamp | string | 交易开始时间毫秒时间戳 |
+| finishTimeTimestamp | string | 交易完成时间毫秒时间戳 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/TXN-20260827-0001" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
-  -H "Content-Type: application/json" \
-  -d '{}' 
+  -H "X-Nonce: YOUR_NONCE"
 ```
 
 ---
@@ -109,19 +108,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | size | integer | 否 | 分页每页条数 |
 | current | integer | 否 | 分页当前页码，从 1 开始 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
-| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔; 可选值：`ASC`, `DESC` |
+| trackingId | string | 否 | 用于跟踪请求的唯一标识 |
 | symbolId | integer | 否 | 按币种 ID 筛选 |
 | exchangeSymbolId | integer | 否 | 按兑换后币种 ID 筛选 |
-| transactionType | string | 否 | 交易类型枚举 |
+| transactionType | string | 否 | 交易类型枚举; 可选值：`NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
 | transactionTypes | array | 否 | 仅 transactionType==null 时生效 |
-| status | string | 否 | 按交易状态筛选：SUCCESS / FAIL / PENDING |
+| status | string | 否 | 按交易状态筛选：SUCCESS / FAIL / PENDING; 可选值：`SUCCESS`, `FAIL`, `PENDING` |
 | statuses | array | 否 | 仅 status==null 时生效 |
 | createTimeStart | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeStartTimestamp | integer | 否 | 毫秒级 Unix timestamp |
 | createTimeEnd | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeEndTimestamp | integer | 否 | 毫秒级 Unix timestamp |
-| transactionMethod | string | 否 | 交易方式枚举 |
+| transactionMethod | string | 否 | CHAIN_TX / USER_TRANSFER / OTHER; 可选值：`CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 
 ### 响应 `data` 字段
 
@@ -139,52 +138,52 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
+| id | string | 交易记录主键 ID |
 | uid | string | 用户 UID |
 | transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
+| symbolId | string | 币种 ID |
 | acSymbol | string | 币种名称；闪兑时为兑出币种 |
 | network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
+| exchangeSymbolId | string | 兑换后币种 ID |
 | exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举；可选值：`RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`ROLLBACK`、`SAFEBOX_TRANSFER_OUT`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`、`RECHARGE - 充值`、`WITHDRAWAL - 提现`、`TRANSFER_IN - 划入`、`TRANSFER_OUT - 划出`、`EXCHANGE - 兑换`、`ROLLBACK - 回退`、`SAFEBOX_TRANSFER_IN - 转入保险箱`、`SAFEBOX_TRANSFER_OUT - 转出 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
+| transactionType | string | 交易类型; 可选值：`NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
+| status | string | 交易状态：SUCCESS / FAIL / PENDING; 可选值：`SUCCESS`, `FAIL`, `PENDING` |
+| amount | string | 交易金额 |
 | amountStr | string | 交易金额字符串 |
 | amountDisplay | string | 交易金额展示值 |
 | amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
+| exchangeAmount | string | 兑换后到账金额 |
 | exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
+| fee | string | 交易手续费 |
 | feeDisplay | string | 手续费展示值 |
 | createTime | string | 交易开始时间 |
 | finishTime | string | 交易完成时间 |
 | failureReason | string | 失败原因说明 |
 | errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
+| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用ExceptionTypeEnum名称，未知码为空 |
+| hourBucketSeconds | string | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
+| hourlyRate | string | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
+| basisBalance | string | 负结余利息计息基数，结算币种单位；其它类型为空 |
+| exchangeRate | string | 汇率 |
+| convertExchangeRate | string | 闪兑汇率（兑入/兑出） |
 | rateDisplay | string | 汇率展示值 |
 | txHash | string | 链上交易哈希 |
 | feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
-| targetAccountType | string | 目标账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| sourceAccountType | string | 来源账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
+| targetAccountType | string | 目标账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 | sourceAccountId | string | 来源账户 ID |
 | targetAccountId | string | 目标账户 ID |
 | sourceWalletAddress | string | 来源链上钱包地址 |
 | targetWalletAddress | string | 目标链上钱包地址 |
 | extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型；可选值：`CRYPTO_ADDRESS`、`FIAT` |
-| transactionMethod | string | 交易方式枚举；可选值：`CHAIN_TX`、`USER_TRANSFER`、`OTHER`、`CHAIN_TX - 链交易`、`USER_TRANSFER - 用户间划转`、`OTHER - 其他` |
+| sourceAccountBalance | string | 源账户动账后余额 |
+| targetAccountBalance | string | 目标账户动账后余额 |
+| fundFlowType | string | 资金流向类型; 可选值：`CRYPTO_ADDRESS`, `FIAT` |
+| transactionMethod | string | 交易方式; 可选值：`CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
-| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用既有错误键，未知码为空 |
-| hourBucketSeconds | integer | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
-| hourlyRate | number | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
-| basisBalance | number | 负结余利息计息基数，结算币种单位；其它类型为空 |
+| createTimeTimestamp | string | 交易开始时间毫秒时间戳 |
+| finishTimeTimestamp | string | 交易完成时间毫秒时间戳 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/page" \
@@ -211,10 +210,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
+| trackingId | string | 否 | 用于跟踪请求的唯一标识 |
 | symbol | string | 是 | 如 BTC/USDT |
 | exchangeSymbol | string | 是 | 如 BTC/USDT |
-| amount | number | 是 | 兑换金额/兑换币种的数量 |
+| amount | number | 是 | 兑换金额/兑换币种的数量; 最小值: 1e-08 |
 | quoteSessionId | string | 是 | 询价会话 ID，来自闪兑汇率查询接口 |
 
 ### 响应 `data` 字段
@@ -252,19 +251,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | size | integer | 否 | 分页每页条数 |
 | current | integer | 否 | 分页当前页码，从 1 开始 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
-| trackingId | string | 是 | 用于跟踪请求的唯一标识 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔; 可选值：`ASC`, `DESC` |
+| trackingId | string | 否 | 用于跟踪请求的唯一标识 |
 | symbolId | integer | 否 | 按币种 ID 筛选 |
 | exchangeSymbolId | integer | 否 | 按兑换后币种 ID 筛选 |
-| transactionType | string | 否 | 交易类型枚举 |
+| transactionType | string | 否 | 交易类型枚举; 可选值：`NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
 | transactionTypes | array | 否 | 仅 transactionType==null 时生效 |
-| status | string | 否 | 按交易状态筛选：SUCCESS / FAIL / PENDING |
+| status | string | 否 | 按交易状态筛选：SUCCESS / FAIL / PENDING; 可选值：`SUCCESS`, `FAIL`, `PENDING` |
 | statuses | array | 否 | 仅 status==null 时生效 |
 | createTimeStart | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeStartTimestamp | integer | 否 | 毫秒级 Unix timestamp |
 | createTimeEnd | string | 否 | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeEndTimestamp | integer | 否 | 毫秒级 Unix timestamp |
-| transactionMethod | string | 否 | 交易方式枚举 |
+| transactionMethod | string | 否 | CHAIN_TX / USER_TRANSFER / OTHER; 可选值：`CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 
 ### 响应 `data` 字段
 
@@ -282,52 +281,52 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 交易记录主键 ID |
+| id | string | 交易记录主键 ID |
 | uid | string | 用户 UID |
 | transactionId | string | 业务交易流水号 |
-| symbolId | integer | 币种 ID |
+| symbolId | string | 币种 ID |
 | acSymbol | string | 币种名称；闪兑时为兑出币种 |
 | network | string | 链上网络协议 |
-| exchangeSymbolId | integer | 兑换后币种 ID |
+| exchangeSymbolId | string | 兑换后币种 ID |
 | exchangeSymbol | string | 兑换后币种名称；闪兑时为兑入币种 |
-| transactionType | string | 交易类型枚举；可选值：`RECHARGE`、`WITHDRAWAL`、`TRANSFER_IN`、`TRANSFER_OUT`、`EXCHANGE`、`SAFEBOX_TRANSFER_IN`、`ROLLBACK`、`SAFEBOX_TRANSFER_OUT`、`ADJUSTMENT_ADD`、`ADJUSTMENT_REDUCE`、`MLP_DEPOSIT`、`MLP_WITHDRAWAL`、`TRANSFER_TRADE_TO_SPOT`、`TRANSFER_SPOT_TO_TRADE`、`EARN_DEPOSIT`、`EARN_WITHDRAWAL`、`PROMO_REWARD_IN`、`PROMO_REWARD_OUT`、`RECHARGE - 充值`、`WITHDRAWAL - 提现`、`TRANSFER_IN - 划入`、`TRANSFER_OUT - 划出`、`EXCHANGE - 兑换`、`ROLLBACK - 回退`、`SAFEBOX_TRANSFER_IN - 转入保险箱`、`SAFEBOX_TRANSFER_OUT - 转出 |
-| status | string | 交易状态：SUCCESS / FAIL / PENDING |
-| amount | number | 交易金额 |
+| transactionType | string | 交易类型; 可选值：`NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
+| status | string | 交易状态：SUCCESS / FAIL / PENDING; 可选值：`SUCCESS`, `FAIL`, `PENDING` |
+| amount | string | 交易金额 |
 | amountStr | string | 交易金额字符串 |
 | amountDisplay | string | 交易金额展示值 |
 | amountScale | integer | 交易金额展示小数位数 |
-| exchangeAmount | number | 兑换后到账金额 |
+| exchangeAmount | string | 兑换后到账金额 |
 | exchangeAmountDisplay | string | 兑换后金额展示值 |
-| fee | number | 交易手续费 |
+| fee | string | 交易手续费 |
 | feeDisplay | string | 手续费展示值 |
 | createTime | string | 交易开始时间 |
 | finishTime | string | 交易完成时间 |
 | failureReason | string | 失败原因说明 |
 | errorCode | string | 失败错误码 |
-| exchangeRate | number | 汇率 |
-| convertExchangeRate | number | 闪兑汇率（兑入/兑出） |
+| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用ExceptionTypeEnum名称，未知码为空 |
+| hourBucketSeconds | string | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
+| hourlyRate | string | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
+| basisBalance | string | 负结余利息计息基数，结算币种单位；其它类型为空 |
+| exchangeRate | string | 汇率 |
+| convertExchangeRate | string | 闪兑汇率（兑入/兑出） |
 | rateDisplay | string | 汇率展示值 |
 | txHash | string | 链上交易哈希 |
 | feeSymbol | string | 手续费计价币种 |
-| sourceAccountType | string | 来源账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
-| targetAccountType | string | 目标账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| sourceAccountType | string | 来源账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
+| targetAccountType | string | 目标账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 | sourceAccountId | string | 来源账户 ID |
 | targetAccountId | string | 目标账户 ID |
 | sourceWalletAddress | string | 来源链上钱包地址 |
 | targetWalletAddress | string | 目标链上钱包地址 |
 | extParams | string | 扩展参数 JSON 字符串 |
-| sourceAccountBalance | number | 源账户动账后余额 |
-| targetAccountBalance | number | 目标账户动账后余额 |
-| fundFlowType | string | 资金流向类型；可选值：`CRYPTO_ADDRESS`、`FIAT` |
-| transactionMethod | string | 交易方式枚举；可选值：`CHAIN_TX`、`USER_TRANSFER`、`OTHER`、`CHAIN_TX - 链交易`、`USER_TRANSFER - 用户间划转`、`OTHER - 其他` |
+| sourceAccountBalance | string | 源账户动账后余额 |
+| targetAccountBalance | string | 目标账户动账后余额 |
+| fundFlowType | string | 资金流向类型; 可选值：`CRYPTO_ADDRESS`, `FIAT` |
+| transactionMethod | string | 交易方式; 可选值：`CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 | recipientUid | string | WITHDRAWAL 用户间划转时有值 |
 | payerUid | string | RECHARGE 用户间划转时有值 |
-| finishTimeTimestamp | integer | 交易完成时间毫秒时间戳 |
-| createTimeTimestamp | integer | 交易开始时间毫秒时间戳 |
-| errorCodeKey | string | 稳定业务错误键；负结余转出为TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE，其它已知码沿用既有错误键，未知码为空 |
-| hourBucketSeconds | integer | 负结余利息的计息整点，Unix秒UTC epoch；其它类型为空 |
-| hourlyRate | number | 负结余利息小时利率百分数，最多6位小数；其它类型为空 |
-| basisBalance | number | 负结余利息计息基数，结算币种单位；其它类型为空 |
+| createTimeTimestamp | string | 交易开始时间毫秒时间戳 |
+| finishTimeTimestamp | string | 交易完成时间毫秒时间戳 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/account/record/page" \
@@ -340,4 +339,32 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   "current": 1,
   "size": 20
 }' 
+```
+
+---
+
+## 校验转账收款用户
+
+`GET /openapi/v1/mc-account/transaction/user-transfer/recipients/{recipientUid}/validation` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| recipientUid | string | 是 |  |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| valid | boolean | 仅 reason=NONE 时为 true |
+| reason | string | NONE 可收款；NOT_FOUND 不可见；NOT_RECEIVABLE 不可收款；SELF 本人; 可选值：`NONE`, `NOT_FOUND`, `NOT_RECEIVABLE`, `SELF` |
+| checkedAtTimestamp | string | 检查完成时服务器 Unix 毫秒 UTC epoch |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/user-transfer/recipients/100000001/validation" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
 ```

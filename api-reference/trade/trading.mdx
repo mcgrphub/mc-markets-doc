@@ -34,10 +34,10 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5 contract account ID / spot account ID |
+| login | string | Yes | Trading or spot account login |
 | order | integer | Yes | Order ID |
 | symbol | string | Yes | Trading pair, e.g. BTCUSDT; valid only when placing orders |
-| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| type | integer | Yes | Order type: 0 OP_BUY market buy; 1 OP_SELL market sell; 2 OP_BUY_LIMIT buy limit; 3 OP_SELL_LIMIT sell limit; 4 OP_BUY_STOP buy stop; 5 OP_SELL_STOP sell stop; 6 OP_BUY_STOP_LIMIT buy stop-limit; 7 OP_SELL_STOP_LIMIT sell stop-limit; 8 OP_CLOSE_BY close by an opposite position in hedging mode |
 | priceSL | number | No | New stop-loss price |
 | priceTP | number | No | New take-profit price |
 
@@ -48,6 +48,12 @@ Paths in this group use the `/openapi/v1/mc-trade/` prefix.
 | code | string | MT5 Return Status Code |
 | orderId | string | MT5 Order ID (if any) |
 | params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+
+`params` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -76,17 +82,17 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5 contract account ID / spot account ID |
+| login | string | Yes | Trading or spot account login |
 | symbol | string | Yes | Trading pair, e.g. BTCUSDT; valid only when placing orders |
 | price | number | Yes | Order price |
-| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
-| typeTime | integer | Yes | Time-in-force type; defaults to 0 if omitted. Values: "0-good till cancelled", "1-day order", "2-specified time", "3-specified date; expires at 00:00 on that date or the nearest trading time" |
+| type | integer | Yes | Order type: 0 OP_BUY market buy; 1 OP_SELL market sell; 2 OP_BUY_LIMIT buy limit; 3 OP_SELL_LIMIT sell limit; 4 OP_BUY_STOP buy stop; 5 OP_SELL_STOP sell stop; 6 OP_BUY_STOP_LIMIT buy stop-limit; 7 OP_SELL_STOP_LIMIT sell stop-limit; 8 OP_CLOSE_BY close by an opposite position in hedging mode |
+| typeTime | integer | Yes | Time policy, default 0: 0 good till canceled; 1 valid for the day; 2 valid until a specified time; 3 valid until 00:00 on a specified date or the nearest trading time |
 | expiration | integer | Yes | Expiration timestamp (required when typeTime=2) |
 | priceTrigger | number | Yes | Stop-limit order trigger price |
 | priceSL | number | Yes | Stop-loss |
-| priceTP | number | Yes | Take-profit |
+| priceTP | number | Yes | Take-profit price |
 | order | integer | Yes | Order ID |
-| volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000; must match the volumeExt passed when the order was placed |
+| volumeExt | integer | Yes | Volume at the same precision used when placing the order; send 100000000 for 1 lot |
 
 ### Response `data` fields
 
@@ -95,6 +101,12 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 | code | string | MT5 Return Status Code |
 | orderId | string | MT5 Order ID (if any) |
 | params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+
+`params` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -128,20 +140,20 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5 contract account ID / spot account ID |
+| login | string | Yes | Trading or spot account login |
 | symbol | string | Yes | Trading pair, e.g. BTCUSDT |
-| volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000 |
+| volumeExt | integer | Yes | Volume scaled to position-volume precision; send 100000000 for 1 lot |
 | price | number | No | Order price; defaults to 0 if omitted; 0 = market, any other value = limit |
-| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| type | integer | Yes | Order type: 0 OP_BUY market buy; 1 OP_SELL market sell; 2 OP_BUY_LIMIT buy limit; 3 OP_SELL_LIMIT sell limit; 4 OP_BUY_STOP buy stop; 5 OP_SELL_STOP sell stop; 6 OP_BUY_STOP_LIMIT buy stop-limit; 7 OP_SELL_STOP_LIMIT sell stop-limit; 8 OP_CLOSE_BY close by an opposite position in hedging mode |
 | position | integer | No | Position ID; defaults to 0 |
-| typeFill | integer | Yes | Fill type: "0-Fill or Kill: the order must be fully filled or cancelled; partial fills are not kept.", "1-Immediate or Cancel: the order may be partially filled; the unfilled remainder is cancelled.", "2-Return remainder to queue: for pending orders (e.g. limit, stop); only for exchange-executed market orders; unfilled volume re-enters the queue.", "3-BOC (Book or Cancel): placed on the book only; if it would execute immediately, it is cancelled." |
-| typeTime | integer | No | Time-in-force type; defaults to 0 if omitted. Values: "0-good till cancelled", "1-day order", "2-specified time", "3-specified date; expires at 00:00 on that date or the nearest trading time" |
-| expiration | integer | No | Expiration timestamp (required when typeTime=2); defaults to 0 if omitted (no auto-expiry) |
+| typeFill | integer | Yes | Fill policy: 0 Fill or Kill requires a full fill or cancels the order; 1 Immediate or Cancel permits a partial fill and cancels the remainder; 2 Return puts the remainder back in the queue for supported exchange execution orders; 3 Book or Cancel places the order in the book only and cancels it if it would execute immediately |
+| typeTime | integer | No | Time policy, default 0: 0 good till canceled; 1 valid for the day; 2 valid until a specified time; 3 valid until 00:00 on a specified date or the nearest trading time |
+| expiration | integer | No | Expiration timestamp, required when typeTime=2. Default 0 means no automatic expiration |
 | priceTrigger | number | No | Stop-limit order trigger price; defaults to 0 if omitted |
 | priceSL | number | No | Stop-loss |
-| priceTP | number | No | Take-profit |
-| userSlippageLimit | number | No | Maximum slippage limit for market orders entered by the user (market orders only) |
-| frontMarketPrice | number | No | Client-side market reference price (optional); must be ≥ 0 |
+| priceTP | number | No | Take-profit price |
+| userSlippageLimit | number | No | Maximum slippage limit for market orders entered by the user (market orders only); Minimum: 0 |
+| frontMarketPrice | number | No | Optional reference market price; must not be negative; Minimum: 0 |
 
 ### Response `data` fields
 
@@ -150,6 +162,12 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 | code | string | MT5 Return Status Code |
 | orderId | string | MT5 Order ID (if any) |
 | params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+
+`params` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -179,19 +197,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5 contract account ID / spot account ID |
+| login | string | Yes | Trading or spot account login |
 | symbol | string | Yes | Trading pair, e.g. BTCUSDT |
-| volumeExt | integer | Yes | Volume scaled by 10^8; for 1 lot pass 1*100000000 |
+| volumeExt | integer | Yes | Volume scaled to position-volume precision; send 100000000 for 1 lot |
 | price | number | No | Order price; defaults to 0 if omitted; 0 = market, any other value = limit |
-| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| type | integer | Yes | Order type: 0 OP_BUY market buy; 1 OP_SELL market sell; 2 OP_BUY_LIMIT buy limit; 3 OP_SELL_LIMIT sell limit; 4 OP_BUY_STOP buy stop; 5 OP_SELL_STOP sell stop; 6 OP_BUY_STOP_LIMIT buy stop-limit; 7 OP_SELL_STOP_LIMIT sell stop-limit; 8 OP_CLOSE_BY close by an opposite position in hedging mode |
 | position | integer | No | Position ID; defaults to 0 |
-| typeFill | integer | Yes | Fill type: "0-Fill or Kill: the order must be fully filled or cancelled; partial fills are not kept.", "1-Immediate or Cancel: the order may be partially filled; the unfilled remainder is cancelled.", "2-Return remainder to queue: for pending orders (e.g. limit, stop); only for exchange-executed market orders; unfilled volume re-enters the queue.", "3-BOC (Book or Cancel): placed on the book only; if it would execute immediately, it is cancelled." |
-| typeTime | integer | No | Time-in-force type; defaults to 0 if omitted. Values: "0-good till cancelled", "1-day order", "2-specified time", "3-specified date; expires at 00:00 on that date or the nearest trading time" |
-| expiration | integer | No | Expiration timestamp (required when typeTime=2); defaults to 0 if omitted (no auto-expiry) |
+| typeFill | integer | Yes | Fill policy: 0 Fill or Kill requires a full fill or cancels the order; 1 Immediate or Cancel permits a partial fill and cancels the remainder; 2 Return puts the remainder back in the queue for supported exchange execution orders; 3 Book or Cancel places the order in the book only and cancels it if it would execute immediately |
+| typeTime | integer | No | Time policy, default 0: 0 good till canceled; 1 valid for the day; 2 valid until a specified time; 3 valid until 00:00 on a specified date or the nearest trading time |
+| expiration | integer | No | Expiration timestamp, required when typeTime=2. Default 0 means no automatic expiration |
 | priceTrigger | number | No | Stop-limit order trigger price; defaults to 0 if omitted |
 | priceSL | number | No | Stop-loss |
-| priceTP | number | No | Take-profit |
-| frontMarketPrice | number | No | Client-side market reference price (optional); must be ≥ 0 |
+| priceTP | number | No | Take-profit price |
+| frontMarketPrice | number | No | Optional reference market price; must not be negative; Minimum: 0 |
 
 ### Response `data` fields
 
@@ -200,6 +218,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | code | string | MT5 Return Status Code |
 | orderId | string | MT5 Order ID (if any) |
 | params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+
+`params` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -243,7 +267,7 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | Field | Type | Description |
 | --- | --- | --- |
 | symbol | string | Trading Symbol Identifier |
-| mt5 | object | MT5 Data Configuration |
+| mt5 | object | MT5 engine symbol configuration |
 | risk | object | Risk Control Configuration Info |
 
 `data[].mt5` fields:
@@ -282,14 +306,51 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | TimeExpiration | string | Trade Expiry Date |
 | TimeStart | string | Trade Start Date |
 | TradeMode | integer | Trading Mode |
-| Spread | number | Spread |
+| Spread | string | Spread |
 | VolumeLimitExt | integer | Max Cumulative Volume |
 | VolumeMaxExt | integer | Max Trade Volume |
 | VolumeMinExt | integer | Min Trade Volume |
 | VolumeStepExt | integer | Volume Step |
 | leverageGrade | array | Leverage Tier Configuration |
-| marginRateInitial | object | Margin Ratio Details |
-| marginRateMaintenance | object | Margin Ratio Details |
+| marginRateInitial | object | Initial margin rate details |
+| marginRateMaintenance | object | Maintenance margin rate details |
+| category | string | Trading Symbol Category |
+| contractSize | number | Contract Size |
+| currencyBase | string | Base Currency |
+| currencyBaseDigits | integer | Base Currency Precision |
+| currencyMargin | string | Margin Currency |
+| currencyMarginDigits | integer | Margin Currency Precision |
+| currencyProfit | string | Profit Currency |
+| currencyProfitDigits | integer | Profit Currency Precision |
+| digits | integer | Price Decimal Places |
+| freezeLevel | integer | Freeze Level |
+| ieSlipLosing | integer | Max decline in loss direction for market execution |
+| ieSlipProfit | integer | Max decline in profit direction for market execution |
+| ieVolumeMaxExt | integer | Max trade volume for market execution |
+| international | string | International Name |
+| marginFlags | integer | Margin Check Mode |
+| marginHedged | number | Hedged Margin Value |
+| marginInitial | number | Initial Margin Size |
+| marginMaintenance | number | Maintenance Margin Size |
+| marginRateCurrency | number | Margin Currency Exchange Rate |
+| marginRateLiquidity | number | Liquidity Ratio |
+| orderFlags | integer | Order Type Identifier |
+| path | string | Trading Symbol Path |
+| priceLimitMax | number | Max Price Limit |
+| priceLimitMin | number | Min Price Limit |
+| priceSettle | number | Settlement Price |
+| sessionTrade | array | Trading Time |
+| source | string | Quote Source Symbol |
+| stopsLevel | integer | Stop Loss Order Deviation |
+| tickBookDepth | integer | Market Depth Range |
+| timeExpiration | string | Trade Expiry Date |
+| timeStart | string | Trade Start Date |
+| tradeMode | integer | Trading Mode |
+| spread | string | Spread |
+| volumeLimitExt | integer | Max Cumulative Volume |
+| volumeMaxExt | integer | Max Trade Volume |
+| volumeMinExt | integer | Min Trade Volume |
+| volumeStepExt | integer | Volume Step |
 
 `data[].mt5.SessionTrade[]` items:
 
@@ -348,99 +409,67 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | sellStop | number | Sell Stop Ratio |
 | sellStopLimit | number | Sell Stop Limit Ratio |
 
+`data[].mt5.sessionTrade[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| quote | array | Quote Time |
+| trade | array | Trading Time |
+| weekDay | string | Day of Week |
+
+`data[].mt5.sessionTrade[].quote[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| from | string | Start Time |
+| to | string | End Time |
+
+`data[].mt5.sessionTrade[].trade[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| from | string | Start Time |
+| to | string | End Time |
+
 `data[].risk` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Configuration ID |
+| tradingSymbolStatus | string | ONLINE means available for trading; OFFLINE means delisted and close-only; Allowed values: `ONLINE`, `OFFLINE` |
+| id | string | Configuration ID |
 | symbol | string | Trading Symbol Identifier |
 | version | integer | Configuration Version |
-| longAnnualRate | number | Long Annualized Rate |
-| shortAnnualRate | number | Short Annualized Rate |
-| discountRate | number | Discounted Rate |
-| baseRate | number | Base Rate |
+| longAnnualRate | string | Long Annualized Rate |
+| shortAnnualRate | string | Short Annualized Rate |
+| discountRate | string | Discounted Rate |
+| baseRate | string | Base Rate |
 | specialSymbol | integer | Special spot flag: 0=No, 1=Yes |
+| baseSlippagePct | string | Shared base slippage percentage |
+| marketCoefficient | object | Market coefficients for regular and scheduled periods |
 | fundingRateBaseType | string | Funding Rate Benchmark Type |
-| fundingRateThreshold | number | Funding Rate Threshold |
-| fundingRateStep | number | Funding Rate Step |
-| fundingRateIncrease | number | Funding Rate Increment |
-| fundingRateBase | number | Funding Rate Benchmark |
-| fundingRateMin | number | Funding Rate Min Value |
-| fundingRateMax | number | Funding Rate Max Value |
+| fundingRateThreshold | string | Funding Rate Threshold |
+| fundingRateStep | string | Funding Rate Step |
+| fundingRateIncrease | string | Funding Rate Increment |
+| fundingRateBase | string | Funding Rate Benchmark |
+| fundingRateMin | string | Funding Rate Min Value |
+| fundingRateMax | string | Funding Rate Max Value |
 | liquidationFeeType | string | Liquidation Fee Type |
-| liquidationFeeValue | number | Liquidation Fee Value |
-| minLiquidationFee | number | Minimum Liquidation Fee |
+| liquidationFeeValue | string | Liquidation Fee Value |
+| minLiquidationFee | string | Minimum Liquidation Fee |
 | fundingRateMode | string | Funding Rate Mode |
 | fundingRateExternalMarketSymbol | string | Funding Rate External Market Symbol |
 | groupName | string | Group Name |
 | platformMaxSlippageType | string | Platform Maximum Slippage Type |
-| platformMaxSlippage | number | Platform Maximum Slippage |
+| platformMaxSlippage | string | Platform Maximum Slippage |
 | tpSlMaxSlippageType | string | TP/SL Maximum Slippage Type |
-| tpSlMaxSlippage | number | TP/SL Maximum Slippage |
-| userLongPositionValueLimitUsdc | number | User long position value cap (USDC) |
-| userShortPositionValueLimitUsdc | number | User short position value cap (USDC) |
-| platformLongTotalPositionLimitUsdc | number | Platform total long position cap (USDC) |
-| platformShortTotalPositionLimitUsdc | number | Platform total short position cap (USDC) |
-| free | object | Premium Tier Configuration |
-| premium | object | Premium Tier Configuration |
-| tradingSymbolStatus | string | ONLINE means available for trading; OFFLINE means delisted and close-only |
-| baseSlippagePct | number | Shared base slippage percentage |
-| marketCoefficient | object | Market coefficients for regular and scheduled periods |
-| quoteDiffTolerancePoints | number | Quote difference tolerance in points for price protection |
-
-`data[].risk.free` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| transCostConfig | array | Trading Cost Configuration |
-| discountRate | number | Discounted Rate |
-
-`data[].risk.free.transCostConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| startTime | string | Trading Cost Config - Start Time |
-| endTime | string | Trading Cost Config - End Time |
-| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
-| transTotalTime | integer | Deal cumulative time |
-| slippageConfig | array | Slippage Tier Configuration |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | integer | Tier Range (From) |
-| to | integer | Tier Range (To) |
-| value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
-| valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
-| slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
-
-`data[].risk.premium` fields:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| transCostConfig | array | Trading Cost Configuration |
-| discountRate | number | Discounted Rate |
-
-`data[].risk.premium.transCostConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| startTime | string | Trading Cost Config - Start Time |
-| endTime | string | Trading Cost Config - End Time |
-| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
-| transTotalTime | integer | Deal cumulative time |
-| slippageConfig | array | Slippage Tier Configuration |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` items:
-
-| Field | Type | Description |
-| --- | --- | --- |
-| from | integer | Tier Range (From) |
-| to | integer | Tier Range (To) |
-| value | number | Slippage value; stored and retrieved as-is. For PERCENTAGE type, range is (0,100], 0.05=0.05% |
-| valueType | string | Slippage value type: POINT-Points, PERCENTAGE-Percentage, defaults to POINT |
-| slippageCoefficient | number | Slippage coefficient k, independent of value/valueType |
+| tpSlMaxSlippage | string | TP/SL Maximum Slippage |
+| quoteDiffTolerancePoints | string | Quote difference tolerance in points for price protection |
+| userLongPositionValueLimitUsdc | string | User long position value cap (USDC) |
+| userShortPositionValueLimitUsdc | string | User short position value cap (USDC) |
+| platformLongTotalPositionLimitUsdc | string | Platform total long position cap (USDC) |
+| platformShortTotalPositionLimitUsdc | string | Platform total short position cap (USDC) |
+| free | object | Free tier configuration |
+| premium | object | Premium tier configuration |
 
 `data[].risk.marketCoefficient` fields:
 
@@ -455,7 +484,7 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | --- | --- | --- |
 | key | string | Tier key: SMALL, MEDIUM, or LARGE |
 | label | string | Display name |
-| coefficient | number | Market coefficient |
+| coefficient | string | Market coefficient |
 
 `data[].risk.marketCoefficient.scheduled[]` items:
 
@@ -465,7 +494,57 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | label | string | Display name |
 | startAt | string | Start time; ISO-8601 is recommended |
 | endAt | string | End time; ISO-8601 is recommended |
-| coefficient | number | Market coefficient |
+| coefficient | string | Market coefficient |
+
+`data[].risk.free` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| transCostConfig | array | Trading Cost Configuration |
+| discountRate | string | Discounted Rate |
+
+`data[].risk.free.transCostConfig[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| startTime | string | Trading Cost Config - Start Time |
+| endTime | string | Trading Cost Config - End Time |
+| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| transTotalTime | string | Deal cumulative time |
+| slippageConfig | array | Slippage Tier Configuration |
+
+`data[].risk.free.transCostConfig[].slippageConfig[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| from | string | Tier Range (From) |
+| to | string | Tier Range (To) |
+| slippageCoefficient | string | Slippage coefficient k |
+
+`data[].risk.premium` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| transCostConfig | array | Trading Cost Configuration |
+| discountRate | string | Discounted Rate |
+
+`data[].risk.premium.transCostConfig[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| startTime | string | Trading Cost Config - Start Time |
+| endTime | string | Trading Cost Config - End Time |
+| transCostMode | string | Trading Cost Config - Mode TRADE_AMOUNT: Trade Amount |
+| transTotalTime | string | Deal cumulative time |
+| slippageConfig | array | Slippage Tier Configuration |
+
+`data[].risk.premium.transCostConfig[].slippageConfig[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| from | string | Tier Range (From) |
+| to | string | Tier Range (To) |
+| slippageCoefficient | string | Slippage coefficient k |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
@@ -482,16 +561,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5 contract account ID / spot account ID |
-| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order", "7-OP_SELL_STOP_LIMIT: stop-limit sell pending order", "8-OP_CLOSE_BY: close-by order; applies only in hedging mode" |
-| volumeExt | integer | Yes | Order quantity (extended precision ×100000000); e.g. for 0.01 lots pass 0.01*100000000 |
+| login | string | Yes | Trading or spot account login |
+| type | integer | Yes | Order type: 0 OP_BUY market buy; 1 OP_SELL market sell; 2 OP_BUY_LIMIT buy limit; 3 OP_SELL_LIMIT sell limit; 4 OP_BUY_STOP buy stop; 5 OP_SELL_STOP sell stop; 6 OP_BUY_STOP_LIMIT buy stop-limit; 7 OP_SELL_STOP_LIMIT sell stop-limit; 8 OP_CLOSE_BY close by an opposite position in hedging mode |
+| volumeExt | integer | Yes | Order volume after scaling to position-volume precision; for example, send 1000000 for 0.01 lots; Minimum: 1 |
 | symbol | string | Yes | Trading pair / symbol |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| estimatedSlippage | number | Estimated Slippage |
+| estimatedSlippage | string | Estimated Slippage |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
@@ -515,7 +594,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| uid | string | Yes | The current user's spot or contract account ID, not the customer UID. Get it from `data.user.spotAccount` or `data.user.tradeAccount` in [Get the current authenticated user](/api-reference/account/user#get-the-current-authenticated-user) |
+| uid | string | Yes | Current user spot or trading account ID, not the customer UID; obtain from data.user.spotAccount or data.user.tradeAccount in getProfile |
 
 ### Response `data` fields
 
@@ -602,18 +681,18 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | Field | Type | Description |
 | --- | --- | --- |
-| userAssets | object | User assets |
+| userAssets | object | User asset details |
 
 `userAssets` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| balance | number | Balance |
-| equity | number | Equity |
-| floating | number | Floating P&L |
-| margin | number | Used margin |
-| marginFree | number | Free margin |
-| marginLevel | number | Margin level |
+| balance | string | Balance |
+| equity | string | Equity |
+| floating | string | Floating P&L |
+| margin | string | Used margin |
+| marginFree | string | Free margin |
+| marginLevel | string | Margin level |
 | positions | array | Position list |
 | marginDisplay | string | Margin display value (truncated down to 2 decimals) |
 | marginScale | integer | Margin display decimal places |
@@ -626,25 +705,25 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Position ID |
-| login | integer | Trading account login |
+| id | string | Position ID |
+| login | string | Trading account login |
 | action | integer | Asset action (for example 0 = normal) |
-| contractSize | number | Contract size |
-| freeMargin | number | Free margin |
+| contractSize | string | Contract size |
+| freeMargin | string | Free margin |
 | precision | integer | Precision |
 | priceDigits | integer | Price digits |
 | currencyDigits | integer | Currency digits |
-| priceCurrent | number | Current price |
-| openPrice | number | Open price |
-| time | integer | Open time |
-| slPrice | number | Stop-loss price |
-| tpPrice | number | Take-profit price |
-| rateProfit | number | Profit conversion rate |
-| freeAmount | number | Available quantity |
+| priceCurrent | string | Current price |
+| openPrice | string | Open price |
+| time | string | Open time |
+| slPrice | string | Stop-loss price |
+| tpPrice | string | Take-profit price |
+| rateProfit | string | Profit conversion rate |
+| freeAmount | string | Available quantity |
 | symbol | string | Trading symbol |
-| usdValue | number | USD-equivalent value |
-| volume | number | Position volume (standard precision) |
-| volumeExt | number | Position volume (extended precision) |
+| usdValue | string | USD-equivalent value |
+| volume | string | Position volume (standard precision) |
+| volumeExt | string | Position volume (extended precision) |
 | volumeDisplay | string | Position volume display value |
 | volumeScale | integer | Position volume display decimal places |
 
@@ -667,9 +746,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| login | string | Yes | MT5 contract account ID / spot account ID |
+| login | string | Yes | Trading or spot account login |
 | order | integer | Yes | Order ID |
-| type | integer | Yes | Order type: "0-OP_BUY: market buy", "1-OP_SELL: market sell", "2-OP_BUY_LIMIT: limit buy pending order", "3-OP_SELL_LIMIT: limit sell pending order", "4-OP_BUY_STOP: stop buy pending order", "5-OP_SELL_STOP: stop sell pending order", "6-OP_BUY_STOP_LIMIT: stop-limit buy pending order"… |
+| type | integer | Yes | Order type: 0 OP_BUY market buy; 1 OP_SELL market sell; 2 OP_BUY_LIMIT buy limit; 3 OP_SELL_LIMIT sell limit; 4 OP_BUY_STOP buy stop; 5 OP_SELL_STOP sell stop; 6 OP_BUY_STOP_LIMIT buy stop-limit; 7 OP_SELL_STOP_LIMIT sell stop-limit; 8 OP_CLOSE_BY close by an opposite position in hedging mode |
 | symbol | string | Yes | Trading pair, e.g. BTCUSDT |
 
 ### Response `data` fields
@@ -679,6 +758,12 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 | code | string | MT5 Return Status Code |
 | orderId | string | MT5 Order ID (if any) |
 | params | object | MT5 return parameters (passed through to frontend or for business logic processing) |
+
+`params` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | MT5 return parameters (passed through to frontend or for business logic processing) |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

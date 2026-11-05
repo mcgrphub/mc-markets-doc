@@ -43,57 +43,57 @@ Query pending (unfilled) orders for the current user. UID is taken from the `X-U
 
 | Field | Type | Description |
 | --- | --- | --- |
-| order | integer | Order number, primary key |
-| login | integer | Login account, MT5 account login number |
-| dealer | integer | Dealer ID, the MT5 dealer code |
-| symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
-| digits | integer | Price precision, the number of decimal places for the trading symbol |
-| digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
-| contractSize | number | Contract size, the standard size per lot |
+| order | string | Order number, primary key |
+| externalID | string | External-system ID |
+| login | string | Trading account login |
+| dealer | string | Dealer ID |
+| symbol | string | Trading symbol |
+| digits | integer | Price precision |
+| digitsCurrency | integer | Currency precision |
+| contractSize | string | Standard contract size per lot |
 | state | integer | Order Status |
 | reason | integer | Reason, the reason code for the order change |
-| timeSetup | integer | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
-| timeExpiration | integer | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
-| timeDone | integer | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
-| timeSetupMsc | integer | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
-| timeDoneMsc | integer | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
+| timeSetup | string | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
+| timeExpiration | string | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
+| timeDone | string | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
+| timeSetupMsc | string | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
+| timeDoneMsc | string | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
 | modifyFlags | integer | Modification flags, the flag bits for order modification |
 | type | integer | Order type, e.g., buy, sell, etc. |
 | typeFill | integer | Deal type, the fill type of the order |
 | typeTime | integer | Time validity type, the validity type of the order |
-| priceOrder | number | Order price, the execution price of the order |
+| priceOrder | string | Order price, the execution price of the order |
 | priceOrderDisplay | string | Order price display value |
 | priceOrderScale | integer | Order price display decimal places |
-| priceTrigger | number | Trigger price, the trigger price of the order |
+| priceTrigger | string | Trigger price, the trigger price of the order |
 | priceTriggerDisplay | string | Trigger price display value |
 | priceTriggerScale | integer | Trigger price display decimal places |
-| priceCurrent | number | Current price, the current market price of the order |
+| priceCurrent | string | Current price, the current market price of the order |
 | priceCurrentDisplay | string | Current price display value |
 | priceCurrentScale | integer | Current price display decimal places |
+| priceSL | string | Stop-loss price |
 | priceSlDisplay | string | Stop loss price display value |
 | priceSlScale | integer | Stop loss price display decimal places |
+| priceTP | string | Take-profit price |
 | priceTpDisplay | string | Take profit price display value |
 | priceTpScale | integer | Take profit price display decimal places |
-| volumeInitialExt | number | Initial extended volume, the initial extended volume of the order (for large orders) |
-| volumeCurrentExt | number | Current extended volume, the current extended volume of the order |
-| quantity | number | User quantity, equals current remaining volumeCurrentExt divided by 10^8 |
-| rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
+| volumeInitialExt | string | Initial extended volume, the initial extended volume of the order (for large orders) |
+| volumeCurrentExt | string | Current extended volume, the current extended volume of the order |
+| quantity | string | User quantity, equals current remaining volumeCurrentExt divided by 10^8 |
+| expertID | string | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
+| positionID | string | Related position ID |
+| positionByID | string | Opposite position ID, the associated opposite position ID |
+| rateMargin | string | Margin conversion rate |
 | activationMode | integer | Activation mode, the activation mode of the pending order |
-| activationTime | integer | Activation time, the activation timestamp of the pending order |
-| activationPrice | number | Activation price, the activation price of the pending order |
+| activationTime | string | Activation time, the activation timestamp of the pending order |
+| activationPrice | string | Activation price, the activation price of the pending order |
 | activationFlags | integer | Activation flag, the flag bit for pending order activation |
-| volumeInitial | number | Initial volume, the initial trading volume of the order |
+| volumeInitial | string | Initial volume, the initial trading volume of the order |
 | volumeInitialDisplay | string | Initial volume display value |
 | volumeInitialScale | integer | Initial volume display decimal places |
-| volumeCurrent | number | Current volume, the current trading volume of the order |
+| volumeCurrent | string | Current volume, the current trading volume of the order |
 | volumeCurrentDisplay | string | Current volume display value |
 | volumeCurrentScale | integer | Current volume display decimal places |
-| externalID | string | External ID, the ID associated with the external system |
-| priceSL | number | Stop loss price, the set stop loss level |
-| priceTP | number | Take profit price, the set take profit level |
-| expertID | integer | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
-| positionID | integer | Position ID, the associated position ID |
-| positionByID | integer | Opposite position ID, the associated opposite position ID |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/pending/v2" \
@@ -118,22 +118,24 @@ Query historical orders by UID and account data type (SPOT/CONTRACT/SPOT_CONTRAC
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number |
-| orderBy | string | No | Sort fields, comma-separated |
-| sortOrder | string | No | Sort direction: ASC / DESC |
-| type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined |
+| orderBy | string | No |  |
+| sortOrder | string | No |  |
+| type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined; Allowed values: `SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
 | from | integer | Yes | Start timestamp (Unix timestamp, seconds) |
 | to | integer | Yes | End timestamp (Unix timestamp, seconds) |
 | symbol | string | No | Trading symbol name |
+| cursorTimeSetupMsc | integer | No | CURSOR timestamp from records.timeSetupMsc of the last item on the previous page, in Unix milliseconds; provide together with cursorOrderId |
+| cursorOrderId | integer | No | CURSOR order ID from records.order of the last item on the previous page; provide together with cursorTimeSetupMsc |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array | Records on the current page |
-| total | integer | Total number of records |
+| total | integer | Total count for standard page pagination; may be 0 when counting is disabled or cursor pagination is used. In that case, use records and hasNext |
 | size | integer | Page size |
 | current | integer | Current page number |
-| pages | integer | Total number of pages |
+| pages | integer | Page count for standard page pagination; may be 0 when counting is disabled or cursor pagination is used. For platform deals, use the last timeMsc/dealId as the next cursor |
 | hasPrevious | boolean | Whether a previous page exists |
 | hasNext | boolean | Whether a next page exists |
 
@@ -141,58 +143,58 @@ Query historical orders by UID and account data type (SPOT/CONTRACT/SPOT_CONTRAC
 
 | Field | Type | Description |
 | --- | --- | --- |
-| order | integer | Order number, primary key |
-| login | integer | Login account, MT5 account login number |
-| dealer | integer | Dealer ID, the MT5 dealer code |
-| symbol | string | Trading symbol, e.g., EURUSD, GBPUSD, etc. |
-| digits | integer | Price precision, the number of decimal places for the trading symbol |
-| digitsCurrency | integer | Currency precision, the number of currency decimal places for the trading symbol |
-| contractSize | number | Contract size, the standard size per lot |
+| order | string | Order number, primary key |
+| externalID | string | External-system ID |
+| login | string | Trading account login |
+| dealer | string | Dealer ID |
+| symbol | string | Trading symbol |
+| digits | integer | Price precision |
+| digitsCurrency | integer | Currency precision |
+| contractSize | string | Standard contract size per lot |
 | state | integer | Order Status |
 | reason | integer | Reason, the reason code for the order change |
-| timeSetup | integer | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
-| timeExpiration | integer | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
-| timeDone | integer | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
-| timeSetupMsc | integer | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
-| timeDoneMsc | integer | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
+| timeSetup | string | Order time, the timestamp when the order was created, in milliseconds, 13 digits |
+| timeExpiration | string | Expiry time, the expiration timestamp of the order, in milliseconds, 13 digits |
+| timeDone | string | Completion time, the timestamp when the order was completed, in milliseconds, 13 digits |
+| timeSetupMsc | string | Order time (ms), the timestamp when the order was created (milliseconds), 13 digits |
+| timeDoneMsc | string | Completion time (ms), the timestamp when the order was completed (milliseconds), 13 digits |
 | modifyFlags | integer | Modification flags, the flag bits for order modification |
 | type | integer | Order type, e.g., buy, sell, etc. |
 | typeFill | integer | Deal type, the fill type of the order |
 | typeTime | integer | Time validity type, the validity type of the order |
-| priceOrder | number | Order price, the execution price of the order |
+| priceOrder | string | Order price, the execution price of the order |
 | priceOrderStr | string | Order price raw string |
 | priceOrderDisplay | string | Order price display value |
 | priceOrderScale | integer | Order price display decimal places |
-| priceTrigger | number | Trigger price, the trigger price of the order |
+| priceTrigger | string | Trigger price, the trigger price of the order |
 | priceTriggerDisplay | string | Trigger price display value |
 | priceTriggerScale | integer | Trigger price display decimal places |
-| priceCurrent | number | Current price, the current market price of the order |
+| priceCurrent | string | Current price, the current market price of the order |
 | priceCurrentDisplay | string | Current price display value |
 | priceCurrentScale | integer | Current price display decimal places |
+| priceSL | string | Stop-loss price |
 | priceSlDisplay | string | Stop loss price display value |
 | priceSlScale | integer | Stop loss price display decimal places |
+| priceTP | string | Take-profit price |
 | priceTpDisplay | string | Take profit price display value |
 | priceTpScale | integer | Take profit price display decimal places |
-| volumeInitialExt | number | Initial extended volume, the initial extended volume of the order (for large orders) |
-| quantity | number | User quantity, equals initial volumeInitialExt divided by 10^8 |
+| volumeInitialExt | string | Initial extended volume, the initial extended volume of the order (for large orders) |
+| quantity | string | User quantity, equals initial volumeInitialExt divided by 10^8 |
 | volumeInitialDisplay | string | Initial volume display value |
 | volumeInitialScale | integer | Initial volume display decimal places |
-| volumeCurrentExt | number | Current extended volume, the current extended volume of the order |
+| volumeCurrentExt | string | Current extended volume, the current extended volume of the order |
 | volumeCurrentDisplay | string | Current volume display value |
 | volumeCurrentScale | integer | Current volume display decimal places |
-| rateMargin | number | Margin exchange rate, the exchange rate used when calculating margin |
+| expertID | string | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
+| positionID | string | Related position ID |
+| positionByID | string | Opposite position ID, the associated opposite position ID |
+| rateMargin | string | Margin conversion rate |
 | activationMode | integer | Activation mode, the activation mode of the pending order |
-| activationTime | integer | Activation time, the activation timestamp of the pending order |
-| activationPrice | number | Activation price, the activation price of the pending order |
+| activationTime | string | Activation time, the activation timestamp of the pending order |
+| activationPrice | string | Activation price, the activation price of the pending order |
 | activationFlags | integer | Activation flag, the flag bit for pending order activation |
-| volumeInitial | number | Initial volume, the initial trading volume of the order |
-| volumeCurrent | number | Current volume, the current trading volume of the order |
-| externalID | string | External ID, the ID associated with the external system |
-| priceSL | number | Stop loss price, the set stop loss level |
-| priceTP | number | Take profit price, the set take profit level |
-| expertID | integer | Expert Advisor ID. If the order was created by an EA (Expert Advisor), records the EA ID |
-| positionID | integer | Position ID, the associated position ID |
-| positionByID | integer | Opposite position ID, the associated opposite position ID |
+| volumeInitial | string | Initial volume, the initial trading volume of the order |
+| volumeCurrent | string | Current volume, the current trading volume of the order |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/history/v3" \
@@ -226,9 +228,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/his
 | taskId | string | Opaque unique task identifier |
 | dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
 | language | string | Normalized language code fixed at creation |
-| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; Nullable |
 | retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
-| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| retryContext | object | Retry conditions are provided only for complete, authorized FAILED tasks that are safe to retry; Nullable |
 | status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
 | failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
 | createdAt | integer | Creation time in Unix milliseconds (UTC) |
@@ -273,7 +275,7 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/histor
 
 ### Response
 
-HTTP `302 Found`. `Location` contains a temporary download URL; `Cache-Control: no-store`. The response has no JSON `data`.
+HTTP `302 Found`; `Location` contains a temporary download URL; `Cache-Control: no-store`. No JSON `data`.
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/history/export-tasks/TASK_DEMO_001/download" \
@@ -293,12 +295,12 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/histor
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientRequestId | string | Yes | Client idempotency identifier; 1 to 64 printable characters after trimming; Min length: 1; Max length: 64 |
-| sourceView | string | No | Source list: SPOT, CONTRACT, or PORTFOLIO; optional for legacy calls; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| clientRequestId | string | Yes | Client idempotency identifier; 1 to 64 printable characters after trimming; Min length: 0; Max length: 64 |
+| sourceView | string | No | Source list: SPOT, CONTRACT, PORTFOLIO, or VAULT; optional for legacy requests; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; Nullable |
 | type | string | Yes | Account data type: SPOT, CONTRACT, or SPOT_CONTRACT; Allowed values: `SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
 | from | integer | Yes | Query start time in Unix seconds (UTC) |
 | to | integer | Yes | Query end time in Unix seconds (UTC); must not precede from |
-| symbol | string | No | Optional trading symbol; empty means all symbols; Min length: 1; Max length: 64 |
+| symbol | string | No | Optional trading symbol; empty means all symbols; Min length: 0; Max length: 64 |
 | sort | string | Yes | Fixed descending ordering; deal and order datasets use their respective sort enums; Allowed values: `DEAL_TIME_DESC`, `ORDER_TIME_DESC` |
 | language | string | No | CSV language tag; aliases, empty values, and unknown tags are normalized by the service |
 | timeZone | string | Yes | IANA time zone identifier |
@@ -306,16 +308,16 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/histor
 
 ### Response `data` fields
 
-HTTP `202 Accepted`. Generation is asynchronous; poll the task status afterward.
+HTTP `202 Accepted`; The task is generated asynchronously.
 
 | Field | Type | Description |
 | --- | --- | --- |
 | taskId | string | Opaque unique task identifier |
 | dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
 | language | string | Normalized language code fixed at creation |
-| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; Nullable |
 | retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
-| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| retryContext | object | Retry conditions are provided only for complete, authorized FAILED tasks that are safe to retry; Nullable |
 | status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
 | failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
 | createdAt | integer | Creation time in Unix milliseconds (UTC) |

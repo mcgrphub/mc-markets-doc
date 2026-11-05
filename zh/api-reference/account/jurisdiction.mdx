@@ -23,11 +23,12 @@ description: "地区访问检查公开接口。"
 
 匿名或登录均可；结果不能授权业务写操作
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| result | string | 访问结果；可选值：`ACCESS_ALLOWED`、`JURISDICTION_RESTRICTED`、`JURISDICTION_UNKNOWN` |
+| result | string | 访问结果; 可选值：`ACCESS_ALLOWED`, `JURISDICTION_RESTRICTED`, `JURISDICTION_UNKNOWN` |
 | messageKey | string | 前端文案键；允许时为空字符串 |
 | policyVersion | string | 不透明策略版本 |
 | evaluatedAtMillis | integer | 评估完成时间，Unix 毫秒 UTC epoch |
@@ -54,8 +55,8 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/acce
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| decision | string | 门禁决定；可选值：`PASS`、`KYC_REQUIRED`、`JURISDICTION_RESTRICTED`、`JURISDICTION_UNKNOWN` |
-| reasonSource | string | 决定来源；不返回具体国家；可选值：`NONE`、`ACCESS_COUNTRY`、`IDENTITY_COUNTRY`、`BASIC_KYC` |
+| decision | string | 门禁决定; 可选值：`PASS`, `KYC_REQUIRED`, `JURISDICTION_RESTRICTED`, `JURISDICTION_UNKNOWN` |
+| reasonSource | string | 决定来源；不返回具体国家; 可选值：`NONE`, `ACCESS_COUNTRY`, `IDENTITY_COUNTRY`, `BASIC_KYC` |
 | policyVersion | string | 不透明策略版本 |
 | evaluatedAtMillis | integer | 评估完成时间，Unix 毫秒 UTC epoch |
 | retryable | boolean | 客户端是否可在事实更新后重试 |

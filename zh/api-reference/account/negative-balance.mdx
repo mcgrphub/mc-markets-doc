@@ -20,12 +20,13 @@ description: "负结余账户公开接口。"
 
 `GET /openapi/v1/mc-account/negative-balance/accounts` — 权限 `READ`.
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | accounts | array | 负结余账户；完整查询且全部非负时才为空 |
-| snapshotAtMs | integer | 权威快照时刻，Unix毫秒UTC |
+| snapshotAtMs | string | 权威快照时刻，Unix毫秒UTC |
 
 `accounts[]` 元素：
 
@@ -37,7 +38,7 @@ description: "负结余账户公开接口。"
 | amountToCover | string | 需补足的正数金额，USDC6位/其它币种8位向上取整 |
 | hourlyRate | string | 当前小时适用利率百分数字符串，最多6位小数 |
 | eventId | string | 可选已核实周期标识，未核实时不返回 |
-| negativeSinceMs | integer | 可选已核实周期开始，Unix毫秒UTC；未核实时不返回 |
+| negativeSinceMs | string | 可选已核实周期开始，Unix毫秒UTC；未核实时不返回 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/negative-balance/accounts" \

@@ -28,33 +28,39 @@ This creation endpoint only exports funding fee history and uses `FUNDING_FEE_HI
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| taskId | string | Yes | Unique task identifier |
+| taskId | string | Yes |  |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| taskId | string | Unique task identifier |
-| dataset | string | Task dataset: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, or `DEPOSIT_WITHDRAW`. The funding fee creation endpoint always uses `FUNDING_FEE_HISTORY` |
-| language | string | CSV language tag, normalized by the service |
-| status | string | Asynchronous task status: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, or `FAILED` |
-| failureReason | string | Failure reason for failed tasks: `RESTART`, `GENERATION`, `UPLOAD`, or `TIMEOUT` |
-| createdAt | string | Creation time in Unix milliseconds (UTC), serialized as a JSON string |
-| updatedAt | string | Update time in Unix milliseconds (UTC), serialized as a JSON string |
-| expiresAt | string | Expiration time in Unix milliseconds (UTC), serialized as a JSON string |
+| taskId | string | Task ID |
+| sourceView | string | Original source: SWAP, SPOT, CONTRACT, or PORTFOLIO; null for legacy tasks with an unknown source; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | Original failed task ID associated with this task; null for funding fee and ordinary task creation |
+| retryContext | object | Original frozen conditions for retry; explicitly null when retry is unavailable |
+| dataset | string | FUNDING_FEE_HISTORY, SWAP_HISTORY, BALANCE, FUND_FLOW, or DEPOSIT_WITHDRAW; Allowed values: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | Normalized CSV language |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | GENERATION, UPLOAD, RESTART, or TIMEOUT for failed tasks; otherwise null; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| updatedAt | string | Update time in Unix milliseconds (UTC) |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC) |
 | rowCount | integer | Data rows excluding the header; null before generation or when the limit is exceeded |
-| fileName | string | Downloadable file name; may be null |
+| fileName | string | Downloadable file name; nullable |
 | downloadAvailable | boolean | True only after success, before expiration, and after file metadata verification |
-| sourceView | string | Source view: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, or `VAULT`. Null for legacy tasks without a recorded source |
-| retryOfTaskId | string | Original failed task ID; null for funding fee tasks and ordinary task creation |
-| retryContext | object | Original frozen conditions when retry is available; otherwise null |
 
 `retryContext` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
 | originalTaskId | string | Current failed task ID |
-| createRequest | object | Allowed fields accepted by the original creation endpoint, excluding clientRequestId; keys and values depend on the original request |
+| createRequest | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+`retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks/TASK_DEMO_001" \
@@ -74,11 +80,11 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-recor
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| taskId | string | Yes | Unique task identifier |
+| taskId | string | Yes |  |
 
 ### Response
 
-HTTP `302 Found`. `Location` contains a temporary download URL; `Cache-Control: no-store`. The response has no JSON `data`.
+HTTP `302 Found`; `Location` contains a temporary download URL; `Cache-Control: no-store`. No JSON `data`.
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks/TASK_DEMO_001/download" \
@@ -98,41 +104,47 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-recor
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientRequestId | string | Yes | Non-empty client idempotency identifier, at most 64 characters; Min length: 1; Max length: 64 |
-| from | integer | Yes | Start time in Unix seconds (UTC), non-negative |
-| to | integer | Yes | End time in Unix seconds (UTC), not earlier than from |
-| sort | string | Yes | Fixed descending order for funding fee records; Allowed values: `DEAL_TIME_DESC` |
-| sourceView | string | No | Source view: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, or `VAULT`. Omit or set to null to retain the legacy unknown-source behavior |
-| language | string | No | CSV language tag, normalized by the service |
-| timeZone | string | Yes | IANA time zone identifier |
+| clientRequestId | string | Yes | Min length: 0; Max length: 64 |
+| from | integer | Yes |  |
+| to | integer | Yes |  |
+| sort | string | Yes | Allowed values: `DEAL_TIME_DESC` |
+| sourceView | string | No | Optional source: SPOT, CONTRACT, or PORTFOLIO; null preserves the legacy unknown-source behavior; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| language | string | No |  |
+| timeZone | string | Yes |  |
 
 ### Response `data` fields
 
-HTTP `202 Accepted`. Generation is asynchronous; poll the task status afterward.
+HTTP `202 Accepted`; The task is generated asynchronously.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| taskId | string | Unique task identifier |
-| dataset | string | Task dataset: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, or `DEPOSIT_WITHDRAW`. The funding fee creation endpoint always uses `FUNDING_FEE_HISTORY` |
-| language | string | CSV language tag, normalized by the service |
-| status | string | Asynchronous task status: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, or `FAILED` |
-| failureReason | string | Failure reason for failed tasks: `RESTART`, `GENERATION`, `UPLOAD`, or `TIMEOUT` |
-| createdAt | string | Creation time in Unix milliseconds (UTC), serialized as a JSON string |
-| updatedAt | string | Update time in Unix milliseconds (UTC), serialized as a JSON string |
-| expiresAt | string | Expiration time in Unix milliseconds (UTC), serialized as a JSON string |
+| taskId | string | Task ID |
+| sourceView | string | Original source: SWAP, SPOT, CONTRACT, or PORTFOLIO; null for legacy tasks with an unknown source; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | Original failed task ID associated with this task; null for funding fee and ordinary task creation |
+| retryContext | object | Original frozen conditions for retry; explicitly null when retry is unavailable |
+| dataset | string | FUNDING_FEE_HISTORY, SWAP_HISTORY, BALANCE, FUND_FLOW, or DEPOSIT_WITHDRAW; Allowed values: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | Normalized CSV language |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | GENERATION, UPLOAD, RESTART, or TIMEOUT for failed tasks; otherwise null; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| updatedAt | string | Update time in Unix milliseconds (UTC) |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC) |
 | rowCount | integer | Data rows excluding the header; null before generation or when the limit is exceeded |
-| fileName | string | Downloadable file name; may be null |
+| fileName | string | Downloadable file name; nullable |
 | downloadAvailable | boolean | True only after success, before expiration, and after file metadata verification |
-| sourceView | string | Source view: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, or `VAULT`. Null for legacy tasks without a recorded source |
-| retryOfTaskId | string | Original failed task ID; null for funding fee tasks and ordinary task creation |
-| retryContext | object | Original frozen conditions when retry is available; otherwise null |
 
 `retryContext` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
 | originalTaskId | string | Current failed task ID |
-| createRequest | object | Allowed fields accepted by the original creation endpoint, excluding clientRequestId; keys and values depend on the original request |
+| createRequest | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+`retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks" \

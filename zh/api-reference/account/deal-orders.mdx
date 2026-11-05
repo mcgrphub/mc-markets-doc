@@ -11,7 +11,6 @@ description: "成交订单相关 OpenAPI 接口。"
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/deal-order | READ | 分页查询成交订单 |
-| GET | /openapi/v1/mc-account/deal-order/&#123;dealId&#125; | READ | 成交单详情查询 |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -30,7 +29,7 @@ description: "成交订单相关 OpenAPI 接口。"
 | size | integer | 否 | 分页每页条数 |
 | current | integer | 否 | 分页当前页码，从 1 开始 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔; 可选值：`ASC`, `DESC` |
 
 ### 响应 `data` 字段
 
@@ -49,13 +48,13 @@ description: "成交订单相关 OpenAPI 接口。"
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | remark | string | 备注信息 |
-| dealAmount | number | 成交价值(USDC) |
+| dealAmount | string | 成交价值(USDC) |
 | dealAmountDisplay | string | 成交价值展示值 |
 | dealAmountScale | integer | 成交价值展示小数位 |
-| commission | number | 费用 |
+| commission | string | 费用 |
 | commissionDisplay | string | 费用展示值 |
 | commissionScale | integer | 费用展示小数位 |
-| profit | number | 已实现盈亏 |
+| profit | string | 已实现盈亏 |
 | profitDisplay | string | 已实现盈亏展示值 |
 | profitScale | integer | 已实现盈亏展示小数位 |
 
@@ -85,45 +84,45 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| businessLineId | integer | 业务线ID |
+| businessLineId | string | 业务线ID |
 | uid | string | 用户ID |
-| positionId | integer | 持仓单ID |
-| orderId | integer | 订单号 |
-| dealId | integer | 成交单号 |
+| positionId | string | 持仓单ID |
+| orderId | string | 订单号 |
+| dealId | string | 成交单号 |
 | dealTime | string | 成交时间 |
-| dealTimeTimestamp | integer | 成交时间毫秒时间戳 |
-| type | string | 交易类型；可选值：`EnDealActionEnum{id=0, description='买入交易'}`、`EnDealActionEnum{id=1, description='卖出交易'}`、`EnDealActionEnum{id=2, description='结余操作'}`、`EnDealActionEnum{id=3, description='信贷操作'}`、`EnDealActionEnum{id=4, description='其他费用/出金'}`、`EnDealActionEnum{id=5, description='更正操作'}`、`EnDealActionEnum{id=6, description='红利。该类型的操作影响客户的信贷资产'}`、`EnDealActionEnum{id=7, description='手续费'}`、`EnDealActionEnum{id=8, description='每日手续费'}`、`EnDealActionEnum{id=9, description='每月手续费'}`、`En |
+| dealTimeTimestamp | string | 成交时间毫秒时间戳 |
+| type | string | 交易类型; 可选值：`DEAL_BUY`, `DEAL_SELL`, `DEAL_BALANCE`, `DEAL_CREDIT`, `DEAL_CHARGE`, `DEAL_CORRECTION`, `DEAL_BONUS`, `DEAL_COMMISSION`, `DEAL_COMMISSION_DAILY`, `DEAL_COMMISSION_MONTHLY`, `DEAL_AGENT_DAILY`, `DEAL_AGENT_MONTHLY`, `DEAL_INTERESTRATE`, `DEAL_BUY_CANCELED`, `DEAL_SELL_CANCELED`, `DEAL_DIVIDEND`, `DEAL_DIVIDEND_FRANKED`, `DEAL_TAX`, `DEAL_AGENT`, `DEAL_SO_COMPENSATION`, `DEAL_SO_COMPENSATION_CREDIT` |
 | symbolPair | string | 交易对 |
-| baseSymbolId | integer | 基础币种ID |
-| quoteSymbolId | integer | 计价币种ID |
-| entry | string | 方向；可选值：`ENTRY_IN`、`ENTRY_OUT`、`ENTRY_INOUT`、`ENTRY_OUT_BY` |
-| price | number | 委托价格 |
-| pricePosition | number | 成交均价 |
-| lot | number | 委托数量 |
-| volumeClosed | number | 成交数量 |
-| storage | number | 库存费 |
-| commission | number | 手续费 |
+| baseSymbolId | string | 基础币种ID |
+| quoteSymbolId | string | 计价币种ID |
+| entry | string | 方向; 可选值：`ENTRY_IN`, `ENTRY_OUT`, `ENTRY_INOUT`, `ENTRY_OUT_BY` |
+| price | string | 委托价格 |
+| pricePosition | string | 成交均价 |
+| lot | string | 委托数量 |
+| volumeClosed | string | 成交数量 |
+| storage | string | 库存费 |
+| commission | string | 手续费 |
 | commissionDisplay | string | 手续费展示值，带符号向上取整后固定6位小数 |
 | commissionScale | integer | 手续费展示精度 |
-| profit | number | 交易盈亏额 |
+| profit | string | 交易盈亏额 |
 | profitDisplay | string | 盈亏展示值，四舍五入后固定6位小数 |
 | profitScale | integer | 盈亏展示精度 |
 | contractSize | integer | 合约大小 |
-| stopLoss | number | 止损价 |
-| takeProfit | number | 止盈价 |
-| onChainStatus | string | 上链状态；可选值：`PENDING`、`INITIALIZING`、`SUBMITTED`、`CONFIRMED`、`FAILED`、`RETRYING` |
+| stopLoss | string | 止损价 |
+| takeProfit | string | 止盈价 |
+| onChainStatus | string | 上链状态; 可选值：`PENDING`, `INITIALIZING`, `SUBMITTED`, `CONFIRMED`, `FAILED`, `RETRYING` |
 | txHash | string | 区块链交易哈希 |
 | retryCount | integer | 重试次数 |
-| gasUsed | integer | 实际消耗的Gas |
-| gasPrice | integer | Gas价格 |
+| gasUsed | string | 实际消耗的Gas |
+| gasPrice | string | Gas价格 |
 | blockNumber | integer | 区块号 |
 | blockConfirmation | integer | 区块确认数 |
 | submitTime | string | 提交时间 |
-| submitTimeTimestamp | integer | 提交时间毫秒时间戳 |
+| submitTimeTimestamp | string | 提交时间毫秒时间戳 |
 | confirmTime | string | 确认时间 |
-| confirmTimeTimestamp | integer | 确认时间毫秒时间戳 |
+| confirmTimeTimestamp | string | 确认时间毫秒时间戳 |
 | remark | string | 备注信息 |
-| accountType | string | 账户类型；可选值：`FUND_ACCOUNT`、`TRADING_ACCOUNT`、`SAFE_BOX`、`EXTERNAL_ACCOUNT`、`MLP_ACCOUNT`、`SPOT_ACCOUNT`、`EARN_ACCOUNT` |
+| accountType | string | 账户类型; 可选值：`FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/1000001" \

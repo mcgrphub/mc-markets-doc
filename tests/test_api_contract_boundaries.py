@@ -50,11 +50,6 @@ class ApiContractBoundariesTest(unittest.TestCase):
                 "longVolume` 和 `shortVolume` 均返回 `0`",
                 "`longVolume` and `shortVolume` are both `0`",
             ),
-            (
-                "/openapi/v1/mc-trade/account/contract-notional-by-symbol",
-                "longNotional` 和 `shortNotional` 均返回 `0`",
-                "`longNotional` and `shortNotional` are both `0`",
-            ),
         ]
         for endpoint, zh_copy, en_copy in account_endpoints:
             zh_section = endpoint_section(

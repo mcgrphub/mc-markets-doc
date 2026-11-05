@@ -28,40 +28,40 @@ description: "查询当前认证用户的主信息、资料、认证方式、邀
 
 返回用户主信息、资料、Privy 认证方式、邀请与 KYC 兼容信息，以及现货和合约交易账号的就绪状态。
 
-### 查询参数
+### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| uid | string | 是 | 当前认证用户的 UID；必须与认证上下文中的 UID 一致 |
+| uid | string | 是 |  |
 
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | user | object | 用户主信息 |
-| authList | array | 认证方式列表 |
+| authList | array | 认证方式列表（Privy 各通道绑定记录） |
 | profile | object | 用户扩展信息 |
-| legacy | object | 与旧版 GetUserInfoAndAccountInfo 对齐的兼容信息 |
-| boundLoginMethods | array | 已绑定的登录方式：email、google、wallet |
-| currentLoginMethod | string | 当前会话登录方式；OpenAPI Stateless JWT 场景可能为 null |
-| allTradingAccountsReady | boolean | 现货与合约交易账号是否均已生成 |
+| legacy | object | 与旧版 GetUserInfoAndAccountInfo 对齐的扩展字段（邀请、KYC、子账户列表等） |
+| boundLoginMethods | array | 当前已绑定的 Privy 登录方式：email / google / wallet（小写，来自 ac_user_credential） |
+| currentLoginMethod | string | 当前会话登录方式：email / google / wallet；OpenAPI Stateless JWT 场景本服务无法解析时可能为 null，由客户端或网关注入 |
+| allTradingAccountsReady | boolean | 现货与合约交易号是否均已生成（注册异步领号场景下可能暂时为 false） |
 
 `user` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| uid | string | 用户 UID |
+| uid | string | 用户UID（ac_user_base.uid） |
 | email | string | 邮箱 |
-| walletAddress | string | 已绑定的登录钱包地址 |
-| spotAccount | integer | 现货交易账号 |
-| tradeAccount | integer | 合约交易账号 |
-| demoAccount | integer | 模拟账号 |
+| walletAddress | string | 登录钱包地址（ac_user_credential，credential_type=WALLET） |
+| spotAccount | string | 现货交易账号 |
+| tradeAccount | string | 合约交易账号 |
+| demoAccount | string | 模拟账号 |
 | registerType | integer | 注册来源 |
-| appId | string | 渠道 ID |
-| clientId | string | 设备 ID |
+| appId | string | 渠道ID |
+| clientId | string | 设备ID |
 | version | string | 客户端版本号 |
-| ip | string | 注册 IP |
-| ipAddr | string | IP 归属地 |
+| ip | string | 注册IP |
+| ipAddr | string | IP归属地 |
 | imRef | string | 推广参数 IM_REF |
 
 `authList[]` 元素：
@@ -69,64 +69,60 @@ description: "查询当前认证用户的主信息、资料、认证方式、邀
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | authType | string | 认证类型 |
-| privyType | integer | Privy 三方类型 |
+| privyType | integer | 三方类型 |
 
 `profile` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | nickname | string | 昵称 |
-| avatar | string | 头像 URL |
+| avatar | string | 头像URL |
 | phone | string | 手机号 |
 | mobileAreaId | integer | 手机区号 |
-| country | string | 国家或地区 |
+| country | string | 国家 |
 | address | string | 地址 |
-| gender | integer | 性别：0 未知，1 男，2 女 |
-| birthday | string | 生日，格式为 yyyy-MM-dd |
+| gender | integer | 性别 0未知 1男 2女 |
+| birthday | string | 生日 yyyy-MM-dd |
 
 `legacy` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| uid | string | 用户 UID |
-| email | string | 邮箱 |
-| countryId | integer | 国家或地区 ID；无法转换为数字时为 0 |
-| mobileAreaId | integer | 手机区号 |
-| mobile | string | 手机号 |
-| credentialsType | integer | 证件类型：0 无，1 身份证，2 护照，3 驾照，99 其他 |
-| credentialsNum | string | 证件号码 |
-| credentialsCountryId | integer | 证件签发国家或地区 ID |
-| credentialsValidDateEnd | string | 证件有效期截止日期 |
-| isLongTime | boolean | 证件是否长期有效 |
-| cardStatus | integer | KYC 状态：0 无记录，1 待审，2 已通过，3 已拒绝，4 未提交 |
-| noCard | string | 无证说明或备注 |
-| createTime | string | 用户创建时间，格式为 yyyy-MM-dd HH:mm:ss |
-| spreadCode | string | 当前用户的邀请码 |
-| disseminatorCode | string | 注册时填写的邀请人邀请码 |
-| recommendedTime | string | 邀请关系绑定时间，格式为 yyyy-MM-dd HH:mm:ss |
-| nickName | string | 昵称 |
-| avatar | string | 头像 URL |
-| userLanguage | string | 用户语言偏好；未同步时为 null |
+| uid | string | 用户UID（字符串，与旧版 UserId 对应） |
+| email | string | 邮箱（明文；旧版可能为密文存储） |
+| countryId | integer | 国家/地区 ID；由 profile.country 可解析为数字时填充，否则 0 |
+| mobileAreaId | integer | 手机区号（ac_user_profile.mobile_area_id，无则回退资金账户 country_code） |
+| mobile | string | 手机号（资金账户） |
+| credentialsType | integer | 证件类型：0 无；1 身份证；2 护照；3 驾照；99 其他（与 KYC 类型映射） |
+| credentialsNum | string | 证件号码（KYC） |
+| credentialsCountryId | integer | 证件签发国家/地区 ID（cert_issue_region 为纯数字时） |
+| credentialsValidDateEnd | string | 证件有效期截止（KYC cert_valid_until） |
+| isLongTime | boolean | 是否长期有效（由 cert_valid_until 含「长期」等判定） |
+| cardStatus | integer | 证件/KYC 卡片状态：0 无记录；1 待审；2 已通过；3 已拒绝；4 未提交 |
+| noCard | string | 无证说明/备注类文案（暂无专门字段时为空串） |
+| createTime | string | 用户创建时间 yyyy-MM-dd HH:mm:ss |
+| spreadCode | string | 我的推广码/邀请码（SpreadCode） |
+| disseminatorCode | string | 注册时填写的邀请人邀请码（DisseminatorCode，绑定关系中的 invitation_code） |
+| recommendedTime | string | 推荐/邀请绑定时间 yyyy-MM-dd HH:mm:ss |
+| nickName | string | 昵称（与 profile 一致，便于旧端读顶层） |
+| avatar | string | 头像（与 profile 一致） |
+| userLanguage | string | 用户语言偏好（ac_user_profile_ext，item_name=USER_LANGUAGE；未同步时为 null） |
 | appId | string | 渠道 AppId |
-| cardSubmitTime | string | KYC 提交时间，格式为 yyyy-MM-dd HH:mm:ss |
-| accountInfos | array | 子账户或交易号列表 |
-| createTimeTimestamp | integer | 用户创建时间毫秒时间戳 |
-| recommendedTimeTimestamp | integer | 邀请关系绑定时间毫秒时间戳 |
-| cardSubmitTimeTimestamp | integer | KYC 提交时间毫秒时间戳 |
+| cardSubmitTime | string | KYC 提交时间 yyyy-MM-dd HH:mm:ss |
+| accountInfos | array | 子账户/交易号列表（对齐旧版 AccountInfos） |
+| createTimeTimestamp | string | 用户创建时间毫秒时间戳 |
+| recommendedTimeTimestamp | string | 推荐/邀请绑定时间毫秒时间戳 |
+| cardSubmitTimeTimestamp | string | KYC 提交时间毫秒时间戳 |
 
 `legacy.accountInfos[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| account | integer | 交易登录号或子账户号 |
-| accountType | integer | 账号类型：1 真实，2 模拟 |
-| accountGroup | integer | 账号组别：1 合约，2 现货 |
-| createTime | string | 创建时间，格式为 yyyy-MM-dd HH:mm:ss |
-| createTimeTimestamp | integer | 创建时间毫秒时间戳 |
-
-<Info>
-  `currentLoginMethod` 在 Stateless JWT 场景可能为 `null`。注册异步分配交易账号期间，`allTradingAccountsReady` 可能为 `false`；客户端可轮询本接口或延后读取用户信息。
-</Info>
+| account | string | 交易登录号/子账户号（MT5 Account） |
+| accountType | integer | 账号类型：1=真实 2=模拟 |
+| accountGroup | integer | 账号组别：1=合约 2=现货 |
+| createTime | string | 创建时间 yyyy-MM-dd HH:mm:ss（无单独落库时用用户创建时间） |
+| createTimeTimestamp | string | 创建时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-v2/profile" \

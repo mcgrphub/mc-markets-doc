@@ -28,20 +28,20 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number |
-| orderBy | string | No | Multi-field sort; comma-separated |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
 | symbol | string | Yes | Trading symbol |
-| isSettlementRate | boolean | No | Whether this is the settlement rate |
+| isSettlementRate | boolean | No | Whether this is the settlement rate; Allowed values: `true`, `false` |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array | Records on the current page |
-| total | integer | Total number of records |
+| total | integer | Total record count in standard mode; `0` in cursor mode |
 | size | integer | Page size |
 | current | integer | Current page number |
-| pages | integer | Total number of pages |
+| pages | integer | Total page count in standard mode; `0` in cursor mode |
 | hasPrevious | boolean | Whether a previous page exists |
 | hasNext | boolean | Whether a next page exists |
 
@@ -49,25 +49,25 @@ Paths in this group use the `/openapi/v1/mc-risk/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbol | string | Currency |
-| fundingRate | number | Funding Rate |
+| businessLineId | string | Business line ID |
+| symbol | string | Trading symbol |
+| fundingRate | string | Funding Rate |
 | fundingRateStr | string | Funding rate raw decimal string |
 | fundingRateDisplay | string | Funding rate display value |
 | fundingRateScale | integer | Funding rate display decimal places |
 | annualRateDisplay | string | Annualized funding rate display value |
-| settlementPrice | number | Close Price |
+| settlementPrice | string | Settlement Price |
 | settlementPriceStr | string | Close price raw decimal string |
 | settlementPriceDisplay | string | Close price display value |
 | settlementPriceScale | integer | Close price display decimal places |
-| longInterestRate | number | Long Interest Rate |
+| longInterestRate | string | Long Interest Rate |
 | longInterestRateStr | string | Long interest rate raw decimal string |
-| shortInterestRate | number | Short Interest Rate |
+| shortInterestRate | string | Short Interest Rate |
 | shortInterestRateStr | string | Short interest rate raw decimal string |
 | isSettlementRate | boolean | Whether it is the settlement rate |
-| nextSettlementTime | integer | Next settlement time Unix timestamp |
-| timestamp | integer | Funding rate generation time Unix timestamp |
-| settlementCycle | integer | Settlement cycle (unit: seconds) |
-| businessLineId | integer | Business line ID |
+| nextSettlementTime | string | Next settlement time Unix timestamp |
+| timestamp | string | Funding rate generation time Unix timestamp |
+| settlementCycle | string | Settlement cycle (unit: seconds) |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/funding-rate" \

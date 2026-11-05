@@ -101,7 +101,9 @@
                   "api-reference/account/jurisdiction",
                   "api-reference/account/negative-balance",
                   "api-reference/account/funding-fee-export",
-                  "api-reference/trade/export-history"
+                  "api-reference/trade/export-history",
+                  "api-reference/account/export-tasks",
+                  "api-reference/trade/funding-rate-history"
                 ]
               },
               {
@@ -197,7 +199,9 @@
                   "zh/api-reference/account/jurisdiction",
                   "zh/api-reference/account/negative-balance",
                   "zh/api-reference/account/funding-fee-export",
-                  "zh/api-reference/trade/export-history"
+                  "zh/api-reference/trade/export-history",
+                  "zh/api-reference/account/export-tasks",
+                  "zh/api-reference/trade/funding-rate-history"
                 ]
               },
               {
