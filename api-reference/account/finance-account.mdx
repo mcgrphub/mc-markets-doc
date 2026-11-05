@@ -12,6 +12,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | POST | /openapi/v1/mc-account/finance/account/withdraw | TRADE | Withdraw from Finance account (flexible) |
 | POST | /openapi/v1/mc-account/finance/account/withdraw/fixed | TRADE | Withdraw fixed-term Finance position |
+| POST | /openapi/v1/mc-account/finance/account/withdraw/all | TRADE | Withdraw the full finance balance |
 | POST | /openapi/v1/mc-account/finance/account/deposit | TRADE | Deposit to Finance account |
 | GET | /openapi/v1/mc-account/finance/products/catalog | READ | Finance product catalog |
 | GET | /openapi/v1/mc-account/finance/account/positions/holding | READ | Current Finance account positions |
@@ -437,4 +438,39 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
   -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Withdraw the full finance balance
+
+`POST /openapi/v1/mc-account/finance/account/withdraw/all` — Permission `TRADE`。
+
+For a current product, provide `productCode` so the server calculates the full redeemable amount. For a fixed position, provide `positionId` to redeem its principal and interest. Provide exactly one of these fields; do not send `amount`. The existing amount-based and fixed-position withdrawal endpoints remain available.
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| trackingId | string | Yes | Unique request tracking identifier |
+| productCode | string | Conditional | Current product code; provide either this field or positionId |
+| positionId | integer | Conditional | Fixed-position ID; provide either this field or productCode. Matches positionId returned by the current positions endpoint |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| data | string | `data` is a scalar of this type |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/withdraw/all" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "trackingId": "finance-withdraw-all-demo-001",
+  "productCode": "USDT_CURRENT"
+}'
 ```
