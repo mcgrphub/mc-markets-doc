@@ -34,10 +34,10 @@ description: "交易相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
+| login | string | 是 | 交易账户或现货账户登录号 |
 | order | integer | 是 | 订单ID |
 | symbol | string | 是 | 交易对，例如 BTCUSDT, 仅下单有效 |
-| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
+| type | integer | 是 | 订单类型             "0-OP_BUY: 市价买入",             "1-OP_SELL: 市价卖出",             "2-OP_BUY_LIMIT: 限价买入挂单",             "3-OP_SELL_LIMIT: 限价卖出挂单",             "4-OP_BUY_STOP: 止损买入挂单",             "5-OP_SELL_STOP: 止损卖出挂单",             "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单",             "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单",             "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
 | priceSL | number | 否 | 新的止损价格 |
 | priceTP | number | 否 | 新的止盈价格 |
 
@@ -48,6 +48,12 @@ description: "交易相关 OpenAPI 接口。"
 | code | string | 交易引擎返回状态码 |
 | orderId | string | 订单ID（如有） |
 | params | object | 交易引擎返回参数 |
+
+`params` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positions/modify" \
@@ -76,17 +82,17 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
+| login | string | 是 | 交易账户或现货账户登录号 |
 | symbol | string | 是 | 交易对，例如 BTCUSDT, 仅下单有效 |
 | price | number | 是 | 下单价格 |
-| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
-| typeTime | integer | 是 | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
+| type | integer | 是 | 订单类型             "0-OP_BUY: 市价买入",             "1-OP_SELL: 市价卖出",             "2-OP_BUY_LIMIT: 限价买入挂单",             "3-OP_SELL_LIMIT: 限价卖出挂单",             "4-OP_BUY_STOP: 止损买入挂单",             "5-OP_SELL_STOP: 止损卖出挂单",             "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单",             "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单",             "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
+| typeTime | integer | 是 | 有效期类型，不传默认0             "0-取消前有效",             "1-当天有效",             "2-指定时间",             "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
 | expiration | integer | 是 | 过期时间戳（typeTime=2时必填） |
 | priceTrigger | number | 是 | 止损限价单触发价格 |
 | priceSL | number | 是 | 止损 |
-| priceTP | number | 是 | 止盈, |
+| priceTP | number | 是 | 止盈 |
 | order | integer | 是 | 订单ID |
-| volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000, 需与下单时传入的volumeExt一致 |
+| volumeExt | integer | 是 | 交易量（持仓量精度换算后），需与下单时一致；如下单 1 手则传入 100000000 |
 
 ### 响应 `data` 字段
 
@@ -95,6 +101,12 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/positi
 | code | string | 交易引擎返回状态码 |
 | orderId | string | 订单ID（如有） |
 | params | object | 交易引擎返回参数 |
+
+`params` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/modify" \
@@ -128,20 +140,20 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
+| login | string | 是 | 交易账户或现货账户登录号 |
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
-| volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
+| volumeExt | integer | 是 | 交易量（持仓量精度换算后），如下单 1 手则传入 100000000 |
 | price | number | 否 | 下单价格，不传默认0, 0为市价，其他为限价 |
-| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
+| type | integer | 是 | 订单类型             "0-OP_BUY: 市价买入",             "1-OP_SELL: 市价卖出",             "2-OP_BUY_LIMIT: 限价买入挂单",             "3-OP_SELL_LIMIT: 限价卖出挂单",             "4-OP_BUY_STOP: 止损买入挂单",             "5-OP_SELL_STOP: 止损卖出挂单",             "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单",             "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单",             "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
 | position | integer | 否 | 持仓ID, 默认0 |
-| typeFill | integer | 是 | 成交类型 "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。", "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。", "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
-| typeTime | integer | 否 | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
-| expiration | integer | 否 | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
+| typeFill | integer | 是 | 成交类型             "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。",             "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。",             "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交。",             "3-BOC（Book or Cancel，订单簿或取消）。订单只能在市场深度（订单簿）中提交，若下单时能立即成交则直接取消。" |
+| typeTime | integer | 否 | 有效期类型，不传默认0             "0-取消前有效",             "1-当天有效",             "2-指定时间",             "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
+| expiration | integer | 否 | 过期时间戳（typeTime=2时必填），不传默认0不自动过期 |
 | priceTrigger | number | 否 | 止损限价单触发价格, 不传默认0 |
 | priceSL | number | 否 | 止损 |
-| priceTP | number | 否 | 止盈, |
-| userSlippageLimit | number | 否 | 用户填入的市价单最大滑点限制(仅市价单有效) |
-| frontMarketPrice | number | 否 | 前端市价参考价格(可选)，不能小于0 |
+| priceTP | number | 否 | 止盈 |
+| userSlippageLimit | number | 否 | 用户填入的市价单最大滑点限制(仅市价单有效); 最小值: 0 |
+| frontMarketPrice | number | 否 | 市价参考价格（可选），不能小于0; 最小值: 0 |
 
 ### 响应 `data` 字段
 
@@ -150,6 +162,12 @@ curl -sS -X PUT "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders
 | code | string | 交易引擎返回状态码 |
 | orderId | string | 订单ID（如有） |
 | params | object | 交易引擎返回参数 |
+
+`params` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/create" \
@@ -179,19 +197,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
+| login | string | 是 | 交易账户或现货账户登录号 |
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
-| volumeExt | integer | 是 | 交易量，10e8放大后的值, 如下单1手则传入1*100000000 |
+| volumeExt | integer | 是 | 交易量（持仓量精度换算后），如下单 1 手则传入 100000000 |
 | price | number | 否 | 下单价格，不传默认0, 0为市价，其他为限价 |
-| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
+| type | integer | 是 | 订单类型             "0-OP_BUY: 市价买入",             "1-OP_SELL: 市价卖出",             "2-OP_BUY_LIMIT: 限价买入挂单",             "3-OP_SELL_LIMIT: 限价卖出挂单",             "4-OP_BUY_STOP: 止损买入挂单",             "5-OP_SELL_STOP: 止损卖出挂单",             "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单",             "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单",             "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
 | position | integer | 否 | 持仓ID, 默认0 |
-| typeFill | integer | 是 | 成交类型 "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。", "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。", "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交… |
-| typeTime | integer | 否 | 有效期类型，不传默认 0。取值："0-取消前有效", "1-当天有效", "2-指定时间", "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
-| expiration | integer | 否 | 过期时间戳（typeTime=2时必填）, 不传默认0不自动过期, |
+| typeFill | integer | 是 | 成交类型             "0-Fill or Kill（成交或取消）。订单必须全部成交或直接取消，不保留部分未成交量。",             "1-Immediate or Cancel（立即或取消）。订单可部分成交，剩余未成交量自动取消。",             "2-剩余量回退队列。该模式用于挂单（如限价挂单、止损挂单），仅支持“交易所执行的市价单”场景：未成交部分会重新加入订单队列等待后续成交。",             "3-BOC（Book or Cancel，订单簿或取消）。订单只能在市场深度（订单簿）中提交，若下单时能立即成交则直接取消。" |
+| typeTime | integer | 否 | 有效期类型，不传默认0             "0-取消前有效",             "1-当天有效",             "2-指定时间",             "3-指定某日。到期时间为指定某日的00:00或最近的交易时间" |
+| expiration | integer | 否 | 过期时间戳（typeTime=2时必填），不传默认0不自动过期 |
 | priceTrigger | number | 否 | 止损限价单触发价格, 不传默认0 |
 | priceSL | number | 否 | 止损 |
-| priceTP | number | 否 | 止盈, |
-| frontMarketPrice | number | 否 | 前端市价参考价格(可选)，不能小于0 |
+| priceTP | number | 否 | 止盈 |
+| frontMarketPrice | number | 否 | 市价参考价格（可选），不能小于0; 最小值: 0 |
 
 ### 响应 `data` 字段
 
@@ -200,6 +218,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | code | string | 交易引擎返回状态码 |
 | orderId | string | 订单ID（如有） |
 | params | object | 交易引擎返回参数 |
+
+`params` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/close" \
@@ -243,7 +267,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | symbol | string | 交易品种标识 |
-| mt5 | object | 交易品种配置 |
+| mt5 | object | MT5 引擎侧品种静态配置 |
 | risk | object | 风控侧品种静态配置 |
 
 `data[].mt5` 字段：
@@ -282,14 +306,51 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | TimeExpiration | string | 交易到期日期 |
 | TimeStart | string | 交易开始日期 |
 | TradeMode | integer | 交易模式 |
-| Spread | number | 点差 |
+| Spread | string | 点差 |
 | VolumeLimitExt | integer | 最大累计交易量 |
 | VolumeMaxExt | integer | 最大交易量 |
 | VolumeMinExt | integer | 最小交易量 |
 | VolumeStepExt | integer | 交易量步长 |
 | leverageGrade | array | 杠杆等级配置 |
-| marginRateInitial | object | 预付款比率详情 |
-| marginRateMaintenance | object | 预付款比率详情 |
+| marginRateInitial | object | 初始预付款比率详情 |
+| marginRateMaintenance | object | 维持预付款比率详情 |
+| category | string | 交易品种分类 |
+| contractSize | number | 合约大小 |
+| currencyBase | string | 基础货币 |
+| currencyBaseDigits | integer | 基础货币精度 |
+| currencyMargin | string | 预付款货币 |
+| currencyMarginDigits | integer | 预付款货币精度 |
+| currencyProfit | string | 利润货币 |
+| currencyProfitDigits | integer | 利润货币精度 |
+| digits | integer | 价格小数位数 |
+| freezeLevel | integer | 冻结级别 |
+| ieSlipLosing | integer | 现价执行亏损方向最大下降 |
+| ieSlipProfit | integer | 现价执行盈利方向最大下降 |
+| ieVolumeMaxExt | integer | 现价执行最大交易量 |
+| international | string | 国际名称 |
+| marginFlags | integer | 预付款检查模式 |
+| marginHedged | number | 锁仓预付款值 |
+| marginInitial | number | 初始预付款大小 |
+| marginMaintenance | number | 维持预付款大小 |
+| marginRateCurrency | number | 预付款货币汇率 |
+| marginRateLiquidity | number | 流动性比率 |
+| orderFlags | integer | 订单类型标识 |
+| path | string | 交易品种路径 |
+| priceLimitMax | number | 最大价格限制 |
+| priceLimitMin | number | 最小价格限制 |
+| priceSettle | number | 结算价格 |
+| sessionTrade | array | 交易时间 |
+| source | string | 报价源交易品种 |
+| stopsLevel | integer | 止损订单幅度 |
+| tickBookDepth | integer | 市场深度范围 |
+| timeExpiration | string | 交易到期日期 |
+| timeStart | string | 交易开始日期 |
+| tradeMode | integer | 交易模式 |
+| spread | string | 点差 |
+| volumeLimitExt | integer | 最大累计交易量 |
+| volumeMaxExt | integer | 最大交易量 |
+| volumeMinExt | integer | 最小交易量 |
+| volumeStepExt | integer | 交易量步长 |
 
 `data[].mt5.SessionTrade[]` 元素：
 
@@ -348,99 +409,67 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | sellStop | number | 卖出止损单比率 |
 | sellStopLimit | number | 卖出止损限价单比率 |
 
+`data[].mt5.sessionTrade[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| quote | array | 报价时间 |
+| trade | array | 交易时间 |
+| weekDay | string | 星期 |
+
+`data[].mt5.sessionTrade[].quote[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| from | string | 开始时间 |
+| to | string | 结束时间 |
+
+`data[].mt5.sessionTrade[].trade[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| from | string | 开始时间 |
+| to | string | 结束时间 |
+
 `data[].risk` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 配置ID |
+| tradingSymbolStatus | string | ONLINE=上架可交易，OFFLINE=下架仅平仓; 可选值：`ONLINE`, `OFFLINE` |
+| id | string | 配置ID |
 | symbol | string | 交易品种标识 |
 | version | integer | 配置版本 |
-| longAnnualRate | number | 多头年化费率 |
-| shortAnnualRate | number | 空头年化费率 |
-| discountRate | number | 优惠费率 |
-| baseRate | number | 基准费率 |
+| longAnnualRate | string | 多头年化费率 |
+| shortAnnualRate | string | 空头年化费率 |
+| discountRate | string | 优惠费率 |
+| baseRate | string | 基准费率 |
 | specialSymbol | integer | 特殊现货标识：0=否，1=是 |
+| baseSlippagePct | string | 共用基础滑点% |
+| marketCoefficient | object | 市场系数（常规 + 指定时段） |
 | fundingRateBaseType | string | 资金费率基准类型 |
-| fundingRateThreshold | number | 资金费率阈值 |
-| fundingRateStep | number | 资金费率步长 |
-| fundingRateIncrease | number | 资金费率递增值 |
-| fundingRateBase | number | 资金费率基准 |
-| fundingRateMin | number | 资金费率最小值 |
-| fundingRateMax | number | 资金费率最大值 |
+| fundingRateThreshold | string | 资金费率阈值 |
+| fundingRateStep | string | 资金费率步长 |
+| fundingRateIncrease | string | 资金费率递增值 |
+| fundingRateBase | string | 资金费率基准 |
+| fundingRateMin | string | 资金费率最小值 |
+| fundingRateMax | string | 资金费率最大值 |
 | liquidationFeeType | string | 强平手续费类型 |
-| liquidationFeeValue | number | 强平手续费值 |
-| minLiquidationFee | number | 最小强平手续费 |
+| liquidationFeeValue | string | 强平手续费值 |
+| minLiquidationFee | string | 最小强平手续费 |
 | fundingRateMode | string | 资金费率模式 |
 | fundingRateExternalMarketSymbol | string | 资金费率外部市场品种 |
 | groupName | string | 分组名称 |
 | platformMaxSlippageType | string | 平台最大滑点类型 |
-| platformMaxSlippage | number | 平台最大滑点 |
+| platformMaxSlippage | string | 平台最大滑点 |
 | tpSlMaxSlippageType | string | 止盈止损最大滑点类型 |
-| tpSlMaxSlippage | number | 止盈止损最大滑点 |
-| userLongPositionValueLimitUsdc | number | 用户多头持仓价值上限(USDC) |
-| userShortPositionValueLimitUsdc | number | 用户空头持仓价值上限(USDC) |
-| platformLongTotalPositionLimitUsdc | number | 平台多头总持仓上限(USDC) |
-| platformShortTotalPositionLimitUsdc | number | 平台空头总持仓上限(USDC) |
-| free | object | 风控档位配置 |
-| premium | object | 风控档位配置 |
-| tradingSymbolStatus | string | ONLINE=上架可交易，OFFLINE=下架仅平仓 |
-| baseSlippagePct | number | 共用基础滑点% |
-| marketCoefficient | object | 市场系数（常规 + 指定时段） |
-| quoteDiffTolerancePoints | number | 行情差异容忍点差（价格保护） |
-
-`data[].risk.free` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.free.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
-
-`data[].risk.premium` 字段：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| transCostConfig | array | 交易成本配置 |
-| discountRate | number | 优惠费率 |
-
-`data[].risk.premium.transCostConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| startTime | string | 交易成本配置-开始时间 |
-| endTime | string | 交易成本配置-结束时间 |
-| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
-| transTotalTime | integer | 成交累计时间 |
-| slippageConfig | array | 滑点档位配置 |
-
-`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| from | integer | 档位范围 (从) |
-| to | integer | 档位范围 (到) |
-| value | number | 滑点值；原样存取。PERCENTAGE 时 (0,100]，0.05=0.05% |
-| valueType | string | 滑点值类型：POINT-点，PERCENTAGE-百分比，缺省为POINT |
-| slippageCoefficient | number | 滑点系数 k，与 value/valueType 独立 |
+| tpSlMaxSlippage | string | 止盈止损最大滑点 |
+| quoteDiffTolerancePoints | string | 行情差异容忍点差（价格保护） |
+| userLongPositionValueLimitUsdc | string | 用户多头持仓价值上限(USDC) |
+| userShortPositionValueLimitUsdc | string | 用户空头持仓价值上限(USDC) |
+| platformLongTotalPositionLimitUsdc | string | 平台多头总持仓上限(USDC) |
+| platformShortTotalPositionLimitUsdc | string | 平台空头总持仓上限(USDC) |
+| free | object | Free 档位配置 |
+| premium | object | Premium 档位配置 |
 
 `data[].risk.marketCoefficient` 字段：
 
@@ -455,7 +484,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | --- | --- | --- |
 | key | string | 档位键：SMALL / MEDIUM / LARGE |
 | label | string | 展示名称 |
-| coefficient | number | 市场系数 |
+| coefficient | string | 市场系数 |
 
 `data[].risk.marketCoefficient.scheduled[]` 元素：
 
@@ -465,7 +494,57 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | label | string | 展示名称 |
 | startAt | string | 开始时间（建议 ISO-8601） |
 | endAt | string | 结束时间（建议 ISO-8601） |
-| coefficient | number | 市场系数 |
+| coefficient | string | 市场系数 |
+
+`data[].risk.free` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| transCostConfig | array | 交易成本配置 |
+| discountRate | string | 优惠费率 |
+
+`data[].risk.free.transCostConfig[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| startTime | string | 交易成本配置-开始时间 |
+| endTime | string | 交易成本配置-结束时间 |
+| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
+| transTotalTime | string | 成交累计时间 |
+| slippageConfig | array | 滑点档位配置 |
+
+`data[].risk.free.transCostConfig[].slippageConfig[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| from | string | 档位范围 (从) |
+| to | string | 档位范围 (到) |
+| slippageCoefficient | string | 滑点系数 k |
+
+`data[].risk.premium` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| transCostConfig | array | 交易成本配置 |
+| discountRate | string | 优惠费率 |
+
+`data[].risk.premium.transCostConfig[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| startTime | string | 交易成本配置-开始时间 |
+| endTime | string | 交易成本配置-结束时间 |
+| transCostMode | string | 交易成本配置-模式 TRADE_AMOUNT：交易额 |
+| transTotalTime | string | 成交累计时间 |
+| slippageConfig | array | 滑点档位配置 |
+
+`data[].risk.premium.transCostConfig[].slippageConfig[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| from | string | 档位范围 (从) |
+| to | string | 档位范围 (到) |
+| slippageCoefficient | string | 滑点系数 k |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/staticConfig" \
@@ -482,16 +561,16 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/symbol/sta
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
-| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单", "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单", "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
-| volumeExt | integer | 是 | 下单数量（*100000000扩展精度）， 如用户下单量是0.01， 则传入0.01*100000000 |
+| login | string | 是 | 交易账户或现货账户登录号 |
+| type | integer | 是 | 订单类型             "0-OP_BUY: 市价买入",             "1-OP_SELL: 市价卖出",             "2-OP_BUY_LIMIT: 限价买入挂单",             "3-OP_SELL_LIMIT: 限价卖出挂单",             "4-OP_BUY_STOP: 止损买入挂单",             "5-OP_SELL_STOP: 止损卖出挂单",             "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单",             "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单",             "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
+| volumeExt | integer | 是 | 下单数量（持仓量精度换算后），如用户下单量是 0.01，则传入 1000000; 最小值: 1 |
 | symbol | string | 是 | 交易对/品种 |
 
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| estimatedSlippage | number | 预估滑点 |
+| estimatedSlippage | string | 预估滑点 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/estimate" \
@@ -515,7 +594,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/slippage/e
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| uid | string | 是 | 当前用户的现货账户 ID 或合约账户 ID，不是客户 UID。可通过[查询当前认证用户信息](/zh/api-reference/account/user#查询当前认证用户信息)响应中的 `data.user.spotAccount` 或 `data.user.tradeAccount` 获取 |
+| uid | string | 是 | 当前用户的现货账户 ID 或合约账户 ID，不是客户 UID；可通过 getProfile 响应中的 data.user.spotAccount 或 data.user.tradeAccount 获取 |
 
 ### 响应 `data` 字段
 
@@ -602,18 +681,18 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| userAssets | object | 用户资产 |
+| userAssets | object | 用户资产明细 |
 
 `userAssets` 字段：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| balance | number | 余额 |
-| equity | number | 净值 |
-| floating | number | 浮动盈亏 |
-| margin | number | 已用保证金 |
-| marginFree | number | 可用保证金 |
-| marginLevel | number | 保证金比例 |
+| balance | string | 余额 |
+| equity | string | 净值 |
+| floating | string | 浮动盈亏 |
+| margin | string | 已用保证金 |
+| marginFree | string | 可用保证金 |
+| marginLevel | string | 保证金比例 |
 | positions | array | 持仓列表 |
 | marginDisplay | string | 保证金展示值（向下截断，保留 2 位小数） |
 | marginScale | integer | 保证金展示小数位数 |
@@ -626,25 +705,25 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/mt5-group/
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| id | integer | 持仓号 |
-| login | integer | 交易账户登录号 |
+| id | string | 持仓号 |
+| login | string | 交易账户登录号 |
 | action | integer | 资产动作（例如 0=普通） |
-| contractSize | number | 合约面值 |
-| freeMargin | number | 可用保证金 |
+| contractSize | string | 合约面值 |
+| freeMargin | string | 可用保证金 |
 | precision | integer | 精度 |
 | priceDigits | integer | 价格精度 |
 | currencyDigits | integer | 货币精度 |
-| priceCurrent | number | 当前价格 |
-| openPrice | number | 开仓价格 |
-| time | integer | 开仓时间 |
-| slPrice | number | 止损价格 |
-| tpPrice | number | 止盈价格 |
-| rateProfit | number | 盈亏汇率 |
-| freeAmount | number | 可用数量 |
+| priceCurrent | string | 当前价格 |
+| openPrice | string | 开仓价格 |
+| time | string | 开仓时间 |
+| slPrice | string | 止损价格 |
+| tpPrice | string | 止盈价格 |
+| rateProfit | string | 盈亏汇率 |
+| freeAmount | string | 可用数量 |
 | symbol | string | 交易品种 |
-| usdValue | number | 折算美元价值 |
-| volume | number | 持仓量（标准精度） |
-| volumeExt | number | 持仓量（扩展精度） |
+| usdValue | string | 折算美元价值 |
+| volume | string | 持仓量（标准精度） |
+| volumeExt | string | 持仓量（扩展精度） |
 | volumeDisplay | string | 持仓量展示值 |
 | volumeScale | integer | 持仓量展示小数位数 |
 
@@ -667,9 +746,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| login | string | 是 | MT5合约账户ID/现货账户ID |
+| login | string | 是 | 交易账户或现货账户登录号 |
 | order | integer | 是 | 订单ID |
-| type | integer | 是 | 订单类型 "0-OP_BUY: 市价买入", "1-OP_SELL: 市价卖出", "2-OP_BUY_LIMIT: 限价买入挂单", "3-OP_SELL_LIMIT: 限价卖出挂单", "4-OP_BUY_STOP: 止损买入挂单", "5-OP_SELL_STOP: 止损卖出挂单", "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单"… |
+| type | integer | 是 | 订单类型             "0-OP_BUY: 市价买入",             "1-OP_SELL: 市价卖出",             "2-OP_BUY_LIMIT: 限价买入挂单",             "3-OP_SELL_LIMIT: 限价卖出挂单",             "4-OP_BUY_STOP: 止损买入挂单",             "5-OP_SELL_STOP: 止损卖出挂单",             "6-OP_BUY_STOP_LIMIT: 止损限价买入挂单",             "7-OP_SELL_STOP_LIMIT: 止损限价卖出挂单",             "8-OP_CLOSE_BY: 相互平仓订单，该操作仅适用于锁仓模式" |
 | symbol | string | 是 | 交易对，例如 BTCUSDT |
 
 ### 响应 `data` 字段
@@ -679,6 +758,12 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/account/as
 | code | string | 交易引擎返回状态码 |
 | orderId | string | 订单ID（如有） |
 | params | object | 交易引擎返回参数 |
+
+`params` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 交易引擎返回参数 |
 
 ```bash
 curl -sS -X DELETE "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/orders/cancel" \

@@ -87,3 +87,11 @@ Referenced from [`AGENTS.md`](AGENTS.md) — do not duplicate these tables inlin
 | 统一导出历史 | 导出历史 | Export history | `export-history` | trade |
 
 订单历史 CSV 导出 / Order history CSV export 归入 `trade/orders`；成交历史 CSV 导出 / Deal history CSV export 归入 `trade/deals`。
+
+## 2026-11-05 main 核对新增映射
+
+| Spec tag / 内容 | 对外中文 | English | slug | service |
+| --- | --- | --- | --- | --- |
+| account-export-controller / account-export-history-controller | 账户导出任务 | Account export tasks | `export-tasks` | account |
+| 资金费率 | 资金费率历史 | Funding rate history | `funding-rate-history` | trade |
+| 当前列表 CSV 导出 | 导出历史 | Export history | `export-history` | trade |

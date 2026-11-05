@@ -11,7 +11,6 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/deal-order | READ | Paginate deal orders |
-| GET | /openapi/v1/mc-account/deal-order/&#123;dealId&#125; | READ | Get deal order details |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -30,7 +29,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | size | integer | No | Page size |
 | current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort; comma-separated fields |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
 
 ### Response `data` fields
 
@@ -49,13 +48,13 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | Field | Type | Description |
 | --- | --- | --- |
 | remark | string | Remark |
-| dealAmount | number | Deal value in USDC |
+| dealAmount | string | Deal value in USDC |
 | dealAmountDisplay | string | Deal value display string |
 | dealAmountScale | integer | Deal value display precision |
-| commission | number | Commission |
+| commission | string | Commission |
 | commissionDisplay | string | Commission display string |
 | commissionScale | integer | Commission display precision |
-| profit | number | Realized profit and loss |
+| profit | string | Realized PnL |
 | profitDisplay | string | Realized PnL display string |
 | profitScale | integer | Realized PnL display precision |
 
@@ -85,45 +84,45 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order" \
 
 | Field | Type | Description |
 | --- | --- | --- |
-| businessLineId | integer | Business Line ID |
+| businessLineId | string | Business Line ID |
 | uid | string | User ID |
-| positionId | integer | Position Order ID |
-| orderId | integer | Order Number |
-| dealId | integer | Deal Order Number |
+| positionId | string | Position Order ID |
+| orderId | string | Order identifier |
+| dealId | string | Deal Order Number |
 | dealTime | string | Deal Time |
-| dealTimeTimestamp | integer | Deal time millisecond timestamp |
-| type | string | Trade Type |
+| dealTimeTimestamp | string | Deal time millisecond timestamp |
+| type | string | Transaction type; Allowed values: `DEAL_BUY`, `DEAL_SELL`, `DEAL_BALANCE`, `DEAL_CREDIT`, `DEAL_CHARGE`, `DEAL_CORRECTION`, `DEAL_BONUS`, `DEAL_COMMISSION`, `DEAL_COMMISSION_DAILY`, `DEAL_COMMISSION_MONTHLY`, `DEAL_AGENT_DAILY`, `DEAL_AGENT_MONTHLY`, `DEAL_INTERESTRATE`, `DEAL_BUY_CANCELED`, `DEAL_SELL_CANCELED`, `DEAL_DIVIDEND`, `DEAL_DIVIDEND_FRANKED`, `DEAL_TAX`, `DEAL_AGENT`, `DEAL_SO_COMPENSATION`, `DEAL_SO_COMPENSATION_CREDIT` |
 | symbolPair | string | Trading Pair |
-| baseSymbolId | integer | Base Currency ID |
-| quoteSymbolId | integer | Quote Currency ID |
-| entry | string | Direction |
-| price | number | Order Price |
-| pricePosition | number | Average Deal Price |
-| lot | number | Order Quantity |
-| volumeClosed | number | Deal Quantity |
-| storage | number | Storage Fee |
-| commission | number | Fee |
+| baseSymbolId | string | Base Currency ID |
+| quoteSymbolId | string | Quote Currency ID |
+| entry | string | Direction; Allowed values: `ENTRY_IN`, `ENTRY_OUT`, `ENTRY_INOUT`, `ENTRY_OUT_BY` |
+| price | string | Order Price |
+| pricePosition | string | Average Deal Price |
+| lot | string | Order Quantity |
+| volumeClosed | string | Deal Quantity |
+| storage | string | Storage Fee |
+| commission | string | Fee |
 | commissionDisplay | string | Fee display value, rounded up with sign, fixed to 6 decimal places |
 | commissionScale | integer | Fee display precision |
-| profit | number | Trading P/L Amount |
+| profit | string | Trading P/L Amount |
 | profitDisplay | string | P/L display value, rounded and fixed to 6 decimal places |
 | profitScale | integer | P/L display precision |
 | contractSize | integer | Contract Size |
-| stopLoss | number | Stop Loss Price |
-| takeProfit | number | Take Profit Price |
-| onChainStatus | string | On-chain Status |
+| stopLoss | string | Stop Loss Price |
+| takeProfit | string | Take Profit Price |
+| onChainStatus | string | On-chain status; Allowed values: `PENDING`, `INITIALIZING`, `SUBMITTED`, `CONFIRMED`, `FAILED`, `RETRYING` |
 | txHash | string | Blockchain Transaction Hash |
 | retryCount | integer | Retry Count |
-| gasUsed | integer | Actual Gas Consumed |
-| gasPrice | integer | Gas Price |
+| gasUsed | string | Actual Gas Consumed |
+| gasPrice | string | Gas Price |
 | blockNumber | integer | Block Number |
 | blockConfirmation | integer | Block Confirmations |
 | submitTime | string | Submit Time |
-| submitTimeTimestamp | integer | Submit time millisecond timestamp |
+| submitTimeTimestamp | string | Submit time millisecond timestamp |
 | confirmTime | string | Confirmation Time |
-| confirmTimeTimestamp | integer | Confirmation time millisecond timestamp |
-| remark | string | Remarks Information |
-| accountType | string | Account Type |
+| confirmTimeTimestamp | string | Confirmation time millisecond timestamp |
+| remark | string | Remark |
+| accountType | string | Account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/deal-order/1000001" \

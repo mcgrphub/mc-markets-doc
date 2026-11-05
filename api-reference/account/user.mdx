@@ -28,23 +28,23 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 Returns core user details, profile data, Privy authentication methods, legacy-compatible invitation and KYC information, and spot and contract trading-account readiness.
 
-### Query parameters
+### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| uid | string | Yes | Authenticated user's UID; must match the UID in the authentication context |
+| uid | string | Yes |  |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | user | object | Core user details |
-| authList | array | Authentication methods |
+| authList | array | Authentication methods bound through Privy |
 | profile | object | Extended user profile |
-| legacy | object | Compatibility data aligned with the legacy GetUserInfoAndAccountInfo response |
-| boundLoginMethods | array | Bound login methods: email, google, wallet |
-| currentLoginMethod | string | Current session login method; may be null with an OpenAPI stateless JWT |
-| allTradingAccountsReady | boolean | Whether both spot and contract trading accounts have been created |
+| legacy | object | Legacy-compatible additional user details, including invitations, KYC, and subaccounts |
+| boundLoginMethods | array | Bound Privy login methods: email, google, or wallet, in lowercase |
+| currentLoginMethod | string | Current session login method: email, google, or wallet. May be null for OpenAPI stateless JWT sessions when the service cannot resolve it; supplied by the client or gateway |
+| allTradingAccountsReady | boolean | Whether both spot and trading logins have been generated; may temporarily be false during asynchronous registration |
 
 `user` fields:
 
@@ -52,16 +52,16 @@ Returns core user details, profile data, Privy authentication methods, legacy-co
 | --- | --- | --- |
 | uid | string | User UID |
 | email | string | Email address |
-| walletAddress | string | Bound login wallet address |
-| spotAccount | integer | Spot trading account |
-| tradeAccount | integer | Contract trading account |
-| demoAccount | integer | Demo account |
+| walletAddress | string | Wallet address bound as a login credential |
+| spotAccount | string | Spot trading account |
+| tradeAccount | string | Contract trading account |
+| demoAccount | string | Demo account |
 | registerType | integer | Registration source |
 | appId | string | Channel ID |
 | clientId | string | Device ID |
 | version | string | Client version |
 | ip | string | Registration IP address |
-| ipAddr | string | Registration IP location |
+| ipAddr | string | IP geolocation |
 | imRef | string | IM_REF promotion parameter |
 
 `authList[]` items:
@@ -69,7 +69,7 @@ Returns core user details, profile data, Privy authentication methods, legacy-co
 | Field | Type | Description |
 | --- | --- | --- |
 | authType | string | Authentication type |
-| privyType | integer | Privy provider type |
+| privyType | integer | Third-party type |
 
 `profile` fields:
 
@@ -79,54 +79,50 @@ Returns core user details, profile data, Privy authentication methods, legacy-co
 | avatar | string | Avatar URL |
 | phone | string | Phone number |
 | mobileAreaId | integer | Calling code |
-| country | string | Country or region |
+| country | string | Country |
 | address | string | Address |
 | gender | integer | Gender: 0 unknown, 1 male, 2 female |
-| birthday | string | Birthday in yyyy-MM-dd format |
+| birthday | string | Date of birth, yyyy-MM-dd |
 
 `legacy` fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| uid | string | User UID |
-| email | string | Email address |
-| countryId | integer | Country or region ID; 0 when the value cannot be converted to a number |
-| mobileAreaId | integer | Calling code |
-| mobile | string | Phone number |
-| credentialsType | integer | Identity-document type: 0 none, 1 ID card, 2 passport, 3 driver's license, 99 other |
-| credentialsNum | string | Identity-document number |
-| credentialsCountryId | integer | Identity-document issuing country or region ID |
-| credentialsValidDateEnd | string | Identity-document expiration date |
-| isLongTime | boolean | Whether the identity document has no expiration date |
-| cardStatus | integer | KYC status: 0 no record, 1 pending, 2 approved, 3 rejected, 4 not submitted |
-| noCard | string | Missing-document explanation or note |
-| createTime | string | User creation time in yyyy-MM-dd HH:mm:ss format |
-| spreadCode | string | Current user's invitation code |
-| disseminatorCode | string | Inviter code entered during registration |
-| recommendedTime | string | Invitation binding time in yyyy-MM-dd HH:mm:ss format |
-| nickName | string | Nickname |
-| avatar | string | Avatar URL |
-| userLanguage | string | User language preference; null when not synchronized |
+| uid | string | User UID as a string, corresponding to legacy UserId |
+| email | string | Email address in plain text; legacy storage may be encrypted |
+| countryId | integer | Country or region ID parsed from profile.country when numeric; otherwise 0 |
+| mobileAreaId | integer | Phone area code from the user profile, with the fund-account country code as fallback |
+| mobile | string | Phone number associated with the fund account |
+| credentialsType | integer | Document type: 0 none, 1 identity card, 2 passport, 3 driving license, 99 other |
+| credentialsNum | string | KYC document number |
+| credentialsCountryId | integer | Document-issuing country or region ID when the source value is numeric |
+| credentialsValidDateEnd | string | KYC document validity end |
+| isLongTime | boolean | Whether the document has indefinite validity, determined from its validity end value |
+| cardStatus | integer | Document or KYC status: 0 no record, 1 pending, 2 approved, 3 rejected, 4 not submitted |
+| noCard | string | Notes concerning missing documents; an empty string when no dedicated field exists |
+| createTime | string | User creation time, yyyy-MM-dd HH:mm:ss |
+| spreadCode | string | Your referral or invitation code (SpreadCode) |
+| disseminatorCode | string | Referrer invitation code supplied at registration (DisseminatorCode) |
+| recommendedTime | string | Referral or invitation binding time, yyyy-MM-dd HH:mm:ss |
+| nickName | string | Nickname, consistent with profile and repeated at the top level for older clients |
+| avatar | string | Avatar, consistent with profile |
+| userLanguage | string | User language preference; null before synchronization |
 | appId | string | Channel AppId |
-| cardSubmitTime | string | KYC submission time in yyyy-MM-dd HH:mm:ss format |
-| accountInfos | array | Subaccount or trading-account list |
-| createTimeTimestamp | integer | User creation timestamp in milliseconds |
-| recommendedTimeTimestamp | integer | Invitation binding timestamp in milliseconds |
-| cardSubmitTimeTimestamp | integer | KYC submission timestamp in milliseconds |
+| cardSubmitTime | string | KYC submission time, yyyy-MM-dd HH:mm:ss |
+| accountInfos | array | Subaccount and trading-login list, compatible with legacy AccountInfos |
+| createTimeTimestamp | string | User creation timestamp in milliseconds |
+| recommendedTimeTimestamp | string | Referral or invitation binding time in Unix milliseconds |
+| cardSubmitTimeTimestamp | string | KYC submission timestamp in milliseconds |
 
 `legacy.accountInfos[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| account | integer | Trading login or subaccount number |
+| account | string | Trading login or subaccount number (MT5 Account) |
 | accountType | integer | Account type: 1 real, 2 demo |
-| accountGroup | integer | Account group: 1 contract, 2 spot |
-| createTime | string | Creation time in yyyy-MM-dd HH:mm:ss format |
-| createTimeTimestamp | integer | Creation timestamp in milliseconds |
-
-<Info>
-  `currentLoginMethod` may be `null` with a stateless JWT. While trading accounts are being assigned asynchronously during registration, `allTradingAccountsReady` may be `false`; clients can poll this endpoint or delay loading the profile.
-</Info>
+| accountGroup | integer | Account group: 1 trading, 2 spot |
+| createTime | string | Creation time, yyyy-MM-dd HH:mm:ss; uses the user creation time when no separate record exists |
+| createTimeTimestamp | string | Creation timestamp in milliseconds |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-v2/profile" \

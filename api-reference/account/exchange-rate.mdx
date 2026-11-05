@@ -10,9 +10,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-account/exchange-rate/query/&#123;symbolType&#125;/&#123;baseCurrency&#125;/&#123;targetCurrency&#125; | READ | Query exchange rate |
 | GET | /openapi/v1/mc-account/exchange-rate/query/usd | READ | Query USD exchange rate |
-| GET | /openapi/v1/mc-account/exchange-rate/convert-rate/&#123;from&#125;/&#123;to&#125; | READ | Query flash conversion exchange rate |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -28,7 +26,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| symbolType | string | Yes | Asset type |
+| symbolType | string | Yes | Asset type; Allowed values: `CRYPTO`, `FIAT` |
 | baseCurrency | string | Yes | Base currency code (ISO 4217) |
 | targetCurrency | string | Yes | Target currency code (ISO 4217) |
 
@@ -36,7 +34,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| data | number | `data` is a scalar of this type |
+| data | string | `data` is a scalar of this type |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/CRYPTO/BTC/USDT" \
@@ -52,6 +50,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 `GET /openapi/v1/mc-account/exchange-rate/query/usd` — permission `READ`.
 
+
 ### Response `data` fields
 
 `data` is an array of objects. Element fields follow.
@@ -60,10 +59,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbolType | string | Base currency type |
-| baseCurrency | string | Base currency code (ISO 4217 standard) |
-| targetCurrency | string | Target currency code (ISO 4217 standard) |
-| exchangeRate | number | Exchange Rate |
+| symbolType | string | Base-currency type; Allowed values: `CRYPTO`, `FIAT` |
+| baseCurrency | string | Base currency code (ISO 4217) |
+| targetCurrency | string | Target currency code (ISO 4217) |
+| exchangeRate | string | Exchange Rate |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/exchange-rate/query/usd" \
@@ -93,31 +92,31 @@ For USDT to BTC, set `from` to USDT and `to` to BTC.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| exchangeRate | number | Exchange Rate |
-| timestamp | integer | Timestamp |
-| oneFromToQuantity | number | Quantity of [to] currency exchangeable for 1 [from] currency |
-| oneToFromQuantity | number | Quantity of [from] currency exchangeable for 1 [to] currency |
+| exchangeRate | string | Exchange Rate |
+| timestamp | string | Timestamp |
+| oneFromToQuantity | string | Quantity of [to] currency exchangeable for 1 [from] currency |
+| oneToFromQuantity | string | Quantity of [from] currency exchangeable for 1 [to] currency |
 | bookPriceDotMap | object | Quotes from the exchange rate conversion process - includes multiple conversion steps, key=currency pair (Warning: only available in non-production environments, used for testing exchange rate accuracy) |
-| baseExchangeRate | number | Base exchange rate (before fee deduction / free quota application), used for testing verification |
+| baseExchangeRate | string | Base exchange rate (before fee deduction / free quota application), used for testing verification |
 | baseExchangeRateDisplay | string | Base exchange rate display value |
-| fromAmount | number | User-input source currency amount (from amount) |
+| fromAmount | string | User-input source currency amount (from amount) |
 | fromAmountDisplay | string | User-input source currency amount display value |
 | fromAmountScale | integer | User-input source currency amount display precision |
-| freeQuotaFromAmount | number | Today's remaining free quota (from amount, used for calculating fee-free tier) |
+| freeQuotaFromAmount | string | Today's remaining free quota (from amount, used for calculating fee-free tier) |
 | freeQuotaFromAmountDisplay | string | Today's remaining free quota (from amount) display value |
-| feeAmount | number | Actual fee charged (from amount) |
+| feeAmount | string | Actual fee charged (from amount) |
 | feeAmountDisplay | string | Actual fee charged (from amount) display value |
 | feeAmountScale | integer | Actual fee charged (from amount) display precision |
-| netFromAmount | number | Net amount actually used in exchange (from amount) = fromAmount - feeAmount |
+| netFromAmount | string | Net amount actually used in exchange (from amount) = fromAmount - feeAmount |
 | netFromAmountDisplay | string | Net amount actually used in exchange (from amount) display value |
-| toAmount | number | Expected received amount (to amount) |
+| toAmount | string | Expected received amount (to amount) |
 | toAmountDisplay | string | Expected received amount (to amount) display value |
 | toAmountScale | integer | Expected received amount (to amount) display precision |
-| convertFeePercent | number | Flash exchange fee percentage (deducted from the source amount) |
-| dailyFreeConvertFeeQuotaUsd | number | Daily free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
-| dailyRemainingFreeConvertFeeQuotaUsd | number | Today's remaining free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
+| convertFeePercent | string | Flash exchange fee percentage (deducted from the source amount) |
+| dailyFreeConvertFeeQuotaUsd | string | Daily free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
+| dailyRemainingFreeConvertFeeQuotaUsd | string | Today's remaining free flash exchange fee quota (USDC equivalent, accumulated per user, reset at UTC+8 daily cutover) |
 | dailyRemainingFreeConvertFeeQuotaUsdDisplay | string | Today's remaining free flash exchange fee quota (USDC equivalent) display value |
-| expireTimestamp | integer | Quote expiry timestamp, in milliseconds |
+| expireTimestamp | string | Quote expiry timestamp, in milliseconds |
 | quoteSessionId | string | Quote Session ID |
 
 `bookPriceDotMap` fields:

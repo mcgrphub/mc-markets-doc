@@ -51,10 +51,6 @@ class ApiReferenceExamplesTest(unittest.TestCase):
                 "`GET /openapi/v1/mc-trade/trade/deals/history/v3`",
             ),
             (
-                "trade/trading-account.mdx",
-                "`GET /openapi/v1/mc-trade/account/positions`",
-            ),
-            (
                 "trade/orders.mdx",
                 "`GET /openapi/v1/mc-trade/trade/orders/history/v3`",
             ),
@@ -69,17 +65,17 @@ class ApiReferenceExamplesTest(unittest.TestCase):
                 )
                 self.assertIn('--data-urlencode "to=', section)
 
-    def test_public_market_data_examples_do_not_require_auth_headers(self):
+    def test_market_data_examples_use_main_default_signing_contract(self):
         pages = [
             (
                 ROOT / "zh" / "api-reference" / "aggregator" / "market-data.mdx",
-                "公开访问",
-                "无需 AK/SK",
+                "READ",
+                "AK/SK 签名",
             ),
             (
                 ROOT / "api-reference" / "aggregator" / "market-data.mdx",
-                "Public",
-                "do not require AK/SK",
+                "READ",
+                "AK/SK",
             ),
         ]
         endpoints = [
@@ -101,7 +97,7 @@ class ApiReferenceExamplesTest(unittest.TestCase):
                 )
                 self.assertIn(permission, section.splitlines()[2])
                 for header in auth_headers:
-                    self.assertNotIn(header, section)
+                    self.assertIn(header, section)
 
 
 if __name__ == "__main__":

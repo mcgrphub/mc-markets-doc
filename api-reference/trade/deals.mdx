@@ -34,24 +34,24 @@ Query historical deals for the current authenticated user and filter by account 
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number |
-| cursorTimeMsc | integer | No | Cursor time from the last `records[].timeMsc` on the previous page, in Unix milliseconds; pass it together with `cursorDealId` |
-| cursorDealId | string | No | Cursor deal number from the last `records[].deal` on the previous page; pass it together with `cursorTimeMsc` |
-| orderBy | string | No | Sort fields, comma-separated |
-| sortOrder | string | No | Sort direction: ASC / DESC |
-| type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined |
+| orderBy | string | No |  |
+| sortOrder | string | No |  |
+| type | string | Yes | Account data type: SPOT — spot, CONTRACT — contract, SPOT_CONTRACT — spot and contract combined; Allowed values: `SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
 | from | integer | Yes | Start timestamp (Unix timestamp, seconds) |
 | to | integer | Yes | End timestamp (Unix timestamp, seconds) |
 | symbol | string | No | Trading symbol name |
+| cursorTimeMsc | integer | No | CURSOR timestamp from records.timeMsc of the last item on the previous page, in Unix milliseconds; provide together with cursorDealId |
+| cursorDealId | integer | No | CURSOR deal ID from records.deal of the last item on the previous page; provide together with cursorTimeMsc to use cursor pagination |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array | Records on the current page |
-| total | integer | Total record count in standard mode; `0` in cursor mode |
+| total | integer | Total count for standard page pagination; may be 0 when counting is disabled or cursor pagination is used. In that case, use records and hasNext |
 | size | integer | Page size |
 | current | integer | Current page number |
-| pages | integer | Total page count in standard mode; `0` in cursor mode |
+| pages | integer | Page count for standard page pagination; may be 0 when counting is disabled or cursor pagination is used. For platform deals, use the last timeMsc/dealId as the next cursor |
 | hasPrevious | boolean | Whether a previous page exists |
 | hasNext | boolean | Whether a next page exists |
 
@@ -60,57 +60,53 @@ Query historical deals for the current authenticated user and filter by account 
 | Field | Type | Description |
 | --- | --- | --- |
 | deal | string | Deal number and primary key |
+| externalID | string | External-system ID |
 | login | string | Trading account login |
-| dealer | integer | Dealer ID |
+| dealer | string | Dealer ID |
 | order | string | Related order number |
 | action | integer | `0` buy, `1` sell |
 | entry | integer | `0` open, `1` close |
 | reason | integer | Deal-change reason code |
 | digits | integer | Price precision |
 | digitsCurrency | integer | Currency precision |
-| contractSize | number | Standard contract size per lot |
-| time | integer | Deal time in Unix milliseconds |
-| timeMsc | integer | Deal time in Unix milliseconds |
+| contractSize | string | Standard contract size per lot |
+| time | string | Deal time in Unix milliseconds |
+| timeMsc | string | Deal time in Unix milliseconds |
 | symbol | string | Trading symbol |
-| price | number | Execution price |
-| volumeExt | integer | Deal volume in extended precision |
-| quantity | number | User-readable quantity converted from `volumeExt` |
-| profit | number | Deal profit and loss |
-| storage | number | Storage fee |
-| commission | number | Commission |
+| price | string | Execution price |
+| volumeExt | string | Deal volume in extended precision |
+| quantity | string | User-readable quantity converted from `volumeExt` |
+| profit | string | Deal profit and loss |
+| storage | string | Storage fee |
+| commission | string | Commission |
 | commissionDisplay | string | Commission display value |
 | commissionScale | integer | Commission display precision |
 | profitDisplay | string | PnL display value |
 | profitScale | integer | PnL display precision |
-| fee | number | Trading fee |
-| rateProfit | number | Profit conversion rate |
-| rateMargin | number | Margin conversion rate |
-| profitRaw | number | Raw profit before conversion |
-| pricePosition | number | Average position price |
-| volumeClosedExt | integer | Closed volume in extended precision |
-| tickValue | number | Tick value |
-| tickSize | number | Tick size |
-| flags | integer | Deal flags |
-| value | number | Deal value |
-| gateway | string | Gateway name |
-| priceGateway | number | Gateway execution price |
-| modifyFlags | integer | Deal modification flags |
-| marketBid | number | Market bid price |
-| marketAsk | number | Market ask price |
-| marketLast | number | Last market price |
-| volume | integer | Standard-precision volume |
-| volumeClosed | integer | Closed standard-precision volume |
-| externalID | string | External-system ID |
-| expertID | integer | Expert advisor ID |
+| fee | string | Trading fee |
+| rateProfit | string | Profit conversion rate |
+| rateMargin | string | Margin conversion rate |
+| expertID | string | Expert advisor ID |
 | positionID | string | Related position ID |
-| priceSL | number | Stop-loss price |
-| priceTP | number | Take-profit price |
+| profitRaw | string | Raw profit before conversion |
+| pricePosition | string | Average position price |
+| priceSL | string | Stop-loss price |
+| priceTP | string | Take-profit price |
+| volumeClosedExt | string | Closed volume in extended precision |
+| tickValue | string | Tick value |
+| tickSize | string | Tick size |
+| flags | string | Deal flags |
+| value | string | Deal value |
+| gateway | string | Gateway name |
+| priceGateway | string | Gateway execution price |
+| modifyFlags | integer | Deal modification flags |
+| marketBid | string | Market bid price |
+| marketAsk | string | Market ask price |
+| marketLast | string | Last market price |
+| volume | string | Standard-precision volume |
+| volumeClosed | string | Closed standard-precision volume |
 | on_chain_status | string | On-chain status |
 | tx_hash | string | On-chain transaction hash |
-
-<Note>
-  Use `cursorTimeMsc` and `cursorDealId` together for cursor pagination. Without a cursor, the endpoint uses `current` and `size`. Treat `deal`, `cursorDealId`, `order`, `positionID`, and `login` as strings to avoid precision loss for 64-bit identifiers.
-</Note>
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/v3" \
@@ -138,7 +134,7 @@ Query recent deals by `symbol`. The `limit` range is 1 to 100. If `symbol` does 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | symbol | string | Yes | Trading symbol |
-| limit | integer | Yes | Number of items to return; range is 1 to 100 |
+| limit | integer | Yes | Number of results |
 
 ### Response `data` fields
 
@@ -148,11 +144,11 @@ Query recent deals by `symbol`. The `limit` range is 1 to 100. If `symbol` does 
 
 | Field | Type | Description |
 | --- | --- | --- |
-| action | integer | 0-Buy, 1-Sell |
-| price | number | Deal Price |
-| volumeExt | integer | Extended Volume |
-| timeMsc | integer | Deal Time (ms) |
-| orderId | integer | Order Number |
+| action | integer | `0` buy, `1` sell |
+| price | string | Deal Price |
+| volumeExt | string | Extended Volume |
+| timeMsc | string | Deal Time (ms) |
+| orderId | string | Order identifier |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \
@@ -179,9 +175,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 | taskId | string | Opaque unique task identifier |
 | dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
 | language | string | Normalized language code fixed at creation |
-| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; Nullable |
 | retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
-| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| retryContext | object | Retry conditions are provided only for complete, authorized FAILED tasks that are safe to retry; Nullable |
 | status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
 | failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
 | createdAt | integer | Creation time in Unix milliseconds (UTC) |
@@ -226,7 +222,7 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history
 
 ### Response
 
-HTTP `302 Found`. `Location` contains a temporary download URL; `Cache-Control: no-store`. The response has no JSON `data`.
+HTTP `302 Found`; `Location` contains a temporary download URL; `Cache-Control: no-store`. No JSON `data`.
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/export-tasks/TASK_DEMO_001/download" \
@@ -246,28 +242,28 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientRequestId | string | Yes | Client idempotency identifier; 1 to 64 printable characters after trimming; Min length: 1; Max length: 64 |
-| sourceView | string | No | Source list: SPOT, CONTRACT, or PORTFOLIO; optional for legacy calls; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| clientRequestId | string | Yes | Client idempotency identifier; 1 to 64 printable characters after trimming; Min length: 0; Max length: 64 |
+| sourceView | string | No | Source list: SPOT, CONTRACT, PORTFOLIO, or VAULT; optional for legacy requests; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; Nullable |
 | type | string | Yes | Account data type: SPOT, CONTRACT, or SPOT_CONTRACT; Allowed values: `SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
 | from | integer | Yes | Query start time in Unix seconds (UTC) |
 | to | integer | Yes | Query end time in Unix seconds (UTC); must not precede from |
-| symbol | string | No | Optional trading symbol; empty means all symbols; Min length: 1; Max length: 64 |
+| symbol | string | No | Optional trading symbol; empty means all symbols; Min length: 0; Max length: 64 |
 | sort | string | Yes | Fixed descending ordering; deal and order datasets use their respective sort enums; Allowed values: `DEAL_TIME_DESC`, `ORDER_TIME_DESC` |
 | language | string | No | CSV language tag; aliases, empty values, and unknown tags are normalized by the service |
 | timeZone | string | Yes | IANA time zone identifier |
 
 ### Response `data` fields
 
-HTTP `202 Accepted`. Generation is asynchronous; poll the task status afterward.
+HTTP `202 Accepted`; The task is generated asynchronously.
 
 | Field | Type | Description |
 | --- | --- | --- |
 | taskId | string | Opaque unique task identifier |
 | dataset | string | Task dataset; Allowed values: `DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
 | language | string | Normalized language code fixed at creation |
-| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`; Nullable |
+| sourceView | string | Original source: SPOT, CONTRACT, or PORTFOLIO; may be empty for older tasks; Allowed values: `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; Nullable |
 | retryOfTaskId | string | Original task associated with this retry; empty for non-retry tasks; Nullable |
-| retryContext | object | Safe retry conditions for failed tasks; the client must generate a new clientRequestId; Nullable |
+| retryContext | object | Retry conditions are provided only for complete, authorized FAILED tasks that are safe to retry; Nullable |
 | status | string | Task status; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
 | failureReason | string | Failure reason; populated only when status is FAILED; Allowed values: `GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; Nullable |
 | createdAt | integer | Creation time in Unix milliseconds (UTC) |

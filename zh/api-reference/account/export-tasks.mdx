@@ -1,0 +1,242 @@
+---
+title: "账户导出任务"
+sidebarTitle: "账户导出任务"
+description: "按后端 main 公开契约维护的接口。"
+---
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/mc-account/export-tasks` | READ | 查询账户导出历史 |
+| POST | `/openapi/v1/mc-account/export-tasks` | READ | 创建账户 CSV 导出任务 |
+| GET | `/openapi/v1/mc-account/export-tasks/{taskId}` | READ | 查询账户导出任务 |
+| GET | `/openapi/v1/mc-account/export-tasks/{taskId}/download` | READ | 下载账户导出 CSV |
+
+
+<Note>
+按 [认证](/zh/authentication) 使用 AK/SK 签名。网关地址见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+创建任务仅接受四类数据集。`SWAP_HISTORY` 只能搭配 `SWAP`；`BALANCE` 搭配 `SPOT`、`CONTRACT` 或 `PORTFOLIO`；`FUND_FLOW`、`DEPOSIT_WITHDRAW` 只能搭配 `PORTFOLIO`。`VAULT` 不适用于这些个人资产导出。`filters` 必须是对象，不能包含身份或分页字段；余额支持 `hideSmallBalance`，其它数据集按各自筛选白名单处理。重试必须复用原任务的冻结条件。
+
+---
+
+## 查询账户导出历史
+
+`GET /openapi/v1/mc-account/export-tasks` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| dataset | string | 是 | 必填，账户服务五类数据集; 可选值：`FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| sourceView | string | 是 | 必填，数据集对应的来源; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| pageSize | integer | 否 | 页大小，缺省 20，范围 1～100 |
+| cursor | string | 否 | 可选签名游标，非空且至多 2048 字符 |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| items | array | 公开任务列表，无结果为 [] |
+| pageSize | integer | 本页大小，1～100 |
+| snapshotAt | string | 成员快照上界，Unix 毫秒 UTC epoch |
+| hasMore | boolean | 是否存在更多符合条件的任务 |
+| nextCursor | string | 下一页签名游标，无下一页时 null |
+| pollAfterMs | string | 活动任务建议轮询间隔，毫秒时长；无活动项为 null |
+
+`items[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| taskId | string | 任务 ID |
+| sourceView | string | 原来源 SWAP、SPOT、CONTRACT、PORTFOLIO；旧未知来源为空; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | 本任务关联的原失败项 ID，资金费及普通创建为空 |
+| retryContext | object | 可重试的原冻结条件；不满足重试条件时明确为 null |
+| dataset | string | FUNDING_FEE_HISTORY、SWAP_HISTORY、BALANCE、FUND_FLOW 或 DEPOSIT_WITHDRAW; 可选值：`FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | 规范化 CSV 语言 |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败时 GENERATION、UPLOAD、RESTART 或 TIMEOUT，其余为空; 可选值：`RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | 创建时间，Unix 毫秒 UTC epoch |
+| updatedAt | string | 更新时间，Unix 毫秒 UTC epoch |
+| expiresAt | string | 到期时间，Unix 毫秒 UTC epoch |
+| rowCount | integer | 数据行数，不含表头；尚未生成或超过上限时为空 |
+| fileName | string | 可下载文件名，可空 |
+| downloadAvailable | boolean | 成功且未到期并已校验文件元数据时为 true |
+
+`items[].retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 当前失败任务的 ID |
+| createRequest | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+`items[].retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks?dataset=BALANCE&sourceView=SPOT" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 创建账户 CSV 导出任务
+
+`POST /openapi/v1/mc-account/export-tasks` — 权限 `READ`.
+
+### 请求体（JSON）
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| clientRequestId | string | 是 | owner 内幂等键，trim 后 1～64 个可打印字符 |
+| dataset | string | 是 | SWAP_HISTORY、BALANCE、FUND_FLOW 或 DEPOSIT_WITHDRAW; 可选值：`SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| sourceView | string | 是 | 来源 SWAP、SPOT、CONTRACT 或 PORTFOLIO，须与数据集匹配; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO` |
+| filters | object | 是 | 按数据集校验的筛选对象，不接受分页和身份字段 |
+| sort | object | 否 | 可选显式排序；null 保留来源列表默认排序 |
+| language | string | 否 | 沿既有 CSV 目录规范化语言 |
+| timeZone | string | 是 | 必填 IANA 时区，例如 Asia/Hong_Kong |
+| csvCatalogVersion | string | 否 | 可选列版本；本次支持 bo519-account-v1 |
+| retryOfTaskId | string | 否 | 可选失败原任务 ID，1～64 字符；必须使用原冻结条件 |
+
+`sort` 字段（传入 sort 时，以下两项均必填）：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| field | string | 该数据集允许的原始排序字段 |
+| direction | string | `ASC` / `DESC` |
+
+### 响应 `data` 字段
+
+HTTP `202 Accepted`; 任务异步生成。
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| taskId | string | 任务 ID |
+| sourceView | string | 原来源 SWAP、SPOT、CONTRACT、PORTFOLIO；旧未知来源为空; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | 本任务关联的原失败项 ID，资金费及普通创建为空 |
+| retryContext | object | 可重试的原冻结条件；不满足重试条件时明确为 null |
+| dataset | string | FUNDING_FEE_HISTORY、SWAP_HISTORY、BALANCE、FUND_FLOW 或 DEPOSIT_WITHDRAW; 可选值：`FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | 规范化 CSV 语言 |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败时 GENERATION、UPLOAD、RESTART 或 TIMEOUT，其余为空; 可选值：`RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | 创建时间，Unix 毫秒 UTC epoch |
+| updatedAt | string | 更新时间，Unix 毫秒 UTC epoch |
+| expiresAt | string | 到期时间，Unix 毫秒 UTC epoch |
+| rowCount | integer | 数据行数，不含表头；尚未生成或超过上限时为空 |
+| fileName | string | 可下载文件名，可空 |
+| downloadAvailable | boolean | 成功且未到期并已校验文件元数据时为 true |
+
+`retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 当前失败任务的 ID |
+| createRequest | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+`retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientRequestId": "account-export-demo-001",
+  "dataset": "BALANCE",
+  "sourceView": "SPOT",
+  "filters": {
+    "hideSmallBalance": false
+  },
+  "timeZone": "Asia/Shanghai"
+}'
+```
+
+---
+
+## 查询账户导出任务
+
+`GET /openapi/v1/mc-account/export-tasks/{taskId}` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| taskId | string | 是 |  |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| taskId | string | 任务 ID |
+| sourceView | string | 原来源 SWAP、SPOT、CONTRACT、PORTFOLIO；旧未知来源为空; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | 本任务关联的原失败项 ID，资金费及普通创建为空 |
+| retryContext | object | 可重试的原冻结条件；不满足重试条件时明确为 null |
+| dataset | string | FUNDING_FEE_HISTORY、SWAP_HISTORY、BALANCE、FUND_FLOW 或 DEPOSIT_WITHDRAW; 可选值：`FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | 规范化 CSV 语言 |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败时 GENERATION、UPLOAD、RESTART 或 TIMEOUT，其余为空; 可选值：`RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | 创建时间，Unix 毫秒 UTC epoch |
+| updatedAt | string | 更新时间，Unix 毫秒 UTC epoch |
+| expiresAt | string | 到期时间，Unix 毫秒 UTC epoch |
+| rowCount | integer | 数据行数，不含表头；尚未生成或超过上限时为空 |
+| fileName | string | 可下载文件名，可空 |
+| downloadAvailable | boolean | 成功且未到期并已校验文件元数据时为 true |
+
+`retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 当前失败任务的 ID |
+| createRequest | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+`retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks/TASK_DEMO_001" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## 下载账户导出 CSV
+
+`GET /openapi/v1/mc-account/export-tasks/{taskId}/download` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| taskId | string | 是 |  |
+
+### 响应
+
+HTTP `302 Found`; `Location` 为限时下载地址，`Cache-Control: no-store`。无 JSON `data`。
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks/TASK_DEMO_001/download" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

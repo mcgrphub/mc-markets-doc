@@ -31,11 +31,11 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 | size | integer | 否 | 分页每页条数 |
 | current | integer | 否 | 分页当前页码，从 1 开始 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔; 可选值：`ASC`, `DESC` |
 | userId | string | 否 | 用户ID |
-| login | string | 否 | mt5登录账号 |
-| dealTimeStart | string | 否 | 开始扣费时间，格式为 `yyyy-MM-dd HH:mm:ss` |
-| dealTimeEnd | string | 否 | 结束扣费时间，格式为 `yyyy-MM-dd HH:mm:ss` |
+| login | string | 否 | 交易账户登录号 |
+| dealTimeStart | string | 否 | 开始扣费时间，格式为 yyyy-MM-dd HH:mm:ss |
+| dealTimeEnd | string | 否 | 结束扣费时间，格式为 yyyy-MM-dd HH:mm:ss |
 
 ### 响应 `data` 字段
 
@@ -56,28 +56,28 @@ feeType固定为INTEREST_FEE/FUNDING_FEE，按positionId+dealTime分组汇总amo
 | relatedBizId | string | 关联业务ID |
 | userId | string | 用户ID |
 | login | string | 交易账户登录号 |
-| businessLineId | integer | 业务线ID |
+| businessLineId | string | 业务线ID |
 | businessLineName | string | 业务线名称 |
 | dealTime | string | 扣费时间 |
 | symbol | string | 结算币种 |
 | symbolPair | string | 交易对 |
-| amount | number | 金额汇总，负数表示扣除 |
+| amount | string | 金额汇总，负数表示扣除 |
 | remark | string | 备注 |
 | createTime | string | 记录创建时间 |
 | updateTime | string | 记录更新时间 |
-| feeRate | number | 费率 |
-| volume | number | 持仓数量 |
+| feeRate | string | 费率 |
+| volume | string | 持仓数量 |
 | positionSide | string | 持仓方向 |
 | positionId | string | 持仓ID |
 | batchTime | string | 费用结算批次时间(整点时间) |
 | amountDisplay | string | 资金费金额展示值，向上保留8位小数 |
 | amountScale | integer | 资金费金额展示精度 |
-| createTimeTimestamp | integer | 记录创建时间毫秒时间戳 |
-| updateTimeTimestamp | integer | 记录更新时间毫秒时间戳 |
-| dealTimeTimestamp | integer | 扣费时间毫秒时间戳 |
 | feeRateDisplay | string | 资金费率展示值，ratio转百分比后四舍五入至4位小数 |
 | feeRateScale | integer | 资金费率展示精度 |
-| batchTimeTimestamp | integer | 费用结算批次时间毫秒时间戳 |
+| dealTimeTimestamp | string | 扣费时间毫秒时间戳 |
+| createTimeTimestamp | string | 记录创建时间毫秒时间戳 |
+| updateTimeTimestamp | string | 记录更新时间毫秒时间戳 |
+| batchTimeTimestamp | string | 费用结算批次时间毫秒时间戳 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/page/v2" \

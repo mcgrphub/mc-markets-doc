@@ -12,7 +12,6 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/symbol/list | READ | Query symbol network list |
 | GET | /openapi/v1/mc-account/symbol/exchange/list | READ | Query exchangeable symbol list |
-| GET | /openapi/v1/mc-account/symbol/detail/&#123;id&#125; | READ | Query symbol details |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -24,6 +23,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 `GET /openapi/v1/mc-account/symbol/list` — permission `READ`.
 
+
 ### Response `data` fields
 
 `data` is an array of objects. Element fields follow.
@@ -32,20 +32,20 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbolId | integer | Currency ID |
-| assetType | string | Currency Type |
+| symbolId | string | Currency identifier |
+| assetType | string | Currency type; Allowed values: `CRYPTO`, `FIAT` |
 | symbol | string | Currency Name |
 | network | string | Currency Network Protocol |
-| minTradeUnit | number | Minimum Transfer Unit |
-| pricePrecision | integer | Price Precision |
-| exchangeRate | number | Exchange Rate |
-| minRechargeAmount | number | Minimum Deposit Amount |
-| minWithdrawAmount | number | Minimum Withdrawal Amount |
+| minTradeUnit | string | Minimum Transfer Unit |
+| pricePrecision | integer | Price digits |
+| exchangeRate | string | Exchange Rate |
+| subscriptionCurrencyPair | string | Subscribed market-data pair, such as ETHUSD.c; null without a subscription |
+| minRechargeAmount | string | Minimum Deposit Amount |
+| minWithdrawAmount | string | Minimum Withdrawal Amount |
 | assetNet | string | Asset Network |
 | iconData | string | Network Protocol Icon |
 | depositStatus | integer | Whether deposit is available, [0: No, 1: Yes] |
 | withdrawalStatus | integer | Whether withdrawal is available, [0: No, 1: Yes] |
-| subscriptionCurrencyPair | string | Subscribed market-data pair, such as ETHUSD.c; null without a subscription |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
@@ -61,6 +61,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 
 `GET /openapi/v1/mc-account/symbol/exchange/list` — permission `READ`.
 
+
 ### Response `data` fields
 
 `data` is an array of objects. Element fields follow.
@@ -69,13 +70,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbolId | integer | Currency ID |
-| symbolType | string | Currency Type |
+| symbolId | string | Currency identifier |
+| symbolType | string | Currency type; Allowed values: `CRYPTO`, `FIAT` |
 | symbol | string | Currency Name |
-| minTradeUnit | number | Minimum Transfer Unit |
-| pricePrecision | integer | Price Precision |
-| exchangeRate | number | Exchange Rate |
-| minExchangeAmount | number | Minimum Exchange Amount |
+| minTradeUnit | string | Minimum Transfer Unit |
+| pricePrecision | integer | Price digits |
+| exchangeRate | string | Exchange Rate |
+| minExchangeAmount | string | Minimum Exchange Amount |
 | exchangeOutStatus | integer | Whether source is available, [0: No, 1: Yes] |
 | exchangeInStatus | integer | Whether target is available, [0: No, 1: Yes] |
 
@@ -97,26 +98,26 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| id | string | Yes | Symbol ID |
+| id | string | Yes | Currency identifier |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| symbolId | integer | Currency ID |
-| assetType | string | Currency Type |
+| symbolId | string | Currency identifier |
+| assetType | string | Currency type; Allowed values: `CRYPTO`, `FIAT` |
 | symbol | string | Currency Name |
 | network | string | Currency Network Protocol |
-| minTradeUnit | number | Minimum Transfer Unit |
-| pricePrecision | integer | Price Precision |
-| exchangeRate | number | Exchange Rate |
-| minRechargeAmount | number | Minimum Deposit Amount |
-| minWithdrawAmount | number | Minimum Withdrawal Amount |
+| minTradeUnit | string | Minimum Transfer Unit |
+| pricePrecision | integer | Price digits |
+| exchangeRate | string | Exchange Rate |
+| subscriptionCurrencyPair | string | Subscribed market-data pair, such as ETHUSD.c; null without a subscription |
+| minRechargeAmount | string | Minimum Deposit Amount |
+| minWithdrawAmount | string | Minimum Withdrawal Amount |
 | assetNet | string | Asset Network |
 | iconData | string | Network Protocol Icon |
 | depositStatus | integer | Whether deposit is available, [0: No, 1: Yes] |
 | withdrawalStatus | integer | Whether withdrawal is available, [0: No, 1: Yes] |
-| subscriptionCurrencyPair | string | Subscribed market-data pair, such as ETHUSD.c; null without a subscription |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/detail/1" \

@@ -24,7 +24,7 @@ class SyncResponseFieldsTest(unittest.TestCase):
         self.assertIsNotNone(data)
         rendered = sync.render_response_block(spec, data, "zh")
 
-        self.assertIn("| positionId | integer |", rendered)
+        self.assertIn("| positionId | string |", rendered)
         self.assertIn("| productCode | string |", rendered)
         self.assertIn("| couponId | string |", rendered)
         self.assertIn("| pauseRedeem | boolean |", rendered)

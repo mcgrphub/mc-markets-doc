@@ -35,9 +35,9 @@ Flexible products only: pass the product code and withdrawal amount. Funds move 
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | Unique request tracking ID |
+| trackingId | string | No | Unique request tracking ID |
 | productCode | string | Yes | Flexible finance product code |
-| amount | number | Yes | Withdrawal amount |
+| amount | number | Yes | Withdrawal amount; Minimum: 1e-08 |
 
 ### Response `data` fields
 
@@ -71,7 +71,7 @@ Fixed-term products only: specify the position detail ID (active or matured; mat
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | Unique request tracking ID |
+| trackingId | string | No | Unique request tracking ID |
 | positionId | integer | Yes | Fixed-term position primary key ID (redeemable whether active or matured; matches `positionId` returned by the current positions endpoint) |
 
 ### Response `data` fields
@@ -105,10 +105,10 @@ Deposit to the Finance account: transfer from the trading account to the fund ac
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | Unique request tracking ID |
+| trackingId | string | No | Unique request tracking ID |
 | productCode | string | Yes | Finance product code, e.g. USDT_CURRENT |
-| amount | number | Yes | Deposit amount |
-| couponId | string | No | Interest coupon ID. Omit it to subscribe without a coupon or coupon locking. |
+| amount | number | Yes | Deposit amount; Minimum: 1e-08 |
+| couponId | string | No | Optional; an empty value subscribes without an interest coupon |
 
 ### Response `data` fields
 
@@ -142,7 +142,7 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| type | string | Yes | Product type enum: `CURRENT` (flexible) or `FIXED` (fixed-term) |
+| type | string | Yes | Product type: current or fixed; Allowed values: `CURRENT`, `FIXED` |
 
 ### Response `data` fields
 
@@ -153,29 +153,29 @@ Returns the full list of enabled product configurations by type (flexible / fixe
 | Field | Type | Description |
 | --- | --- | --- |
 | productCode | string | Product Code |
-| productName | string | Product Name |
-| type | string | Product type enum: `CURRENT` (flexible) or `FIXED` (fixed-term) |
+| productName | string | Product name |
+| type | string | Type: current or fixed; Allowed values: `CURRENT`, `FIXED` |
 | currency | string | Currency |
-| annualRate | number | Base APY% |
-| rewardAnnualRate | number | Excess reward APY% (config tier) |
-| maxAnnualRate | number | Maximum APY% = base + flexible-product excess reward + the signed-in user's highest eligible coupon rate |
-| periodDays | integer | Term days, 0 for demand products |
-| minDepositAmount | number | Minimum Deposit Amount |
-| minRedeemAmount | number | Minimum Redemption Amount |
+| annualRate | string | Base APY% |
+| rewardAnnualRate | string | Excess reward APY% (config tier) |
+| maxAnnualRate | string | Maximum APY% = base + flexible-product excess reward + the signed-in user's highest eligible coupon rate |
+| couponSupported | boolean | Whether interest coupons are supported |
+| couponNominalAnnualRate | string | Highest available coupon nominal annual rate as a percentage |
+| rewardMinHoldingDays | integer | Consecutive holding days required for rewards; empty or 0 for fixed-term products |
+| rewardMinPosition | string | Principal threshold for extra rewards; empty or 0 for fixed-term products |
+| periodDays | integer | Fixed-term duration in days; 0 for flexible products |
+| minDepositAmount | string | Minimum initial deposit |
+| minRedeemAmount | string | Minimum redemption amount |
 | digit | integer | Currency precision (decimal places) |
-| subscribedAmount | number | Subscribed amount: net retained subscription principal in the pool (consistent with fund pool cap verification: cumulative deposits - cumulative redemptions + cumulative interest redemptions) |
-| fundPoolAmount | number | Pool cap: maximum fund pool (ac_finance_product_config.fund_pool_amount; null or ≤0 means no limit) |
-| availableSubscriptionBalance | number | Available subscription balance: remaining depositable amount up to the pool cap; null when pool has no cap set |
-| subscriptionStartTime | string | Subscription start time; if both start and end are null, no restriction applies |
-| subscriptionEndTime | string | Subscription end time; if both start and end are null, no restriction applies |
-| maxDepositAmount | number | Max subscription amount: per-user max deposit (ac_finance_product_config.max_deposit_amount; null or ≤0 means no limit) |
-| dailyMaxRedeemAmount | number | Daily Withdrawal Limit |
-| subscriptionStartTimeTimestamp | integer | Subscription start time millisecond timestamp |
-| subscriptionEndTimeTimestamp | integer | Subscription end time millisecond timestamp |
-| couponSupported | boolean | Whether the product supports interest coupons |
-| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
-| rewardMinHoldingDays | integer | Minimum continuous holding days required for the excess reward tier; null or 0 for fixed-term products |
-| rewardMinPosition | number | Principal threshold required for the excess reward tier; null or 0 for fixed-term products |
+| subscribedAmount | string | Net retained subscription principal in the pool: cumulative deposits minus redemptions plus redeemed interest; used for pool-cap checks |
+| fundPoolAmount | string | Maximum pool size; null or a value at most 0 means unlimited |
+| availableSubscriptionBalance | string | Remaining deposit capacity under the pool cap; null when no cap is configured |
+| subscriptionStartTime | string | Subscription window start; no time restriction when both start and end are null |
+| subscriptionEndTime | string | Subscription window end; no time restriction when both start and end are null |
+| maxDepositAmount | string | Maximum deposit per user; null or a value at most 0 means unlimited |
+| dailyMaxRedeemAmount | string | Daily withdrawal limit |
+| subscriptionStartTimeTimestamp | string | Subscription window start in Unix milliseconds |
+| subscriptionEndTimeTimestamp | string | Subscription window end in Unix milliseconds |
 
 ```bash
 ACCESS_KEY="${MC_ACCESS_KEY:?Set MC_ACCESS_KEY}"
@@ -219,8 +219,8 @@ Paginated query of active and matured positions for the context user ID. Multipl
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number, starting from 1 |
-| orderBy | string | No | Multi-field sort supported; comma-separated |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
 
 ### Response `data` fields
 
@@ -238,55 +238,55 @@ Paginated query of active and matured positions for the context user ID. Multipl
 
 | Field | Type | Description |
 | --- | --- | --- |
-| positionId | integer | Position detail ID; null when multiple flexible positions for the same product are aggregated |
+| positionId | string | Position detail ID; null when multiple flexible positions for the same product are aggregated |
 | productName | string | Product name |
-| productCode | string | Product code |
+| productCode | string | Product Code |
 | currency | string | Asset currency |
-| digit | integer | Currency precision in decimal places |
+| digit | integer | Currency precision (decimal places) |
 | lockPeriodDays | integer | Lock-up days for fixed-term products; 0 for flexible products |
-| type | string | Product type: `CURRENT` or `FIXED` |
-| positionAmount | number | Position principal; excludes unsettled interest and frozen amounts |
-| baseAnnualRate | number | Base annual rate percentage |
+| type | string | Type: current or fixed; Allowed values: `CURRENT`, `FIXED` |
+| positionAmount | string | Principal of held orders; for grouped current products, sums subscription positionAmount. Excludes unsettled interest and frozen funds; see currentRewardAmount for interest |
+| baseAnnualRate | string | Base annual rate percentage |
 | rewardMinHoldingDays | integer | Minimum continuous holding days required for the excess reward tier |
-| excessRewardAnnualRate | number | Excess reward annual rate percentage |
-| eligibleRewardAmount | number | Principal threshold required for the excess reward tier |
-| currentRewardAmount | number | Current unsettled interest in the product currency |
-| cumulativeRewardAmount | number | Historical interest total in the product currency |
-| status | string | Position status: `HOLDING`, `REDEEMED`, or `EXPIRED` |
+| excessRewardAnnualRate | string | Excess reward annual rate percentage |
+| eligibleRewardAmount | string | Principal threshold required for the excess reward tier |
+| currentRewardAmount | string | Total unsettled interest; the parent row sums currentRewardAmount from its subscriptions. Denominated in the product currency, not converted to USDC |
+| cumulativeRewardAmount | string | Historical interest total in the product currency |
+| status | string | Position status: holding or matured. A grouped current position is holding if any subscription is still holding; Allowed values: `HOLDING`, `REDEEMED`, `EXPIRED` |
 | subscribeTime | string | Subscription time for a fixed-term detail; null for an aggregated flexible row |
-| excessRewardAnnualRateDisplay | string | Excess reward annual rate display value |
-| eligibleRewardAmountDisplay | string | Reward principal threshold display value |
-| currentRewardAmountDisplay | string | Current unsettled interest display value |
-| cumulativeRewardAmountDisplay | string | Historical interest total display value |
-| positionAmountDisplay | string | Position principal display value |
-| subscribeTimeTimestamp | integer | Subscription time as a Unix timestamp in milliseconds |
-| baseAnnualRateDisplay | string | Base annual rate display value |
-| couponId | string | Bound interest coupon ID |
-| couponNominalAnnualRate | number | Coupon nominal annual rate percentage |
-| couponBoostAmountUsdc | number | Coupon boost amount in USDC |
-| couponQuoteUsdcPerProduct | number | Product-currency-to-USDC quote captured when the coupon was locked |
-| couponQuoteTimeMs | integer | Quote time as a Unix timestamp in milliseconds |
-| pauseRedeem | boolean | Whether redemption is suspended; `true` means redemption cannot currently be initiated |
+| couponId | string | Bound interest coupon identifier |
+| couponNominalAnnualRate | string | Nominal annual rate as a percentage |
+| couponBoostAmountUsdc | string | Coupon interest amount in USDC |
+| couponQuoteUsdcPerProduct | string | USDC per unit of the product currency when the quote was locked |
+| couponQuoteTimeMs | string | Quote time in Unix milliseconds |
+| pauseRedeem | boolean | Whether redemption is paused |
 | subOrders | array | Flexible-product subscription details; null for fixed-term products. Each child contains the holding's withdrawable interest; parent currentRewardAmount and positionAmount sum the child values |
+| subscribeTimeTimestamp | string | Subscription time in Unix milliseconds |
+| positionAmountDisplay | string | Active order principal display value |
+| baseAnnualRateDisplay | string | Base annual rate display value |
+| excessRewardAnnualRateDisplay | string | Extra reward annual rate display value |
+| eligibleRewardAmountDisplay | string | Reward principal threshold display value |
+| currentRewardAmountDisplay | string | Current holding interest display value |
+| cumulativeRewardAmountDisplay | string | Historical total interest display value |
 
 `records[].subOrders[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| positionId | integer | Holding detail identifier |
+| positionId | string | Holding detail identifier |
 | currency | string | Asset currency |
-| type | string | Product type: `CURRENT` or `FIXED` |
-| positionAmount | number | Principal for this order; excludes unsettled interest and frozen amounts |
-| currentRewardAmount | number | Withdrawable interest for this holding |
-| couponNominalAnnualRate | number | Interest coupon annual rate as a percentage; null without a coupon |
-| couponBoostAmountUsdc | number | Coupon interest amount in USDC; null without a coupon |
+| type | string | Type: current or fixed; Allowed values: `CURRENT`, `FIXED` |
+| positionAmount | string | Principal for this order; excludes unsettled interest and frozen amounts |
+| currentRewardAmount | string | Withdrawable interest for this holding |
+| couponNominalAnnualRate | string | Interest coupon annual rate as a percentage; null without a coupon |
+| couponBoostAmountUsdc | string | Coupon interest amount in USDC; null without a coupon |
 | endTime | string | Expiration time; null for flexible products |
 | status | string | Holding status: active or matured; Allowed values: `HOLDING`, `REDEEMED`, `EXPIRED` |
+| endTimeTimestamp | string | Expiration time in Unix milliseconds |
+| positionAmountDisplay | string | Order principal display value |
 | currentRewardAmountDisplay | string | Withdrawable interest display value |
 | couponNominalAnnualRateDisplay | string | Interest coupon annual rate display value |
 | couponBoostAmountUsdcDisplay | string | Coupon interest amount display value in USDC |
-| endTimeTimestamp | integer | Expiration time in Unix milliseconds |
-| positionAmountDisplay | string | Order principal display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/holding" \
@@ -312,8 +312,8 @@ Aligns with admin redemption history: main table `ac_transaction_history` (`EARN
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number, starting from 1 |
-| orderBy | string | No | Multi-field sort supported; comma-separated |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
 
 ### Response `data` fields
 
@@ -332,21 +332,21 @@ Aligns with admin redemption history: main table `ac_transaction_history` (`EARN
 | Field | Type | Description |
 | --- | --- | --- |
 | productName | string | Product name |
-| productCode | string | Product code |
+| productCode | string | Product Code |
 | currency | string | Asset currency |
-| digit | integer | Currency precision in decimal places |
+| digit | integer | Currency precision (decimal places) |
 | lockPeriodDays | integer | Lock-up days for fixed-term products; 0 for flexible products |
-| type | string | Product type: `CURRENT` or `FIXED` |
-| redeemAmount | number | Redemption amount |
+| type | string | Type: current or fixed; Allowed values: `CURRENT`, `FIXED` |
+| redeemAmount | string | Redemption amount |
 | endTime | string | Redemption time |
 | expireTime | string | Related position maturity date; null when no position is linked |
-| expireTimeTimestamp | integer | Related position maturity time as a Unix timestamp in milliseconds |
-| endTimeTimestamp | integer | Redemption time as a Unix timestamp in milliseconds |
 | subscribeTime | string | Related position subscription time |
-| currentRewardAmount | number | Current interest; 0 after redemption or the stored position snapshot value |
-| cumulativeRewardAmount | number | Cumulative interest |
+| currentRewardAmount | string | Current interest; 0 after redemption or the stored position snapshot value |
+| cumulativeRewardAmount | string | Cumulative interest |
 | status | string | Always `REDEEMED` in this list |
-| subscribeTimeTimestamp | integer | Related position subscription time as a Unix timestamp in milliseconds |
+| endTimeTimestamp | string | Redemption time as a Unix timestamp in milliseconds |
+| expireTimeTimestamp | string | Related position maturity time as a Unix timestamp in milliseconds |
+| subscribeTimeTimestamp | string | Related position subscription time as a Unix timestamp in milliseconds |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/positions/history" \
@@ -366,13 +366,14 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/accoun
 
 Returns `products` by product dimension, ordered by `product_code` ascending, then `currency` ascending. User-side `userDepositedAmount`, `userInterestAmount`, and `availableBalance` come from position aggregates in `ac_user_finance_position` for that product (in the product currency). `totalDepositValue` is the sum of each product's position principal × oracle price, converted to USDC. `totalInterestValue` and `yesterdayInterestValue` are interest settlement records converted to USDC by currency. `userSpotAvailableBalance` is per trading-account currency; products sharing the same currency have the same value. User-side values are 0 when not logged in.
 
+
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| totalDepositValue | number | User total deposit (principal per currency × corresponding oracle price, converted to USDC; 0 when not logged in) |
-| totalInterestValue | number | User historical settled interest total (ac_finance_transaction successful INTEREST records aggregated by currency, amount × oracle price, converted to USDC. Calculation consistent with totalDepositValue and yesterdayInterestValue: decimal p |
-| yesterdayInterestValue | number | Yesterday's interest (settled interest records from the previous calendar day in Asia/Shanghai timezone, converted to USDC using the same oracle; 0 when not logged in) |
+| totalDepositValue | string | User total deposit (principal per currency × corresponding oracle price, converted to USDC; 0 when not logged in) |
+| totalInterestValue | string | User historical settled interest total (ac_finance_transaction successful INTEREST records aggregated by currency, amount × oracle price, converted to USDC. Calculation consistent with totalDepositValue and yesterdayInterestValue: decimal p |
+| yesterdayInterestValue | string | Yesterday's interest (settled interest records from the previous calendar day in Asia/Shanghai timezone, converted to USDC using the same oracle; 0 when not logged in) |
 | products | array | By product dimension: each entry corresponds to ac_finance_product + configuration. User amounts come from position summaries under that product, platform fields come from product summary tables. Includes subscribedAmount, fundPoolAmount, a |
 | totalDepositValueDisplay | string | User total deposit display value |
 | totalInterestValueDisplay | string | User historical settled interest total display value |
@@ -383,54 +384,54 @@ Returns `products` by product dimension, ordered by `product_code` ascending, th
 | Field | Type | Description |
 | --- | --- | --- |
 | productCode | string | Product Code |
-| type | string | Product type enum: `CURRENT` (flexible) or `FIXED` (fixed-term) |
+| type | string | Product type: current or fixed; Allowed values: `CURRENT`, `FIXED` |
 | currency | string | Currency |
-| lockPeriodDays | integer | Lock-up days (term); 0 for demand products |
-| maxDepositAmount | number | Per-user subscription cap (per-user max deposit; null or ≤0 means no limit) |
-| dailyMaxRedeemAmount | number | Daily redemption limit (null or ≤0 means no limit) |
+| lockPeriodDays | integer | Lock-up days for fixed-term products; 0 for flexible products |
+| maxDepositAmount | string | Per-user subscription cap (per-user max deposit; null or ≤0 means no limit) |
+| dailyMaxRedeemAmount | string | Daily redemption limit (null or ≤0 means no limit) |
 | pauseRedeem | boolean | Whether redemption is suspended (true means suspended, redemption cannot be initiated) |
-| annualRate | number | Base APY% (excluding point rewards) |
-| rewardAnnualRate | number | Reward annual rate: excess reward tier APY% (config excess_reward_annual_rate) |
-| totalAnnualRate | number | Total APY% = base + reward + the signed-in user's highest eligible coupon rate |
-| minDepositAmount | number | Minimum Deposit Amount |
-| minRedeemAmount | number | Minimum Withdrawal Amount |
-| subscriptionStartTime | string | Subscription start time; if both start and end are null, no restriction applies |
-| subscriptionEndTime | string | Subscription end time; if both start and end are null, no restriction applies |
-| rewardMinHoldingDays | integer | Order holding days: must hold continuously for (days) to qualify for the excess reward tier (reward_min_holding_days) |
-| rewardMinPosition | number | Order holding amount not less than: must satisfy together with holding days for tiered interest calculation (reward_min_position) |
-| oraclePrice | number | Oracle price (quote currency) |
-| userDepositedAmount | number | Total position principal for the current user under this product (ac_user_finance_position.principal_balance, holding + matured; 0 when not logged in) |
-| userInterestAmount | number | Total unsettled interest for the current user under this product (ac_user_finance_position.interest_balance; 0 when not logged in) |
-| availableBalance | number | Total book value for the current user under this product: principal + interest + frozen (ac_user_finance_position; 0 when not logged in) |
-| userSpotAvailableBalance | number | Spot available balance for the current user in this currency (independent of product; same value returned for all products of the same currency; 0 when not logged in) |
-| totalDeposited | number | Platform's cumulative deposits for this product (ac_finance_product.total_deposited) |
-| totalPrincipal | number | Platform's current retained principal for this product (ac_finance_product: total_deposited - total_withdrawn + total_interest_withdrawn) |
-| subscribedAmount | number | Subscribed amount: net retained subscription principal in the pool (consistent with fund pool cap verification: cumulative deposits - cumulative redemptions + cumulative interest redemptions) |
-| fundPoolAmount | number | Pool cap: maximum fund pool (ac_finance_product_config.fund_pool_amount; null or ≤0 means no limit) |
-| availableSubscriptionBalance | number | Available subscription balance: remaining depositable amount up to the pool cap; null when pool has no cap set |
-| digit | integer | Currency Decimal Places |
+| annualRate | string | Base APY% (excluding point rewards) |
+| rewardAnnualRate | string | Reward annual rate: excess reward tier APY% (config excess_reward_annual_rate) |
+| totalAnnualRate | string | Total APY% = base + reward + the signed-in user's highest eligible coupon rate |
+| couponSupported | boolean | Whether interest coupons are supported |
+| couponNominalAnnualRate | string | Highest available coupon nominal annual rate as a percentage |
+| minDepositAmount | string | Minimum deposit amount |
+| minRedeemAmount | string | Minimum withdrawal amount |
+| subscriptionStartTime | string | Subscription window start; no time restriction when both start and end are null |
+| subscriptionEndTime | string | Subscription window end; no time restriction when both start and end are null |
+| rewardMinHoldingDays | integer | Consecutive order holding days required for the extra reward tier |
+| rewardMinPosition | string | Order principal threshold; tiered interest applies only when both the amount and holding-day requirements are met |
+| oraclePrice | string | Reference price used for valuation conversion |
+| userDepositedAmount | string | Your total principal for this product, including active and matured holdings; 0 when signed out |
+| userInterestAmount | string | Your unsettled interest for this product; 0 when signed out |
+| availableBalance | string | Your total book value for this product: principal plus interest plus frozen amounts; 0 when signed out |
+| userSpotAvailableBalance | string | Your available spot balance for this currency; identical across products in the same currency; 0 when signed out |
+| totalDeposited | string | Platform cumulative deposits for this product |
+| totalPrincipal | string | Platform retained principal for this product: cumulative deposits minus redemptions plus redeemed interest |
+| subscribedAmount | string | Net retained subscription principal in the pool: cumulative deposits minus redemptions plus redeemed interest; used for pool-cap checks |
+| fundPoolAmount | string | Maximum pool size; null or a value at most 0 means unlimited |
+| availableSubscriptionBalance | string | Remaining deposit capacity under the pool cap; null when no cap is configured |
+| digit | integer | Currency decimal places |
+| subscriptionStartTimeTimestamp | string | Subscription window start in Unix milliseconds |
+| subscriptionEndTimeTimestamp | string | Subscription window end in Unix milliseconds |
+| maxDepositAmountDisplay | string | Per-user subscription limit display value |
 | dailyMaxRedeemAmountDisplay | string | Daily redemption limit display value |
-| rewardMinPositionDisplay | string | Order holding amount threshold display value |
-| userDepositedAmountDisplay | string | User position principal total display value |
-| userInterestAmountDisplay | string | User unsettled interest total display value |
-| userSpotAvailableBalanceDisplay | string | User spot available balance display value |
-| availableSubscriptionBalanceDisplay | string | Available subscription balance display value |
-| subscriptionStartTimeTimestamp | integer | Subscription start time millisecond timestamp |
-| subscriptionEndTimeTimestamp | integer | Subscription end time millisecond timestamp |
-| maxDepositAmountDisplay | string | Per-user subscription cap display value |
-| annualRateDisplay | string | Base APY display value |
+| annualRateDisplay | string | Base annualized yield display value |
 | rewardAnnualRateDisplay | string | Reward annual rate display value |
-| totalAnnualRateDisplay | string | Total APY display value |
+| totalAnnualRateDisplay | string | Total annual rate display value |
 | minDepositAmountDisplay | string | Minimum deposit amount display value |
 | minRedeemAmountDisplay | string | Minimum withdrawal amount display value |
-| oraclePriceDisplay | string | Oracle price display value |
-| availableBalanceDisplay | string | User position book value total display value |
-| totalDepositedDisplay | string | Platform cumulative deposit display value |
-| totalPrincipalDisplay | string | Platform current retained principal display value |
+| rewardMinPositionDisplay | string | Order principal threshold display value |
+| oraclePriceDisplay | string | Valuation reference price display value |
+| userDepositedAmountDisplay | string | User total principal display value |
+| userInterestAmountDisplay | string | User unsettled interest display value |
+| availableBalanceDisplay | string | User total holding book value display value |
+| userSpotAvailableBalanceDisplay | string | User available spot balance display value |
+| totalDepositedDisplay | string | Platform cumulative deposit amount display value |
+| totalPrincipalDisplay | string | Platform retained principal display value |
 | subscribedAmountDisplay | string | Subscribed amount display value |
 | fundPoolAmountDisplay | string | Pool cap display value |
-| couponSupported | boolean | Whether the product supports interest coupons |
-| couponNominalAnnualRate | number | Highest eligible coupon nominal annual rate for the signed-in user; null or 0 when unavailable |
+| availableSubscriptionBalanceDisplay | string | Available subscription amount display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/finance/account/overview" \
@@ -452,9 +453,9 @@ For a current product, provide `productCode` so the server calculates the full r
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | Unique request tracking identifier |
-| productCode | string | Conditional | Current product code; provide either this field or positionId |
-| positionId | integer | Conditional | Fixed-position ID; provide either this field or productCode. Matches positionId returned by the current positions endpoint |
+| trackingId | string | No | Unique request tracking ID |
+| productCode | string | No | Required for full withdrawal of a current product; mutually exclusive with positionId |
+| positionId | integer | No | Required for full withdrawal of a fixed position; mutually exclusive with productCode. Matches positionId in current positions |
 
 ### Response `data` fields
 

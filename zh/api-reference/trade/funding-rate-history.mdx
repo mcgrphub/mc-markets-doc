@@ -1,0 +1,57 @@
+---
+title: "资金费率历史"
+sidebarTitle: "资金费率历史"
+description: "按后端 main 公开契约维护的接口。"
+---
+
+## 接口列表
+
+| 方法 | 路径 | 权限 | 描述 |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/mc-trade/trade/funding-rates/history` | READ | 查询资金费率历史 |
+
+
+<Note>
+按 [认证](/zh/authentication) 使用 AK/SK 签名。网关地址见 [基础 URL](/zh/api-reference/base-url)。
+</Note>
+
+---
+
+## 查询资金费率历史
+
+`GET /openapi/v1/mc-trade/trade/funding-rates/history` — 权限 `READ`.
+
+### 查询 / 路径参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| symbol | string | 是 | 精确品种标识，原值查询，不更改大小写 |
+| fromTimestamp | integer | 是 | UTC epoch 毫秒左闭边界，0 至 9007199254740991 |
+| toTimestamp | integer | 是 | UTC epoch 毫秒右闭边界，跨度不超过604800000 |
+
+### 响应 `data` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| points | array | 完整结算点，严格按时间递增；无历史为[] |
+| currentRate | string | 最新原始十进制费率文本，不乘100，不截断 |
+| nextSettlementAtTimestamp | string | 下一结算点 UTC epoch 毫秒，源记录确实缺失时为null; 可为空 |
+| payerDirection | string | LONG_PAYS_SHORT 正费率，SHORT_PAYS_LONG 负费率，NEUTRAL 零费率; 可选值：`LONG_PAYS_SHORT`, `SHORT_PAYS_LONG`, `NEUTRAL` |
+
+`points[]` 元素：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| settledAtTimestamp | integer | 结算时刻 UTC epoch 毫秒，闭区间内严格递增 |
+| rate | string | 原始精确十进制费率文本，保留精度 |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/funding-rates/history" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "symbol=BTCUSDT" \
+  --data-urlencode "fromTimestamp=1" \
+  --data-urlencode "toTimestamp=1"
+```

@@ -26,6 +26,7 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 Query positions.
 
+
 ### Response `data` fields
 
 | Field | Type | Description |
@@ -46,12 +47,12 @@ Query positions.
 | contractSize | number | Contract Size |
 | freeMargin | number | Available |
 | precision | number | Precision |
-| priceCurrent | number | Current Price |
-| symbol | string | Trading Symbol |
+| priceCurrent | number | Current price |
+| symbol | string | Trading symbol |
 | usdValue | number | USD Value |
 | volumeExt | number | Extended Position Volume |
 | volume | number | Actual Position Quantity |
-| openPrice | number | Open Price |
+| openPrice | number | Open price |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot/positions/v2" \
@@ -95,17 +96,17 @@ Query spot account positions.
 | contractSize | number | Contract Size |
 | freeMargin | number | Available |
 | precision | number | Precision |
-| priceCurrent | number | Current Price |
-| symbol | string | Trading Symbol |
+| priceCurrent | number | Current price |
+| symbol | string | Trading symbol |
 | usdValue | number | USD Value |
-| rateProfit | number | P/L Exchange Rate |
+| rateProfit | number | Profit conversion rate |
 | volume | number | Actual Position Quantity |
 | volumeExt | number | Actual Position Quantity |
-| openPrice | number | Current Price |
+| openPrice | number | Current price |
 | freeAmount | number | Available (excluding portion locked by pending orders). This field is non-zero only for USDC |
-| volumeExtDec | number | Actual position volume (readable value after volumeExt precision conversion) |
+| volumeExtDec | number | Readable position quantity converted from volumeExt using the applicable precision |
 | volumeDisplay | string | Total balance display value |
-| volumeScale | integer | Total balance display precision |
+| volumeScale | integer | Decimal places for the total balance display value |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/spot-account/positions" \
@@ -134,7 +135,7 @@ Query the current user's Proof of Reserves (PoR). You can filter by batch ID.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| treeBatchId | integer | Merkle Tree Build Batch |
+| treeBatchId | string | Merkle Tree Build Batch |
 | userId | string | User ID |
 | userHash | string | PoRv2 User Hash (user_hash) |
 | assetInfo | string | Asset Information |

@@ -10,10 +10,11 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
-| POST | /openapi/v1/mc-account/transaction/transaction/record/transactionId/&#123;id&#125; | READ | Get transaction record details by transactionId |
 | POST | /openapi/v1/mc-account/transaction/transaction/record/page | READ | Paginate transaction records |
 | POST | /openapi/v1/mc-account/transaction/exchange/v2 | TRADE | Flash conversion (quote-supported) |
 | POST | /openapi/v1/mc-account/transaction/account/record/page | READ | Paginate fund account ledger records |
+| GET | `/openapi/v1/mc-account/transaction/user-transfer/recipients/{recipientUid}/validation` | READ | Validate a transfer recipient |
+
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
@@ -39,61 +40,59 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
+| id | string | Transaction Record ID |
 | uid | string | Associated Account Table |
 | transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
+| symbolId | string | Currency ID |
 | acSymbol | string | Currency Name / From |
 | network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
+| exchangeSymbolId | string | Target Currency ID |
 | exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
+| transactionType | string | Transaction type; Allowed values: `NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
+| status | string | Trade Status; Allowed values: `SUCCESS`, `FAIL`, `PENDING` |
+| amount | string | Transaction Amount |
 | amountStr | string | Transaction Amount String |
 | amountDisplay | string | Transaction amount display value |
 | amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
+| exchangeAmount | string | Target Amount |
 | exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
+| fee | string | Trading Fee |
 | feeDisplay | string | Trading fee display value |
 | createTime | string | Trade Start Time |
 | finishTime | string | Trade Completion Time |
 | failureReason | string | Failure Reason |
 | errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
+| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
+| hourBucketSeconds | string | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
+| hourlyRate | string | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
+| basisBalance | string | Negative balance interest principal in the settlement currency; empty for other record types |
+| exchangeRate | string | Exchange Rate |
+| convertExchangeRate | string | Exchange rate (to/from) |
 | rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
+| txHash | string | On-chain transaction hash |
 | feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
+| sourceAccountType | string | Source account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
+| targetAccountType | string | Target account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 | sourceAccountId | string | Source Account ID |
 | targetAccountId | string | Target Account ID |
 | sourceWalletAddress | string | Source Wallet Address |
 | targetWalletAddress | string | Target Wallet Address |
 | extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
+| sourceAccountBalance | string | Source Account Balance After Transfer |
+| targetAccountBalance | string | Target Account Balance After Transfer |
+| fundFlowType | string | Fund-flow type; Allowed values: `CRYPTO_ADDRESS`, `FIAT` |
+| transactionMethod | string | Execution mode; Allowed values: `CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 | recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
 | payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
-| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
-| hourBucketSeconds | integer | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
-| hourlyRate | number | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
-| basisBalance | number | Negative balance interest principal in the settlement currency; empty for other record types |
+| createTimeTimestamp | string | Trade start time millisecond timestamp |
+| finishTimeTimestamp | string | Trade completion time millisecond timestamp |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/transactionId/TXN-20260827-0001" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \
-  -H "X-Nonce: YOUR_NONCE" \
-  -H "Content-Type: application/json" \
-  -d '{}' 
+  -H "X-Nonce: YOUR_NONCE"
 ```
 
 ---
@@ -109,19 +108,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | size | integer | No | Page size |
 | current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort; comma-separated fields |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
-| trackingId | string | Yes | Unique request tracking ID |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
+| trackingId | string | No | Unique request tracking ID |
 | symbolId | integer | No | Filter by currency ID |
 | exchangeSymbolId | integer | No | Filter by destination currency ID |
-| transactionType | string | No | Transaction type enum |
+| transactionType | string | No | Transaction type enum; Allowed values: `NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
 | transactionTypes | array | No | Applies only when transactionType==null |
-| status | string | No | Filter by status: SUCCESS / FAIL / PENDING |
+| status | string | No | Filter by status: SUCCESS / FAIL / PENDING; Allowed values: `SUCCESS`, `FAIL`, `PENDING` |
 | statuses | array | No | Applies only when status==null |
 | createTimeStart | string | No | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeStartTimestamp | integer | No | Unix timestamp (ms) |
 | createTimeEnd | string | No | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeEndTimestamp | integer | No | Unix timestamp (ms) |
-| transactionMethod | string | No | Transaction method enum |
+| transactionMethod | string | No | CHAIN_TX / USER_TRANSFER / OTHER; Allowed values: `CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 
 ### Response `data` fields
 
@@ -139,52 +138,52 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
+| id | string | Transaction Record ID |
 | uid | string | Associated Account Table |
 | transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
+| symbolId | string | Currency ID |
 | acSymbol | string | Currency Name / From |
 | network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
+| exchangeSymbolId | string | Target Currency ID |
 | exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
+| transactionType | string | Transaction type; Allowed values: `NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
+| status | string | Trade Status; Allowed values: `SUCCESS`, `FAIL`, `PENDING` |
+| amount | string | Transaction Amount |
 | amountStr | string | Transaction Amount String |
 | amountDisplay | string | Transaction amount display value |
 | amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
+| exchangeAmount | string | Target Amount |
 | exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
+| fee | string | Trading Fee |
 | feeDisplay | string | Trading fee display value |
 | createTime | string | Trade Start Time |
 | finishTime | string | Trade Completion Time |
 | failureReason | string | Failure Reason |
 | errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
+| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
+| hourBucketSeconds | string | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
+| hourlyRate | string | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
+| basisBalance | string | Negative balance interest principal in the settlement currency; empty for other record types |
+| exchangeRate | string | Exchange Rate |
+| convertExchangeRate | string | Exchange rate (to/from) |
 | rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
+| txHash | string | On-chain transaction hash |
 | feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
+| sourceAccountType | string | Source account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
+| targetAccountType | string | Target account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 | sourceAccountId | string | Source Account ID |
 | targetAccountId | string | Target Account ID |
 | sourceWalletAddress | string | Source Wallet Address |
 | targetWalletAddress | string | Target Wallet Address |
 | extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
+| sourceAccountBalance | string | Source Account Balance After Transfer |
+| targetAccountBalance | string | Target Account Balance After Transfer |
+| fundFlowType | string | Fund-flow type; Allowed values: `CRYPTO_ADDRESS`, `FIAT` |
+| transactionMethod | string | Execution mode; Allowed values: `CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 | recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
 | payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
-| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
-| hourBucketSeconds | integer | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
-| hourlyRate | number | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
-| basisBalance | number | Negative balance interest principal in the settlement currency; empty for other record types |
+| createTimeTimestamp | string | Trade start time millisecond timestamp |
+| finishTimeTimestamp | string | Trade completion time millisecond timestamp |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/transaction/record/page" \
@@ -211,10 +210,10 @@ Complete a flash conversion. First call [Query flash conversion exchange rate](/
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| trackingId | string | Yes | Unique request tracking ID |
+| trackingId | string | No | Unique request tracking ID |
 | symbol | string | Yes | e.g. BTC/USDT |
 | exchangeSymbol | string | Yes | e.g. BTC/USDT |
-| amount | number | Yes | Exchange amount / quantity of the exchange symbol |
+| amount | number | Yes | Exchange amount / quantity of the exchange symbol; Minimum: 1e-08 |
 | quoteSessionId | string | Yes | Quote session ID from the flash conversion rate quote |
 
 ### Response `data` fields
@@ -252,19 +251,19 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 | size | integer | No | Page size |
 | current | integer | No | Current page number, starting from 1 |
 | orderBy | string | No | Multi-field sort; comma-separated fields |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
-| trackingId | string | Yes | Unique request tracking ID |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
+| trackingId | string | No | Unique request tracking ID |
 | symbolId | integer | No | Filter by currency ID |
 | exchangeSymbolId | integer | No | Filter by destination currency ID |
-| transactionType | string | No | Transaction type enum |
+| transactionType | string | No | Transaction type enum; Allowed values: `NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
 | transactionTypes | array | No | Applies only when transactionType==null |
-| status | string | No | Filter by status: SUCCESS / FAIL / PENDING |
+| status | string | No | Filter by status: SUCCESS / FAIL / PENDING; Allowed values: `SUCCESS`, `FAIL`, `PENDING` |
 | statuses | array | No | Applies only when status==null |
 | createTimeStart | string | No | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeStartTimestamp | integer | No | Unix timestamp (ms) |
 | createTimeEnd | string | No | yyyy-MM-dd HH:mm:ss.SSS |
 | createTimeEndTimestamp | integer | No | Unix timestamp (ms) |
-| transactionMethod | string | No | Transaction method enum |
+| transactionMethod | string | No | CHAIN_TX / USER_TRANSFER / OTHER; Allowed values: `CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 
 ### Response `data` fields
 
@@ -282,52 +281,52 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
 
 | Field | Type | Description |
 | --- | --- | --- |
-| id | integer | Transaction Record ID |
+| id | string | Transaction Record ID |
 | uid | string | Associated Account Table |
 | transactionId | string | Transaction ID |
-| symbolId | integer | Currency ID |
+| symbolId | string | Currency ID |
 | acSymbol | string | Currency Name / From |
 | network | string | Network Protocol |
-| exchangeSymbolId | integer | Target Currency ID |
+| exchangeSymbolId | string | Target Currency ID |
 | exchangeSymbol | string | Target Currency Name / To |
-| transactionType | string | Trade Type Enum |
-| status | string | Trade Status |
-| amount | number | Transaction Amount |
+| transactionType | string | Transaction type; Allowed values: `NEGATIVE_BALANCE_INTEREST`, `RECHARGE`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `EXCHANGE`, `SAFEBOX_TRANSFER_IN`, `ROLLBACK`, `SAFEBOX_TRANSFER_OUT`, `ADJUSTMENT_ADD`, `ADJUSTMENT_REDUCE`, `MLP_DEPOSIT`, `MLP_WITHDRAWAL`, `TRANSFER_TRADE_TO_SPOT`, `TRANSFER_SPOT_TO_TRADE`, `EARN_DEPOSIT`, `EARN_WITHDRAWAL`, `PROMO_REWARD_IN`, `PROMO_REWARD_OUT`, `TRANSFER_SPOT_TO_USER_VAULT`, `TRANSFER_SPOT_TO_FUND_USER_VAULT_SUBSCRIBE`, `TRANSFER_FUND_TO_USER_VAULT`, `TRANSFER_USER_VAULT_TO_SPOT` |
+| status | string | Trade Status; Allowed values: `SUCCESS`, `FAIL`, `PENDING` |
+| amount | string | Transaction Amount |
 | amountStr | string | Transaction Amount String |
 | amountDisplay | string | Transaction amount display value |
 | amountScale | integer | Transaction amount display precision |
-| exchangeAmount | number | Target Amount |
+| exchangeAmount | string | Target Amount |
 | exchangeAmountDisplay | string | Target amount display value |
-| fee | number | Trading Fee |
+| fee | string | Trading Fee |
 | feeDisplay | string | Trading fee display value |
 | createTime | string | Trade Start Time |
 | finishTime | string | Trade Completion Time |
 | failureReason | string | Failure Reason |
 | errorCode | string | Failure Error Code |
-| exchangeRate | number | Exchange Rate |
-| convertExchangeRate | number | Exchange rate (to/from) |
+| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
+| hourBucketSeconds | string | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
+| hourlyRate | string | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
+| basisBalance | string | Negative balance interest principal in the settlement currency; empty for other record types |
+| exchangeRate | string | Exchange Rate |
+| convertExchangeRate | string | Exchange rate (to/from) |
 | rateDisplay | string | Exchange rate display value |
-| txHash | string | Blockchain Transaction Hash |
+| txHash | string | On-chain transaction hash |
 | feeSymbol | string | Fee Currency |
-| sourceAccountType | string | Source Account Type |
-| targetAccountType | string | Target Account Type |
+| sourceAccountType | string | Source account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
+| targetAccountType | string | Target account type; Allowed values: `FUND_ACCOUNT`, `TRADING_ACCOUNT`, `SAFE_BOX`, `EXTERNAL_ACCOUNT`, `MLP_ACCOUNT`, `SPOT_ACCOUNT`, `EARN_ACCOUNT`, `USER_VAULT_CONTRACT_ACCOUNT` |
 | sourceAccountId | string | Source Account ID |
 | targetAccountId | string | Target Account ID |
 | sourceWalletAddress | string | Source Wallet Address |
 | targetWalletAddress | string | Target Wallet Address |
 | extParams | string | Extended Parameters |
-| sourceAccountBalance | number | Source Account Balance After Transfer |
-| targetAccountBalance | number | Target Account Balance After Transfer |
-| fundFlowType | string | Fund Flow Type |
-| transactionMethod | string | Trading Method Enum |
+| sourceAccountBalance | string | Source Account Balance After Transfer |
+| targetAccountBalance | string | Target Account Balance After Transfer |
+| fundFlowType | string | Fund-flow type; Allowed values: `CRYPTO_ADDRESS`, `FIAT` |
+| transactionMethod | string | Execution mode; Allowed values: `CHAIN_TX`, `USER_TRANSFER`, `OTHER` |
 | recipientUid | string | WITHDRAWAL Has value during user-to-user transfers |
 | payerUid | string | RECHARGE Has value during user-to-user transfers |
-| finishTimeTimestamp | integer | Trade completion time millisecond timestamp |
-| createTimeTimestamp | integer | Trade start time millisecond timestamp |
-| errorCodeKey | string | Stable business error key; TRANSFER_OUT_FORBIDDEN_NEGATIVE_BALANCE for transfers out of negative balance accounts; other known errors retain their existing keys; empty for unknown errors |
-| hourBucketSeconds | integer | Negative balance interest accrual hour in Unix seconds (UTC); empty for other record types |
-| hourlyRate | number | Hourly negative balance interest rate as a percentage, with at most 6 decimal places; empty for other record types |
-| basisBalance | number | Negative balance interest principal in the settlement currency; empty for other record types |
+| createTimeTimestamp | string | Trade start time millisecond timestamp |
+| finishTimeTimestamp | string | Trade completion time millisecond timestamp |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/account/record/page" \
@@ -340,4 +339,32 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/transacti
   "current": 1,
   "size": 20
 }' 
+```
+
+---
+
+## Validate a transfer recipient
+
+`GET /openapi/v1/mc-account/transaction/user-transfer/recipients/{recipientUid}/validation` — Permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| recipientUid | string | Yes |  |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| valid | boolean | True only when reason is NONE |
+| reason | string | NONE: can receive; NOT_FOUND: not visible; NOT_RECEIVABLE: cannot receive; SELF: the current user; Allowed values: `NONE`, `NOT_FOUND`, `NOT_RECEIVABLE`, `SELF` |
+| checkedAtTimestamp | string | Server time when validation completed, in Unix milliseconds (UTC) |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/transaction/user-transfer/recipients/100000001/validation" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
 ```

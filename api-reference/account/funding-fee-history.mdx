@@ -30,12 +30,12 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number, starting from 1 |
-| orderBy | string | No | Multi-field sort; comma-separated |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
 | userId | string | No | User ID |
-| login | string | No | MT5 login ID |
-| dealTimeStart | string | No | Fee deduction start time in `yyyy-MM-dd HH:mm:ss` format |
-| dealTimeEnd | string | No | Fee deduction end time in `yyyy-MM-dd HH:mm:ss` format |
+| login | string | No | Trading account login |
+| dealTimeStart | string | No | Fee start time, yyyy-MM-dd HH:mm:ss |
+| dealTimeEnd | string | No | Fee end time, yyyy-MM-dd HH:mm:ss |
 
 ### Response `data` fields
 
@@ -56,28 +56,28 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | relatedBizId | string | Related business ID |
 | userId | string | User ID |
 | login | string | Trading account login |
-| businessLineId | integer | Business line ID |
+| businessLineId | string | Business Line ID |
 | businessLineName | string | Business line name |
 | dealTime | string | Fee deduction time |
 | symbol | string | Settlement currency |
-| symbolPair | string | Trading pair |
-| amount | number | Aggregated amount; a negative value indicates a deduction |
+| symbolPair | string | Trading Pair |
+| amount | string | Aggregated amount; a negative value indicates a deduction |
 | remark | string | Remark |
 | createTime | string | Record creation time |
 | updateTime | string | Record update time |
-| feeRate | number | Fee rate |
-| volume | number | Position volume |
+| feeRate | string | Fee rate |
+| volume | string | Position volume |
 | positionSide | string | Position side |
 | positionId | string | Position ID |
 | batchTime | string | Fee settlement batch time |
 | amountDisplay | string | Funding-fee amount display value |
 | amountScale | integer | Funding-fee amount display precision |
-| createTimeTimestamp | integer | Creation time in Unix milliseconds |
-| updateTimeTimestamp | integer | Update time in Unix milliseconds |
-| dealTimeTimestamp | integer | Fee deduction time in Unix milliseconds |
 | feeRateDisplay | string | Funding-rate percentage display value |
 | feeRateScale | integer | Funding-rate display precision |
-| batchTimeTimestamp | integer | Settlement batch time in Unix milliseconds |
+| dealTimeTimestamp | string | Fee deduction time in Unix milliseconds |
+| createTimeTimestamp | string | Creation time in Unix milliseconds |
+| updateTimeTimestamp | string | Update time in Unix milliseconds |
+| batchTimeTimestamp | string | Settlement batch time in Unix milliseconds |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/page/v2" \

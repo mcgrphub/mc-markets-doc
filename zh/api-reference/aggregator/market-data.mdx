@@ -4,37 +4,37 @@ sidebarTitle: "行情数据"
 description: "查询币种行情排行与 K 线数据。"
 ---
 
-**行情数据**接口用于拉取币种行情排行榜与 K 线。本组接口均为公开访问，无需 AK/SK 鉴权。路径前缀为 `/openapi/v1/mc-aggregator/`。
+**行情数据**接口用于拉取币种行情排行榜与 K 线。按 main 默认契约，本组接口需要具备 `READ` 权限的 AK/SK 签名。网关可配置匿名放行，是否免签以目标环境配置为准。路径前缀为 `/openapi/v1/mc-aggregator/`。
 
 ## 接口列表
 
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
-| GET | /openapi/v1/mc-aggregator/market-data/symbol-ranking | 公开访问 | 按分类与排序维度分页查询币种行情排行。 |
-| GET | /openapi/v1/mc-aggregator/market-data/kline | 公开访问 | 按品种、周期与时间范围查询 K 线。 |
+| GET | /openapi/v1/mc-aggregator/market-data/symbol-ranking | READ | 按分类与排序维度分页查询币种行情排行。 |
+| GET | /openapi/v1/mc-aggregator/market-data/kline | READ | 按品种、周期与时间范围查询 K 线。 |
 
 <Note>
-  Playground 已关闭。这两个接口无需 AK/SK，可直接请求。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
+  Playground 已关闭。示例按默认 AK/SK 签名方式编写；匿名放行属于网关环境配置，本次未验证生产配置。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
 </Note>
 
 ---
 
 ## 币种行情排行
 
-`GET /openapi/v1/mc-aggregator/market-data/symbol-ranking` — 权限 `公开访问`。
+`GET /openapi/v1/mc-aggregator/market-data/symbol-ranking` — 权限 `READ`。
 
 按分类与排序维度分页查询币种行情排行榜。
 
-### 查询参数
+### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| category | string | 是 | Tab 分类：CONTRACT / SPOT / CRYPTO / TRADFI |
-| subGroup | string | 否 | 传统金融二级 Tab：ALL / FOREX / METALS / INDICES / ENERGY / STOCKS |
-| hotOnly | boolean | 否 | 是否仅返回热门品种（isHot=1 且 status=1） |
-| sortBy | string | 否 | 排序字段：symbol / bid / change24hPct |
-| sortOrder | string | 否 | 排序方向：asc / desc |
-| page | integer | 否 | 页码，从 1 开始 |
+| category | string | 是 | 分类：CONTRACT/SPOT/CRYPTO/TRADFI |
+| subGroup | string | 否 | 传统金融二级分类：ALL/FOREX/METALS/INDICES/ENERGY/STOCKS |
+| hotOnly | boolean | 否 | 是否仅返回热门品种 |
+| sortBy | string | 否 | 排序字段：symbol/bid/change24hPct |
+| sortOrder | string | 否 | 排序方向：asc/desc |
+| page | integer | 否 | 页码，从 1 开始; 最小值: 1 |
 | pageSize | integer | 否 | 每页条数，最大 100 |
 
 ### 响应 `data` 字段
@@ -61,29 +61,29 @@ description: "查询币种行情排行与 K 线数据。"
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/symbol-ranking" \
-  --data-urlencode "category=SPOT" \
-  --data-urlencode "sortBy=change24hPct" \
-  --data-urlencode "sortOrder=desc" \
-  --data-urlencode "page=1" \
-  --data-urlencode "pageSize=20"
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "category=SPOT"
 ```
 
 ---
 
 ## 查询 K 线数据
 
-`GET /openapi/v1/mc-aggregator/market-data/kline` — 权限 `公开访问`。
+`GET /openapi/v1/mc-aggregator/market-data/kline` — 权限 `READ`。
 
 根据币种、时间间隔与时间范围查询 K 线数据。
 
-### 查询参数
+### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| symbol | string | 是 | 交易品种代码（例如 EURUSD） |
-| period | integer | 是 | 周期（分钟）：1 / 5 / 15 / 60 / 240 / 1440；周=1440*7；月=1440*30 |
-| endTime | integer | 是 | 结束时间，秒级时间戳 |
-| startTime | integer | 否 | 开始时间，秒级时间戳 |
+| symbol | string | 是 | 交易品种代码 |
+| period | integer | 是 | 1分钟-1, 5分钟-5, 15分钟-15, 1小时-60, 4小时-240, 1天-1440, 1周-1440*7, 1月-1440*30 |
+| startTime | integer | 否 | 开始时间, 秒级时间戳 |
+| endTime | integer | 是 | 结束时间, 秒级时间戳 |
 | limit | integer | 否 | 单次最大返回条数，最大 500 |
 
 ### 响应 `data` 字段
@@ -117,9 +117,11 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-aggregator/market-data/kline" \
-  --data-urlencode "symbol=EURUSD" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "symbol=BTCUSDT" \
   --data-urlencode "period=60" \
-  --data-urlencode "startTime=1755792000" \
-  --data-urlencode "endTime=1755878400" \
-  --data-urlencode "limit=500"
+  --data-urlencode "endTime=1762041600"
 ```

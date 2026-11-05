@@ -23,29 +23,26 @@ description: "查询当前认证用户的 KYC 基础资料。"
 
 查询当前认证用户在当前业务线下的 KYC 基础资料。用户身份由认证上下文确定，不接受 UID 查询参数。
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| applyNo | string | 当前业务线 KYC 主单号，无工单时为 null |
-| businessLineId | integer | 业务线 ID |
-| l0StepPassed | boolean | 基础认证（L0）步骤是否已审核通过 |
+| applyNo | string | 当前业务线 KYC 主单号，无工单则为 null |
+| businessLineId | string | 业务线 ID |
+| l0StepPassed | boolean | 基础认证（L0）步骤是否已审核通过，为 true 时才允许调用修改接口 |
 | firstName | string | 名 |
 | lastName | string | 姓 |
 | nationality | string | 国籍 |
 | residenceCountry | string | 居住国家 |
 | residenceRegion | string | 居住地区 |
 | birthDate | string | 出生日期 |
-| kycType | string | 证件类型 |
+| kycType | string | 证件类型; 可选值：`ID_CARD`, `PASSPORT`, `DRIVER_LICENSE`, `OTHER` |
 | certNo | string | 证件号码 |
-| certValidUntil | string | 证件有效期截止日期，格式为 yyyy-MM-dd |
-| certValidFrom | string | 证件有效期开始日期，格式为 yyyy-MM-dd |
+| certValidUntil | string | 证件有效期截止 yyyy-MM-dd |
+| certValidFrom | string | 证件有效期开始 yyyy-MM-dd |
 | certPermanentFlag | integer | 证件长期有效：1=是，0=否 |
 | certIssueRegion | string | 签发地区 |
-
-<Warning>
-  响应包含个人身份资料。仅在必要时读取，不要将响应写入日志、提示词、工单或其他共享位置。
-</Warning>
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/kyc/profile/base" \

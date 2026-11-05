@@ -68,33 +68,33 @@ Sign authenticated requests with AK/SK as described in [Authentication](/authent
 | strategySummary | string | Strategy summary; returned in both listings and details |
 | status | string | Status enum; independent of frozen |
 | frozen | boolean | Operational freeze flag; independent of status |
-| navPerShare | number | Latest published NAV per share; null before publication |
-| aum | number | AUM after fees |
-| totalShares | number | Issued shares, with 8 decimal places; excludes unconfirmed subscriptions |
-| maxAumCap | number | AUM cap = seed × 20; fixed at creation |
-| capacityRatio | number | Capacity ratio = aum / maxAumCap; null if the cap is invalid |
-| myShares | number | Your confirmed shares in this pool; 0 with no holding; omitted when no user context is available |
+| navPerShare | string | Latest published NAV per share; null before publication |
+| aum | string | AUM after fees |
+| totalShares | string | Issued shares, with 8 decimal places; excludes unconfirmed subscriptions |
+| maxAumCap | string | AUM cap = seed × 20; fixed at creation |
+| capacityRatio | string | Capacity ratio = aum / maxAumCap; null if the cap is invalid |
+| myShares | string | Your confirmed shares in this pool; 0 with no holding; omitted when no user context is available |
 | sparkline | array | NAV sparkline for the last 30 days; returned only with include=sparkline; null or empty when no published points exist |
-| ownerShareRatio | number | Manager ownership ratio = manager confirmed shares / total confirmed shares; null when no shares exist |
-| investedUserCount | integer | Number of depositors holding confirmed shares, including the manager |
-| accruedPerformanceFee | number | Cumulative crystallized performance fees for this pool in USDC; collectedPerformanceFee |
-| collectedPerformanceFee | number | Crystallized performance fees collected in USDC; equals accruedPerformanceFee; prefer this field |
-| performanceFeeRate | number | Performance fee rate in [0, 0.30] |
-| minSubscription | number | Minimum subscription in USDC |
-| maxSubscription | number | Maximum subscription in USDC |
-| lastNavAt | integer | Latest NAV publication time in Unix milliseconds (UTC) |
-| createdAt | integer | Creation time in Unix milliseconds (UTC) |
-| return30d | number | 30-day return; null when fewer than two published points exist |
+| ownerShareRatio | string | Manager ownership ratio = manager confirmed shares / total confirmed shares; null when no shares exist |
+| investedUserCount | string | Number of depositors holding confirmed shares, including the manager |
+| accruedPerformanceFee | string | Cumulative crystallized performance fees for this pool in USDC; collectedPerformanceFee |
+| collectedPerformanceFee | string | Crystallized performance fees collected in USDC; equals accruedPerformanceFee; prefer this field |
+| performanceFeeRate | string | Performance fee rate in [0, 0.30] |
+| minSubscription | string | Minimum subscription in USDC |
+| maxSubscription | string | Maximum subscription in USDC |
+| lastNavAt | string | Latest NAV publication time in Unix milliseconds (UTC) |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| return30d | string | 30-day return; null when fewer than two published points exist |
 | ownerUid | string | Creator UID; omitted from the market listing |
-| mt5Login | integer | Vault contract MT5 login; omitted from the market listing |
+| mt5Login | string | Vault contract MT5 login; omitted from the market listing |
 
 `records[].sparkline[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| asOf | integer | Valuation time in Unix milliseconds (UTC) |
-| navPerShare | number | NAV per share |
-| aum | number | Total NAV after fees |
+| asOf | string | Valuation time in Unix milliseconds (UTC) |
+| navPerShare | string | NAV per share |
+| aum | string | Total NAV after fees |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults" \
@@ -143,33 +143,33 @@ Vaults created by the current user, including closed vaults but excluding CREATE
 | strategySummary | string | Strategy summary; returned in both listings and details |
 | status | string | Status enum; independent of frozen |
 | frozen | boolean | Operational freeze flag; independent of status |
-| navPerShare | number | Latest published NAV per share; null before publication |
-| aum | number | AUM after fees |
-| totalShares | number | Issued shares, with 8 decimal places; excludes unconfirmed subscriptions |
-| maxAumCap | number | AUM cap = seed × 20; fixed at creation |
-| capacityRatio | number | Capacity ratio = aum / maxAumCap; null if the cap is invalid |
-| myShares | number | Your confirmed shares in this pool; 0 with no holding; omitted when no user context is available |
+| navPerShare | string | Latest published NAV per share; null before publication |
+| aum | string | AUM after fees |
+| totalShares | string | Issued shares, with 8 decimal places; excludes unconfirmed subscriptions |
+| maxAumCap | string | AUM cap = seed × 20; fixed at creation |
+| capacityRatio | string | Capacity ratio = aum / maxAumCap; null if the cap is invalid |
+| myShares | string | Your confirmed shares in this pool; 0 with no holding; omitted when no user context is available |
 | sparkline | array | NAV sparkline for the last 30 days; returned only with include=sparkline; null or empty when no published points exist |
-| ownerShareRatio | number | Manager ownership ratio = manager confirmed shares / total confirmed shares; null when no shares exist |
-| investedUserCount | integer | Number of depositors holding confirmed shares, including the manager |
-| accruedPerformanceFee | number | Cumulative crystallized performance fees for this pool in USDC; collectedPerformanceFee |
-| collectedPerformanceFee | number | Crystallized performance fees collected in USDC; equals accruedPerformanceFee; prefer this field |
-| performanceFeeRate | number | Performance fee rate in [0, 0.30] |
-| minSubscription | number | Minimum subscription in USDC |
-| maxSubscription | number | Maximum subscription in USDC |
-| lastNavAt | integer | Latest NAV publication time in Unix milliseconds (UTC) |
-| createdAt | integer | Creation time in Unix milliseconds (UTC) |
-| return30d | number | 30-day return; null when fewer than two published points exist |
+| ownerShareRatio | string | Manager ownership ratio = manager confirmed shares / total confirmed shares; null when no shares exist |
+| investedUserCount | string | Number of depositors holding confirmed shares, including the manager |
+| accruedPerformanceFee | string | Cumulative crystallized performance fees for this pool in USDC; collectedPerformanceFee |
+| collectedPerformanceFee | string | Crystallized performance fees collected in USDC; equals accruedPerformanceFee; prefer this field |
+| performanceFeeRate | string | Performance fee rate in [0, 0.30] |
+| minSubscription | string | Minimum subscription in USDC |
+| maxSubscription | string | Maximum subscription in USDC |
+| lastNavAt | string | Latest NAV publication time in Unix milliseconds (UTC) |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| return30d | string | 30-day return; null when fewer than two published points exist |
 | ownerUid | string | Creator UID; omitted from the market listing |
-| mt5Login | integer | Vault contract MT5 login; omitted from the market listing |
+| mt5Login | string | Vault contract MT5 login; omitted from the market listing |
 
 `records[].sparkline[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| asOf | integer | Valuation time in Unix milliseconds (UTC) |
-| navPerShare | number | NAV per share |
-| aum | number | Total NAV after fees |
+| asOf | string | Valuation time in Unix milliseconds (UTC) |
+| navPerShare | string | NAV per share |
+| aum | string | Total NAV after fees |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/managed" \
@@ -212,14 +212,14 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/manag
 | vaultName | string | Vault name |
 | vaultStatus | string | Vault runtime status enum |
 | uid | string | Holder UID |
-| shares | number | Confirmed shares |
-| navPerShare | number | Latest published NAV per share; null before publication |
-| cost | number | Confirmed cost in USDC |
-| estimatedValue | number | Estimated value = shares × current navPerShare; null until NAV is published |
-| totalPnl | number | Cumulative PnL = estimatedValue − cost; null until NAV is published; consistent with myTotalPnl in vault details |
-| pendingSubscribeAmount | number | Total pending subscription amount |
-| pendingRedeemShares | number | Total pending redemption shares |
-| updatedAt | integer | Holding record update time in Unix milliseconds (UTC) |
+| shares | string | Confirmed shares |
+| navPerShare | string | Latest published NAV per share; null before publication |
+| cost | string | Confirmed cost in USDC |
+| estimatedValue | string | Estimated value = shares × current navPerShare; null until NAV is published |
+| totalPnl | string | Cumulative PnL = estimatedValue − cost; null until NAV is published; consistent with myTotalPnl in vault details |
+| pendingSubscribeAmount | string | Total pending subscription amount |
+| pendingRedeemShares | string | Total pending redemption shares |
+| updatedAt | string | Holding record update time in Unix milliseconds (UTC) |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/holdings" \
@@ -235,16 +235,17 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/ho
 
 `GET /openapi/v1/mc-account/user-vaults/me/manager-overview` — permission `READ`.
 
+
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| managedAum | number | Total AUM across all vaults you manage |
-| tradablePool | number | Total tradable pool cash across market-visible, unfrozen vaults |
-| accruedPerformanceFee | number | Cumulative posted performance fees; legacy alias of collectedPerformanceFee |
-| collectedPerformanceFee | number | Total crystallized performance fees collected in USDC |
+| managedAum | string | Total AUM across all vaults you manage |
+| tradablePool | string | Total tradable pool cash across market-visible, unfrozen vaults |
+| accruedPerformanceFee | string | Cumulative posted performance fees; legacy alias of collectedPerformanceFee |
+| collectedPerformanceFee | string | Total crystallized performance fees collected in USDC |
 | occupyingVaultId | string | Currently assigned vault identifier; null when unassigned |
-| updatedAt | integer | Overview generation time in Unix milliseconds (UTC) |
+| updatedAt | string | Overview generation time in Unix milliseconds (UTC) |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/manager-overview" \
@@ -290,22 +291,22 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/ma
 | vaultName | string | Vault name |
 | uid | string | User UID; may be null in this public response |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION / PERFORMANCE_FEE |
-| applicationQuantity | number | Requested quantity: amount for subscriptions, shares for redemptions, and accrued amount for performance fees |
+| applicationQuantity | string | Requested quantity: amount for subscriptions, shares for redemptions, and accrued amount for performance fees |
 | applicationQuantityUnit | string | USDC or SHARE |
-| convertedAmount | number | Converted value; subscription approximately equals shares, redemption approximately equals gross amount, and settlement equals grossPayout |
-| hwmNavPerShare | number | Deprecated per-share high-water mark; use costNavPerShare |
-| benchmarkNavPerShare | number | Deprecated pre-fee benchmark NAV; use settleNavPerShare |
-| redeemShares | number | Redeemed shares at crystallization |
-| grossPayout | number | Gross amount at crystallization |
-| costDelta | number | Cost deduction at crystallization |
-| profit | number | Profit at crystallization |
-| feeRate | number | Fee rate at crystallization |
-| feeAmount | number | Performance fee at crystallization |
-| costNavPerShare | number | Personal weighted cost NAV; replaces the legacy per-share high-water mark |
-| settleNavPerShare | number | Settlement NAV per share; replaces the legacy benchmark NAV |
+| convertedAmount | string | Converted value; subscription approximately equals shares, redemption approximately equals gross amount, and settlement equals grossPayout |
+| hwmNavPerShare | string | Deprecated per-share high-water mark; use costNavPerShare |
+| benchmarkNavPerShare | string | Deprecated pre-fee benchmark NAV; use settleNavPerShare |
+| redeemShares | string | Redeemed shares at crystallization |
+| grossPayout | string | Gross amount at crystallization |
+| costDelta | string | Cost deduction at crystallization |
+| profit | string | Profit at crystallization |
+| feeRate | string | Fee rate at crystallization |
+| feeAmount | string | Performance fee at crystallization |
+| costNavPerShare | string | Personal weighted cost NAV; replaces the legacy per-share high-water mark |
+| settleNavPerShare | string | Settlement NAV per share; replaces the legacy benchmark NAV |
 | status | string | Status; returned for subscription, redemption, and settlement records, but omitted from posted flows |
-| expectedPayoutAt | integer | Payout time in Unix milliseconds; required for settlement records |
-| occurredAt | integer | Business event time in Unix milliseconds |
+| expectedPayoutAt | string | Payout time in Unix milliseconds; required for settlement records |
+| occurredAt | string | Business event time in Unix milliseconds |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/posted-flows" \
@@ -350,22 +351,22 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/po
 | vaultName | string | Vault name |
 | uid | string | User UID; may be null in this public response |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION / PERFORMANCE_FEE |
-| applicationQuantity | number | Requested quantity: amount for subscriptions, shares for redemptions, and accrued amount for performance fees |
+| applicationQuantity | string | Requested quantity: amount for subscriptions, shares for redemptions, and accrued amount for performance fees |
 | applicationQuantityUnit | string | USDC or SHARE |
-| convertedAmount | number | Converted value; subscription approximately equals shares, redemption approximately equals gross amount, and settlement equals grossPayout |
-| hwmNavPerShare | number | Deprecated per-share high-water mark; use costNavPerShare |
-| benchmarkNavPerShare | number | Deprecated pre-fee benchmark NAV; use settleNavPerShare |
-| redeemShares | number | Redeemed shares at crystallization |
-| grossPayout | number | Gross amount at crystallization |
-| costDelta | number | Cost deduction at crystallization |
-| profit | number | Profit at crystallization |
-| feeRate | number | Fee rate at crystallization |
-| feeAmount | number | Performance fee at crystallization |
-| costNavPerShare | number | Personal weighted cost NAV; replaces the legacy per-share high-water mark |
-| settleNavPerShare | number | Settlement NAV per share; replaces the legacy benchmark NAV |
+| convertedAmount | string | Converted value; subscription approximately equals shares, redemption approximately equals gross amount, and settlement equals grossPayout |
+| hwmNavPerShare | string | Deprecated per-share high-water mark; use costNavPerShare |
+| benchmarkNavPerShare | string | Deprecated pre-fee benchmark NAV; use settleNavPerShare |
+| redeemShares | string | Redeemed shares at crystallization |
+| grossPayout | string | Gross amount at crystallization |
+| costDelta | string | Cost deduction at crystallization |
+| profit | string | Profit at crystallization |
+| feeRate | string | Fee rate at crystallization |
+| feeAmount | string | Performance fee at crystallization |
+| costNavPerShare | string | Personal weighted cost NAV; replaces the legacy per-share high-water mark |
+| settleNavPerShare | string | Settlement NAV per share; replaces the legacy benchmark NAV |
 | status | string | Status; returned for subscription, redemption, and settlement records, but omitted from posted flows |
-| expectedPayoutAt | integer | Payout time in Unix milliseconds; required for settlement records |
-| occurredAt | integer | Business event time in Unix milliseconds |
+| expectedPayoutAt | string | Payout time in Unix milliseconds; required for settlement records |
+| occurredAt | string | Business event time in Unix milliseconds |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/settlement-records" \
@@ -411,22 +412,22 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/se
 | vaultName | string | Vault name |
 | uid | string | User UID; may be null in this public response |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION / PERFORMANCE_FEE |
-| applicationQuantity | number | Requested quantity: amount for subscriptions, shares for redemptions, and accrued amount for performance fees |
+| applicationQuantity | string | Requested quantity: amount for subscriptions, shares for redemptions, and accrued amount for performance fees |
 | applicationQuantityUnit | string | USDC or SHARE |
-| convertedAmount | number | Converted value; subscription approximately equals shares, redemption approximately equals gross amount, and settlement equals grossPayout |
-| hwmNavPerShare | number | Deprecated per-share high-water mark; use costNavPerShare |
-| benchmarkNavPerShare | number | Deprecated pre-fee benchmark NAV; use settleNavPerShare |
-| redeemShares | number | Redeemed shares at crystallization |
-| grossPayout | number | Gross amount at crystallization |
-| costDelta | number | Cost deduction at crystallization |
-| profit | number | Profit at crystallization |
-| feeRate | number | Fee rate at crystallization |
-| feeAmount | number | Performance fee at crystallization |
-| costNavPerShare | number | Personal weighted cost NAV; replaces the legacy per-share high-water mark |
-| settleNavPerShare | number | Settlement NAV per share; replaces the legacy benchmark NAV |
+| convertedAmount | string | Converted value; subscription approximately equals shares, redemption approximately equals gross amount, and settlement equals grossPayout |
+| hwmNavPerShare | string | Deprecated per-share high-water mark; use costNavPerShare |
+| benchmarkNavPerShare | string | Deprecated pre-fee benchmark NAV; use settleNavPerShare |
+| redeemShares | string | Redeemed shares at crystallization |
+| grossPayout | string | Gross amount at crystallization |
+| costDelta | string | Cost deduction at crystallization |
+| profit | string | Profit at crystallization |
+| feeRate | string | Fee rate at crystallization |
+| feeAmount | string | Performance fee at crystallization |
+| costNavPerShare | string | Personal weighted cost NAV; replaces the legacy per-share high-water mark |
+| settleNavPerShare | string | Settlement NAV per share; replaces the legacy benchmark NAV |
 | status | string | Status; returned for subscription, redemption, and settlement records, but omitted from posted flows |
-| expectedPayoutAt | integer | Payout time in Unix milliseconds; required for settlement records |
-| occurredAt | integer | Business event time in Unix milliseconds |
+| expectedPayoutAt | string | Payout time in Unix milliseconds; required for settlement records |
+| occurredAt | string | Business event time in Unix milliseconds |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/subscription-redemption-records" \
@@ -457,46 +458,46 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/su
 | strategySummary | string | Strategy summary; returned in both listings and details |
 | status | string | Status enum; independent of frozen |
 | frozen | boolean | Operational freeze flag; independent of status |
-| navPerShare | number | Latest published NAV per share; null before publication |
-| aum | number | AUM after fees |
-| totalShares | number | Issued shares, with 8 decimal places; excludes unconfirmed subscriptions |
-| maxAumCap | number | AUM cap = seed × 20; fixed at creation |
-| capacityRatio | number | Capacity ratio = aum / maxAumCap; null if the cap is invalid |
-| myShares | number | Your confirmed shares in this pool; 0 with no holding; omitted when no user context is available |
+| navPerShare | string | Latest published NAV per share; null before publication |
+| aum | string | AUM after fees |
+| totalShares | string | Issued shares, with 8 decimal places; excludes unconfirmed subscriptions |
+| maxAumCap | string | AUM cap = seed × 20; fixed at creation |
+| capacityRatio | string | Capacity ratio = aum / maxAumCap; null if the cap is invalid |
+| myShares | string | Your confirmed shares in this pool; 0 with no holding; omitted when no user context is available |
 | sparkline | array | NAV sparkline for the last 30 days; returned only with include=sparkline; null or empty when no published points exist |
-| ownerShareRatio | number | Manager ownership ratio = manager confirmed shares / total confirmed shares; null when no shares exist |
-| investedUserCount | integer | Number of depositors holding confirmed shares, including the manager |
-| accruedPerformanceFee | number | Cumulative crystallized performance fees for this pool in USDC; collectedPerformanceFee |
-| collectedPerformanceFee | number | Crystallized performance fees collected in USDC; equals accruedPerformanceFee; prefer this field |
-| performanceFeeRate | number | Performance fee rate in [0, 0.30] |
-| minSubscription | number | Minimum subscription in USDC |
-| maxSubscription | number | Maximum subscription in USDC |
-| lastNavAt | integer | Latest NAV publication time in Unix milliseconds (UTC) |
-| createdAt | integer | Creation time in Unix milliseconds (UTC) |
-| return30d | number | 30-day return; null when fewer than two published points exist |
+| ownerShareRatio | string | Manager ownership ratio = manager confirmed shares / total confirmed shares; null when no shares exist |
+| investedUserCount | string | Number of depositors holding confirmed shares, including the manager |
+| accruedPerformanceFee | string | Cumulative crystallized performance fees for this pool in USDC; collectedPerformanceFee |
+| collectedPerformanceFee | string | Crystallized performance fees collected in USDC; equals accruedPerformanceFee; prefer this field |
+| performanceFeeRate | string | Performance fee rate in [0, 0.30] |
+| minSubscription | string | Minimum subscription in USDC |
+| maxSubscription | string | Maximum subscription in USDC |
+| lastNavAt | string | Latest NAV publication time in Unix milliseconds (UTC) |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| return30d | string | 30-day return; null when fewer than two published points exist |
 | ownerUid | string | Creator UID; omitted from the market listing |
-| mt5Login | integer | Vault contract MT5 login; omitted from the market listing |
-| seedAmount | number | Seed amount in USDC |
-| cash | number | Pool cash in USDC |
+| mt5Login | string | Vault contract MT5 login; omitted from the market listing |
+| seedAmount | string | Seed amount in USDC |
+| cash | string | Pool cash in USDC |
 | capitalInjectionId | string | Latest capital injection identifier; visible only to the manager; null when absent |
 | capitalInjectionStatus | string | Latest capital injection status: PENDING_FUNDING, SETTLED, or FAILED; visible only to the manager |
-| capitalInjectionAmount | number | Latest capital injection amount in USDC; visible only to the manager |
-| capitalInjectionEstimatedShares | number | Shares locked by the latest capital injection; visible only to the manager |
-| capitalInjectionNavUsed | number | NAV locked by the latest capital injection; visible only to the manager |
-| capitalInjectionCreatedAt | integer | Latest capital injection creation time in milliseconds; visible only to the manager |
-| capitalInjectionSettledAt | integer | Latest settled capital injection time in milliseconds; null unless SETTLED; visible only to the manager |
-| myCost | number | Your confirmed cost in this pool; 0 with no holding |
-| myRedeemableShares | number | Your redeemable shares = confirmedShares − pendingRedeemShares; 0 with no holding; excludes pending redemptions |
-| myEstimatedValue | number | Your estimated value = myShares × navPerShare; null until NAV is published |
-| myTotalPnl | number | Your cumulative PnL = myEstimatedValue − myCost; null until NAV is published |
+| capitalInjectionAmount | string | Latest capital injection amount in USDC; visible only to the manager |
+| capitalInjectionEstimatedShares | string | Shares locked by the latest capital injection; visible only to the manager |
+| capitalInjectionNavUsed | string | NAV locked by the latest capital injection; visible only to the manager |
+| capitalInjectionCreatedAt | string | Latest capital injection creation time in milliseconds; visible only to the manager |
+| capitalInjectionSettledAt | string | Latest settled capital injection time in milliseconds; null unless SETTLED; visible only to the manager |
+| myCost | string | Your confirmed cost in this pool; 0 with no holding |
+| myRedeemableShares | string | Your redeemable shares = confirmedShares − pendingRedeemShares; 0 with no holding; excludes pending redemptions |
+| myEstimatedValue | string | Your estimated value = myShares × navPerShare; null until NAV is published |
+| myTotalPnl | string | Your cumulative PnL = myEstimatedValue − myCost; null until NAV is published |
 
 `sparkline[]` items:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| asOf | integer | Valuation time in Unix milliseconds (UTC) |
-| navPerShare | number | NAV per share |
-| aum | number | Total NAV after fees |
+| asOf | string | Valuation time in Unix milliseconds (UTC) |
+| navPerShare | string | NAV per share |
+| aum | string | Total NAV after fees |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001" \
@@ -543,12 +544,12 @@ Posted subscriptions and redemptions, including forced redemptions. The path rem
 | vaultName | string | Vault name |
 | uid | string | User UID |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION |
-| applicationQuantity | number | Requested quantity: amount for subscriptions, shares for redemptions |
+| applicationQuantity | string | Requested quantity: amount for subscriptions, shares for redemptions |
 | applicationQuantityUnit | string | USDC or SHARE |
-| confirmedNav | number | Confirmed NAV |
-| confirmedQuantity | number | Confirmed result: shares for subscriptions, USDC payout for redemptions |
+| confirmedNav | string | Confirmed NAV |
+| confirmedQuantity | string | Confirmed result: shares for subscriptions, USDC payout for redemptions |
 | confirmedQuantityUnit | string | SHARE or USDC |
-| occurredAt | integer | Posting time in Unix milliseconds (UTC) |
+| occurredAt | string | Posting time in Unix milliseconds (UTC) |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/deposit-withdrawals" \
@@ -590,11 +591,11 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 | --- | --- | --- |
 | depositorMask | string | Masked depositor identifier; required in this public response |
 | uid | string | Unmasked UID; always null in this public response |
-| vaultAmount | number | Estimated holding value |
-| unrealizedPnl | number | Unrealized PnL |
-| realizedPnl | number | Realized PnL |
+| vaultAmount | string | Estimated holding value |
+| unrealizedPnl | string | Unrealized PnL |
+| realizedPnl | string | Realized PnL |
 | followingDays | integer | Holding days by Shanghai calendar date, including the first confirmation date; at least 1 |
-| updatedAt | integer | Holding update time in Unix milliseconds (UTC) |
+| updatedAt | string | Holding update time in Unix milliseconds (UTC) |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/depositors" \
@@ -629,9 +630,9 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 
 | Field | Type | Description |
 | --- | --- | --- |
-| asOf | integer | Valuation time in Unix milliseconds (UTC) |
-| navPerShare | number | NAV per share |
-| aum | number | Total NAV after fees |
+| asOf | string | Valuation time in Unix milliseconds (UTC) |
+| navPerShare | string | NAV per share |
+| aum | string | Total NAV after fees |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/nav-history" \
@@ -666,7 +667,7 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 
 | Field | Type | Description |
 | --- | --- | --- |
-| data | object | Shape depends on `tab`; see the corresponding trading endpoint response fields. |
+| data | object | `data` is a scalar of this type |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/trading-overview" \
@@ -687,9 +688,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 1; Max length: 64 |
-| name | string | Yes | Vault name, from 1 to 64 characters after trimming; Min length: 1; Max length: 64 |
-| strategySummary | string | Yes | Strategy summary, from 1 to 2000 characters; Min length: 1; Max length: 2000 |
+| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 0; Max length: 64 |
+| name | string | Yes | Vault name, from 1 to 64 characters after trimming; Min length: 0; Max length: 64 |
+| strategySummary | string | Yes | Strategy summary, from 1 to 2000 characters; Min length: 0; Max length: 2000 |
 | minSubscription | number | Yes | Minimum subscription; greater than 0, with at most 6 USDC decimal places |
 | maxSubscription | number | Yes | Maximum subscription; must be at least minSubscription |
 | performanceFeeRate | number | Yes | Performance fee rate in [0, 0.30], with at most 4 decimal places |
@@ -702,10 +703,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10
 | --- | --- | --- |
 | vaultId | string | Public vault identifier |
 | status | string | SEED_FUNDING after successful submission |
-| mt5Login | integer | Vault contract login associated with this claim |
-| seedAmount | number | Seed amount in USDC |
-| maxAumCap | number | AUM cap = seed × 20 |
-| createdAt | integer | Creation time in Unix milliseconds (UTC) |
+| mt5Login | string | Vault contract login associated with this claim |
+| seedAmount | string | Seed amount in USDC |
+| maxAumCap | string | AUM cap = seed × 20 |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults" \
@@ -742,7 +743,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 1; Max length: 64 |
+| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 0; Max length: 64 |
 | amount | number | Yes | Capital injection in USDC; greater than 0, with at most 6 decimal places; exempt from subscription limits, the 30% limit, and dilution checks; Minimum: 1e-06 |
 
 ### Response `data` fields
@@ -750,12 +751,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 | Field | Type | Description |
 | --- | --- | --- |
 | injectionId | string | Capital injection identifier |
-| estimatedShares | number | Estimated shares = amount / navUsed, rounded down to 8 decimal places; final values are locked at submission |
-| navUsed | number | Published NAV locked at submission |
+| estimatedShares | string | Estimated shares = amount / navUsed, rounded down to 8 decimal places; final values are locked at submission |
+| navUsed | string | Published NAV locked at submission |
 | status | string | PENDING_FUNDING after successful submission |
-| seedAmountAfterEstimate | number | Expected seedAmount after success |
-| maxAumCapAfterEstimate | number | Expected maxAumCap after success = seed × 20 |
-| createdAt | integer | Creation time in Unix milliseconds |
+| seedAmountAfterEstimate | string | Expected seedAmount after success |
+| maxAumCapAfterEstimate | string | Expected maxAumCap after success = seed × 20 |
+| createdAt | string | Creation time in Unix milliseconds |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/capital-injections" \
@@ -786,7 +787,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 1; Max length: 64 |
+| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 0; Max length: 64 |
 
 ### Response `data` fields
 
@@ -823,7 +824,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 1; Max length: 64 |
+| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 0; Max length: 64 |
 | shares | number | Yes | Redemption shares; greater than 0 and no more than available shares |
 
 ### Response `data` fields
@@ -831,9 +832,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 | Field | Type | Description |
 | --- | --- | --- |
 | orderId | string | Redemption order identifier |
-| estimatedPayout | number | Estimated payout = shares × navUsed, rounded down to 6 USDC decimal places |
-| navUsed | number | Reference NAV when the order was submitted |
-| cutoffAt | integer | Cutoff: midnight of the next UTC+8 calendar day, in Unix milliseconds |
+| estimatedPayout | string | Estimated payout = shares × navUsed, rounded down to 6 USDC decimal places |
+| navUsed | string | Reference NAV when the order was submitted |
+| cutoffAt | string | Cutoff: midnight of the next UTC+8 calendar day, in Unix milliseconds |
 | status | string | PENDING_SETTLEMENT after successful submission |
 
 ```bash
@@ -865,7 +866,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 1; Max length: 64 |
+| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 0; Max length: 64 |
 | amount | number | Yes | Subscription amount in USDC; the service validates limits and dilution again |
 
 ### Response `data` fields
@@ -873,9 +874,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 | Field | Type | Description |
 | --- | --- | --- |
 | orderId | string | Subscription order identifier |
-| estimatedShares | number | Estimated shares = amount / navUsed, rounded down to 8 decimal places; recalculated using settleNav during daily settlement |
-| navUsed | number | Reference NAV when the order was submitted |
-| cutoffAt | integer | Cutoff: midnight of the next UTC+8 calendar day, in Unix milliseconds |
+| estimatedShares | string | Estimated shares = amount / navUsed, rounded down to 8 decimal places; recalculated using settleNav during daily settlement |
+| navUsed | string | Reference NAV when the order was submitted |
+| cutoffAt | string | Cutoff: midnight of the next UTC+8 calendar day, in Unix milliseconds |
 | status | string | PENDING_FUNDING after successful submission |
 
 ```bash
@@ -908,16 +909,16 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 1; Max length: 64 |
+| clientOrderId | string | Yes | Client idempotency identifier; at most 64 characters; Min length: 0; Max length: 64 |
 
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | orderId | string | Subscription order identifier |
-| estimatedShares | number | Estimated shares = amount / navUsed, rounded down to 8 decimal places; recalculated using settleNav during daily settlement |
-| navUsed | number | Reference NAV when the order was submitted |
-| cutoffAt | integer | Cutoff: midnight of the next UTC+8 calendar day, in Unix milliseconds |
+| estimatedShares | string | Estimated shares = amount / navUsed, rounded down to 8 decimal places; recalculated using settleNav during daily settlement |
+| navUsed | string | Reference NAV when the order was submitted |
+| cutoffAt | string | Cutoff: midnight of the next UTC+8 calendar day, in Unix milliseconds |
 | status | string | PENDING_FUNDING after successful submission |
 
 ```bash

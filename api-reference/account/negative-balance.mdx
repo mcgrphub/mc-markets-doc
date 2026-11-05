@@ -20,12 +20,13 @@ Sign authenticated requests with AK/SK as described in [Authentication](/authent
 
 `GET /openapi/v1/mc-account/negative-balance/accounts` — permission `READ`.
 
+
 ### Response `data` fields
 
 | Field | Type | Description |
 | --- | --- | --- |
 | accounts | array | Negative balance accounts; empty only after a complete query confirms all balances are non-negative |
-| snapshotAtMs | integer | Authoritative snapshot time in Unix milliseconds (UTC) |
+| snapshotAtMs | string | Authoritative snapshot time in Unix milliseconds (UTC) |
 
 `accounts[]` items:
 
@@ -37,7 +38,7 @@ Sign authenticated requests with AK/SK as described in [Authentication](/authent
 | amountToCover | string | Positive amount required to cover the deficit; rounded up to 6 decimal places for USDC and 8 for other currencies |
 | hourlyRate | string | Applicable hourly rate as a percentage string, with at most 6 decimal places |
 | eventId | string | Optional verified period identifier; omitted when unverified |
-| negativeSinceMs | integer | Optional verified period start in Unix milliseconds (UTC); omitted when unverified |
+| negativeSinceMs | string | Optional verified period start in Unix milliseconds (UTC); omitted when unverified |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/negative-balance/accounts" \

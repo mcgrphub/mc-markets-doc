@@ -1,0 +1,242 @@
+---
+title: "Account export tasks"
+sidebarTitle: "Account export tasks"
+description: "Public API endpoints verified against the backend main contract."
+---
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/mc-account/export-tasks` | READ | List account export history |
+| POST | `/openapi/v1/mc-account/export-tasks` | READ | Create an account CSV export task |
+| GET | `/openapi/v1/mc-account/export-tasks/{taskId}` | READ | Get an account export task |
+| GET | `/openapi/v1/mc-account/export-tasks/{taskId}/download` | READ | Download account export CSV |
+
+
+<Note>
+Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+Creation accepts four datasets. Use `SWAP_HISTORY` with `SWAP`; `BALANCE` with `SPOT`, `CONTRACT`, or `PORTFOLIO`; and `FUND_FLOW` or `DEPOSIT_WITHDRAW` with `PORTFOLIO`. `VAULT` is not supported for these personal-asset exports. `filters` must be an object and cannot contain identity or pagination fields; balance exports support `hideSmallBalance`, while other datasets use their own filter allowlists. Retries must reuse the original frozen conditions.
+
+---
+
+## List account export history
+
+`GET /openapi/v1/mc-account/export-tasks` — Permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| dataset | string | Yes | Required account-service dataset; one of the five supported datasets; Allowed values: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| sourceView | string | Yes | Required source corresponding to the dataset; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| pageSize | integer | No | Page size; default 20, from 1 to 100 |
+| cursor | string | No | Optional non-empty signed cursor, at most 2048 characters |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| items | array | Public task list; an empty result is [] |
+| pageSize | integer | Page size, from 1 to 100 |
+| snapshotAt | string | Upper bound of the member snapshot in Unix milliseconds (UTC) |
+| hasMore | boolean | Whether more matching tasks exist |
+| nextCursor | string | Signed cursor for the next page; null when there is no next page |
+| pollAfterMs | string | Suggested polling interval for active tasks, in milliseconds; null when there are no active tasks |
+
+`items[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Task ID |
+| sourceView | string | Original source: SWAP, SPOT, CONTRACT, or PORTFOLIO; null for legacy tasks with an unknown source; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | Original failed task ID associated with this task; null for funding fee and ordinary task creation |
+| retryContext | object | Original frozen conditions for retry; explicitly null when retry is unavailable |
+| dataset | string | FUNDING_FEE_HISTORY, SWAP_HISTORY, BALANCE, FUND_FLOW, or DEPOSIT_WITHDRAW; Allowed values: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | Normalized CSV language |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | GENERATION, UPLOAD, RESTART, or TIMEOUT for failed tasks; otherwise null; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| updatedAt | string | Update time in Unix milliseconds (UTC) |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC) |
+| rowCount | integer | Data rows excluding the header; null before generation or when the limit is exceeded |
+| fileName | string | Downloadable file name; nullable |
+| downloadAvailable | boolean | True only after success, before expiration, and after file metadata verification |
+
+`items[].retryContext` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| originalTaskId | string | Current failed task ID |
+| createRequest | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+`items[].retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks?dataset=BALANCE&sourceView=SPOT" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Create an account CSV export task
+
+`POST /openapi/v1/mc-account/export-tasks` — Permission `READ`.
+
+### Request body (JSON)
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| clientRequestId | string | Yes | Idempotency key scoped to the owner; 1 to 64 printable characters after trimming |
+| dataset | string | Yes | SWAP_HISTORY, BALANCE, FUND_FLOW, or DEPOSIT_WITHDRAW; Allowed values: `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| sourceView | string | Yes | Source: SWAP, SPOT, CONTRACT, or PORTFOLIO; must match the dataset; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO` |
+| filters | object | Yes | Dataset-specific filters; pagination and identity fields are not accepted |
+| sort | object | No | Optional explicit sorting; null preserves the source list default |
+| language | string | No | Language normalized according to the existing CSV catalog |
+| timeZone | string | Yes | Required IANA time zone, for example Asia/Hong_Kong |
+| csvCatalogVersion | string | No | Optional column version; this release supports bo519-account-v1 |
+| retryOfTaskId | string | No | Optional original failed task ID, 1 to 64 characters; reuse the original frozen conditions |
+
+`sort` fields (both are required when sort is provided):
+
+| Field | Type | Description |
+| --- | --- | --- |
+| field | string | Original sort field allowed by the dataset |
+| direction | string | `ASC` / `DESC` |
+
+### Response `data` fields
+
+HTTP `202 Accepted`; The task is generated asynchronously.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Task ID |
+| sourceView | string | Original source: SWAP, SPOT, CONTRACT, or PORTFOLIO; null for legacy tasks with an unknown source; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | Original failed task ID associated with this task; null for funding fee and ordinary task creation |
+| retryContext | object | Original frozen conditions for retry; explicitly null when retry is unavailable |
+| dataset | string | FUNDING_FEE_HISTORY, SWAP_HISTORY, BALANCE, FUND_FLOW, or DEPOSIT_WITHDRAW; Allowed values: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | Normalized CSV language |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | GENERATION, UPLOAD, RESTART, or TIMEOUT for failed tasks; otherwise null; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| updatedAt | string | Update time in Unix milliseconds (UTC) |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC) |
+| rowCount | integer | Data rows excluding the header; null before generation or when the limit is exceeded |
+| fileName | string | Downloadable file name; nullable |
+| downloadAvailable | boolean | True only after success, before expiration, and after file metadata verification |
+
+`retryContext` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| originalTaskId | string | Current failed task ID |
+| createRequest | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+`retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+```bash
+curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "clientRequestId": "account-export-demo-001",
+  "dataset": "BALANCE",
+  "sourceView": "SPOT",
+  "filters": {
+    "hideSmallBalance": false
+  },
+  "timeZone": "Asia/Shanghai"
+}'
+```
+
+---
+
+## Get an account export task
+
+`GET /openapi/v1/mc-account/export-tasks/{taskId}` — Permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| taskId | string | Yes |  |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| taskId | string | Task ID |
+| sourceView | string | Original source: SWAP, SPOT, CONTRACT, or PORTFOLIO; null for legacy tasks with an unknown source; Allowed values: `SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | Original failed task ID associated with this task; null for funding fee and ordinary task creation |
+| retryContext | object | Original frozen conditions for retry; explicitly null when retry is unavailable |
+| dataset | string | FUNDING_FEE_HISTORY, SWAP_HISTORY, BALANCE, FUND_FLOW, or DEPOSIT_WITHDRAW; Allowed values: `FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | Normalized CSV language |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; Allowed values: `QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | GENERATION, UPLOAD, RESTART, or TIMEOUT for failed tasks; otherwise null; Allowed values: `RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | Creation time in Unix milliseconds (UTC) |
+| updatedAt | string | Update time in Unix milliseconds (UTC) |
+| expiresAt | string | Expiration time in Unix milliseconds (UTC) |
+| rowCount | integer | Data rows excluding the header; null before generation or when the limit is exceeded |
+| fileName | string | Downloadable file name; nullable |
+| downloadAvailable | boolean | True only after success, before expiration, and after file metadata verification |
+
+`retryContext` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| originalTaskId | string | Current failed task ID |
+| createRequest | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+`retryContext.createRequest` fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `<key>` | object | Fields accepted by the original creation endpoint, excluding clientRequestId |
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks/TASK_DEMO_001" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```
+
+---
+
+## Download account export CSV
+
+`GET /openapi/v1/mc-account/export-tasks/{taskId}/download` — Permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| taskId | string | Yes |  |
+
+### Response
+
+HTTP `302 Found`; `Location` contains a temporary download URL; `Cache-Control: no-store`. No JSON `data`.
+
+```bash
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/export-tasks/TASK_DEMO_001/download" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE"
+```

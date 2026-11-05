@@ -30,8 +30,8 @@ Query the trading symbol list for the current user.
 | --- | --- | --- | --- |
 | size | integer | No | Page size |
 | current | integer | No | Current page number |
-| orderBy | string | No | Multi-field sort; comma-separated |
-| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields |
+| orderBy | string | No | Multi-field sort; comma-separated fields |
+| orderDirection | string | No | ASC ascending / DESC descending; comma-separated for multiple fields; Allowed values: `ASC`, `DESC` |
 | group | string | No | Product group (last segment of MT5 Path, e.g. Forex); omit or leave empty to return direct child symbols under all configured groups |
 
 ### Response `data` fields
@@ -39,10 +39,10 @@ Query the trading symbol list for the current user.
 | Field | Type | Description |
 | --- | --- | --- |
 | records | array | Records on the current page |
-| total | integer | Total number of records |
+| total | integer | Total record count in standard mode; `0` in cursor mode |
 | size | integer | Page size |
 | current | integer | Current page number |
-| pages | integer | Total number of pages |
+| pages | integer | Total page count in standard mode; `0` in cursor mode |
 | hasPrevious | boolean | Whether a previous page exists |
 | hasNext | boolean | Whether a next page exists |
 
@@ -52,7 +52,7 @@ Query the trading symbol list for the current user.
 | --- | --- | --- |
 | symbol | string | Product name |
 | group | string | Product group |
-| flags | string | Symbol flags: `MORTGAGE`, `TRADE`, or `SPOT` |
+| flags | string | Symbol flags: `MORTGAGE`, `TRADE`, or `SPOT`; Allowed values: `TRADE`, `MORTGAGE`, `SPOT` |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \
