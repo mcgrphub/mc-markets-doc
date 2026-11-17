@@ -23,11 +23,12 @@ description: "地区访问检查公开接口。"
 
 匿名或登录均可；结果不能授权业务写操作
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| result | string | 访问结果；可选值：`ACCESS_ALLOWED`、`JURISDICTION_RESTRICTED`、`JURISDICTION_UNKNOWN` |
+| result | string | 访问结果; 可选值：`ACCESS_ALLOWED`, `JURISDICTION_RESTRICTED`, `JURISDICTION_UNKNOWN` |
 | messageKey | string | 前端文案键；允许时为空字符串 |
 | policyVersion | string | 不透明策略版本 |
 | evaluatedAtMillis | integer | 评估完成时间，Unix 毫秒 UTC epoch |
@@ -40,29 +41,30 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/acce
 
 ## 查询完整司法管辖区门禁
 
-`GET /openapi/v1/mc-account/jurisdiction/evaluation` — 权限 `READ`.
+`GET /openapi/v1/mc-account/jurisdiction/evaluation` — 权限 `READ`。
 
-只读预检；最终写请求会重新评估
+这是只读预检。实际执行写操作时会重新检查。充值和交易预检可跳过基础 KYC，仍会校验访问证据和受限地区。
 
 ### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| action | string | 否 |  |
+| action | string | 是 | 传一次 `PROTECTED_WRITE`。 |
+| operation | string | 否 | 只能传一次。`RECHARGE`、`DEPOSIT`、`TRADE_BUY`、`TRADE_SELL` 跳过基础 KYC；未传或传其他值时仍要求基础 KYC。 |
 
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| decision | string | 门禁决定；可选值：`PASS`、`KYC_REQUIRED`、`JURISDICTION_RESTRICTED`、`JURISDICTION_UNKNOWN` |
-| reasonSource | string | 决定来源；不返回具体国家；可选值：`NONE`、`ACCESS_COUNTRY`、`IDENTITY_COUNTRY`、`BASIC_KYC` |
+| decision | string | 门禁决定; 可选值：`PASS`, `KYC_REQUIRED`, `JURISDICTION_RESTRICTED`, `JURISDICTION_UNKNOWN` |
+| reasonSource | string | 决定来源；不返回具体国家; 可选值：`NONE`, `ACCESS_COUNTRY`, `IDENTITY_COUNTRY`, `BASIC_KYC` |
 | policyVersion | string | 不透明策略版本 |
 | evaluatedAtMillis | integer | 评估完成时间，Unix 毫秒 UTC epoch |
 | retryable | boolean | 客户端是否可在事实更新后重试 |
 | messageKey | string | 前端文案键；通过时为空字符串 |
 
 ```bash
-curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/evaluation" \
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/evaluation?action=PROTECTED_WRITE&operation=DEPOSIT" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \

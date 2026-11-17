@@ -31,7 +31,7 @@ description: "交易品种列表等 Risk 交易相关接口。"
 | size | integer | 否 | 每页显示条数 |
 | current | integer | 否 | 当前页码 |
 | orderBy | string | 否 | 支持多字段排序，用逗号分隔 |
-| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔 |
+| orderDirection | string | 否 | ASC升序/DESC降序，多字段时用逗号分隔; 可选值：`ASC`, `DESC` |
 | group | string | 否 | 产品分组（MT5 Path 最后一段，如 Forex）；省略或为空时返回所有已配置分组下的直接子品种 |
 
 ### 响应 `data` 字段
@@ -52,7 +52,7 @@ description: "交易品种列表等 Risk 交易相关接口。"
 | --- | --- | --- |
 | symbol | string | 产品名称 |
 | group | string | 产品分组 |
-| flags | string | 品种标签, MORTGAGE:抵押品，TRADE:交易品种,SPOT:现货 |
+| flags | string | 品种标签, MORTGAGE:抵押品，TRADE:交易品种,SPOT:现货; 可选值：`TRADE`, `MORTGAGE`, `SPOT` |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-risk/trade/symbol/list" \

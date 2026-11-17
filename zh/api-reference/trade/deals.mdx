@@ -34,28 +34,24 @@ description: "成交相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | size | integer | 否 | 每页显示条数 |
 | current | integer | 否 | 当前页码 |
-| cursorTimeMsc | integer | 否 | 游标时间。取上一页最后一条 `records[].timeMsc`，Unix 毫秒时间戳；必须与 `cursorDealId` 同时传入 |
-| cursorDealId | string | 否 | 游标成交号。取上一页最后一条 `records[].deal`；必须与 `cursorTimeMsc` 同时传入 |
-| orderBy | string | 否 | 排序字段，多个用逗号分隔 |
-| sortOrder | string | 否 | 排序方向：ASC / DESC |
-| type | string | 是 | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并 |
+| orderBy | string | 否 |  |
+| sortOrder | string | 否 |  |
+| type | string | 是 | 账户数据类型：SPOT-现货，CONTRACT-合约，SPOT_CONTRACT-现货与合约合并; 可选值：`SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
 | from | integer | 是 | 开始时间戳（Unix时间戳，秒） |
 | to | integer | 是 | 结束时间戳（Unix时间戳，秒） |
 | symbol | string | 否 | 交易品种名 |
-
-<Note>
-  推荐使用 `cursorTimeMsc` 和 `cursorDealId` 成对翻页。不传游标时，接口使用 `current` 和 `size` 分页。`deal`、`cursorDealId`、`order`、`positionID` 和 `login` 均应作为字符串处理，以免 64 位标识符发生精度丢失。
-</Note>
+| cursorTimeMsc | integer | 否 | CURSOR 模式游标时间，取上一页最后一条 records.timeMsc，毫秒时间戳；与 cursorDealId 成对传入时走游标分页 |
+| cursorDealId | integer | 否 | CURSOR 模式游标成交号，取上一页最后一条 records.deal；与 cursorTimeMsc 成对传入时走游标分页 |
 
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | records | array | 当前页记录列表 |
-| total | integer | 总记录数 |
+| total | integer | 总数。普通 Page 分页返回真实总数；关闭 count 或使用 cursor 翻页的接口可能返回 0，此时以 records 和 hasNext 为准 |
 | size | integer | 每页条数 |
 | current | integer | 当前页码 |
-| pages | integer | 总页数 |
+| pages | integer | 总页数。普通 Page 分页返回真实总页数；关闭 count 或使用 cursor 翻页的接口可能返回 0，平台成交列表使用上一页最后一条记录的 timeMsc/dealId 作为下一页 cursor |
 | hasPrevious | boolean | 是否有上一页 |
 | hasNext | boolean | 是否有下一页 |
 
@@ -64,51 +60,51 @@ description: "成交相关 OpenAPI 接口。"
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | deal | string | 成交号，主键 |
+| externalID | string | 外部ID，外部系统关联的ID |
 | login | string | 交易账户登录号 |
-| dealer | integer | 交易商ID |
+| dealer | string | 交易商ID |
 | order | string | 订单号，关联的订单号 |
 | action | integer | 0-买入, 1-卖出 |
 | entry | integer | 0-开仓，1-平仓 |
 | reason | integer | 原因，成交变更的原因代码 |
 | digits | integer | 价格精度，交易品种的价格小数位数 |
 | digitsCurrency | integer | 货币精度，交易品种的货币小数位数 |
-| contractSize | number | 合约大小，每手合约的标准大小 |
-| time | integer | 成交时间，成交发生的时间戳，毫秒级，长度13位 |
-| timeMsc | integer | 成交时间（毫秒），成交发生的时间戳（毫秒），毫秒级，长度13位 |
+| contractSize | string | 合约大小，每手合约的标准大小 |
+| time | string | 成交时间，成交发生的时间戳，毫秒级，长度13位 |
+| timeMsc | string | 成交时间（毫秒），成交发生的时间戳（毫秒），毫秒级，长度13位 |
 | symbol | string | 交易品种，如EURUSD、GBPUSD等 |
-| price | number | 成交价格，成交的执行价格 |
-| volumeExt | integer | 成交量（扩展精度），需按持仓量精度换算 |
-| quantity | number | 用户数量，volumeExt 经持仓量精度换算后的值 |
-| profit | number | 盈亏，成交产生的盈亏金额 |
-| storage | number | 库存费，持仓产生的库存费用 |
-| commission | number | 佣金，成交产生的佣金费用 |
+| price | string | 成交价格，成交的执行价格 |
+| volumeExt | string | 成交量（扩展精度），需按持仓量精度换算 |
+| quantity | string | 用户数量，volumeExt 经持仓量精度换算后的值 |
+| profit | string | 盈亏，成交产生的盈亏金额 |
+| storage | string | 库存费，持仓产生的库存费用 |
+| commission | string | 佣金，成交产生的佣金费用 |
 | commissionDisplay | string | 佣金展示值，按带符号 CEILING 固定保留 6 位小数 |
 | commissionScale | integer | 佣金展示小数位 |
 | profitDisplay | string | 盈亏展示值，按 HALF_UP 固定保留 8 位小数 |
 | profitScale | integer | 盈亏展示小数位 |
-| fee | number | 手续费，成交产生的手续费用 |
-| rateProfit | number | 盈亏汇率，计算盈亏时使用的汇率 |
-| rateMargin | number | 保证金汇率，计算保证金时使用的汇率 |
-| profitRaw | number | 原始盈亏，成交的原始盈亏金额（未考虑汇率） |
-| pricePosition | number | 持仓价格，持仓的平均价格 |
-| volumeClosedExt | integer | 已平仓交易量（扩展精度） |
-| tickValue | number | 点值，每个点的价值 |
-| tickSize | number | 点大小，每个点的大小 |
-| flags | integer | 标志位，成交的标志位 |
-| value | number | 价值，成交的价值 |
-| gateway | string | 网关，成交的网关名称 |
-| priceGateway | number | 网关价格，网关的成交价格 |
-| modifyFlags | integer | 修改标志，成交修改的标志位 |
-| marketBid | number | 市场买价，市场当前的买价 |
-| marketAsk | number | 市场卖价，市场当前的卖价 |
-| marketLast | number | 市场最后价，市场最后的成交价 |
-| volume | integer | 手数（标准精度），需按持仓量精度换算 |
-| volumeClosed | integer | 已平仓手数，已平仓的交易手数 |
-| externalID | string | 外部ID，外部系统关联的ID |
-| expertID | integer | 专家顾问ID，如果成交由 EA 创建，则记录 EA 的 ID |
+| fee | string | 手续费，成交产生的手续费用 |
+| rateProfit | string | 盈亏汇率，计算盈亏时使用的汇率 |
+| rateMargin | string | 保证金汇率，计算保证金时使用的汇率 |
+| expertID | string | 专家顾问ID，如果成交由 EA 创建，则记录 EA 的 ID |
 | positionID | string | 持仓ID，关联的持仓ID |
-| priceSL | number | 止损价格，设置的止损价位 |
-| priceTP | number | 止盈价格，设置的止盈价位 |
+| profitRaw | string | 原始盈亏，成交的原始盈亏金额（未考虑汇率） |
+| pricePosition | string | 持仓价格，持仓的平均价格 |
+| priceSL | string | 止损价格，设置的止损价位 |
+| priceTP | string | 止盈价格，设置的止盈价位 |
+| volumeClosedExt | string | 已平仓交易量（扩展精度） |
+| tickValue | string | 点值，每个点的价值 |
+| tickSize | string | 点大小，每个点的大小 |
+| flags | string | 标志位，成交的标志位 |
+| value | string | 价值，成交的价值 |
+| gateway | string | 网关，成交的网关名称 |
+| priceGateway | string | 网关价格，网关的成交价格 |
+| modifyFlags | integer | 修改标志，成交修改的标志位 |
+| marketBid | string | 市场买价，市场当前的买价 |
+| marketAsk | string | 市场卖价，市场当前的卖价 |
+| marketLast | string | 市场最后价，市场最后的成交价 |
+| volume | string | 手数（标准精度），需按持仓量精度换算 |
+| volumeClosed | string | 已平仓手数，已平仓的交易手数 |
 | on_chain_status | string | 链上状态 |
 | tx_hash | string | 链上交易哈希 |
 
@@ -138,7 +134,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | symbol | string | 是 | 交易品种 |
-| limit | integer | 是 | 返回条数，范围为 1～100 |
+| limit | integer | 是 | 返回条数 |
 
 ### 响应 `data` 字段
 
@@ -149,10 +145,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | action | integer | 0-买入, 1-卖出 |
-| price | number | 成交价格 |
-| volumeExt | integer | 成交量（扩展精度） |
-| timeMsc | integer | 成交时间（毫秒） |
-| orderId | integer | 订单号 |
+| price | string | 成交价格 |
+| volumeExt | string | 成交量（扩展精度） |
+| timeMsc | string | 成交时间（毫秒） |
+| orderId | string | 订单号 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/recent" \
@@ -177,18 +173,18 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/hist
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | taskId | string | 任务的不透明唯一标识 |
-| dataset | string | 任务数据集；可选值：`DEAL_HISTORY`、`ORDER_HISTORY`、`FUNDING_FEE_HISTORY`、`POSITION_CURRENT`、`ORDER_CURRENT` |
+| dataset | string | 任务数据集; 可选值：`DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
 | language | string | 创建时冻结的规范语言码 |
-| sourceView | string | 原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空 |
-| retryOfTaskId | string | 当前列表重试关联的原任务；非重试为空 |
-| retryContext | object | 失败任务的安全重试条件；客户端必须生成新的 clientRequestId |
-| status | string | 任务状态；可选值：`QUEUED`、`RUNNING`、`SUCCEEDED`、`EMPTY`、`OVER_LIMIT`、`FAILED` |
-| failureReason | string | 失败原因；仅 FAILED 状态非空；可选值：`GENERATION`、`UPLOAD`、`RESTART`、`TIMEOUT` |
+| sourceView | string | 原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空; 可选值：`SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; 可为空 |
+| retryOfTaskId | string | 当前列表重试关联的原任务；非重试为空; 可为空 |
+| retryContext | object | 仅安全完整且授权有效的 FAILED 任务提供重试条件; 可为空 |
+| status | string | 任务状态; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败原因；仅 FAILED 状态非空; 可选值：`GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; 可为空 |
 | createdAt | integer | 创建时间，Unix 毫秒，UTC epoch |
 | updatedAt | integer | 更新时间，Unix 毫秒，UTC epoch |
 | expiresAt | integer | 绝对过期时间，Unix 毫秒，UTC epoch |
-| rowCount | integer | 导出行数；未完成或超过上限时为空 |
-| fileName | string | 下载文件名；仅成功任务非空 |
+| rowCount | integer | 导出行数；未完成或超过上限时为空; 可为空 |
+| fileName | string | 下载文件名；仅成功任务非空; 可为空 |
 | downloadAvailable | boolean | 服务端确认对象完整且未过期时为 true |
 
 `retryContext` 字段：
@@ -226,7 +222,7 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history
 
 ### 响应
 
-HTTP `302 Found`；`Location` 为限时下载地址，`Cache-Control: no-store`。响应不含 JSON `data`。
+HTTP `302 Found`; `Location` 为限时下载地址，`Cache-Control: no-store`。无 JSON `data`。
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history/export-tasks/TASK_DEMO_001/download" \
@@ -246,35 +242,35 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/deals/history
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientRequestId | string | 是 | 客户端幂等请求标识，去除首尾空白后为 1 到 64 个可打印字符; 最短长度: 1; 最长长度: 64 |
-| sourceView | string | 否 | 来源列表：SPOT、CONTRACT、PORTFOLIO；旧调用可不传; 可选值：`SPOT`, `CONTRACT`, `PORTFOLIO`; 可为空 |
+| clientRequestId | string | 是 | 客户端幂等请求标识，去除首尾空白后为 1 到 64 个可打印字符; 最短长度: 0; 最长长度: 64 |
+| sourceView | string | 否 | 来源列表：SPOT、CONTRACT、PORTFOLIO、VAULT；旧调用可不传; 可选值：`SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; 可为空 |
 | type | string | 是 | 账户数据类型：SPOT、CONTRACT 或 SPOT_CONTRACT; 可选值：`SPOT`, `CONTRACT`, `SPOT_CONTRACT` |
 | from | integer | 是 | 查询开始时间，Unix 秒，UTC epoch |
 | to | integer | 是 | 查询结束时间，Unix 秒，UTC epoch；必须不早于 from |
-| symbol | string | 否 | 可选交易品种；空值表示全部品种; 最短长度: 1; 最长长度: 64 |
+| symbol | string | 否 | 可选交易品种；空值表示全部品种; 最短长度: 0; 最长长度: 64 |
 | sort | string | 是 | 固定倒序规则；成交与订单使用各自的排序枚举; 可选值：`DEAL_TIME_DESC`, `ORDER_TIME_DESC` |
 | language | string | 否 | CSV 语言标签；别名、空值与未知标签由共享目录规范化 |
 | timeZone | string | 是 | IANA 时区标识 |
 
 ### 响应 `data` 字段
 
-HTTP `202 Accepted`；任务异步生成，随后查询任务状态。
+HTTP `202 Accepted`; 任务异步生成。
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | taskId | string | 任务的不透明唯一标识 |
-| dataset | string | 任务数据集；可选值：`DEAL_HISTORY`、`ORDER_HISTORY`、`FUNDING_FEE_HISTORY`、`POSITION_CURRENT`、`ORDER_CURRENT` |
+| dataset | string | 任务数据集; 可选值：`DEAL_HISTORY`, `ORDER_HISTORY`, `FUNDING_FEE_HISTORY`, `POSITION_CURRENT`, `ORDER_CURRENT` |
 | language | string | 创建时冻结的规范语言码 |
-| sourceView | string | 原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空 |
-| retryOfTaskId | string | 当前列表重试关联的原任务；非重试为空 |
-| retryContext | object | 失败任务的安全重试条件；客户端必须生成新的 clientRequestId |
-| status | string | 任务状态；可选值：`QUEUED`、`RUNNING`、`SUCCEEDED`、`EMPTY`、`OVER_LIMIT`、`FAILED` |
-| failureReason | string | 失败原因；仅 FAILED 状态非空；可选值：`GENERATION`、`UPLOAD`、`RESTART`、`TIMEOUT` |
+| sourceView | string | 原来源 SPOT、CONTRACT、PORTFOLIO；旧任务可能为空; 可选值：`SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT`; 可为空 |
+| retryOfTaskId | string | 当前列表重试关联的原任务；非重试为空; 可为空 |
+| retryContext | object | 仅安全完整且授权有效的 FAILED 任务提供重试条件; 可为空 |
+| status | string | 任务状态; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败原因；仅 FAILED 状态非空; 可选值：`GENERATION`, `UPLOAD`, `RESTART`, `TIMEOUT`; 可为空 |
 | createdAt | integer | 创建时间，Unix 毫秒，UTC epoch |
 | updatedAt | integer | 更新时间，Unix 毫秒，UTC epoch |
 | expiresAt | integer | 绝对过期时间，Unix 毫秒，UTC epoch |
-| rowCount | integer | 导出行数；未完成或超过上限时为空 |
-| fileName | string | 下载文件名；仅成功任务非空 |
+| rowCount | integer | 导出行数；未完成或超过上限时为空; 可为空 |
+| fileName | string | 下载文件名；仅成功任务非空; 可为空 |
 | downloadAvailable | boolean | 服务端确认对象完整且未过期时为 true |
 
 `retryContext` 字段：

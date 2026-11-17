@@ -12,7 +12,6 @@ description: "币种相关 OpenAPI 接口。"
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/symbol/list | READ | 查询币种网络列表 |
 | GET | /openapi/v1/mc-account/symbol/exchange/list | READ | 查询可兑换币种列表 |
-| GET | /openapi/v1/mc-account/symbol/detail/&#123;id&#125; | READ | 查询币种详情 |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。
@@ -24,6 +23,7 @@ description: "币种相关 OpenAPI 接口。"
 
 `GET /openapi/v1/mc-account/symbol/list` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 `data` 为对象数组。元素字段见下表。
@@ -32,20 +32,20 @@ description: "币种相关 OpenAPI 接口。"
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbolId | integer | 币种ID |
-| assetType | string | 币种类型；可选值：`CRYPTO`、`FIAT` |
+| symbolId | string | 币种ID |
+| assetType | string | 币种类型; 可选值：`CRYPTO`, `FIAT` |
 | symbol | string | 币种名称 |
 | network | string | 币种网络协议 |
-| minTradeUnit | number | 最小动账单位 |
+| minTradeUnit | string | 最小动账单位 |
 | pricePrecision | integer | 价格精度 |
-| exchangeRate | number | 汇率 |
-| minRechargeAmount | number | 最小入金金额 |
-| minWithdrawAmount | number | 最小出金金额 |
+| exchangeRate | string | 汇率 |
+| subscriptionCurrencyPair | string | 行情订阅币对（ac_currency_pair_subscription.currency_pair），如 ETHUSD.c；无订阅时为 null |
+| minRechargeAmount | string | 最小入金金额 |
+| minWithdrawAmount | string | 最小出金金额 |
 | assetNet | string | 资产所属网络标识 |
 | iconData | string | 网络协议图标（Base64 或 URL） |
 | depositStatus | integer | 入金是否可用：0 否，1 是 |
 | withdrawalStatus | integer | 出金是否可用：0 否，1 是 |
-| subscriptionCurrencyPair | string | 行情订阅币对，如 ETHUSD.c；无订阅时为 null |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
@@ -61,6 +61,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 
 `GET /openapi/v1/mc-account/symbol/exchange/list` — 权限 `READ`。
 
+
 ### 响应 `data` 字段
 
 `data` 为对象数组。元素字段见下表。
@@ -69,13 +70,13 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/list" \
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbolId | integer | 币种ID |
-| symbolType | string | 币种类型；可选值：`CRYPTO`、`FIAT` |
+| symbolId | string | 币种ID |
+| symbolType | string | 币种类型; 可选值：`CRYPTO`, `FIAT` |
 | symbol | string | 币种名称 |
-| minTradeUnit | number | 最小动账单位 |
+| minTradeUnit | string | 最小动账单位 |
 | pricePrecision | integer | 价格精度 |
-| exchangeRate | number | 汇率 |
-| minExchangeAmount | number | 最小闪兑金额 |
+| exchangeRate | string | 汇率 |
+| minExchangeAmount | string | 最小闪兑金额 |
 | exchangeOutStatus | integer | 是否可兑出：0 否，1 是 |
 | exchangeInStatus | integer | 是否可兑入：0 否，1 是 |
 
@@ -103,20 +104,20 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/exchang
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| symbolId | integer | 币种ID |
-| assetType | string | 币种类型；可选值：`CRYPTO`、`FIAT` |
+| symbolId | string | 币种ID |
+| assetType | string | 币种类型; 可选值：`CRYPTO`, `FIAT` |
 | symbol | string | 币种名称 |
 | network | string | 币种网络协议 |
-| minTradeUnit | number | 最小动账单位 |
+| minTradeUnit | string | 最小动账单位 |
 | pricePrecision | integer | 价格精度 |
-| exchangeRate | number | 汇率 |
-| minRechargeAmount | number | 最小入金金额 |
-| minWithdrawAmount | number | 最小出金金额 |
+| exchangeRate | string | 汇率 |
+| subscriptionCurrencyPair | string | 行情订阅币对（ac_currency_pair_subscription.currency_pair），如 ETHUSD.c；无订阅时为 null |
+| minRechargeAmount | string | 最小入金金额 |
+| minWithdrawAmount | string | 最小出金金额 |
 | assetNet | string | 资产所属网络标识 |
 | iconData | string | 网络协议图标（Base64 或 URL） |
 | depositStatus | integer | 入金是否可用：0 否，1 是 |
 | withdrawalStatus | integer | 出金是否可用：0 否，1 是 |
-| subscriptionCurrencyPair | string | 行情订阅币对，如 ETHUSD.c；无订阅时为 null |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/symbol/detail/1" \

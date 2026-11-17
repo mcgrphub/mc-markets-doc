@@ -26,6 +26,7 @@ description: "资金账户相关 OpenAPI 接口。"
 
 获取持仓信息
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
@@ -134,7 +135,7 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/fund/account/s
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| treeBatchId | integer | Merkle Tree构建批次 |
+| treeBatchId | string | Merkle Tree构建批次 |
 | userId | string | 用户ID |
 | userHash | string | PoRv2 用户哈希（user_hash） |
 | assetInfo | string | 资产信息 |

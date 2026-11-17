@@ -23,6 +23,7 @@ Sign authenticated requests with AK/SK as described in [Authentication](/authent
 
 Available anonymously or when signed in; the result does not authorize business writes
 
+
 ### Response `data` fields
 
 | Field | Type | Description |
@@ -42,13 +43,14 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/acce
 
 `GET /openapi/v1/mc-account/jurisdiction/evaluation` — permission `READ`.
 
-Read-only preflight check; the final write request is evaluated again
+This is a read-only preflight check. The write request is evaluated again. Deposit and trading preflight checks can skip basic KYC while still checking access evidence and restricted jurisdictions.
 
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| action | string | No |  |
+| action | string | Yes | Send `PROTECTED_WRITE` once. |
+| operation | string | No | Send at most once. `RECHARGE`, `DEPOSIT`, `TRADE_BUY`, and `TRADE_SELL` skip basic KYC. Omitting this parameter or sending any other value still requires basic KYC. |
 
 ### Response `data` fields
 
@@ -62,7 +64,7 @@ Read-only preflight check; the final write request is evaluated again
 | messageKey | string | Message key; an empty string when the check passes |
 
 ```bash
-curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/evaluation" \
+curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/jurisdiction/evaluation?action=PROTECTED_WRITE&operation=DEPOSIT" \
   -H "X-Access-Key: YOUR_ACCESS_KEY" \
   -H "X-Signature: YOUR_SIGNATURE" \
   -H "X-Timestamp: YOUR_TIMESTAMP" \

@@ -16,6 +16,8 @@ description: "资金费导出公开接口。"
 需认证的接口请按 [认证](/zh/authentication) 使用 AK/SK 签名。公开访问接口无需签名。网关地址见 [基础 URL](/zh/api-reference/base-url)。
 </Note>
 
+该创建接口仅导出资金费历史，数据集固定为 `FUNDING_FEE_HISTORY`。任务状态使用共享响应视图，其余 `dataset` 枚举不表示此接口支持创建其它数据集。资金费任务的 `retryOfTaskId` 为 `null`；`retryContext` 仅在允许重试时返回原冻结条件，否则为 `null`。
+
 ---
 
 ## 查询资金费历史导出任务
@@ -26,23 +28,39 @@ description: "资金费导出公开接口。"
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| taskId | string | 是 | 任务唯一标识 |
+| taskId | string | 是 |  |
 
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| taskId | string | 任务唯一标识 |
-| dataset | string | 导出数据集; 可选值：`FUNDING_FEE_HISTORY` |
-| language | string | CSV 语言标签，由服务端规范化 |
-| status | string | 异步任务状态; 可选值：`QUEUED`、`RUNNING`、`SUCCEEDED`、`EMPTY`、`OVER_LIMIT`、`FAILED` |
-| failureReason | string | 失败原因；仅失败任务适用; 可选值：`RESTART`、`GENERATION`、`UPLOAD`、`TIMEOUT` |
-| createdAt | string | 创建时间，UTC Unix 毫秒；JSON 字符串 |
-| updatedAt | string | 更新时间，UTC Unix 毫秒；JSON 字符串 |
-| expiresAt | string | 过期时间，UTC Unix 毫秒；JSON 字符串 |
-| rowCount | integer | 导出记录数 |
-| fileName | string | 导出文件名 |
-| downloadAvailable | boolean | 是否可下载 |
+| taskId | string | 任务 ID |
+| sourceView | string | 原来源 SWAP、SPOT、CONTRACT、PORTFOLIO；旧未知来源为空; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | 本任务关联的原失败项 ID，资金费及普通创建为空 |
+| retryContext | object | 可重试的原冻结条件；不满足重试条件时明确为 null |
+| dataset | string | FUNDING_FEE_HISTORY、SWAP_HISTORY、BALANCE、FUND_FLOW 或 DEPOSIT_WITHDRAW; 可选值：`FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | 规范化 CSV 语言 |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败时 GENERATION、UPLOAD、RESTART 或 TIMEOUT，其余为空; 可选值：`RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | 创建时间，Unix 毫秒 UTC epoch |
+| updatedAt | string | 更新时间，Unix 毫秒 UTC epoch |
+| expiresAt | string | 到期时间，Unix 毫秒 UTC epoch |
+| rowCount | integer | 数据行数，不含表头；尚未生成或超过上限时为空 |
+| fileName | string | 可下载文件名，可空 |
+| downloadAvailable | boolean | 成功且未到期并已校验文件元数据时为 true |
+
+`retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 当前失败任务的 ID |
+| createRequest | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+`retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原创建端点接受的白名单字段，不含 clientRequestId |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks/TASK_DEMO_001" \
@@ -62,11 +80,11 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-recor
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| taskId | string | 是 | 任务唯一标识 |
+| taskId | string | 是 |  |
 
 ### 响应
 
-HTTP `302 Found`；`Location` 为限时下载地址，`Cache-Control: no-store`。响应不含 JSON `data`。
+HTTP `302 Found`; `Location` 为限时下载地址，`Cache-Control: no-store`。无 JSON `data`。
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks/TASK_DEMO_001/download" \
@@ -86,30 +104,47 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-recor
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientRequestId | string | 是 | 非空客户端幂等标识，最多 64 个字符; 最短长度: 1; 最长长度: 64 |
-| from | integer | 是 | 查询起始时间，UTC Unix 秒，非负 |
-| to | integer | 是 | 查询结束时间，UTC Unix 秒，不早于 from |
-| sort | string | 是 | 资金费记录固定倒序; 可选值：`DEAL_TIME_DESC` |
-| language | string | 否 | CSV 语言标签，由服务端规范化 |
-| timeZone | string | 是 | IANA 时区标识 |
+| clientRequestId | string | 是 | 最短长度: 0; 最长长度: 64 |
+| from | integer | 是 |  |
+| to | integer | 是 |  |
+| sort | string | 是 | 可选值：`DEAL_TIME_DESC` |
+| sourceView | string | 否 | 可选来源 SPOT、CONTRACT、PORTFOLIO；null 保留旧调用的未知来源语义; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| language | string | 否 |  |
+| timeZone | string | 是 |  |
 
 ### 响应 `data` 字段
 
-HTTP `202 Accepted`；任务异步生成，随后查询任务状态。
+HTTP `202 Accepted`; 任务异步生成。
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| taskId | string | 任务唯一标识 |
-| dataset | string | 导出数据集; 可选值：`FUNDING_FEE_HISTORY` |
-| language | string | CSV 语言标签，由服务端规范化 |
-| status | string | 异步任务状态; 可选值：`QUEUED`、`RUNNING`、`SUCCEEDED`、`EMPTY`、`OVER_LIMIT`、`FAILED` |
-| failureReason | string | 失败原因；仅失败任务适用; 可选值：`RESTART`、`GENERATION`、`UPLOAD`、`TIMEOUT` |
-| createdAt | string | 创建时间，UTC Unix 毫秒；JSON 字符串 |
-| updatedAt | string | 更新时间，UTC Unix 毫秒；JSON 字符串 |
-| expiresAt | string | 过期时间，UTC Unix 毫秒；JSON 字符串 |
-| rowCount | integer | 导出记录数 |
-| fileName | string | 导出文件名 |
-| downloadAvailable | boolean | 是否可下载 |
+| taskId | string | 任务 ID |
+| sourceView | string | 原来源 SWAP、SPOT、CONTRACT、PORTFOLIO；旧未知来源为空; 可选值：`SWAP`, `SPOT`, `CONTRACT`, `PORTFOLIO`, `VAULT` |
+| retryOfTaskId | string | 本任务关联的原失败项 ID，资金费及普通创建为空 |
+| retryContext | object | 可重试的原冻结条件；不满足重试条件时明确为 null |
+| dataset | string | FUNDING_FEE_HISTORY、SWAP_HISTORY、BALANCE、FUND_FLOW 或 DEPOSIT_WITHDRAW; 可选值：`FUNDING_FEE_HISTORY`, `SWAP_HISTORY`, `BALANCE`, `FUND_FLOW`, `DEPOSIT_WITHDRAW` |
+| language | string | 规范化 CSV 语言 |
+| status | string | QUEUED、RUNNING、SUCCEEDED、EMPTY、OVER_LIMIT、FAILED; 可选值：`QUEUED`, `RUNNING`, `SUCCEEDED`, `EMPTY`, `OVER_LIMIT`, `FAILED` |
+| failureReason | string | 失败时 GENERATION、UPLOAD、RESTART 或 TIMEOUT，其余为空; 可选值：`RESTART`, `GENERATION`, `UPLOAD`, `TIMEOUT` |
+| createdAt | string | 创建时间，Unix 毫秒 UTC epoch |
+| updatedAt | string | 更新时间，Unix 毫秒 UTC epoch |
+| expiresAt | string | 到期时间，Unix 毫秒 UTC epoch |
+| rowCount | integer | 数据行数，不含表头；尚未生成或超过上限时为空 |
+| fileName | string | 可下载文件名，可空 |
+| downloadAvailable | boolean | 成功且未到期并已校验文件元数据时为 true |
+
+`retryContext` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| originalTaskId | string | 当前失败任务的 ID |
+| createRequest | object | 原创建端点接受的白名单字段，不含 clientRequestId |
+
+`retryContext.createRequest` 字段：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `<key>` | object | 原创建端点接受的白名单字段，不含 clientRequestId |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/funding-fee-record/export-tasks" \

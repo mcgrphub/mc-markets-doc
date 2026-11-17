@@ -1,0 +1,57 @@
+---
+title: "Funding rate history"
+sidebarTitle: "Funding rate history"
+description: "Public API endpoints verified against the backend main contract."
+---
+
+## Endpoints
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/openapi/v1/mc-trade/trade/funding-rates/history` | READ | Get funding rate history |
+
+
+<Note>
+Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
+</Note>
+
+---
+
+## Get funding rate history
+
+`GET /openapi/v1/mc-trade/trade/funding-rates/history` — Permission `READ`.
+
+### Query / path parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| symbol | string | Yes | Exact symbol identifier; queried without changing case |
+| fromTimestamp | integer | Yes | Inclusive start in Unix milliseconds (UTC), from 0 to 9007199254740991 |
+| toTimestamp | integer | Yes | Inclusive end in Unix milliseconds (UTC); the interval must not exceed 604800000 milliseconds |
+
+### Response `data` fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| points | array | Complete settlement points in strictly increasing time order; [] when there is no history |
+| currentRate | string | Latest original decimal rate text, without multiplication by 100 or truncation |
+| nextSettlementAtTimestamp | string | Next settlement time in Unix milliseconds (UTC); null only when the source record is missing; Nullable |
+| payerDirection | string | LONG_PAYS_SHORT for a positive rate, SHORT_PAYS_LONG for a negative rate, and NEUTRAL for zero; Allowed values: `LONG_PAYS_SHORT`, `SHORT_PAYS_LONG`, `NEUTRAL` |
+
+`points[]` items:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| settledAtTimestamp | integer | Settlement time in Unix milliseconds (UTC); strictly increasing within the inclusive interval |
+| rate | string | Original decimal rate text, preserving precision |
+
+```bash
+curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/funding-rates/history" \
+  -H "X-Access-Key: YOUR_ACCESS_KEY" \
+  -H "X-Signature: YOUR_SIGNATURE" \
+  -H "X-Timestamp: YOUR_TIMESTAMP" \
+  -H "X-Nonce: YOUR_NONCE" \
+  --data-urlencode "symbol=BTCUSDT" \
+  --data-urlencode "fromTimestamp=1" \
+  --data-urlencode "toTimestamp=1"
+```

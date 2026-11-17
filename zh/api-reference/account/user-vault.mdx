@@ -68,33 +68,33 @@ description: "用户金库公开接口。"
 | strategySummary | string | 策略摘要；列表与详情均返回 |
 | status | string | 状态机枚举名；与 frozen 正交 |
 | frozen | boolean | 运营冻结；与 status 正交 |
-| navPerShare | number | 最近已发布每份净值；未发布为 null |
-| aum | number | 费后总净值 AUM |
-| totalShares | number | 已发行总份额；8位；不含待确认申购 |
-| maxAumCap | number | AUM上限=seed×20，创建时固定 |
-| capacityRatio | number | 容量占比=aum÷maxAumCap；上限无效时为 null |
-| myShares | number | 当前登录用户在该池的已确认份额；无持仓为 0；未传 uid 时不填 |
+| navPerShare | string | 最近已发布每份净值；未发布为 null |
+| aum | string | 费后总净值 AUM |
+| totalShares | string | 已发行总份额；8位；不含待确认申购；与 ac_uv_vault.total_shares 同步 |
+| maxAumCap | string | AUM上限=seed×20，创建时固定 |
+| capacityRatio | string | 容量占比=aum÷maxAumCap；上限无效时为 null |
+| myShares | string | 当前登录用户在该池的已确认份额；无持仓为 0；未传 uid 时不填 |
 | sparkline | array | 近30日净值 sparkline；仅 include=sparkline 时返回；无已发布点时为 null 或空列表 |
-| ownerShareRatio | number | 管理人自持占比=管理人确认份额÷总确认份额；无份额时为 null |
-| investedUserCount | integer | 当前持有确认份额的存款人数量（含管理人） |
-| accruedPerformanceFee | number | 本池累计已结晶业绩费合计（USDC）；collectedPerformanceFee |
-| collectedPerformanceFee | number | 累计已收结晶业绩费（USDC）；与 accruedPerformanceFee 同值，优先使用本字段 |
-| performanceFeeRate | number | 业绩费率 [0,0.30] |
-| minSubscription | number | 最小申购（USDC） |
-| maxSubscription | number | 最大申购（USDC） |
-| lastNavAt | integer | 最近净值发布时间，UTC epoch 毫秒 |
-| createdAt | integer | 创建时间，UTC epoch 毫秒 |
-| return30d | number | 近30日收益；不足两个已发布点时为 null |
+| ownerShareRatio | string | 管理人自持占比=管理人确认份额÷总确认份额；无份额时为 null |
+| investedUserCount | string | 当前持有确认份额的存款人数量（含管理人） |
+| accruedPerformanceFee | string | 本池累计已结晶业绩费合计（USDC）；B10 collectedPerformanceFee |
+| collectedPerformanceFee | string | 累计已收结晶业绩费（USDC）；与 accruedPerformanceFee 同值，优先使用本字段 |
+| performanceFeeRate | string | 业绩费率 [0,0.30] |
+| minSubscription | string | 最小申购（USDC） |
+| maxSubscription | string | 最大申购（USDC） |
+| lastNavAt | string | 最近净值发布时间，UTC epoch 毫秒 |
+| createdAt | string | 创建时间，UTC epoch 毫秒 |
+| return30d | string | 近30日收益；不足两个已发布点时为 null |
 | ownerUid | string | 创建者UID；市场列表不返回 |
-| mt5Login | integer | 金库合约MT5 login；市场列表不返回 |
+| mt5Login | string | 金库合约MT5 login；市场列表不返回 |
 
 `records[].sparkline[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| asOf | integer | 估值时点，UTC epoch 毫秒 |
-| navPerShare | number | 每份净值 |
-| aum | number | 费后总净值 |
+| asOf | string | 估值时点，UTC epoch 毫秒 |
+| navPerShare | string | 每份净值 |
+| aum | string | 费后总净值 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults" \
@@ -143,33 +143,33 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults" \
 | strategySummary | string | 策略摘要；列表与详情均返回 |
 | status | string | 状态机枚举名；与 frozen 正交 |
 | frozen | boolean | 运营冻结；与 status 正交 |
-| navPerShare | number | 最近已发布每份净值；未发布为 null |
-| aum | number | 费后总净值 AUM |
-| totalShares | number | 已发行总份额；8位；不含待确认申购 |
-| maxAumCap | number | AUM上限=seed×20，创建时固定 |
-| capacityRatio | number | 容量占比=aum÷maxAumCap；上限无效时为 null |
-| myShares | number | 当前登录用户在该池的已确认份额；无持仓为 0；未传 uid 时不填 |
+| navPerShare | string | 最近已发布每份净值；未发布为 null |
+| aum | string | 费后总净值 AUM |
+| totalShares | string | 已发行总份额；8位；不含待确认申购；与 ac_uv_vault.total_shares 同步 |
+| maxAumCap | string | AUM上限=seed×20，创建时固定 |
+| capacityRatio | string | 容量占比=aum÷maxAumCap；上限无效时为 null |
+| myShares | string | 当前登录用户在该池的已确认份额；无持仓为 0；未传 uid 时不填 |
 | sparkline | array | 近30日净值 sparkline；仅 include=sparkline 时返回；无已发布点时为 null 或空列表 |
-| ownerShareRatio | number | 管理人自持占比=管理人确认份额÷总确认份额；无份额时为 null |
-| investedUserCount | integer | 当前持有确认份额的存款人数量（含管理人） |
-| accruedPerformanceFee | number | 本池累计已结晶业绩费合计（USDC）；collectedPerformanceFee |
-| collectedPerformanceFee | number | 累计已收结晶业绩费（USDC）；与 accruedPerformanceFee 同值，优先使用本字段 |
-| performanceFeeRate | number | 业绩费率 [0,0.30] |
-| minSubscription | number | 最小申购（USDC） |
-| maxSubscription | number | 最大申购（USDC） |
-| lastNavAt | integer | 最近净值发布时间，UTC epoch 毫秒 |
-| createdAt | integer | 创建时间，UTC epoch 毫秒 |
-| return30d | number | 近30日收益；不足两个已发布点时为 null |
+| ownerShareRatio | string | 管理人自持占比=管理人确认份额÷总确认份额；无份额时为 null |
+| investedUserCount | string | 当前持有确认份额的存款人数量（含管理人） |
+| accruedPerformanceFee | string | 本池累计已结晶业绩费合计（USDC）；B10 collectedPerformanceFee |
+| collectedPerformanceFee | string | 累计已收结晶业绩费（USDC）；与 accruedPerformanceFee 同值，优先使用本字段 |
+| performanceFeeRate | string | 业绩费率 [0,0.30] |
+| minSubscription | string | 最小申购（USDC） |
+| maxSubscription | string | 最大申购（USDC） |
+| lastNavAt | string | 最近净值发布时间，UTC epoch 毫秒 |
+| createdAt | string | 创建时间，UTC epoch 毫秒 |
+| return30d | string | 近30日收益；不足两个已发布点时为 null |
 | ownerUid | string | 创建者UID；市场列表不返回 |
-| mt5Login | integer | 金库合约MT5 login；市场列表不返回 |
+| mt5Login | string | 金库合约MT5 login；市场列表不返回 |
 
 `records[].sparkline[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| asOf | integer | 估值时点，UTC epoch 毫秒 |
-| navPerShare | number | 每份净值 |
-| aum | number | 费后总净值 |
+| asOf | string | 估值时点，UTC epoch 毫秒 |
+| navPerShare | string | 每份净值 |
+| aum | string | 费后总净值 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/managed" \
@@ -212,14 +212,14 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/manag
 | vaultName | string | 金库名称 |
 | vaultStatus | string | 金库运行状态枚举名 |
 | uid | string | 持有人UID |
-| shares | number | 已确认份额 |
-| navPerShare | number | 最近已发布每份净值；未发布为 null |
-| cost | number | 已确认成本（USDC） |
-| estimatedValue | number | 估算市值=shares×当前navPerShare；净值未发布时为 null |
-| totalPnl | number | 累计收益=estimatedValue−cost；净值未发布时为 null（与详情 myTotalPnl 同口径） |
-| pendingSubscribeAmount | number | 在途申购金额合计 |
-| pendingRedeemShares | number | 在途赎回份额合计 |
-| updatedAt | integer | 持仓行更新时间，UTC epoch 毫秒 |
+| shares | string | 已确认份额 |
+| navPerShare | string | 最近已发布每份净值；未发布为 null |
+| cost | string | 已确认成本（USDC） |
+| estimatedValue | string | 估算市值=shares×当前navPerShare；净值未发布时为 null |
+| totalPnl | string | 累计收益=estimatedValue−cost；净值未发布时为 null（与详情 myTotalPnl 同口径） |
+| pendingSubscribeAmount | string | 在途申购金额合计 |
+| pendingRedeemShares | string | 在途赎回份额合计 |
+| updatedAt | string | 持仓行更新时间，UTC epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/holdings" \
@@ -235,16 +235,17 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/ho
 
 `GET /openapi/v1/mc-account/user-vaults/me/manager-overview` — 权限 `READ`.
 
+
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| managedAum | number | 名下全部金库 AUM 合计 |
-| tradablePool | number | 可交易池现金合计（市场可见且未冻结） |
-| accruedPerformanceFee | number | 累计已记业绩费流水合计（兼容旧字段，同 collectedPerformanceFee） |
-| collectedPerformanceFee | number | 累计已收结晶业绩费合计（USDC） |
+| managedAum | string | 名下全部金库 AUM 合计 |
+| tradablePool | string | 可交易池现金合计（市场可见且未冻结） |
+| accruedPerformanceFee | string | 累计已记业绩费流水合计（兼容旧字段，同 collectedPerformanceFee） |
+| collectedPerformanceFee | string | 累计已收结晶业绩费合计（USDC） |
 | occupyingVaultId | string | 当前占用中金库ID；无占用为null |
-| updatedAt | integer | 概览生成时间，UTC epoch 毫秒 |
+| updatedAt | string | 概览生成时间，UTC epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/manager-overview" \
@@ -290,22 +291,22 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/ma
 | vaultName | string | 金库名称 |
 | uid | string | 业务用户UID；C 端可空 |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION / PERFORMANCE_FEE |
-| applicationQuantity | number | 申请数量：申购=金额；赎回=份额；业绩费=应计金额 |
+| applicationQuantity | string | 申请数量：申购=金额；赎回=份额；业绩费=应计金额 |
 | applicationQuantityUnit | string | USDC 或 SHARE |
-| convertedAmount | number | 折算数值；申购≈份额；赎回≈毛额；结算行=grossPayout |
-| hwmNavPerShare | number | 已弃用：旧单位净值 HWM；请用 costNavPerShare |
-| benchmarkNavPerShare | number | 已弃用：旧费前基准净值；请用 settleNavPerShare |
-| redeemShares | number | 结晶：赎回份额 |
-| grossPayout | number | 结晶：毛额 gross |
-| costDelta | number | 结晶：成本扣减 |
-| profit | number | 结晶：盈利 |
-| feeRate | number | 结晶：费率 |
-| feeAmount | number | 结晶：业绩费金额 |
-| costNavPerShare | number | 结晶：个人加权成本净值（替代旧单位净值 HWM 展示） |
-| settleNavPerShare | number | 结晶：本次结算每份净值（替代旧基准净值展示） |
+| convertedAmount | string | 折算数值；申购≈份额；赎回≈毛额；结算行=grossPayout |
+| hwmNavPerShare | string | 已弃用：旧单位净值 HWM；B10 请用 costNavPerShare |
+| benchmarkNavPerShare | string | 已弃用：旧费前基准净值；B10 请用 settleNavPerShare |
+| redeemShares | string | B10 结晶：赎回份额 |
+| grossPayout | string | B10 结晶：毛额 gross |
+| costDelta | string | B10 结晶：成本扣减 |
+| profit | string | B10 结晶：盈利 |
+| feeRate | string | B10 结晶：费率 |
+| feeAmount | string | B10 结晶：业绩费金额 |
+| costNavPerShare | string | B10 结晶：个人加权成本净值（替代旧单位净值 HWM 展示） |
+| settleNavPerShare | string | B10 结晶：本次结算每份净值（替代旧基准净值展示） |
 | status | string | 状态：仅申赎/结算返回；流水接口不返回本字段 |
-| expectedPayoutAt | integer | 兑付时刻 epoch 毫秒；结算必填 |
-| occurredAt | integer | 业务发生时间 epoch 毫秒 |
+| expectedPayoutAt | string | 兑付时刻 epoch 毫秒；结算必填（结晶行 expected_payout_at） |
+| occurredAt | string | 业务发生时间 epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/posted-flows" \
@@ -350,22 +351,22 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/po
 | vaultName | string | 金库名称 |
 | uid | string | 业务用户UID；C 端可空 |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION / PERFORMANCE_FEE |
-| applicationQuantity | number | 申请数量：申购=金额；赎回=份额；业绩费=应计金额 |
+| applicationQuantity | string | 申请数量：申购=金额；赎回=份额；业绩费=应计金额 |
 | applicationQuantityUnit | string | USDC 或 SHARE |
-| convertedAmount | number | 折算数值；申购≈份额；赎回≈毛额；结算行=grossPayout |
-| hwmNavPerShare | number | 已弃用：旧单位净值 HWM；请用 costNavPerShare |
-| benchmarkNavPerShare | number | 已弃用：旧费前基准净值；请用 settleNavPerShare |
-| redeemShares | number | 结晶：赎回份额 |
-| grossPayout | number | 结晶：毛额 gross |
-| costDelta | number | 结晶：成本扣减 |
-| profit | number | 结晶：盈利 |
-| feeRate | number | 结晶：费率 |
-| feeAmount | number | 结晶：业绩费金额 |
-| costNavPerShare | number | 结晶：个人加权成本净值（替代旧单位净值 HWM 展示） |
-| settleNavPerShare | number | 结晶：本次结算每份净值（替代旧基准净值展示） |
+| convertedAmount | string | 折算数值；申购≈份额；赎回≈毛额；结算行=grossPayout |
+| hwmNavPerShare | string | 已弃用：旧单位净值 HWM；B10 请用 costNavPerShare |
+| benchmarkNavPerShare | string | 已弃用：旧费前基准净值；B10 请用 settleNavPerShare |
+| redeemShares | string | B10 结晶：赎回份额 |
+| grossPayout | string | B10 结晶：毛额 gross |
+| costDelta | string | B10 结晶：成本扣减 |
+| profit | string | B10 结晶：盈利 |
+| feeRate | string | B10 结晶：费率 |
+| feeAmount | string | B10 结晶：业绩费金额 |
+| costNavPerShare | string | B10 结晶：个人加权成本净值（替代旧单位净值 HWM 展示） |
+| settleNavPerShare | string | B10 结晶：本次结算每份净值（替代旧基准净值展示） |
 | status | string | 状态：仅申赎/结算返回；流水接口不返回本字段 |
-| expectedPayoutAt | integer | 兑付时刻 epoch 毫秒；结算必填 |
-| occurredAt | integer | 业务发生时间 epoch 毫秒 |
+| expectedPayoutAt | string | 兑付时刻 epoch 毫秒；结算必填（结晶行 expected_payout_at） |
+| occurredAt | string | 业务发生时间 epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/settlement-records" \
@@ -411,22 +412,22 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/se
 | vaultName | string | 金库名称 |
 | uid | string | 业务用户UID；C 端可空 |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION / PERFORMANCE_FEE |
-| applicationQuantity | number | 申请数量：申购=金额；赎回=份额；业绩费=应计金额 |
+| applicationQuantity | string | 申请数量：申购=金额；赎回=份额；业绩费=应计金额 |
 | applicationQuantityUnit | string | USDC 或 SHARE |
-| convertedAmount | number | 折算数值；申购≈份额；赎回≈毛额；结算行=grossPayout |
-| hwmNavPerShare | number | 已弃用：旧单位净值 HWM；请用 costNavPerShare |
-| benchmarkNavPerShare | number | 已弃用：旧费前基准净值；请用 settleNavPerShare |
-| redeemShares | number | 结晶：赎回份额 |
-| grossPayout | number | 结晶：毛额 gross |
-| costDelta | number | 结晶：成本扣减 |
-| profit | number | 结晶：盈利 |
-| feeRate | number | 结晶：费率 |
-| feeAmount | number | 结晶：业绩费金额 |
-| costNavPerShare | number | 结晶：个人加权成本净值（替代旧单位净值 HWM 展示） |
-| settleNavPerShare | number | 结晶：本次结算每份净值（替代旧基准净值展示） |
+| convertedAmount | string | 折算数值；申购≈份额；赎回≈毛额；结算行=grossPayout |
+| hwmNavPerShare | string | 已弃用：旧单位净值 HWM；B10 请用 costNavPerShare |
+| benchmarkNavPerShare | string | 已弃用：旧费前基准净值；B10 请用 settleNavPerShare |
+| redeemShares | string | B10 结晶：赎回份额 |
+| grossPayout | string | B10 结晶：毛额 gross |
+| costDelta | string | B10 结晶：成本扣减 |
+| profit | string | B10 结晶：盈利 |
+| feeRate | string | B10 结晶：费率 |
+| feeAmount | string | B10 结晶：业绩费金额 |
+| costNavPerShare | string | B10 结晶：个人加权成本净值（替代旧单位净值 HWM 展示） |
+| settleNavPerShare | string | B10 结晶：本次结算每份净值（替代旧基准净值展示） |
 | status | string | 状态：仅申赎/结算返回；流水接口不返回本字段 |
-| expectedPayoutAt | integer | 兑付时刻 epoch 毫秒；结算必填 |
-| occurredAt | integer | 业务发生时间 epoch 毫秒 |
+| expectedPayoutAt | string | 兑付时刻 epoch 毫秒；结算必填（结晶行 expected_payout_at） |
+| occurredAt | string | 业务发生时间 epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/subscription-redemption-records" \
@@ -457,46 +458,46 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/me/su
 | strategySummary | string | 策略摘要；列表与详情均返回 |
 | status | string | 状态机枚举名；与 frozen 正交 |
 | frozen | boolean | 运营冻结；与 status 正交 |
-| navPerShare | number | 最近已发布每份净值；未发布为 null |
-| aum | number | 费后总净值 AUM |
-| totalShares | number | 已发行总份额；8位；不含待确认申购 |
-| maxAumCap | number | AUM上限=seed×20，创建时固定 |
-| capacityRatio | number | 容量占比=aum÷maxAumCap；上限无效时为 null |
-| myShares | number | 当前登录用户在该池的已确认份额；无持仓为 0；未传 uid 时不填 |
+| navPerShare | string | 最近已发布每份净值；未发布为 null |
+| aum | string | 费后总净值 AUM |
+| totalShares | string | 已发行总份额；8位；不含待确认申购；与 ac_uv_vault.total_shares 同步 |
+| maxAumCap | string | AUM上限=seed×20，创建时固定 |
+| capacityRatio | string | 容量占比=aum÷maxAumCap；上限无效时为 null |
+| myShares | string | 当前登录用户在该池的已确认份额；无持仓为 0；未传 uid 时不填 |
 | sparkline | array | 近30日净值 sparkline；仅 include=sparkline 时返回；无已发布点时为 null 或空列表 |
-| ownerShareRatio | number | 管理人自持占比=管理人确认份额÷总确认份额；无份额时为 null |
-| investedUserCount | integer | 当前持有确认份额的存款人数量（含管理人） |
-| accruedPerformanceFee | number | 本池累计已结晶业绩费合计（USDC）；collectedPerformanceFee |
-| collectedPerformanceFee | number | 累计已收结晶业绩费（USDC）；与 accruedPerformanceFee 同值，优先使用本字段 |
-| performanceFeeRate | number | 业绩费率 [0,0.30] |
-| minSubscription | number | 最小申购（USDC） |
-| maxSubscription | number | 最大申购（USDC） |
-| lastNavAt | integer | 最近净值发布时间，UTC epoch 毫秒 |
-| createdAt | integer | 创建时间，UTC epoch 毫秒 |
-| return30d | number | 近30日收益；不足两个已发布点时为 null |
+| ownerShareRatio | string | 管理人自持占比=管理人确认份额÷总确认份额；无份额时为 null |
+| investedUserCount | string | 当前持有确认份额的存款人数量（含管理人） |
+| accruedPerformanceFee | string | 本池累计已结晶业绩费合计（USDC）；B10 collectedPerformanceFee |
+| collectedPerformanceFee | string | 累计已收结晶业绩费（USDC）；与 accruedPerformanceFee 同值，优先使用本字段 |
+| performanceFeeRate | string | 业绩费率 [0,0.30] |
+| minSubscription | string | 最小申购（USDC） |
+| maxSubscription | string | 最大申购（USDC） |
+| lastNavAt | string | 最近净值发布时间，UTC epoch 毫秒 |
+| createdAt | string | 创建时间，UTC epoch 毫秒 |
+| return30d | string | 近30日收益；不足两个已发布点时为 null |
 | ownerUid | string | 创建者UID；市场列表不返回 |
-| mt5Login | integer | 金库合约MT5 login；市场列表不返回 |
-| seedAmount | number | 种子金额（USDC） |
-| cash | number | 池现金（USDC） |
-| capitalInjectionId | string | 最近注资单ID；仅管理人可见；无则 null |
-| capitalInjectionStatus | string | 最近注资状态 PENDING_FUNDING/SETTLED/FAILED；仅管理人可见 |
-| capitalInjectionAmount | number | 最近注资金额 USDC；仅管理人可见 |
-| capitalInjectionEstimatedShares | number | 最近注资锁定份额；仅管理人可见 |
-| capitalInjectionNavUsed | number | 最近注资锁定净值；仅管理人可见 |
-| capitalInjectionCreatedAt | integer | 最近注资创建时间毫秒；仅管理人可见 |
-| capitalInjectionSettledAt | integer | 最近注资成功时间毫秒；非 SETTLED 为 null；仅管理人可见 |
-| myCost | number | 当前登录用户在该池的已确认成本（我的投入）；无持仓为 0 |
-| myRedeemableShares | number | 当前登录用户可赎回份额=confirmedShares−pendingRedeemShares；无持仓为 0；不含在途赎回 |
-| myEstimatedValue | number | 当前登录用户估算市值=myShares×navPerShare；净值未发布时为 null |
-| myTotalPnl | number | 当前登录用户累计收益=myEstimatedValue−myCost；净值未发布时为 null |
+| mt5Login | string | 金库合约MT5 login；市场列表不返回 |
+| seedAmount | string | 种子金额（USDC） |
+| cash | string | 池现金（USDC） |
+| capitalInjectionId | string | 最近注资单ID；仅 owner/Admin；无则 null |
+| capitalInjectionStatus | string | 最近注资状态 PENDING_FUNDING/SETTLED/FAILED；仅 owner/Admin |
+| capitalInjectionAmount | string | 最近注资金额 USDC；仅 owner/Admin |
+| capitalInjectionEstimatedShares | string | 最近注资锁定份额；仅 owner/Admin |
+| capitalInjectionNavUsed | string | 最近注资锁定净值；仅 owner/Admin |
+| capitalInjectionCreatedAt | string | 最近注资创建时间毫秒；仅 owner/Admin |
+| capitalInjectionSettledAt | string | 最近注资成功时间毫秒；非 SETTLED 为 null；仅 owner/Admin |
+| myCost | string | 当前登录用户在该池的已确认成本（我的投入）；无持仓为 0 |
+| myRedeemableShares | string | 当前登录用户可赎回份额=confirmedShares−pendingRedeemShares；无持仓为 0；不含在途赎回 |
+| myEstimatedValue | string | 当前登录用户估算市值=myShares×navPerShare；净值未发布时为 null |
+| myTotalPnl | string | 当前登录用户累计收益=myEstimatedValue−myCost；净值未发布时为 null |
 
 `sparkline[]` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| asOf | integer | 估值时点，UTC epoch 毫秒 |
-| navPerShare | number | 每份净值 |
-| aum | number | 费后总净值 |
+| asOf | string | 估值时点，UTC epoch 毫秒 |
+| navPerShare | string | 每份净值 |
+| aum | string | 费后总净值 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001" \
@@ -543,12 +544,12 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 | vaultName | string | 金库名称 |
 | uid | string | 用户UID |
 | type | string | SUBSCRIPTION / REDEMPTION / FORCE_REDEMPTION |
-| applicationQuantity | number | 申请数量：申购=金额；赎回=份额 |
+| applicationQuantity | string | 申请数量：申购=金额；赎回=份额 |
 | applicationQuantityUnit | string | USDC 或 SHARE |
-| confirmedNav | number | 确认净值 |
-| confirmedQuantity | number | 确认结果：申购=份额；赎回=兑付 USDC |
+| confirmedNav | string | 确认净值 |
+| confirmedQuantity | string | 确认结果：申购=份额；赎回=兑付 USDC |
 | confirmedQuantityUnit | string | SHARE 或 USDC |
-| occurredAt | integer | 入账时间，UTC epoch 毫秒 |
+| occurredAt | string | 入账时间，UTC epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/deposit-withdrawals" \
@@ -588,13 +589,13 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| depositorMask | string | 脱敏存款人标识；此对外接口必填 |
-| uid | string | 明文 UID；此对外接口必须为 null |
-| vaultAmount | number | 估算持仓市值 |
-| unrealizedPnl | number | 未实现盈亏 |
-| realizedPnl | number | 已实现盈亏 |
+| depositorMask | string | 脱敏存款人标识；C端必填，Admin可空 |
+| uid | string | 明文UID；仅Admin返回，C端必须为null |
+| vaultAmount | string | 估算持仓市值 |
+| unrealizedPnl | string | 未实现盈亏 |
+| realizedPnl | string | 已实现盈亏 |
 | followingDays | integer | 跟随天数（上海自然日，含首次确认当日，至少1） |
-| updatedAt | integer | 持仓更新时间，UTC epoch 毫秒 |
+| updatedAt | string | 持仓更新时间，UTC epoch 毫秒 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/depositors" \
@@ -629,9 +630,9 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| asOf | integer | 估值时点，UTC epoch 毫秒 |
-| navPerShare | number | 每份净值 |
-| aum | number | 费后总净值 |
+| asOf | string | 估值时点，UTC epoch 毫秒 |
+| navPerShare | string | 每份净值 |
+| aum | string | 费后总净值 |
 
 ```bash
 curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/nav-history" \
@@ -666,7 +667,7 @@ curl -sS "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| data | object | 结构由 `tab` 决定；参阅对应交易接口的响应字段定义。 |
+| data | object | `data` 为该类型标量 |
 
 ```bash
 curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/trading-overview" \
@@ -687,9 +688,9 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 1; 最长长度: 64 |
-| name | string | 是 | 金库名称，trim后1～64; 最短长度: 1; 最长长度: 64 |
-| strategySummary | string | 是 | 策略摘要，1～2000; 最短长度: 1; 最长长度: 2000 |
+| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 0; 最长长度: 64 |
+| name | string | 是 | 金库名称，trim后1～64; 最短长度: 0; 最长长度: 64 |
+| strategySummary | string | 是 | 策略摘要，1～2000; 最短长度: 0; 最长长度: 2000 |
 | minSubscription | number | 是 | 最小申购，&gt;0，USDC最多6位小数 |
 | maxSubscription | number | 是 | 最大申购，≥minSubscription |
 | performanceFeeRate | number | 是 | 业绩费率，[0,0.30]，最多4位小数 |
@@ -702,10 +703,10 @@ curl -sS -G "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10
 | --- | --- | --- |
 | vaultId | string | 对外金库ID |
 | status | string | 创建提交成功后为 SEED_FUNDING |
-| mt5Login | integer | 本次 claim 的金库合约 login |
-| seedAmount | number | 种子金额（USDC） |
-| maxAumCap | number | AUM上限=seed×20 |
-| createdAt | integer | 创建时间，UTC epoch 毫秒 |
+| mt5Login | string | 本次 claim 的金库合约 login |
+| seedAmount | string | 种子金额（USDC） |
+| maxAumCap | string | AUM上限=seed×20 |
+| createdAt | string | 创建时间，UTC epoch 毫秒 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults" \
@@ -742,7 +743,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 1; 最长长度: 64 |
+| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 0; 最长长度: 64 |
 | amount | number | 是 | 注资金额（USDC），须&gt;0 且最多 6 位小数；豁免申购限额/30%/稀释; 最小值: 1e-06 |
 
 ### 响应 `data` 字段
@@ -750,12 +751,12 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | injectionId | string | 注资单号 |
-| estimatedShares | number | 预估份额=amount/navUsed，8位DOWN；终态以提交锁定为准 |
-| navUsed | number | 提交时锁定的已发布净值 |
+| estimatedShares | string | 预估份额=amount/navUsed，8位DOWN；终态以提交锁定为准 |
+| navUsed | string | 提交时锁定的已发布净值 |
 | status | string | 提交成功为 PENDING_FUNDING |
-| seedAmountAfterEstimate | number | 成功后预计 seedAmount |
-| maxAumCapAfterEstimate | number | 成功后预计 maxAumCap=seed×20 |
-| createdAt | integer | 创建时间，epoch毫秒 |
+| seedAmountAfterEstimate | string | 成功后预计 seedAmount |
+| maxAumCapAfterEstimate | string | 成功后预计 maxAumCap=seed×20 |
+| createdAt | string | 创建时间，epoch毫秒 |
 
 ```bash
 curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaults/10001/capital-injections" \
@@ -786,7 +787,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 1; 最长长度: 64 |
+| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 0; 最长长度: 64 |
 
 ### 响应 `data` 字段
 
@@ -823,7 +824,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 1; 最长长度: 64 |
+| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 0; 最长长度: 64 |
 | shares | number | 是 | 赎回份额，&gt;0 且不超过可用份额 |
 
 ### 响应 `data` 字段
@@ -831,9 +832,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 赎回单号 |
-| estimatedPayout | number | 预估兑付=shares×navUsed，USDC 6位DOWN |
-| navUsed | number | 下单时参考净值 |
-| cutoffAt | integer | 截点：下一UTC+8自然日00:00，epoch毫秒 |
+| estimatedPayout | string | 预估兑付=shares×navUsed，USDC 6位DOWN |
+| navUsed | string | 下单时参考净值 |
+| cutoffAt | string | 截点：下一UTC+8自然日00:00，epoch毫秒 |
 | status | string | 提交成功为 PENDING_SETTLEMENT |
 
 ```bash
@@ -865,7 +866,7 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 1; 最长长度: 64 |
+| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 0; 最长长度: 64 |
 | amount | number | 是 | 申购金额（USDC），服务端再校验限额与稀释 |
 
 ### 响应 `data` 字段
@@ -873,9 +874,9 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 申购单号 |
-| estimatedShares | number | 预估份额=amount/navUsed，份额8位DOWN；日结以 settleNav 重算 |
-| navUsed | number | 下单时参考净值 |
-| cutoffAt | integer | 截点：下一UTC+8自然日00:00，epoch毫秒 |
+| estimatedShares | string | 预估份额=amount/navUsed，份额8位DOWN；日结以 settleNav 重算 |
+| navUsed | string | 下单时参考净值 |
+| cutoffAt | string | 截点：下一UTC+8自然日00:00，epoch毫秒 |
 | status | string | 提交成功为 PENDING_FUNDING |
 
 ```bash
@@ -908,16 +909,16 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-account/user-vaul
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 1; 最长长度: 64 |
+| clientOrderId | string | 是 | 客户端幂等单号，≤64; 最短长度: 0; 最长长度: 64 |
 
 ### 响应 `data` 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 申购单号 |
-| estimatedShares | number | 预估份额=amount/navUsed，份额8位DOWN；日结以 settleNav 重算 |
-| navUsed | number | 下单时参考净值 |
-| cutoffAt | integer | 截点：下一UTC+8自然日00:00，epoch毫秒 |
+| estimatedShares | string | 预估份额=amount/navUsed，份额8位DOWN；日结以 settleNav 重算 |
+| navUsed | string | 下单时参考净值 |
+| cutoffAt | string | 截点：下一UTC+8自然日00:00，epoch毫秒 |
 | status | string | 提交成功为 PENDING_FUNDING |
 
 ```bash
