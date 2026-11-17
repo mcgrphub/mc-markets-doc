@@ -53,8 +53,8 @@ description: "资金费率相关 OpenAPI 接口。"
 | symbol | string | 交易品种 |
 | fundingRate | string | 资金费率 |
 | fundingRateStr | string | 资金费率原始字符串 |
-| fundingRateDisplay | string | 资金费率展示值（百分比文本） |
-| fundingRateScale | integer | 资金费率展示小数位数 |
+| fundingRateDisplay | string | 资金费率百分比文本，四舍五入到最多 4 位小数，去掉末尾的零；零显示为 0%。 |
+| fundingRateScale | integer | 资金费率展示的最大小数位数。 |
 | annualRateDisplay | string | 年化资金费率展示值 |
 | settlementPrice | string | 结算价格 |
 | settlementPriceStr | string | 结算价格原始字符串 |

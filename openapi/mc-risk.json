@@ -359,13 +359,13 @@
                               "fundingRateDisplay": {
                                 "title": "资金费率展示值",
                                 "type": "string",
-                                "description": "资金费率展示值（百分比文本）",
+                                "description": "资金费率百分比文本，四舍五入到最多 4 位小数，去掉末尾的零；零显示为 0%。",
                                 "example": "0.0125%"
                               },
                               "fundingRateScale": {
                                 "title": "资金费率展示小数位",
                                 "type": "integer",
-                                "description": "资金费率展示小数位数",
+                                "description": "资金费率展示的最大小数位数。",
                                 "format": "int32",
                                 "example": "4"
                               },
@@ -777,13 +777,13 @@
           "fundingRateDisplay": {
             "title": "资金费率展示值",
             "type": "string",
-            "description": "资金费率展示值（百分比文本）",
+            "description": "资金费率百分比文本，四舍五入到最多 4 位小数，去掉末尾的零；零显示为 0%。",
             "example": "0.0125%"
           },
           "fundingRateScale": {
             "title": "资金费率展示小数位",
             "type": "integer",
-            "description": "资金费率展示小数位数",
+            "description": "资金费率展示的最大小数位数。",
             "format": "int32",
             "example": "4"
           },

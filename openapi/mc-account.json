@@ -40236,7 +40236,7 @@
       "get": {
         "summary": "查询完整司法管辖区门禁",
         "deprecated": false,
-        "description": "只读预检；最终写请求会重新评估",
+        "description": "只读预检；最终写请求会重新评估。充值和交易场景可以跳过基础 KYC，仍校验访问证据和受限地区。",
         "operationId": "evaluation",
         "tags": [
           "司法管辖区门禁"
@@ -40245,11 +40245,24 @@
           {
             "name": "action",
             "in": "query",
-            "description": "",
+            "description": "只接受 PROTECTED_WRITE，且只允许传一次。",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PROTECTED_WRITE"
+              ]
+            }
+          },
+          {
+            "name": "operation",
+            "in": "query",
             "required": false,
+            "description": "操作类型，只能传一次。RECHARGE、DEPOSIT、TRADE_BUY、TRADE_SELL 跳过基础 KYC；不传或传其他值仍要求基础 KYC。",
             "schema": {
               "type": "string"
-            }
+            },
+            "example": "DEPOSIT"
           }
         ],
         "responses": {

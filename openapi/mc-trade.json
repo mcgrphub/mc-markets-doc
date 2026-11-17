@@ -8475,6 +8475,29 @@
                                 "description": "配置版本",
                                 "format": "int32"
                               },
+                              "openAllowed": {
+                                "type": "boolean",
+                                "description": "批准配置是否允许开仓；品种下架时仍保留配置值。"
+                              },
+                              "closeAllowed": {
+                                "type": "boolean",
+                                "description": "批准配置是否允许平仓；品种下架时仍保留配置值。"
+                              },
+                              "restrictionVersion": {
+                                "type": "integer",
+                                "format": "int64",
+                                "minimum": 0,
+                                "description": "开平仓限制版本，独立于配置 version。",
+                                "example": 12
+                              },
+                              "restrictionEffectiveAtMs": {
+                                "type": "integer",
+                                "format": "int64",
+                                "minimum": 0,
+                                "nullable": true,
+                                "description": "限制生效时间，UTC epoch 毫秒；初始化且尚无生效事件时为 null。",
+                                "example": 1794376800000
+                              },
                               "longAnnualRate": {
                                 "title": "多头年化费率",
                                 "type": "string",
@@ -8803,7 +8826,13 @@
                                   }
                                 }
                               }
-                            }
+                            },
+                            "required": [
+                              "openAllowed",
+                              "closeAllowed",
+                              "restrictionVersion",
+                              "restrictionEffectiveAtMs"
+                            ]
                           }
                         }
                       }
@@ -19995,6 +20024,29 @@
                 "description": "配置版本",
                 "format": "int32"
               },
+              "openAllowed": {
+                "type": "boolean",
+                "description": "批准配置是否允许开仓；品种下架时仍保留配置值。"
+              },
+              "closeAllowed": {
+                "type": "boolean",
+                "description": "批准配置是否允许平仓；品种下架时仍保留配置值。"
+              },
+              "restrictionVersion": {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0,
+                "description": "开平仓限制版本，独立于配置 version。",
+                "example": 12
+              },
+              "restrictionEffectiveAtMs": {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0,
+                "nullable": true,
+                "description": "限制生效时间，UTC epoch 毫秒；初始化且尚无生效事件时为 null。",
+                "example": 1794376800000
+              },
               "longAnnualRate": {
                 "title": "多头年化费率",
                 "type": "string",
@@ -20321,7 +20373,13 @@
                   }
                 }
               }
-            }
+            },
+            "required": [
+              "openAllowed",
+              "closeAllowed",
+              "restrictionVersion",
+              "restrictionEffectiveAtMs"
+            ]
           }
         }
       },
@@ -20355,6 +20413,29 @@
             "type": "integer",
             "description": "配置版本",
             "format": "int32"
+          },
+          "openAllowed": {
+            "type": "boolean",
+            "description": "批准配置是否允许开仓；品种下架时仍保留配置值。"
+          },
+          "closeAllowed": {
+            "type": "boolean",
+            "description": "批准配置是否允许平仓；品种下架时仍保留配置值。"
+          },
+          "restrictionVersion": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "开平仓限制版本，独立于配置 version。",
+            "example": 12
+          },
+          "restrictionEffectiveAtMs": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "nullable": true,
+            "description": "限制生效时间，UTC epoch 毫秒；初始化且尚无生效事件时为 null。",
+            "example": 1794376800000
           },
           "longAnnualRate": {
             "title": "多头年化费率",
@@ -20682,7 +20763,13 @@
               }
             }
           }
-        }
+        },
+        "required": [
+          "openAllowed",
+          "closeAllowed",
+          "restrictionVersion",
+          "restrictionEffectiveAtMs"
+        ]
       },
       "StaticConfigRiskTierRsp": {
         "title": "Premium 档位配置",

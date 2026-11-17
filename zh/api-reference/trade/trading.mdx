@@ -252,6 +252,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 不存在的 `symbol` 可能不出现在响应数组中；如果返回占位项，其 `mt5` 和 `risk` 为 `null`。客户端必须同时兼容这两种情况，并将其都视为未找到配置。
 
+`risk.openAllowed` 和 `risk.closeAllowed` 返回批准配置中的值。品种下架后仍保留这些值，不能用它们单独判断订单是否会被接受。
+
 ### 查询 / 路径参数
 
 | 参数 | 类型 | 必填 | 说明 |
@@ -439,6 +441,10 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 | id | string | 配置ID |
 | symbol | string | 交易品种标识 |
 | version | integer | 配置版本 |
+| openAllowed | boolean | 批准配置是否允许开仓；品种下架时仍保留配置值。 |
+| closeAllowed | boolean | 批准配置是否允许平仓；品种下架时仍保留配置值。 |
+| restrictionVersion | integer (int64) | 非负的开平仓限制版本，独立于配置 `version`。 |
+| restrictionEffectiveAtMs | integer (int64) 或 `null` | 限制生效的 UTC epoch 毫秒时间；初始化且尚无生效事件时为 `null`。 |
 | longAnnualRate | string | 多头年化费率 |
 | shortAnnualRate | string | 空头年化费率 |
 | discountRate | string | 优惠费率 |

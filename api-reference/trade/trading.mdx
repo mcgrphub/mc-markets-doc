@@ -252,6 +252,8 @@ curl -sS -X POST "https://gateway.mcconnects.com/openapi/v1/mc-trade/trade/order
 
 An unknown symbol may be omitted from the response array. If a placeholder item is returned, its `mt5` and `risk` are `null`. Handle both cases as configuration not found.
 
+`risk.openAllowed` and `risk.closeAllowed` are the values stored in the approved configuration. They remain available after delisting and do not by themselves determine whether an order will be accepted.
+
 ### Query / path parameters
 
 | Parameter | Type | Required | Description |
@@ -439,6 +441,10 @@ An unknown symbol may be omitted from the response array. If a placeholder item 
 | id | string | Configuration ID |
 | symbol | string | Trading Symbol Identifier |
 | version | integer | Configuration Version |
+| openAllowed | boolean | Whether the approved configuration allows opening positions. The stored value is retained when the symbol is delisted. |
+| closeAllowed | boolean | Whether the approved configuration allows closing positions. The stored value is retained when the symbol is delisted. |
+| restrictionVersion | integer (int64) | Non-negative restriction version, independent of the configuration `version`. |
+| restrictionEffectiveAtMs | integer (int64) or `null` | UTC epoch milliseconds when the restriction became effective. Returns `null` if no restriction event has taken effect since initialization. |
 | longAnnualRate | string | Long Annualized Rate |
 | shortAnnualRate | string | Short Annualized Rate |
 | discountRate | string | Discounted Rate |
