@@ -11,6 +11,8 @@ description: "汇率相关 OpenAPI 接口。"
 | 方法 | 路径 | 权限 | 描述 |
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/exchange-rate/query/usd | READ | 美元汇率查询 |
+| GET | `/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` | READ | 汇率查询 |
+| GET | `/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}` | READ | 查询币种换算汇率 |
 
 <Note>
   Playground 已关闭。请按 [认证](/zh/authentication) 使用 AK/SK 签名后调用。Base URL 见 [基础 URL](/zh/api-reference/base-url)。

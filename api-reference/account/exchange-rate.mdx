@@ -11,6 +11,8 @@ Paths in this group use the `/openapi/v1/mc-account/` prefix.
 | Method | Path | Permission | Description |
 | --- | --- | --- | --- |
 | GET | /openapi/v1/mc-account/exchange-rate/query/usd | READ | Query USD exchange rate |
+| GET | `/openapi/v1/mc-account/exchange-rate/query/{symbolType}/{baseCurrency}/{targetCurrency}` | READ | Query exchange rates |
+| GET | `/openapi/v1/mc-account/exchange-rate/convert-rate/{from}/{to}` | READ | Get currency conversion rate |
 
 <Note>
   The interactive Playground is disabled. Sign requests with AK/SK as described in [Authentication](/authentication). See [Base URL](/api-reference/base-url) for the gateway host.
